@@ -1,0 +1,24 @@
+# PEPPRO configuration file for an PRO-seq pipeline based on pypiper
+
+# basic tools 
+# public tools
+tools:  # absolute paths to required tools
+  python: python
+  samtools: samtools
+  bowtie2: bowtie2
+  seqkit: seqkit
+  fastp: fastp
+  seqtk: seqtk
+  # optional tools
+  fqdedup: fqdedup
+  cutadapt: cutadapt
+  fastx: fastx
+
+# user configure 
+resources:
+  genomes: ${GENOMES}
+  adapters: null  # Set to null to use default adapter file included in repository
+
+parameters:  # parameters passed to bioinformatic tools, subclassed by tool
+  samtools:
+    q: 10
