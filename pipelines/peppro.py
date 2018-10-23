@@ -741,6 +741,7 @@ def main():
         unmap_fq2 = deinterleave_fq2
     else:
         unmap_fq1 = processed_fastq
+        unmap_fq2 = ""
 
     # Map to any requested prealignments
     # We recommend mapping to chrM first for PRO-seq data
