@@ -5,7 +5,7 @@ PEPPRO - PRO-seq pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 
 from argparse import ArgumentParser
@@ -22,11 +22,11 @@ DEDUPLICATORS = ["fqdedup", "seqkit"]
 ADAPTER_REMOVAL = ["cutadapt", "fastp"]
 TRIMMERS = ["fastx", "seqtk"]
 
-# TODO: if the input is PE, have to merge the files after the prep process
-# fastp can handle both as input, will automatically interleave, then I need to de-interlace...
-# actually I think bowtie2 can handle interleaved just fine
+# TODO: if the input is PE, I can split the files for alignment...do I want to?
+# fastp can handle both as input, will automatically interleave, then I need to de-interleave...
+# actually I think bowtie2 can handle interleaved just fine.  Do I want to do it this way?
 # cutadapt can use --interleaved option (Yes it works)
-# I can deinterleave using the "deinterleave.sh" script
+# I can deinterleave using the "deinterleave.sh" script or with python code
 
 # TODO: can I skip the fastq dedup and do that at alignment? how much time do you lose
 # because of that?
@@ -250,36 +250,6 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         return unmap_fq1, unmap_fq2
 
 
-def _count_alignment(assembly_identifier, aligned_bam, paired_end):
-    """
-    This function counts the aligned reads and alignment rate and reports
-    statistics. You must have previously reported a "Trimmed_reads" result to
-    get alignment rates. It is useful as a follow function after any alignment
-    step to quantify and report the number of reads aligning, and the alignment
-    rate to that reference.
-
-    :param str  aligned_bam: Path to the aligned bam file.
-    :param str assembly_identifier: String identifying the reference to which
-                                    you aligned (can be anything)
-    :param bool paired_end: Whether the sequencing employed a paired-end
-                            strategy.
-    """
-	# count concordantly aligned reads ONLY
-    ar = ngstk.count_concordant(aligned_bam)
-	# Count all aligned reads
-    #ar = ngstk.count_mapped_reads(aligned_bam, paired_end)
-    pm.report_result("Aligned_reads_" + assembly_identifier, ar)
-    try:
-        # wrapped in try block in case Trimmed_reads is not reported in this
-        # pipeline.
-        tr = float(pm.get_stat("Trimmed_reads"))
-    except:
-        print("Trimmed reads is not reported.")
-    else:
-        res_key = "Alignment_rate_" + assembly_identifier
-        pm.report_result(res_key, round(float(ar) * 100 / float(tr), 2))
-
-
 def _get_bowtie2_index(genomes_folder, genome_assembly):
     """
     Create path to genome assembly folder with refgenie structure.
@@ -416,6 +386,7 @@ def main():
         _check_bowtie2_index(res.genomes, reference)
 
     # Adapter file can be set in the config; if left null, we use a default.
+    # TODO: use this option or just specify directly the adapter sequence as I do now
     res.adapters = res.adapters or tool_path("PRO-seq_adapter.fa")
 
     param.outfolder = outfolder
@@ -438,6 +409,8 @@ def main():
 
     raw_folder = os.path.join(param.outfolder, "raw")
     fastq_folder = os.path.join(param.outfolder, "fastq")
+    fastqc_folder=os.path.join(param.outfolder, "fastqc")
+    ngstk.make_dir(fastqc_folder)
 
     pm.timestamp("### Merge/link and fastq conversion: ")
     # This command will merge multiple inputs so you can use multiple
@@ -462,10 +435,10 @@ def main():
 
     # Create names for processed FASTQ files.
     processed_fastq = os.path.join(
-        fastq_folder, args.sample_name + "_R1.trim.fastq")
+        fastq_folder, args.sample_name + "_R1_processed.fastq")
     processed_fastq_R2 = os.path.join(
-        fastq_folder, args.sample_name + "_R2.trim.fastq")
-    fastqc_folder=os.path.join(param.outfolder, "fastqc")
+        fastq_folder, args.sample_name + "_R2_processed.fastq")
+    
     adapter_report = os.path.join(
         fastqc_folder, args.sample_name + "_rmAdapter.html")
     umi_report = os.path.join(
@@ -500,15 +473,19 @@ def main():
         if args.paired_end:
             adapter_cmd_chunks = [
                 tools.cutadapt,
-                ("-m", 26),
                 "--interleaved",
+                #("-j", str(pm.cores)),
+                ("-m", 26),
+                ("-a", "TGGAATTCTCGGGTGCCAAGG"),                
                 untrimmed_fastq1,
                 untrimmed_fastq2
             ]
         else:
             adapter_cmd_chunks = [
                 tools.cutadapt,
+                #("-j", str(pm.cores)),
                 ("-m", 26),
+                ("-a", "TGGAATTCTCGGGTGCCAAGG"),
                 untrimmed_fastq1
             ]
         adapter_cmd = build_command(adapter_cmd_chunks)
@@ -597,7 +574,12 @@ def main():
                     "|",
                     rc_tool,
                     ("-Q", 33),
-                    ("-o", processed_fastq)
+                    #("-o", processed_fastq),
+                    "|",
+                    (tools.seqtk, "dropse"),
+                    "-",
+                    ">",
+                    processed_fastq
                 ]
                 trim_cmd = build_command(trim_cmd_chunks)
 
@@ -680,7 +662,12 @@ def main():
                 "|",
                 rc_tool,
                 ("-Q", 33),
-                ("-o", processed_fastq)
+                #("-o", processed_fastq),
+                "|",
+                (tools.seqtk, "dropse"),
+                "-",
+                ">",
+                processed_fastq
             ]
             trim_cmd = build_command(trim_cmd_chunks)
 
@@ -702,7 +689,8 @@ def main():
     process_fastq_cmd = build_command([
         adapter_cmd, "|", dedup_cmd, "|", trim_cmd])
     
-    pm.run(process_fastq_cmd, processed_fastq)
+    pm.run(process_fastq_cmd, processed_fastq,
+           follow=ngstk.check_trim(processed_fastq, False, None))
 
     pm.clean_add(os.path.join(fastq_folder, "*.fq"), conditional=True)
     pm.clean_add(os.path.join(fastq_folder, "*.log"), conditional=True)
@@ -713,20 +701,40 @@ def main():
     #########################
     # Deinterleave if paired-end
     #########################
+    def deinterleave(interleaved_file, fq1, fq2):
+        with open(fq1, 'w') as r1, open(fq2, 'w') as r2:
+            [r1.write(line) if (i % 8 < 4) else r2.write(line) for i, line in enumerate(open(interleaved_file))]
+        return fq1, fq2
+    
     if args.paired_end:
         pm.timestamp("### Deinterleave processed FASTQ files")
         deinterleave_fq1 = os.path.join(
-            fastq_folder, args.sample_name + "_R1.processed.fastq.gz")
+            fastq_folder, args.sample_name + "_R1_deinterleave.fastq")
         deinterleave_fq2 = os.path.join(
-            fastq_folder, args.sample_name + "_R1.processed.fastq.gz")
-        deinterleave_cmd_chunks = [
-            tool_path("deinterleave.sh"),
-            ("<", processed_fastq),
-            (deinterleave_fq1, deinterleave_fq2),
-            "compress"    
-        ]
-        cmd = build_command(deinterleave_cmd_chunks)
-        pm.run(cmd, deinterleave_fq2)
+            fastq_folder, args.sample_name + "_R2_deinterleave.fastq")
+        
+        # deinterleave_cmd_chunks = [
+            # ("cat", processed_fastq),
+            # "|",
+            # "paste - - - - - - - -",
+            # "|",
+            # "tee", ">(cut", ("-f", "1-4"),
+            # "|",
+            # "tr", ('\"\\t\"', '\"\\n\"'),
+            # "|",
+            # (ngstk.ziptool, "--best"),
+            # (">", (deinterleave_fq1 + ")")),
+             # "|",
+            # "cut", ("-f", "5-8"),
+            # "|",
+            # "tr", ('\"\\t\"', '\"\\n\"'),
+            # "|",
+            # (ngstk.ziptool, "--best"),
+            # (">", deinterleave_fq2)
+        # ]
+        #cmd = build_command(deinterleave_cmd_chunks)
+        #pm.run(cmd, deinterleave_fq2)
+        deinterleave_fq1, deinterleave_fq2 = deinterleave(processed_fastq, deinterleave_fq1, deinterleave_fq2)
 
         # Prepare variables for alignment step
         unmap_fq1 = deinterleave_fq1
@@ -947,7 +955,7 @@ def main():
     # Shift and produce BigWig's
     pm.timestamp("### Shift and generate BigWig files")
     genome_fq = os.path.join(
-        genomes_folder, genome_assembly, (genome_assembly + ".fa"))
+        res.genomes, args.genome_assembly, (args.genome_assembly + ".fa"))
     signal_folder = os.path.join(
         param.outfolder, "signal_" + args.genome_assembly)
     plus_bw = os.path.join(

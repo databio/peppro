@@ -7,7 +7,7 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-C CONFIG_FILE] -O
                  [--dedup {fqdedup,seqkit}]
                  [--prealignments PREALIGNMENTS [PREALIGNMENTS ...]] [-V]
 
-PEPPRO version 0.1.0
+PEPPRO version 0.2.0
 
 optional arguments:
   -h, --help            show this help message and exit
