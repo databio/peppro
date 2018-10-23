@@ -9,6 +9,7 @@ tools:  # absolute paths to required tools
   seqkit: seqkit
   fastp: fastp
   seqtk: seqtk
+  seqoutbias: seqOutBias
   # optional tools
   fqdedup: fqdedup
   cutadapt: cutadapt
