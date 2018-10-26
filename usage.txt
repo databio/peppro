@@ -3,11 +3,12 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-C CONFIG_FILE] -O
                  -S SAMPLE_NAME -I INPUT_FILES [INPUT_FILES ...]
                  [-I2 [INPUT_FILES2 [INPUT_FILES2 ...]]] -G GENOME_ASSEMBLY
                  [-Q SINGLE_OR_PAIRED] [--keep] [--noFIFO] [--umi]
+                 [--umi_len UMI_LEN] [--max_len MAX_LEN]
                  [--adapter {cutadapt,fastp}] [--trimmer {fastx,seqtk}]
                  [--dedup {fqdedup,seqkit}]
                  [--prealignments PREALIGNMENTS [PREALIGNMENTS ...]] [-V]
 
-PEPPRO version 0.2.0
+PEPPRO version 0.3.0
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -29,6 +30,10 @@ optional arguments:
   --keep                Keep prealignment BAM files
   --noFIFO              Do NOT use named pipes during prealignments
   --umi                 Remove umi with fastp
+  --umi_len UMI_LEN     Specify the length of the UMI.If your data does not
+                        utilize UMIs, set to 0.
+  --max_len MAX_LEN     Trim reads to maximum length. Set to -1 to disable
+                        length trimming.
   --adapter {cutadapt,fastp}
                         Name of adapter removal program
   --trimmer {fastx,seqtk}
