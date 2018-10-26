@@ -5,7 +5,7 @@ PEPPRO - PRO-seq pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 
 from argparse import ArgumentParser
@@ -22,14 +22,8 @@ DEDUPLICATORS = ["fqdedup", "seqkit"]
 ADAPTER_REMOVAL = ["cutadapt", "fastp"]
 TRIMMERS = ["fastx", "seqtk"]
 
-# TODO: if the input is PE, I can split the files for alignment...do I want to?
-# fastp can handle both as input, will automatically interleave, then I need to de-interleave...
-# actually I think bowtie2 can handle interleaved just fine.  Do I want to do it this way?
-# cutadapt can use --interleaved option (Yes it works)
-# I can deinterleave using the "deinterleave.sh" script or with python code
-
-# TODO: can I skip the fastq dedup and do that at alignment? how much time do you lose
-# because of that?
+# TODO: if PE and I interleave for fastq processing, do I split before running
+# bowtie2 or just run it interleaved?
 
 def parse_arguments():
     """
@@ -54,6 +48,16 @@ def parse_arguments():
     parser.add_argument("--umi", action='store_true',
                         dest="umi",
                         help="Remove umi with fastp")
+
+    parser.add_argument("--umi_len", dest="umi_len",
+                        default="8",
+                        help="Specify the length of the UMI."
+                             "If your data does not utilize UMIs, set to 0.")
+
+    parser.add_argument("--max_len", dest="max_len",
+                        default="30",
+                        help="Trim reads to maximum length."
+                             " Set to -1 to disable length trimming.")
 
     parser.add_argument("--adapter", dest="adapter",
                         default="fastp", choices=ADAPTER_REMOVAL,
@@ -163,7 +167,15 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         # uses a random temp file, so it won't choke if the job gets
         # interrupted and restarted at this step.            
         else:
-            if useFIFO:
+            if useFIFO and paired:
+                out_fastq_tmp = os.path.join(sub_outdir,
+                    assembly_identifier + "_bt2")
+                if os.path.isfile(out_fastq_tmp):
+                    out_fastq_tmp = os.path.join(sub_outdir,
+                        assembly_identifier + "_bt2_2")
+                cmd = "mkfifo " + out_fastq_tmp
+                pm.run(cmd, out_fastq_tmp, container=pm.container)
+            elif useFIFO and not paired:
                 out_fastq_tmp = os.path.join(sub_outdir,
                     assembly_identifier + "_bt2")
                 if os.path.isfile(out_fastq_tmp):
@@ -180,20 +192,33 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             if paired:
                 cmd1 = build_command([tools.perl,
                         tool_path("filter_paired_fq.pl"), out_fastq_tmp,
-                        unmap_fq1, unmap_fq2, out_fastq_r1, out_fastq_r2])
+                        unmap_fq1, unmap_fq2, out_fastq_r1, out_fastq_r2])  
+                cmd2 = "(" + tools.bowtie2 + " -p " + str(pm.cores)
+                cmd2 += bt2_opts_txt
+                cmd2 += " -x " + assembly_bt2
+                cmd2 += " --rg-id " + args.sample_name
+                cmd2 += " -U " + unmap_fq1
+                cmd2 += " --un " + out_fastq_tmp
+                cmd2 += " > /dev/null"
+                cmd2 += ") 2>" + summary_file
             else:
-                cmd1 = build_command([tools.perl,
-                        tool_path("filter_paired_fq.pl"), out_fastq_tmp,
-                        unmap_fq1, out_fastq_r1])
-
-            cmd2 = "(" + tools.bowtie2 + " -p " + str(pm.cores)
-            cmd2 += bt2_opts_txt
-            cmd2 += " -x " + assembly_bt2
-            cmd2 += " --rg-id " + args.sample_name
-            cmd2 += " -U " + unmap_fq1
-            cmd2 += " --un " + out_fastq_tmp
-            cmd2 += " > /dev/null"
-            cmd2 += ") 2>" + summary_file
+                # TODO: make filter_paired_fq work with SE data
+                # cmd1 = build_command([tools.perl,
+                        # tool_path("filter_paired_fq.pl"), out_fastq_tmp,
+                        # unmap_fq1, out_fastq_r1])
+                # For now, revert to old method
+                cmd1 = "(" + tools.bowtie2 + " -p " + str(pm.cores)
+                cmd1 += bt2_opts_txt
+                cmd1 += " -x " + assembly_bt2
+                cmd1 += " --rg-id " + args.sample_name
+                cmd1 += " -U " + unmap_fq1
+                cmd1 += " --un-gz " + out_fastq_bt2
+                cmd1 += " | " + tools.samtools + " view -bS - -@ 1"  # convert to bam
+                cmd1 += " | " + tools.samtools + " sort - -@ 1"  # sort output
+                cmd1 += " -T " + tempdir
+                cmd1 += " -o " + mapped_bam
+                cmd1 += ") 2>" + summary_file
+                cmd2 = ""            
 
         if args.keep:
             pm.run(cmd, mapped_bam, container=pm.container)
@@ -204,8 +229,10 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 pm.wait = True
                 pm.run(cmd2, summary_file, container=pm.container)
             else:
-                pm.run(cmd2, summary_file, container=pm.container)
-                pm.run(cmd1, out_fastq_r1, container=pm.container)
+                # TODO: switch to this once filter_paired_fq works with SE
+                #pm.run(cmd2, summary_file, container=pm.container)
+                #pm.run(cmd1, out_fastq_r1, container=pm.container)
+                pm.run(cmd1, out_fastq_bt2, container=pm.container)
 
             pm.clean_add(out_fastq_tmp)
         
@@ -235,12 +262,19 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             pm.report_result(res_key, round(float(ar) * 100 / float(tr), 2))
         
         # filter genome reads not mapped
-        if args.keep:
+        if args.keep and paired:
             unmap_fq1 = out_fastq_pre + "_unmap_R1.fq.gz"
             unmap_fq2 = out_fastq_pre + "_unmap_R2.fq.gz"
-        else:
+        elif not args.keep and paired:
             unmap_fq1 = out_fastq_r1
             unmap_fq2 = out_fastq_r2
+        elif not args.keep and not paired:
+            #unmap_fq1 = out_fastq_r1
+            unmap_fq1 = out_fastq_bt2
+            unmap_fq2 = ""
+        else:
+            unmap_fq1 = out_fastq_bt2
+            unmap_fq2 = ""
 
         return unmap_fq1, unmap_fq2
     else:
@@ -350,6 +384,85 @@ def tool_path(tool_name):
                         TOOLS_FOLDER, tool_name)
 
 
+def guess_encoding(fq):
+    """
+    Adapted from Brent Pedersen's "guess_encoding.py"
+    https://github.com/brentp/bio-playground/blob/master/reads-utils/guess-encoding.py
+    
+    Copyright (c) 2018 Brent Pedersen
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+    Guess the encoding of a stream of qual lines.
+    """
+    RANGES = {
+        'Sanger': (33, 73),
+        'Illumina-1.8': (33, 74),
+        'Solexa': (59, 104),
+        'Illumina-1.3': (64, 104),
+        'Illumina-1.5': (67, 105)
+    }
+    
+    def get_qual_range(qual_str):
+        vals = [ord(c) for c in qual_str]
+        return min(vals), max(vals)
+    
+    def get_encodings_in_range(rmin, rmax, ranges=RANGES):
+        valid_encodings = []
+        for encoding, (emin, emax) in ranges.items():
+            if rmin >= emin and rmax <= emax:
+                valid_encodings.append(encoding)
+        return valid_encodings
+
+    gmin = 99
+    gmax = 0
+    valid = []
+
+    err_exit = False
+
+    with open(fq) as fastq_file:
+        for line_num, line in enumerate(fastq_file):
+            # Python starts at 0; need to start at 1 for this step
+            if (line_num + 1) % 4 == 0:
+                lmin, lmax = get_qual_range(line.rstrip())
+
+                if lmin < gmin or lmax > gmax:
+                    gmin, gmax = min(lmin, gmin), max(lmax, gmax)
+                    valid = get_encodings_in_range(gmin, gmax)
+
+                    if len(valid) == 0:
+                        print("no encodings for range: "
+                              "{}".format((gmin, gmax)))
+                        err_exit = True
+                        continue
+
+                    if len(valid) == 1:
+                        err_exit = False
+                        break
+
+    if err_exit:
+        return("Unknown")
+    else:
+        return(str(valid[-1]))
+
+
+###############################################################################
 def main():
     """
     Main pipeline process.
@@ -428,9 +541,9 @@ def main():
     untrimmed_fastq1 = out_fastq_pre + "_R1.fastq"
     untrimmed_fastq2 = out_fastq_pre + "_R2.fastq" if args.paired_end else None
 
-    ########################
+    ###########################################################################
     # Begin fastq trimming
-    ########################
+    ###########################################################################
     pm.timestamp("### FASTQ processing: ")
 
     # Create names for processed FASTQ files.
@@ -444,6 +557,11 @@ def main():
     umi_report = os.path.join(
         fastqc_folder, args.sample_name + "_rmUmi.html")
 
+    # Check quality encoding for use with FastX_Tools
+    if args.trimmer == "fastx":
+        encoding = guess_encoding(untrimmed_fastq1)
+        #print("Encoding: {}".format(str(encoding)))  # Debug
+        
     # Create adapter trimming command(s).
     if args.adapter == "fastp":
         if args.paired_end:
@@ -454,7 +572,7 @@ def main():
                 ("--in2", untrimmed_fastq2),
                 "--stdout",
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
-                ("--length_required", 26),
+                ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", adapter_report)
             ]
         else:
@@ -464,7 +582,7 @@ def main():
                 ("--in1", untrimmed_fastq1),
                 "--stdout",
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
-                ("--length_required", 26),
+                ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", adapter_report)
             ]
         adapter_cmd = build_command(adapter_cmd_chunks)
@@ -475,7 +593,7 @@ def main():
                 tools.cutadapt,
                 "--interleaved",
                 #("-j", str(pm.cores)),
-                ("-m", 26),
+                ("-m", (18 + int(float(args.umi_len)))),
                 ("-a", "TGGAATTCTCGGGTGCCAAGG"),                
                 untrimmed_fastq1,
                 untrimmed_fastq2
@@ -484,7 +602,7 @@ def main():
             adapter_cmd_chunks = [
                 tools.cutadapt,
                 #("-j", str(pm.cores)),
-                ("-m", 26),
+                ("-m", (18 + int(float(args.umi_len)))),
                 ("-a", "TGGAATTCTCGGGTGCCAAGG"),
                 untrimmed_fastq1
             ]
@@ -500,7 +618,7 @@ def main():
                 ("--in2", untrimmed_fastq2),
                 "--stdout",
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
-                ("--length_required", 26),
+                ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", adapter_report)
             ]
         else:
@@ -510,7 +628,7 @@ def main():
                 ("--in1", untrimmed_fastq1),
                 "--stdout",
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
-                ("--length_required", 26),
+                ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", adapter_report)
             ]
         adapter_cmd = build_command(adapter_cmd_chunks)
@@ -550,52 +668,50 @@ def main():
     if args.umi:
         if args.adapter != "fastp":
             print("To remove UMI intelligently, you must process your reads using 'fastp'")
-            print("Defaulting to removing the first 8 bp instead via trimming")
+            print("Defaulting to removing the first {} "
+                  "bp instead via trimming".format(str(args.umi_len)))
             if args.trimmer == "seqtk":
-                trim_cmd_chunks = [
-                    (tools.seqtk, "trimfq"),
-                    ("-b", 8),
-                    ("-l", 30),
-                    ("-", "|"),
-                    (tools.seqtk, "seq"),
-                    ("-r", "-"),
-                    (">", processed_fastq)
-                ]
-                trim_cmd = build_command(trim_cmd_chunks)
+                trim_cmd_chunks = tools.seqtk + " trimfq "
+                trim_cmd_chunks += " -b " + str(args.umi_len)               
+                if args.max_len != -1:
+                    trim_cmd_chunks += " -L " + str(args.max_len)
+                trim_cmd_chunks += " - | "
+                trim_cmd_chunks += tools.seqtk + " seq -r -"
+                trim_cmd_chunks += " > " + processed_fastq
+                trim_cmd = trim_cmd_chunks
 
             elif args.trimmer == "fastx":
                 trim_tool = tools.fastx + "_trimmer"
                 rc_tool = tools.fastx + "_reverse_complement"
-                trim_cmd_chunks = [
-                    trim_tool,
-                    ("-Q", 33),
-                    ("-f", 9),
-                    ("-l", 38),
-                    "|",
-                    rc_tool,
-                    ("-Q", 33),
-                    #("-o", processed_fastq),
-                    "|",
-                    (tools.seqtk, "dropse"),
-                    "-",
-                    ">",
-                    processed_fastq
-                ]
-                trim_cmd = build_command(trim_cmd_chunks)
+                trim_cmd_chunks = trim_tool
+                if encoding == "Illumina-1.8":
+                    trim_cmd_chunks += " -Q " + str(33)
+                trim_cmd_chunks += " -f " + str(int(float(args.umi_len)) + 1)
+                trim_cmd_chunks += " -l " + str(int(float(args.max_len)) + int(float(args.umi_len)))
+                trim_cmd_chunks += " | "
+                trim_cmd_chunks += rc_tool
+                if encoding == "Illumina-1.8":
+                    trim_cmd_chunks += " -Q " + str(33)
+                if args.paired_end:
+                    trim_cmd_chunks += " | "
+                    trim_cmd_chunks += tools.seqtk + " dropse "
+                    trim_cmd_chunks += " - "
+                    trim_cmd_chunks += " > "
+                    trim_cmd_chunks += processed_fastq
+                else:
+                    trim_cmd_chunks += " -o " + processed_fastq
+                trim_cmd = trim_cmd_chunks
 
             else:
                 # Default to seqtk
-                trim_cmd_chunks = [
-                    (tools.seqtk, "trimfq"),
-                    ("-b", 8),
-                    ("-l", 30),
-                    "-",
-                    "|",
-                    (tools.seqtk, "seq"),
-                    ("-r", "-"),
-                    (">", processed_fastq)
-                ]
-                trim_cmd = build_command(trim_cmd_chunks)
+                trim_cmd_chunks = tools.seqtk + " trimfq "
+                trim_cmd_chunks += " -b " + str(args.umi_len)               
+                if args.max_len != -1:
+                    trim_cmd_chunks += " -L " + str(args.max_len)
+                trim_cmd_chunks += " - | "
+                trim_cmd_chunks += tools.seqtk + " seq -r -"
+                trim_cmd_chunks += " > " + processed_fastq
+                trim_cmd = trim_cmd_chunks
 
         else:
             if args.paired_end:
@@ -606,11 +722,11 @@ def main():
                     "--interleaved_in",
                     "--umi",
                     ("--umi_loc", "read1"),
-                    ("--umi_len", 8),
+                    ("--umi_len", args.umi_len),
                     ("--html", umi_report),
                     "|",
                     (tools.seqtk, "trimfq"),
-                    ("-L", 30),
+                    ("-L", args.max_len),
                     "-",
                     "|",
                     (tools.seqtk, "seq"),
@@ -625,11 +741,11 @@ def main():
                     ("--stdin", "--stdout"),
                     "--umi",
                     ("--umi_loc", "read1"),
-                    ("--umi_len", 8),
+                    ("--umi_len", args.umi_len),
                     ("--html", umi_report),
                     "|",
                     (tools.seqtk, "trimfq"),
-                    ("-L", 30),
+                    ("-L", args.max_len),
                     "-",
                     "|",
                     (tools.seqtk, "seq"),
@@ -640,51 +756,47 @@ def main():
 
     else:
         if args.trimmer == "seqtk":
-            trim_cmd_chunks = [
-                (tools.seqtk, "trimfq"),
-                ("-b", 8),
-                ("-l", 30),
-                ("-", "|"),
-                (tools.seqtk, "seq"),
-                ("-r", "-"),
-                (">", processed_fastq)
-            ]
-            trim_cmd = build_command(trim_cmd_chunks)
+            trim_cmd_chunks = tools.seqtk + " trimfq "
+            trim_cmd_chunks += " -b " + str(args.umi_len)               
+            if args.max_len != -1:
+                trim_cmd_chunks += " -L " + str(args.max_len)
+            trim_cmd_chunks += " - | "
+            trim_cmd_chunks += tools.seqtk + " seq -r -"
+            trim_cmd_chunks += " > " + processed_fastq
 
         elif args.trimmer == "fastx":
             trim_tool = tools.fastx + "_trimmer"
             rc_tool = tools.fastx + "_reverse_complement"
-            trim_cmd_chunks = [
-                trim_tool,
-                ("-Q", 33),
-                ("-f", 9),
-                ("-l", 38),
-                "|",
-                rc_tool,
-                ("-Q", 33),
-                #("-o", processed_fastq),
-                "|",
-                (tools.seqtk, "dropse"),
-                "-",
-                ">",
-                processed_fastq
-            ]
-            trim_cmd = build_command(trim_cmd_chunks)
+            trim_cmd_chunks = trim_tool
+            if encoding == "Illumina-1.8":
+                trim_cmd_chunks += " -Q " + str(33)
+            trim_cmd_chunks += " -f " + str(int(float(args.umi_len)) + 1)
+            trim_cmd_chunks += " -l " + str(int(float(args.max_len)) + int(float(args.umi_len)))
+            trim_cmd_chunks += " | "
+            trim_cmd_chunks += rc_tool
+            if encoding == "Illumina-1.8":
+                trim_cmd_chunks += " -Q " + str(33)
+            if args.paired_end:
+                trim_cmd_chunks += " | "
+                trim_cmd_chunks += tools.seqtk + " dropse "
+                trim_cmd_chunks += " - "
+                trim_cmd_chunks += " > "
+                trim_cmd_chunks += processed_fastq
+            else:
+                trim_cmd_chunks += " -o " + processed_fastq
 
         else:
             # Default to seqtk
-            trim_cmd_chunks = [
-                (tools.seqtk, "trimfq"),
-                ("-b", 8),
-                ("-l", 30),
-                "-",
-                "|",
-                (tools.seqtk, "seq"),
-                ("-r", "-"),
-                (">", processed_fastq)
-            ]
-            trim_cmd = build_command(trim_cmd_chunks)
-    
+            trim_cmd_chunks = tools.seqtk + " trimfq "
+            trim_cmd_chunks += " -b " + str(args.umi_len)               
+            if args.max_len != -1:
+                trim_cmd_chunks += " -L " + str(args.max_len)
+            trim_cmd_chunks += " - | "
+            trim_cmd_chunks += tools.seqtk + " seq -r -"
+            trim_cmd_chunks += " > " + processed_fastq
+
+        trim_cmd = trim_cmd_chunks
+
     # Put it all together
     process_fastq_cmd = build_command([
         adapter_cmd, "|", dedup_cmd, "|", trim_cmd])
@@ -694,16 +806,19 @@ def main():
 
     pm.clean_add(os.path.join(fastq_folder, "*.fq"), conditional=True)
     pm.clean_add(os.path.join(fastq_folder, "*.log"), conditional=True)
-    #########################
+    ###########################################################################
     # End fastq processing
-    #########################
+    ###########################################################################
 
-    #########################
+    # TODO: Check if all reads were trimmed
+    
+    ###########################################################################
     # Deinterleave if paired-end
-    #########################
+    ###########################################################################
     def deinterleave(interleaved_file, fq1, fq2):
         with open(fq1, 'w') as r1, open(fq2, 'w') as r2:
-            [r1.write(line) if (i % 8 < 4) else r2.write(line) for i, line in enumerate(open(interleaved_file))]
+            [r1.write(line) if (i % 8 < 4) else r2.write(line)
+             for i, line in enumerate(open(interleaved_file))]
         return fq1, fq2
     
     if args.paired_end:
@@ -712,36 +827,16 @@ def main():
             fastq_folder, args.sample_name + "_R1_deinterleave.fastq")
         deinterleave_fq2 = os.path.join(
             fastq_folder, args.sample_name + "_R2_deinterleave.fastq")
-        
-        # deinterleave_cmd_chunks = [
-            # ("cat", processed_fastq),
-            # "|",
-            # "paste - - - - - - - -",
-            # "|",
-            # "tee", ">(cut", ("-f", "1-4"),
-            # "|",
-            # "tr", ('\"\\t\"', '\"\\n\"'),
-            # "|",
-            # (ngstk.ziptool, "--best"),
-            # (">", (deinterleave_fq1 + ")")),
-             # "|",
-            # "cut", ("-f", "5-8"),
-            # "|",
-            # "tr", ('\"\\t\"', '\"\\n\"'),
-            # "|",
-            # (ngstk.ziptool, "--best"),
-            # (">", deinterleave_fq2)
-        # ]
-        #cmd = build_command(deinterleave_cmd_chunks)
-        #pm.run(cmd, deinterleave_fq2)
-        deinterleave_fq1, deinterleave_fq2 = deinterleave(processed_fastq, deinterleave_fq1, deinterleave_fq2)
+
+        deinterleave_fq1, deinterleave_fq2 = deinterleave(
+            processed_fastq, deinterleave_fq1, deinterleave_fq2)
 
         # Prepare variables for alignment step
         unmap_fq1 = deinterleave_fq1
         unmap_fq2 = deinterleave_fq2
     else:
         unmap_fq1 = processed_fastq
-        unmap_fq2 = ""
+        unmap_fq2 = ""  
 
     # Map to any requested prealignments
     # We recommend mapping to chrM first for PRO-seq data
@@ -834,31 +929,31 @@ def main():
         pm.run(cmd, temp_mapping_index, container=pm.container)
         pm.clean_add(temp_mapping_index)
 
-        # Determine mitochondrial read counts
-        mito_name = ["chrM", "chrMT", "M", "MT"]
-        cmd1 = (tools.samtools + " idxstats " + mapping_genome_bam_temp +
-                " | grep")
-        for name in mito_name:
-            cmd1 += " -we '" + name + "'"
-        cmd1 += "| cut -f 3"
-        mr = pm.checkprint(cmd1)
+    # Determine mitochondrial read counts
+    mito_name = ["chrM", "chrMT", "M", "MT"]
+    cmd1 = (tools.samtools + " idxstats " + mapping_genome_bam_temp +
+            " | grep")
+    for name in mito_name:
+        cmd1 += " -we '" + name + "'"
+    cmd1 += "| cut -f 3"
+    mr = pm.checkprint(cmd1)
 
-        # If there are mitochondrial reads, report and remove them
-        if mr and mr.strip():
-            pm.report_result("Mitochondrial_reads", round(float(mr)))
-            noMT_mapping_genome_bam = os.path.join(
-                map_genome_folder, args.sample_name + "_noMT.bam")
-            cmd2 = (tools.samtools + " idxstats " + mapping_genome_bam +
-                    " | cut -f 1 | grep")
-            for name in mito_name:
-                cmd2 += " -vwe '" + name + "'"
-            cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
-                     str(pm.cores) + " " + mapping_genome_bam + " > " +
-                     noMT_mapping_genome_bam)
-            cmd3 = ("mv " + noMT_mapping_genome_bam + " " + mapping_genome_bam)
-            cmd4 = tools.samtools + " index " + mapping_genome_bam
-            pm.run([cmd2, cmd3, cmd4], noMT_mapping_genome_bam,
-                   container=pm.container)
+    # If there are mitochondrial reads, report and remove them
+    if mr and mr.strip():
+        pm.report_result("Mitochondrial_reads", round(float(mr)))
+        noMT_mapping_genome_bam = os.path.join(
+            map_genome_folder, args.sample_name + "_noMT.bam")
+        cmd2 = (tools.samtools + " idxstats " + mapping_genome_bam +
+                " | cut -f 1 | grep")
+        for name in mito_name:
+            cmd2 += " -vwe '" + name + "'"
+        cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
+                 str(pm.cores) + " " + mapping_genome_bam + " > " +
+                 noMT_mapping_genome_bam)
+        cmd3 = ("mv " + noMT_mapping_genome_bam + " " + mapping_genome_bam)
+        cmd4 = tools.samtools + " index " + mapping_genome_bam
+        pm.run([cmd2, cmd3, cmd4], noMT_mapping_genome_bam,
+               container=pm.container)
 
     # Calculate quality control metrics for the alignment file
     pm.timestamp("### Calculate NRF, PBC1, and PBC2")
@@ -954,7 +1049,6 @@ def main():
     pm.run([cmd1,cmd2], minus_bam)
 
     # Shift and produce BigWig's
-    pm.timestamp("### Shift and generate BigWig files")
     genome_fq = os.path.join(
         res.genomes, args.genome_assembly, (args.genome_assembly + ".fa"))
     signal_folder = os.path.join(
@@ -964,6 +1058,72 @@ def main():
     minus_bw = os.path.join(
         signal_folder, args.sample_name + "_minus_body_0-mer.bw")
     
+    # Need to run seqOutBias tallymer separately
+    # Do that in the $GENOMES folder, in a subfolder called "mappability_seqoutbias"
+    # Only need to do that once for each read-size of interest
+    # default would be read-size 30 (args.max_len)
+    suffix_index = os.path.join(res.genomes, args.genome_assembly,
+        (args.genome_assembly + ".sft"))
+    tally_index = os.path.join(res.genomes, args.genome_assembly,
+        (args.genome_assembly + ".tal_" + str(args.max_len)))
+    search_file = os.path.join(res.genomes, args.genome_assembly,
+        (args.genome_assembly + ".tal_" + str(args.max_len) + ".gtTxt"))
+
+    map_files = [suffix_index, tally_index, search_file]
+    already_mapped = False
+    
+    for file in map_files:
+        if os.path.isfile(file) and os.stat(file).st_size > 0:
+            already_mapped = True
+        else:
+            already_mapped = False
+    
+    if not already_mapped:
+        pm.timestamp("### Compute mappability information")
+    
+        suffix_cmd_chunks = [
+            ("gt", "suffixerator"),
+            "-dna",
+            "-pl",
+            "-tis",
+            "-suf",
+            "-lcp",
+            "-v",
+            ("-parts", args.max_len),
+            ("-db", genome_fq),
+            ("-indexname", suffix_index)
+        ]
+        suffix_cmd = build_command(suffix_cmd_chunks)
+        pm.run(suffix_cmd, suffix_index)
+
+        tally_cmd_chunks = [
+            ("gt", "tallymer"),
+            "mkindex",
+            ("-mersize", args.max_len),
+            ("-minocc", 2),
+            ("-indexname", tally_index),
+            "-counts",
+            "-pl",
+            ("-esa", suffix_index)
+        ]
+        tally_cmd = build_command(tally_cmd_chunks)
+        pm.run(tally_cmd, tally_index)
+
+        search_cmd_chunks = [
+            ("gt", "tallymer"),
+            "search",
+            "-output", 
+            ("qseqnum", "qpos"),
+            ("-strand", fp),
+            ("-tyr", tally_index),
+            ("-q", args.genome_assembly),
+            (">", search_file)
+        ]
+        search_cmd = build_command(search_cmd_chunks)
+        pm.run(search_cmd, search_file)
+    
+    pm.timestamp("### Scale read counts and produce bigWig files")
+    
     cmd1 = build_command([
         tools.seqoutbias,
         genome_fq,
@@ -972,7 +1132,7 @@ def main():
         "--skip-bed",
         ("--bw=", plus_bw),
         "--tail-edge",
-        ("--read-size=", 30),
+        ("--read-size=", args.max_len),
     ])
     cmd2 = build_command([
         tools.seqoutbias,
@@ -982,10 +1142,10 @@ def main():
         "--skip-bed",
         ("--bw=", minus_bw),
         "--tail-edge",
-        ("--read-size=", 30),
+        ("--read-size=", args.max_len),
     ])
     
-    pm.run([cmd1,cmd2], minus_bam)
+    pm.run([cmd1,cmd2], minus_bw)
 
     # COMPLETE!
     pm.stop_pipeline()
