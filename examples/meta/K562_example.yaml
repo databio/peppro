@@ -1,0 +1,21 @@
+# Run K562_example sample through PEPPRO
+name: K562_example
+
+metadata:
+  sample_annotation: "K562_example.csv"
+  output_dir: "$PROCESSED/pro_example/"
+  pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
+  
+derived_columns: [read1, read2]
+
+data_sources:
+  R1: "$DATA/{sample_name}.fastq"
+  
+implied_columns:
+  organism:
+    human:
+      genome: hg38
+      prealignments:
+      adapter: cutadapt
+      trimmer: fastx
+      dedup: fqdedup
