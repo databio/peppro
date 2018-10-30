@@ -3,12 +3,12 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-C CONFIG_FILE] -O
                  -S SAMPLE_NAME -I INPUT_FILES [INPUT_FILES ...]
                  [-I2 [INPUT_FILES2 [INPUT_FILES2 ...]]] -G GENOME_ASSEMBLY
                  [-Q SINGLE_OR_PAIRED] [--keep] [--noFIFO] [--umi]
-                 [--umi_len UMI_LEN] [--max_len MAX_LEN]
+                 [--umi_len UMI_LEN] [--max_len MAX_LEN] [--parts PARTS]
                  [--adapter {cutadapt,fastp}] [--trimmer {fastx,seqtk}]
                  [--dedup {fqdedup,seqkit}]
                  [--prealignments PREALIGNMENTS [PREALIGNMENTS ...]] [-V]
 
-PEPPRO version 0.3.0
+PEPPRO version 0.4.0
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -34,6 +34,8 @@ optional arguments:
                         utilize UMIs, set to 0.
   --max_len MAX_LEN     Trim reads to maximum length. Set to -1 to disable
                         length trimming.
+  --parts PARTS         Split suffix tree generation into <n> parts. Increase
+                        this value to lower memory use.
   --adapter {cutadapt,fastp}
                         Name of adapter removal program
   --trimmer {fastx,seqtk}
