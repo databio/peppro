@@ -5,7 +5,7 @@ PEPPRO - PRO-seq pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 
 from argparse import ArgumentParser
@@ -58,6 +58,11 @@ def parse_arguments():
                         default="30",
                         help="Trim reads to maximum length."
                              " Set to -1 to disable length trimming.")
+                             
+    parser.add_argument("--parts", dest="parts",
+                        default="4",
+                        help="Split suffix tree generation into <n> parts. "
+                             "Increase this value to lower memory use.")
 
     parser.add_argument("--adapter", dest="adapter",
                         default="fastp", choices=ADAPTER_REMOVAL,
@@ -952,8 +957,7 @@ def main():
                  noMT_mapping_genome_bam)
         cmd3 = ("mv " + noMT_mapping_genome_bam + " " + mapping_genome_bam)
         cmd4 = tools.samtools + " index " + mapping_genome_bam
-        pm.run([cmd2, cmd3, cmd4], noMT_mapping_genome_bam,
-               container=pm.container)
+        pm.run([cmd2, cmd3, cmd4], noMT_mapping_genome_bam)
 
     # Calculate quality control metrics for the alignment file
     pm.timestamp("### Calculate NRF, PBC1, and PBC2")
@@ -1053,23 +1057,35 @@ def main():
         res.genomes, args.genome_assembly, (args.genome_assembly + ".fa"))
     signal_folder = os.path.join(
         param.outfolder, "signal_" + args.genome_assembly)
-    plus_bw = os.path.join(
-        signal_folder, args.sample_name + "_plus_body_0-mer.bw")
-    minus_bw = os.path.join(
-        signal_folder, args.sample_name + "_minus_body_0-mer.bw")
+    ngstk.make_dir(signal_folder)
     
     # Need to run seqOutBias tallymer separately
     # Do that in the $GENOMES folder, in a subfolder called "mappability_seqoutbias"
     # Only need to do that once for each read-size of interest
     # default would be read-size 30 (args.max_len)
-    suffix_index = os.path.join(res.genomes, args.genome_assembly,
-        (args.genome_assembly + ".sft"))
-    tally_index = os.path.join(res.genomes, args.genome_assembly,
-        (args.genome_assembly + ".tal_" + str(args.max_len)))
-    search_file = os.path.join(res.genomes, args.genome_assembly,
-        (args.genome_assembly + ".tal_" + str(args.max_len) + ".gtTxt"))
+    mappability_folder = os.path.join(
+        res.genomes, args.genome_assembly, "mappability")
+    ngstk.make_dir(mappability_folder)
+    
+    # Link fasta file
+    genome_fq_ln = os.path.join(res.genomes, args.genome_assembly,
+        mappability_folder, (args.genome_assembly + ".fa"))
+    if not os.path.isfile(genome_fq_ln):
+        cmd = "ln -sf " + genome_fq + " " + genome_fq_ln
+        pm.run(cmd, genome_fq_ln)
 
-    map_files = [suffix_index, tally_index, search_file]
+    suffix_index = os.path.join(res.genomes, args.genome_assembly,
+        mappability_folder, (args.genome_assembly + ".sft"))
+    suffix_check = os.path.join(res.genomes, args.genome_assembly,
+        mappability_folder, (args.genome_assembly + ".sft.suf"))
+    tally_index = os.path.join(res.genomes, args.genome_assembly,
+        mappability_folder, (args.genome_assembly + ".tal_" + str(args.max_len)))
+    tally_check = os.path.join(res.genomes, args.genome_assembly,
+        mappability_folder, (args.genome_assembly + ".tal_" + str(args.max_len) + ".mer"))
+    search_file = os.path.join(res.genomes, args.genome_assembly,
+        mappability_folder, (args.genome_assembly + ".tal_" + str(args.max_len) + ".gtTxt"))
+
+    map_files = [suffix_check, tally_check, search_file]
     already_mapped = False
     
     for file in map_files:
@@ -1089,8 +1105,8 @@ def main():
             "-suf",
             "-lcp",
             "-v",
-            ("-parts", args.max_len),
-            ("-db", genome_fq),
+            ("-parts", args.parts),
+            ("-db", genome_fq_ln),
             ("-indexname", suffix_index)
         ]
         suffix_cmd = build_command(suffix_cmd_chunks)
@@ -1114,38 +1130,77 @@ def main():
             "search",
             "-output", 
             ("qseqnum", "qpos"),
-            ("-strand", fp),
+            ("-strand", "fp"),
             ("-tyr", tally_index),
-            ("-q", args.genome_assembly),
+            ("-q", genome_fq_ln),
             (">", search_file)
         ]
         search_cmd = build_command(search_cmd_chunks)
         pm.run(search_cmd, search_file)
-    
+
     pm.timestamp("### Scale read counts and produce bigWig files")
-    
-    cmd1 = build_command([
-        tools.seqoutbias,
-        genome_fq,
+
+    seqtable = os.path.join(res.genomes, args.genome_assembly,
+        mappability_folder, (args.genome_assembly + ".tbl"))
+
+    seqtable_cmd = build_command([
+        (tools.seqoutbias, "seqtable"),
+        genome_fq_ln,
+        str("--tallymer=" + search_file),
+        str("--read-size=" + args.max_len),
+        str("--out=" + seqtable)
+    ])
+
+    pm.run(seqtable_cmd, seqtable)
+
+    plus_table = os.path.join(
+        signal_folder, (args.genome_assembly + "_plus_tbl.txt"))
+
+    table_plus_cmd = build_command([
+        (tools.seqoutbias, "table"),
+        seqtable,
+        plus_bam,
+        (">", plus_table)
+    ])
+
+    minus_table = os.path.join(
+        signal_folder, (args.genome_assembly + "_minus_tbl.txt"))
+
+    table_minus_cmd = build_command([
+        (tools.seqoutbias, "table"),
+        seqtable,
+        minus_bam,
+        (">", minus_table)
+    ])
+
+    pm.run([table_plus_cmd, table_minus_cmd], minus_table)
+
+    plus_bw = os.path.join(
+        signal_folder, args.sample_name + "_plus_body_0-mer.bw")
+    minus_bw = os.path.join(
+        signal_folder, args.sample_name + "_minus_body_0-mer.bw")
+
+    scale_plus_cmd = build_command([
+        (tools.seqoutbias, "scale"),
+        seqtable,
         plus_bam,
         "--no-scale",
         "--skip-bed",
-        ("--bw=", plus_bw),
-        "--tail-edge",
-        ("--read-size=", args.max_len),
+        str("--bw=" + plus_bw),
+        "--tail-edge"
     ])
-    cmd2 = build_command([
-        tools.seqoutbias,
-        genome_fq,
+
+    scale_minus_cmd = build_command([
+        (tools.seqoutbias, "scale"),
+        seqtable,
         minus_bam,
         "--no-scale",
         "--skip-bed",
-        ("--bw=", minus_bw),
-        "--tail-edge",
-        ("--read-size=", args.max_len),
+        str("--bw=" + minus_bw),
+        "--tail-edge"
     ])
-    
-    pm.run([cmd1,cmd2], minus_bw)
+
+    pm.run([scale_plus_cmd, scale_minus_cmd], minus_bw)
 
     # COMPLETE!
     pm.stop_pipeline()
