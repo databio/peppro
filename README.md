@@ -29,7 +29,7 @@ Using the [K562 sample](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM14
 You can build that modified version like so:
 * clone the repository and move into it
 * `cargo build --release`
-* copy the `target/release/seqOutBias` file to /usr/bin or update your `$PATH` variable to include seqOutBias
+* copy the `target/release/seqOutBias` file to `/usr/bin` or update your `$PATH` variable to include seqOutBias
 
 For running from the command line:
 
