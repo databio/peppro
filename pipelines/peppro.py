@@ -936,18 +936,22 @@ def main():
 
     # Determine mitochondrial read counts
     mito_name = ["chrM", "chrMT", "M", "MT"]
-    cmd1 = (tools.samtools + " idxstats " + mapping_genome_bam_temp +
-            " | grep")
+    cmd = (tools.samtools + " idxstats " + mapping_genome_bam_temp +
+           " | grep")
     for name in mito_name:
-        cmd1 += " -we '" + name + "'"
-    cmd1 += "| cut -f 3"
-    mr = pm.checkprint(cmd1)
+        cmd += " -we '" + name + "'"
+    cmd += "| cut -f 3"
+    mr = pm.checkprint(cmd)
 
     # If there are mitochondrial reads, report and remove them
     if mr and mr.strip():
         pm.report_result("Mitochondrial_reads", round(float(mr)))
+        # Index the sort'ed BAM file first
+        mapping_genome_index = os.path.join(mapping_genome_bam + ".bai")
         noMT_mapping_genome_bam = os.path.join(
             map_genome_folder, args.sample_name + "_noMT.bam")
+
+        cmd1 = tools.samtools + " index " + mapping_genome_bam
         cmd2 = (tools.samtools + " idxstats " + mapping_genome_bam +
                 " | cut -f 1 | grep")
         for name in mito_name:
@@ -957,7 +961,8 @@ def main():
                  noMT_mapping_genome_bam)
         cmd3 = ("mv " + noMT_mapping_genome_bam + " " + mapping_genome_bam)
         cmd4 = tools.samtools + " index " + mapping_genome_bam
-        pm.run([cmd2, cmd3, cmd4], noMT_mapping_genome_bam)
+        pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam)
+        pm.clean_add(mapping_genome_index)
 
     # Calculate quality control metrics for the alignment file
     pm.timestamp("### Calculate NRF, PBC1, and PBC2")
