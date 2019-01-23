@@ -35,7 +35,7 @@ class CutTracer(pararead.ParaReadProcessor):
     def __init__(self, reads_filename, chrom_sizes_file, temp_parent, nProc,
         limit, verbosity, shift_factor={"+":4, "-":-5}, exactbw=False,
         summary_filename=None, bedout=False, smoothbw=False, smooth_length=25,
-        step_size=5, retain_temp=False):
+        step_size=5, retain_temp=False, tail_edge=False):
         # The resultAcronym should be set for each class
         self.resultAcronym="cuttrace"
         self.chrom_sizes_file = chrom_sizes_file
@@ -57,6 +57,7 @@ class CutTracer(pararead.ParaReadProcessor):
         self.smoothbw = smoothbw
         self.smooth_length = smooth_length
         self.step_size = step_size
+        self.tail_edge = tail_edge
 
         # Confirm that all the commands we will need are callable
 
@@ -92,10 +93,6 @@ class CutTracer(pararead.ParaReadProcessor):
         #self.unbuffered_write("[Name: " + chrom + "; Size: " + str(chrom_size) + "]")
         _LOGGER.info("[Name: " + chrom + "; Size: " + str(chrom_size) + "]")
         reads = self.fetch_chunk(chrom)
-
-        # if isinstance(reads, list):
-        #     print("Chrom has no reads: " + chrom)
-        #     return None
 
         chromOutFile = self._tempf(chrom)
         chromOutFileBw = chromOutFile + ".bw"
@@ -157,23 +154,40 @@ class CutTracer(pararead.ParaReadProcessor):
             """
             # default
             shifted_pos = None
-            if read.flag & 1:  # paired
-                if read.flag == 99:  # paired, mapped in pair, mate reversed, first in pair
-                    shifted_pos = read.reference_start + shift_factor["+"]
-                    #r.reference_length  # col 8
-                elif read.flag == 147:  # mate of 99
-                    shifted_pos = read.reference_end + shift_factor["-"]
-                elif read.flag == 163:  # paired, mapped in pair, mate reversed, second in pair
-                    shifted_pos = read.reference_start + shift_factor["+"]
-                elif read.flag == 83:   # mate of 163
-                    shifted_pos = read.reference_end + shift_factor["-"]
-            else:  # unpaired
-                if read.flag & 16:  # read reverse strand
-                    shifted_pos = read.reference_end + shift_factor["-"]
-                else:
-                    shifted_pos = read.reference_start + shift_factor["+"]
+            if not self.tail_edge:
+                if read.flag & 1:  # paired
+                    if read.flag == 99:  # paired, mapped in pair, mate reversed, first in pair
+                        shifted_pos = read.reference_start + shift_factor["+"]
+                        #r.reference_length  # col 8
+                    elif read.flag == 147:  # mate of 99
+                        shifted_pos = read.reference_end + shift_factor["-"]
+                    elif read.flag == 163:  # paired, mapped in pair, mate reversed, second in pair
+                        shifted_pos = read.reference_start + shift_factor["+"]
+                    elif read.flag == 83:   # mate of 163
+                        shifted_pos = read.reference_end + shift_factor["-"]
+                else:  # unpaired
+                    if read.flag & 16:  # read reverse strand
+                        shifted_pos = read.reference_end + shift_factor["-"]
+                    else:
+                        shifted_pos = read.reference_start + shift_factor["+"]
+            else: # Take 3' end of read
+                if read.flag & 1:  # paired
+                    if read.flag == 99:  # paired, mapped in pair, mate reversed, first in pair
+                        shifted_pos = read.reference_end + shift_factor["-"]
+                        #r.reference_length  # col 8
+                    elif read.flag == 147:  # mate of 99
+                        shifted_pos = read.reference_start + shift_factor["+"]
+                    elif read.flag == 163:  # paired, mapped in pair, mate reversed, second in pair
+                        shifted_pos = read.reference_end + shift_factor["-"]
+                    elif read.flag == 83:   # mate of 163
+                        shifted_pos = read.reference_start + shift_factor["+"]
+                else:  # unpaired
+                    if read.flag & 16:  # read reverse strand
+                        shifted_pos = read.reference_start + shift_factor["+"]
+                    else:
+                        shifted_pos = read.reference_end + shift_factor["-"]
 
-            return shifted_pos    
+            return shifted_pos
 
 
         begin = 1
@@ -295,17 +309,20 @@ def parse_args(cmdl):
         help="Output filename for bed file. Default: None")
     parser.add_argument('-l', '--smooth-length',
         help="Smooth length for bed file", default=25, type=int)
+    parser.add_argument('-d', '--tail-edge', action='store_true', default=False,
+        help="Output the 3' end of the sequence read. Default: False")
+    parser.add_argument('-m', '--mode', dest='mode',
+        default=None, choices=MODES,
+        help="Turn on DNase or ATAC mode (this adjusts the shift parameters)")
+    parser.add_argument('-t', '--limit', dest='limit',
+        help="Limit to these chromosomes", nargs = "+", default=None)
+    parser.add_argument('-p', '--cores', dest='cores',
+        help="Number of cores to use", default=2, type=int)
     parser.add_argument('-e', '--temp-parent',
         default="",#os.getcwd(),
         help="Temporary file location. By default it will use the working"
         " directory, but you can place this elsewhere if you'd like."
         " The actual folder will be based on the exactbw filename.")
-    parser.add_argument("--mode", dest="mode", default=None, choices=MODES,
-        help="Turn on DNase or ATAC mode (this adjusts the shift parameters)")
-    parser.add_argument('-m', '--limit', dest='limit',
-        help="Limit to these chromosomes", nargs = "+", default=None)
-    parser.add_argument('-p', '--cores', dest='cores',
-        help="Number of cores to use", default=2, type=int)
     parser.add_argument('--retain-temp', action='store_true', default=False,
         help="Retain temporary files? Default: False")
 
@@ -316,7 +333,7 @@ if __name__ == "__main__":
 
     args = parse_args(sys.argv[1:])
     if not (args.exactbw or args.smoothbw):
-        parser.error('No output requested, add exactbw and/or smoothbw')
+        parser.error('No output requested, use --exactbw and/or --smoothbw')
     _LOGGER = logger_via_cli(args)
 
 
@@ -329,7 +346,6 @@ if __name__ == "__main__":
 
     ct = CutTracer( reads_filename=args.infile,
                     chrom_sizes_file=args.chrom_sizes_file,
-                    temp_parent=args.temp_parent,
                     nProc=args.cores,
                     exactbw=args.exactbw,
                     limit=args.limit,
@@ -340,6 +356,8 @@ if __name__ == "__main__":
                     smoothbw=args.smoothbw,
                     smooth_length=args.smooth_length,
                     step_size=args.step_size,
+                    tail_edge=args.tail_edge,
+                    temp_parent=args.temp_parent,
                     retain_temp=args.retain_temp)
 
     ct.register_files()
