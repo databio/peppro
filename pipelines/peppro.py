@@ -5,7 +5,7 @@ PEPPRO - PRO-seq pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 
 from argparse import ArgumentParser
@@ -65,7 +65,7 @@ def parse_arguments():
                              "Increase this value to lower memory use.")
 
     parser.add_argument("--scale", action='store_true',
-                        dest="scale",
+                        dest="scale", default=False,
                         help="Scale output using seqOutBias when producing signal tracks")
 
     parser.add_argument("--adapter", dest="adapter",
@@ -1077,6 +1077,8 @@ def main():
         # separate strand bigWigs; just convert the BAM's directly with 
         # bamSitesToWig.py which uses UCSC wigToBigWig
         pm.timestamp("### Produce bigWig files")
+        # TODO: need to produce the `--tail-edge` version of the bigWig files
+        #       this option does not currently exist in `bamSitesToWig.py`
 
         wig_cmd_callable = ngstk.check_command("wigToBigWig")
 
@@ -1087,7 +1089,8 @@ def main():
             cmd2 += " -c " + res.chrom_sizes
             cmd2 += " -w " + plus_bw
             cmd2 += " -p " + str(max(1, int(pm.cores) * 2/3))
-            pm.run([cmd1, cmd2], plus_bw, container=pm.container)
+            cmd2 += " --tail-edge"
+            pm.run([cmd1, cmd2], plus_bw)
 
             cmd3 = tools.samtools + " index " + minus_bam
             cmd4 = tool_path("bamSitesToWig.py")
@@ -1095,7 +1098,8 @@ def main():
             cmd4 += " -c " + res.chrom_sizes
             cmd4 += " -w " + minus_bw
             cmd4 += " -p " + str(max(1, int(pm.cores) * 2/3))
-            pm.run([cmd3, cmd4], minus_bw, container=pm.container)
+            cmd4 += " --tail-edge"
+            pm.run([cmd3, cmd4], minus_bw)
         else:
             print("Skipping signal track production -- Could not call \'wigToBigWig\'.")
             print("Check that you have the required UCSC tools in your PATH.")
