@@ -37,15 +37,15 @@ def parse_arguments():
         required=["input", "genome", "sample-name", "output-parent"])
 
     # Pipeline-specific arguments
-    parser.add_argument("--keep", action='store_true',
+    parser.add_argument("--keep", action='store_true', default=False,
                         dest="keep",
                         help="Keep prealignment BAM files")
                     
-    parser.add_argument("--noFIFO", action='store_true',
+    parser.add_argument("--noFIFO", action='store_true', default=False,
                         dest="no_fifo",
                         help="Do NOT use named pipes during prealignments")
 
-    parser.add_argument("--umi", action='store_true',
+    parser.add_argument("--umi", action='store_true', default=False,
                         dest="umi",
                         help="Remove umi with fastp")
 
