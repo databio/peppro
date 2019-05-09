@@ -433,7 +433,7 @@ def guess_encoding(fq):
         return(str(valid[-1]))
 
 
-def check_commands(commands, ignore):
+def check_commands(commands, ignore=''):
     """
     Check if command(s) can be called
 
@@ -490,10 +490,18 @@ def main():
     # Convenience alias
     tools = pm.config.tools
     param = pm.config.parameters
-    res = pm.config.resources
+    res   = pm.config.resources
 
     # Check that the required tools are callable by the pipeline
-    if not check_commands(tools):
+    tool_list = [v for k,v in tools.items()]    # extract tool list
+    if args.trimmer == "fastx":
+        tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tools]
+    if args.scale:
+        tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tools]
+    else:
+        tool_list.remove('seqoutbias')
+    tool_list = dict((t,t) for t in tool_list)  # convert back to dict
+    if not check_commands(tool_list):
         err_msg = "Please install missing tools before continuing."
         pm.fail_pipeline(RuntimeError(err_msg))
 
@@ -1082,8 +1090,6 @@ def main():
         # separate strand bigWigs; just convert the BAM's directly with 
         # bamSitesToWig.py which uses UCSC wigToBigWig
         pm.timestamp("### Produce bigWig files")
-        # TODO: need to produce the `--tail-edge` version of the bigWig files
-        #       this option does not currently exist in `bamSitesToWig.py`
 
         wig_cmd_callable = ngstk.check_command("wigToBigWig")
 
@@ -1199,6 +1205,7 @@ def main():
             (tools.seqoutbias, "seqtable"),
             genome_fq_ln,
             str("--tallymer=" + search_file),
+            str("--gt-workdir=" + mappability_folder),  # TODO
             str("--read-size=" + args.max_len),
             str("--out=" + seqtable)
         ])
