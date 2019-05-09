@@ -244,7 +244,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             # Use alternate once filter_paired_fq is working with SE
             #unmap_fq1 = out_fastq_r1
             unmap_fq1 = out_fastq_bt2
-            unmap_fq2 = ""
+            #unmap_fq2 = ""
 
         return unmap_fq1, unmap_fq2
     else:
@@ -494,13 +494,18 @@ def main():
 
     # Check that the required tools are callable by the pipeline
     tool_list = [v for k,v in tools.items()]    # extract tool list
-    if args.trimmer == "fastx":
+    if args.trimmer == "fastx":  # update tool call
         tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tools]
+    else:  # otherwise remove it
+        if 'fastx' in tool_list: tool_list.remove('fastx')
+
     if args.scale:
         tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tools]
     else:
-        tool_list.remove('seqoutbias')
+        if 'seqoutbias' in tool_list: tool_list.remove('seqoutbias')
+
     tool_list = dict((t,t) for t in tool_list)  # convert back to dict
+
     if not check_commands(tool_list):
         err_msg = "Please install missing tools before continuing."
         pm.fail_pipeline(RuntimeError(err_msg))
@@ -614,7 +619,7 @@ def main():
             adapter_cmd_chunks = [
                 tools.cutadapt,
                 "--interleaved",
-                #("-j", str(pm.cores)),
+                ("-j", str(pm.cores)),
                 ("-m", (18 + int(float(args.umi_len)))),
                 ("-a", "TGGAATTCTCGGGTGCCAAGG"),                
                 untrimmed_fastq1,
@@ -623,7 +628,7 @@ def main():
         else:
             adapter_cmd_chunks = [
                 tools.cutadapt,
-                #("-j", str(pm.cores)),
+                ("-j", str(pm.cores)),
                 ("-m", (18 + int(float(args.umi_len)))),
                 ("-a", "TGGAATTCTCGGGTGCCAAGG"),
                 untrimmed_fastq1
