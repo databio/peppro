@@ -3,7 +3,7 @@
 __author__ = ["Nathan C. Sheffield", "Jason Smith"]
 __credits__ = []
 __license__ = "BSD2"
-__version__ = "0.2"
+__version__ = "0.3"
 __email__ = "nathan@code.databio.org"
 
 from argparse import ArgumentParser
@@ -17,11 +17,10 @@ import sys
 import pararead
 import pysam
 
-
 from pararead import add_logging_options, ParaReadProcessor
 from pararead import logger_via_cli
 
-MODES = ["dnase", "atac",]
+MODES = ["dnase", "atac"]
 
 # A function object like this will be pickled by the parallel call to map,
 # So it cannot contain huge files or the pickling will limit everything.
@@ -33,9 +32,9 @@ class CutTracer(pararead.ParaReadProcessor):
     that it can be run in parallel.
     """
     def __init__(self, reads_filename, chrom_sizes_file, temp_parent, nProc,
-        limit, verbosity, shift_factor={"+":4, "-":-5}, exactbw=False,
-        summary_filename=None, bedout=False, smoothbw=False, smooth_length=25,
-        step_size=5, retain_temp=False, tail_edge=False):
+        limit, verbosity, shift_factor={"+":0, "-":-0}, variable_step=False,
+        exactbw=False, summary_filename=None, bedout=False, smoothbw=False,
+        smooth_length=25, step_size=5, retain_temp=False, tail_edge=False):
         # The resultAcronym should be set for each class
         self.resultAcronym="cuttrace"
         self.chrom_sizes_file = chrom_sizes_file
@@ -53,6 +52,7 @@ class CutTracer(pararead.ParaReadProcessor):
         self.exactbw = exactbw
         self.summary_filename = summary_filename
         self.verbosity=verbosity
+        self.variable_step=variable_step
         self.bedout = bedout
         self.smoothbw = smoothbw
         self.smooth_length = smooth_length
@@ -99,7 +99,7 @@ class CutTracer(pararead.ParaReadProcessor):
 
         cutsToWig = os.path.join(os.path.dirname(__file__), "cutsToWig.pl")
 
-        cmd = "sort -n | perl " + cutsToWig + " " + str(chrom_size)
+        cmd = "sort -n | perl " + cutsToWig + " " + str(chrom_size) + self.variable_step
         # cmd = "awk 'FNR==1 {print;next} { for (i = $1-" + str(self.smooth_length) + \
         #     "; i <= $1+" + str(self.smooth_length) + "; ++i) print i }' | sort -n | perl " + \
         #     cutsToWig + " " + str(chrom_size) 
@@ -193,13 +193,22 @@ class CutTracer(pararead.ParaReadProcessor):
         begin = 1
 
         if self.exactbw:
-            header_line = ("fixedStep chrom=" + chrom + " start=" + str(begin) +
-                           " step=1\n")
+            if self.variable_step:
+                header_line = "variableStep chrom=" + chrom + " span=1\n";
+            else: 
+                header_line = ("fixedStep chrom=" + chrom + " start=" +
+                               str(begin) + " step=1\n")
+
             cutsToWigProcess.stdin.write(header_line)
 
         if self.smoothbw:
-            header_line = ("fixedStep chrom=" + chrom + " start=" + str(begin) +
-                           " step=" + str(self.step_size) + "\n")
+            if self.variable_step:
+                header_line = "variableStep chrom=" + chrom + " span=1\n";
+            else:
+                header_line = ("fixedStep chrom=" + chrom + " start=" +
+                               str(begin) + " step=" + str(self.step_size) +
+                               "\n")
+
             cutsToWigProcessSm.stdin.write(header_line)
 
         try:
@@ -292,13 +301,13 @@ class CutTracer(pararead.ParaReadProcessor):
 def parse_args(cmdl):
     parser = ArgumentParser(description='Bam processor')
     parser.add_argument('-i', '--infile', dest='infile',
-        help="Input file (in bam or sam format)",
-        required=True)
+        help="Input file (in bam or sam format)", required=True)
     parser.add_argument('-c', '--chrom-sizes-file',
-        help="Chromosome sizes file",
-        required=True)
+        help="Chromosome sizes file", required=True)
     parser.add_argument('-s', '--summary-file',
         help="Summary file")
+    parser.add_argument('-v', '--variable-step', default=False, action='store_true',
+        help="Use variableStep wiggle format. Default: fixedStep")
     parser.add_argument('-o', '--exactbw', dest='exactbw', default=None,
         help="Output filename for exact bigwig. Default: None")
     parser.add_argument('-w', '--smoothbw', dest='smoothbw', default=None,
@@ -311,8 +320,7 @@ def parse_args(cmdl):
         help="Smooth length for bed file", default=25, type=int)
     parser.add_argument('-d', '--tail-edge', action='store_true', default=False,
         help="Output the 3' end of the sequence read. Default: False")
-    parser.add_argument('-m', '--mode', dest='mode',
-        default=None, choices=MODES,
+    parser.add_argument('-m', '--mode', dest='mode', default=None, choices=MODES,
         help="Turn on DNase or ATAC mode (this adjusts the shift parameters)")
     parser.add_argument('-t', '--limit', dest='limit',
         help="Limit to these chromosomes", nargs = "+", default=None)
@@ -336,7 +344,6 @@ if __name__ == "__main__":
         parser.error('No output requested, use --exactbw and/or --smoothbw')
     _LOGGER = logger_via_cli(args)
 
-
     if args.mode == "dnase":
         shift_factor = {"+":1, "-":0}  # DNase
     elif args.mode == "atac":
@@ -346,19 +353,20 @@ if __name__ == "__main__":
 
     ct = CutTracer( reads_filename=args.infile,
                     chrom_sizes_file=args.chrom_sizes_file,
-                    nProc=args.cores,
-                    exactbw=args.exactbw,
-                    limit=args.limit,
-                    verbosity=args.verbosity,
-                    shift_factor=shift_factor,
                     summary_filename=args.summary_file,
-                    bedout=args.bedout,
+                    variable_step=args.variable_step,
+                    exactbw=args.exactbw,
                     smoothbw=args.smoothbw,
-                    smooth_length=args.smooth_length,
                     step_size=args.step_size,
+                    bedout=args.bedout,
+                    shift_factor=shift_factor,
+                    smooth_length=args.smooth_length,
                     tail_edge=args.tail_edge,
+                    limit=args.limit,
+                    nProc=args.cores,
                     temp_parent=args.temp_parent,
-                    retain_temp=args.retain_temp)
+                    retain_temp=args.retain_temp,
+                    verbosity=args.verbosity)
 
     ct.register_files()
     good_chromosomes = ct.run()

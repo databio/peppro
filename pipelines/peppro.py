@@ -5,7 +5,7 @@ PEPPRO - PRO-seq pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 
 from argparse import ArgumentParser
@@ -1094,6 +1094,7 @@ def main():
             cmd2 += " -c " + res.chrom_sizes
             cmd2 += " -w " + plus_bw
             cmd2 += " -p " + str(max(1, int(pm.cores) * 2/3))
+            cmd2 += " --variable-step"
             cmd2 += " --tail-edge"
             pm.run([cmd1, cmd2], plus_bw)
 
@@ -1103,6 +1104,7 @@ def main():
             cmd4 += " -c " + res.chrom_sizes
             cmd4 += " -w " + minus_bw
             cmd4 += " -p " + str(max(1, int(pm.cores) * 2/3))
+            cmd4 += " --variable-step"
             cmd4 += " --tail-edge"
             pm.run([cmd3, cmd4], minus_bw)
         else:
