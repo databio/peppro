@@ -1,3 +1,11 @@
+# <img src="../img/peppro_logo_black.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px">  usage reference
+
+`PEPPRO` command-line usage instructions:
+
+
+
+`python pipelines/peppro.py --help`
+```{console}
 usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-C CONFIG_FILE] -O
                  PARENT_OUTPUT_FOLDER [-M MEMORY_LIMIT] [-P NUMBER_OF_CORES]
                  -S SAMPLE_NAME -I INPUT_FILES [INPUT_FILES ...]
@@ -60,3 +68,4 @@ required named arguments:
                         One or more primary input files
   -G GENOME_ASSEMBLY, --genome GENOME_ASSEMBLY
                         Identifier for genome assembly
+```
