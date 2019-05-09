@@ -144,121 +144,88 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
 
         if not bt2_opts_txt:
             # Default options
-            bt2_opts_txt = " -k 1"  # Return only 1 alignment
+            bt2_opts_txt = "-k 1"  # Return only 1 alignment
             bt2_opts_txt += " -D 20 -R 3 -N 1 -L 20 -i S,1,0.50"
-            if paired and args.keep:
-                bt2_opts_txt += " -X 2000"
 
         # samtools sort needs a temporary directory
         tempdir = tempfile.mkdtemp(dir=sub_outdir)
         pm.clean_add(tempdir)
    
+        out_fastq_r1 = out_fastq_pre + '_unmap_R1.fq'
+        out_fastq_r2 = out_fastq_pre + '_unmap_R2.fq'
+
+        if useFIFO and not args.keep:
+            out_fastq_tmp = os.path.join(sub_outdir,
+                    assembly_identifier + "_bt2")
+            cmd = "mkfifo " + out_fastq_tmp
+            if not os.path.exists(out_fastq_tmp):
+                pm.run(cmd, out_fastq_tmp, container=pm.container)
+        else:
+            out_fastq_tmp = out_fastq_pre + '_unmap.fq'
+
+        filter_pair = build_command([tools.perl,
+            tool_path("filter_paired_fq.pl"), out_fastq_tmp,
+            unmap_fq1, unmap_fq2, out_fastq_r1, out_fastq_r2])
+        # TODO: make filter_paired_fq work with SE data
+        # cmd = build_command([tools.perl,
+           # tool_path("filter_paired_fq.pl"), out_fastq_tmp,
+           # unmap_fq1, out_fastq_r1])
+        # For now, revert to old method
+
         # Build bowtie2 command
-        if args.keep:
-            cmd = "(" + tools.bowtie2 + " -p " + str(pm.cores)
-            cmd += bt2_opts_txt
-            cmd += " -x " + assembly_bt2
-            cmd += " --rg-id " + args.sample_name
-            if paired:
-                cmd += " -1 " + unmap_fq1 + " -2 " + unmap_fq2
-                cmd += " --un-conc-gz " + out_fastq_bt2
-            else:
-                cmd += " -U " + unmap_fq1
-                cmd += " --un-gz " + out_fastq_bt2
+        cmd = "(" + tools.bowtie2 + " -p " + str(pm.cores)
+        cmd += " " + bt2_opts_txt
+        cmd += " -x " + assembly_bt2
+        cmd += " --rg-id " + args.sample_name
+        cmd += " -U " + unmap_fq1
+        cmd += " --un " + out_fastq_tmp
+        if args.keep: #  or not paired
+            #cmd += " --un-gz " + out_fastq_bt2 # TODO drop this for paired... because repair-ing with filter_paired_fq.pl
+            # In this samtools sort command we print to stdout and then use > to
+            # redirect instead of  `+ " -o " + mapped_bam` because then samtools
+            # uses a random temp file, so it won't choke if the job gets
+            # interrupted and restarted at this step.
             cmd += " | " + tools.samtools + " view -bS - -@ 1"  # convert to bam
             cmd += " | " + tools.samtools + " sort - -@ 1"  # sort output
             cmd += " -T " + tempdir
             cmd += " -o " + mapped_bam
-            cmd += ") 2>" + summary_file
-            
-        # In this samtools sort command we print to stdout and then use > to
-        # redirect instead of  `+ " -o " + mapped_bam` because then samtools
-        # uses a random temp file, so it won't choke if the job gets
-        # interrupted and restarted at this step.            
         else:
-            if useFIFO and paired:
-                out_fastq_tmp = os.path.join(sub_outdir,
-                    assembly_identifier + "_bt2")
-                if os.path.isfile(out_fastq_tmp):
-                    out_fastq_tmp = os.path.join(sub_outdir,
-                        assembly_identifier + "_bt2_2")
-                cmd = "mkfifo " + out_fastq_tmp
-                pm.run(cmd, out_fastq_tmp, container=pm.container)
-            elif useFIFO and not paired:
-                out_fastq_tmp = os.path.join(sub_outdir,
-                    assembly_identifier + "_bt2")
-                if os.path.isfile(out_fastq_tmp):
-                    out_fastq_tmp = os.path.join(sub_outdir,
-                        assembly_identifier + "_bt2_2")
-                cmd = "mkfifo " + out_fastq_tmp
-                pm.run(cmd, out_fastq_tmp, container=pm.container)
+            cmd += " > /dev/null"
+        cmd += ") 2>" + summary_file
+
+        if paired:
+            if args.keep or not useFIFO:
+                pm.run([cmd, filter_pair], mapped_bam, container=pm.container)
             else:
-                out_fastq_tmp = out_fastq_pre + '_unmap.fq'
-
-            out_fastq_r1 = out_fastq_pre + '_unmap_R1.fq'
-            out_fastq_r2 = out_fastq_pre + '_unmap_R2.fq'
-
-            if paired:
-                cmd1 = build_command([tools.perl,
-                        tool_path("filter_paired_fq.pl"), out_fastq_tmp,
-                        unmap_fq1, unmap_fq2, out_fastq_r1, out_fastq_r2])  
-                cmd2 = "(" + tools.bowtie2 + " -p " + str(pm.cores)
-                cmd2 += bt2_opts_txt
-                cmd2 += " -x " + assembly_bt2
-                cmd2 += " --rg-id " + args.sample_name
-                cmd2 += " -U " + unmap_fq1
-                cmd2 += " --un " + out_fastq_tmp
-                cmd2 += " > /dev/null"
-                cmd2 += ") 2>" + summary_file
-            else:
-                # TODO: make filter_paired_fq work with SE data
-                # cmd1 = build_command([tools.perl,
-                        # tool_path("filter_paired_fq.pl"), out_fastq_tmp,
-                        # unmap_fq1, out_fastq_r1])
-                # For now, revert to old method
-                cmd1 = "(" + tools.bowtie2 + " -p " + str(pm.cores)
-                cmd1 += bt2_opts_txt
-                cmd1 += " -x " + assembly_bt2
-                cmd1 += " --rg-id " + args.sample_name
-                cmd1 += " -U " + unmap_fq1
-                cmd1 += " --un-gz " + out_fastq_bt2
-                cmd1 += " | " + tools.samtools + " view -bS - -@ 1"  # convert to bam
-                cmd1 += " | " + tools.samtools + " sort - -@ 1"  # sort output
-                cmd1 += " -T " + tempdir
-                cmd1 += " -o " + mapped_bam
-                cmd1 += ") 2>" + summary_file
-                cmd2 = ""            
-
-        if args.keep:
-            pm.run(cmd, mapped_bam, container=pm.container)
-        else:
-            if useFIFO and paired:
                 pm.wait = False
-                pm.run(cmd1, out_fastq_r2, container=pm.container)
+                pm.run(filter_pair, [summary_file, out_fastq_r2], container=pm.container)
                 pm.wait = True
-                pm.run(cmd2, summary_file, container=pm.container)
+                pm.run(cmd, [summary_file, out_fastq_r2], container=pm.container)
+        else:
+            if args.keep:
+                pm.run(cmd, mapped_bam, container=pm.container)
             else:
                 # TODO: switch to this once filter_paired_fq works with SE
                 #pm.run(cmd2, summary_file, container=pm.container)
                 #pm.run(cmd1, out_fastq_r1, container=pm.container)
-                pm.run(cmd1, out_fastq_bt2, container=pm.container)
+                pm.run(cmd, out_fastq_bt2, container=pm.container)
 
-            pm.clean_add(out_fastq_tmp)
-        
-        # get concordant aligned read pairs
-        if args.keep and paired:
-            cmd = ("grep 'aligned concordantly exactly 1 time' " +
-                   summary_file + " | awk '{print $1}'")
-        else:
-            cmd = ("grep 'aligned exactly 1 time' " +
-                   summary_file + " | awk '{print $1}'")
-        concordant = pm.checkprint(cmd)
-        if concordant:
-            ar = float(concordant)*2
+        pm.clean_add(out_fastq_tmp)
+
+        # get aligned read counts
+        #if args.keep and paired:
+        #    cmd = ("grep 'aligned concordantly exactly 1 time' " +
+        #           summary_file + " | awk '{print $1}'")
+        #else:
+        cmd = ("grep 'aligned exactly 1 time' " + summary_file +
+               " | awk '{print $1}'")
+        align_exact = pm.checkprint(cmd)
+        if align_exact:
+            ar = float(align_exact)*2
         else:
             ar = 0
 
-        # report concordant aligned reads
+        # report aligned reads
         pm.report_result("Aligned_reads_" + assembly_identifier, ar)
         try:
             # wrapped in try block in case Trimmed_reads is not reported in this
@@ -270,18 +237,12 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             res_key = "Alignment_rate_" + assembly_identifier
             pm.report_result(res_key, round(float(ar) * 100 / float(tr), 2))
         
-        # filter genome reads not mapped
-        if args.keep and paired:
-            unmap_fq1 = out_fastq_pre + "_unmap_R1.fq.gz"
-            unmap_fq2 = out_fastq_pre + "_unmap_R2.fq.gz"
-        elif not args.keep and paired:
+        if paired:
             unmap_fq1 = out_fastq_r1
             unmap_fq2 = out_fastq_r2
-        elif not args.keep and not paired:
-            #unmap_fq1 = out_fastq_r1
-            unmap_fq1 = out_fastq_bt2
-            unmap_fq2 = ""
         else:
+            # Use alternate once filter_paired_fq is working with SE
+            #unmap_fq1 = out_fastq_r1
             unmap_fq1 = out_fastq_bt2
             unmap_fq2 = ""
 
@@ -381,6 +342,7 @@ def _check_bowtie2_index(genomes_folder, genome_assembly):
         if os.stat(os.path.join(bt2_path, f)).st_size == 0:
             pm.fail_pipeline(IOError("{} is an empty file.".format(f)))
 
+
 def tool_path(tool_name):
     """
     Return the path to a tool used by this pipeline.
@@ -471,6 +433,40 @@ def guess_encoding(fq):
         return(str(valid[-1]))
 
 
+def check_commands(commands, ignore):
+    """
+    Check if command(s) can be called
+
+    :param attributedict commands: dictionary of commands to check
+    :param list ignore: list of commands that are optional and can be ignored
+    """
+
+    # Use `command` to see if command is callable, store exit code
+    is_callable = True
+    uncallable = []
+    for name, command in commands.items():
+        if command not in ignore:
+            # if a command is a java file, modify the command
+            if '.jar' in command:
+                command = "java -jar " + command
+            # if an environment variable is not expanded it means it points to
+            # an uncallable command
+            if '$' in command: 
+                uncallable.append(command)
+
+            code = os.system("command -v {0} >/dev/null 2>&1 || {{ exit 1; }}".format(command))
+            # If exit code is not 0, track which command failed
+            #print("{} code {}".format(command, code))  # DEBUG
+            if code != 0:
+                uncallable.append(command)
+                is_callable = False
+    if is_callable:
+        return True
+    else:
+        print("The following required tool(s) are not callable: {0}".format(' '.join(uncallable)))
+        return False
+
+
 ###############################################################################
 def main():
     """
@@ -495,6 +491,15 @@ def main():
     tools = pm.config.tools
     param = pm.config.parameters
     res = pm.config.resources
+
+    # Check that the required tools are callable by the pipeline
+    if not check_commands(tools):
+        err_msg = "Please install missing tools before continuing."
+        pm.fail_pipeline(RuntimeError(err_msg))
+
+    if args.input2 and not args.paired_end:
+        err_msg = "Incompatible settings: You specified single-end, but provided --input2."
+        pm.fail_pipeline(RuntimeError(err_msg))
 
     # Set up reference resource according to genome prefix.
     gfolder = os.path.join(res.genomes, args.genome_assembly)
