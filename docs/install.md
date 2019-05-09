@@ -14,6 +14,7 @@ PEPPRO uses a series of publicly-available, common bioinformatics tools includin
 Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming, deduplication, and reverse complementation.  The use of `fqdedup`, in particular, is useful if you wish to minimize memory use at the expense of speed.  I also suggest using the default required tools simply due to the fact that the `fastx toolkit` has not been supported since 2012 and issues with reads utilizing newer Phred quality scores can cause problems.
 
 *Optional tools:*
+
 * [fqdedup](https://github.com/guertinlab/fqdedup)
 * [cutadapt](https://cutadapt.readthedocs.io/)
 * [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
@@ -37,11 +38,26 @@ You can build that modified version like so (requires Python3 to build):
 * `cargo build --release`
 * copy the `target/release/seqOutBias` file to `/usr/bin` or update your `$PATH` variable to include seqOutBias
 
-For running from the command line:
+### From command line:
 
-`/pipelines/peppro.py --single-or-paired single --genome hg38 --sample-name K562_pro --input $DATA/K562_pro.fastq --adapter cutadapt --dedup fqdedup --trimmer fastx -O $PROCESSED/pro_example/`
+We use a shell variable that points to where all processed data should be stored, which we name `PROCESSED`.  You can either define that variable for your environment or just change the example below to the full path you'd like to store the processed output from the pipeline.
+
+```
+/pipelines/peppro.py --single-or-paired single 
+  --genome hg38 
+  --sample-name K562_pro
+  --input $DATA/K562_pro.fastq
+  --adapter cutadapt
+  --dedup fqdedup
+  --trimmer fastx
+  -O $PROCESSED/pro_example/
+```
+
+### Use `Looper`:
 
 If using `looper` and the configuration files provided in the `examples/` folder:
 
-`looper run examples/K562_example.yaml`
+```
+looper run examples/K562_example.yaml
+```
 
