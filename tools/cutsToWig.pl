@@ -35,7 +35,6 @@ $cutSite = <>;  # Grab the first cut
 chomp($cutSite);
 
 if ($variableStep) {  # Use variableStep wiggle format
-	#local $" = "\t";
 	# Increment until the first cut
 	while ($countIndex < $cutSite) {
 		$countIndex++;	
