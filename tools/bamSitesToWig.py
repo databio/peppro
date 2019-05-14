@@ -52,7 +52,10 @@ class CutTracer(pararead.ParaReadProcessor):
         self.exactbw = exactbw
         self.summary_filename = summary_filename
         self.verbosity=verbosity
-        self.variable_step=variable_step
+        if variable_step:
+            self.variable_step = 1 # True
+        else:
+            self.variable_step = 0 # False
         self.bedout = bedout
         self.smoothbw = smoothbw
         self.smooth_length = smooth_length
@@ -99,7 +102,7 @@ class CutTracer(pararead.ParaReadProcessor):
 
         cutsToWig = os.path.join(os.path.dirname(__file__), "cutsToWig.pl")
 
-        cmd = "sort -n | perl " + cutsToWig + " " + str(chrom_size) + self.variable_step
+        cmd = "sort -n | perl " + cutsToWig + " " + str(chrom_size) + str(self.variable_step)
         # cmd = "awk 'FNR==1 {print;next} { for (i = $1-" + str(self.smooth_length) + \
         #     "; i <= $1+" + str(self.smooth_length) + "; ++i) print i }' | sort -n | perl " + \
         #     cutsToWig + " " + str(chrom_size) 
@@ -124,7 +127,7 @@ class CutTracer(pararead.ParaReadProcessor):
             tmpFile = chromOutFile + "_cuts.txt"
             cmd = ("sort -n | tee " + tmpFile + " | perl " + cutsToWigSm +
                    " " + str(chrom_size) + " " +  str(self.smooth_length) +
-                   " " + str(self.step_size))
+                   " " + str(self.step_size) + " " + str(self.variable_step))
             cmd2 = ("wigToBigWig -clip -fixedSummaries " +
                     "-keepAllChromosomes stdin " + self.chrom_sizes_file +
                     " " + chromOutFileBwSm)
@@ -194,32 +197,32 @@ class CutTracer(pararead.ParaReadProcessor):
 
         if self.exactbw:
             if self.variable_step:
-                header_line = "variableStep chrom=" + chrom + " span=1\n";
+                header_line = "variableStep chrom=" + chrom + "\n";
             else: 
                 header_line = ("fixedStep chrom=" + chrom + " start=" +
                                str(begin) + " step=1\n")
 
-            cutsToWigProcess.stdin.write(header_line)
+            cutsToWigProcess.stdin.write(header_line.encode('utf-8'))
 
         if self.smoothbw:
             if self.variable_step:
-                header_line = "variableStep chrom=" + chrom + " span=1\n";
+                header_line = "variableStep chrom=" + chrom + "\n";
             else:
                 header_line = ("fixedStep chrom=" + chrom + " start=" +
                                str(begin) + " step=" + str(self.step_size) +
                                "\n")
 
-            cutsToWigProcessSm.stdin.write(header_line)
+            cutsToWigProcessSm.stdin.write(header_line.encode('utf-8'))
 
         try:
             for read in reads:
                 shifted_pos = get_shifted_pos(read, shift_factor)
 
                 if self.exactbw:
-                    cutsToWigProcess.stdin.write(str(shifted_pos) + "\n")
+                    cutsToWigProcess.stdin.write((str(shifted_pos) + "\n").encode('utf-8'))
 
                 if self.smoothbw:
-                    cutsToWigProcessSm.stdin.write(str(shifted_pos) + "\n")
+                    cutsToWigProcessSm.stdin.write((str(shifted_pos) + "\n").encode('utf-8'))
 
                 if self.bedout:
                     strand = "-" if read.is_reverse else "+"

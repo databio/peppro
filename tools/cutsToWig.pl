@@ -25,15 +25,17 @@
 # cat cuts.txt | cutsToWig.pl CHROMSIZE FALSE | wigToBigWig -clip stdin chrom_sizes.txt out.bw
 
 # Setup
-$chrSize = shift;       # Size of chromosome is the first argument
-$variableStep = shift;  # Second argument is whether to use variable or fixed
+my $chrSize = shift;       # Size of chromosome is the first argument
+my $variableStep = shift;  # Second argument is whether to use variable or fixed
 $countIndex = 1;
 $currentCount = 1;
-$header =  <>; # Discard the first line (fixedstep)
+$header =  <>;  # Discard the first line (fixedstep)
 print $header;
 $cutSite = <>;  # Grab the first cut
+chomp($cutSite);
 
 if ($variableStep) {  # Use variableStep wiggle format
+	#local $" = "\t";
 	# Increment until the first cut
 	while ($countIndex < $cutSite) {
 		$countIndex++;	
@@ -42,7 +44,7 @@ if ($variableStep) {  # Use variableStep wiggle format
 
 	# Loop through cuts, converting to wiggle format
 	while($cutSite = <>) {
-		chomp($cutSite);
+		chomp($cutSite);		
 		# if it's a duplicate read...
 		if ($cutSite == $previousCut) { # sum up all reads for this spot.
 			$currentCount++;
@@ -51,7 +53,7 @@ if ($variableStep) {  # Use variableStep wiggle format
 
 		# otherwise, it makes it past this loop;
 		# output the sum of counts for the previous spot
-		print $previousCut."\t".$currentCount."\n"; 
+		print "$previousCut\t$currentCount\n";
 		$countIndex++;
 		# reset for the current spot
 		$currentCount = 1;
