@@ -1,4 +1,4 @@
-#!/bin/env perl 
+#! /usr/bin/env perl
 # By Nathan Sheffield, University of Virginia, 2018
 
 # This is an incredibly fast Perl utility that re-pairs fastq files that have been 
@@ -21,10 +21,30 @@ $file_fq2 = shift;
 $file_fq1_filtered = shift;
 $file_fq2_filtered = shift;
 open(my $fh_filter, "<", $file_filter);
+# We can't read from compressed input because it messes with the way the files
+# are read in, but this is how you would do it.
+# open(my $fh_fq1, "gunzip -c $file_fq1 |");
+# open(my $fh_fq2, "gunzip -c $file_fq2 |");
 open(my $fh_fq1, "<", $file_fq1);
 open(my $fh_fq2, "<", $file_fq2);
-open(FH_FQ1_FILT, ">", $file_fq1_filtered);
-open(FH_FQ2_FILT, ">", $file_fq2_filtered);
+
+
+# write output files here
+if ($file_fq1_filtered =~ /\.gz$/i) {
+	print STDERR "gzipping output";
+	open(FH_FQ1_FILT, "| /bin/gzip -c > $file_fq1_filtered");
+} else {
+	print STDERR "not gzipping output";
+	open(FH_FQ1_FILT, ">", $file_fq1_filtered);
+}
+
+if ($file_fq2_filtered =~ /\.gz$/i) {
+	open(FH_FQ2_FILT, "| /bin/gzip -c > $file_fq2_filtered");
+} else {
+	open(FH_FQ2_FILT, ">", $file_fq2_filtered);
+}
+
+
 
 # Loop through reads
 my $skipped = 0;
