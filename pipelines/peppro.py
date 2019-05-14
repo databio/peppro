@@ -134,32 +134,20 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         summary_name = "{}_{}_bt_aln_summary.log".format(args.sample_name,
                                                           assembly_identifier)
         summary_file = os.path.join(sub_outdir, summary_name)
+
         out_fastq_pre = os.path.join(
             sub_outdir, args.sample_name + "_" + assembly_identifier)
-        # bowtie2 unmapped filename format
-        if paired:
-            out_fastq_bt2 = out_fastq_pre + '_unmap_R%.fq.gz'
-        else:
-            out_fastq_bt2 = out_fastq_pre + '_unmap_R1.fq.gz'
+        out_fastq_r1 = out_fastq_pre + '_unmap_R1.fq.gz'
+        out_fastq_r2 = out_fastq_pre + '_unmap_R2.fq.gz'
 
-        if not bt2_opts_txt:
-            # Default options
-            bt2_opts_txt = "-k 1"  # Return only 1 alignment
-            bt2_opts_txt += " -D 20 -R 3 -N 1 -L 20 -i S,1,0.50"
-
-        # samtools sort needs a temporary directory
-        tempdir = tempfile.mkdtemp(dir=sub_outdir)
-        pm.clean_add(tempdir)
-   
-        out_fastq_r1 = out_fastq_pre + '_unmap_R1.fq'
-        out_fastq_r2 = out_fastq_pre + '_unmap_R2.fq'
-
-        if useFIFO and not args.keep:
+        if useFIFO and paired and not args.keep:
             out_fastq_tmp = os.path.join(sub_outdir,
                     assembly_identifier + "_bt2")
             cmd = "mkfifo " + out_fastq_tmp
-            if not os.path.exists(out_fastq_tmp):
-                pm.run(cmd, out_fastq_tmp, container=pm.container)
+            
+            if os.path.exists(out_fastq_tmp):
+                os.remove(out_fastq_tmp)
+            pm.run(cmd, out_fastq_tmp, container=pm.container)
         else:
             out_fastq_tmp = out_fastq_pre + '_unmap.fq'
 
@@ -172,6 +160,15 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
            # unmap_fq1, out_fastq_r1])
         # For now, revert to old method
 
+        if not bt2_opts_txt:
+            # Default options
+            bt2_opts_txt = "-k 1"  # Return only 1 alignment
+            bt2_opts_txt += " -D 20 -R 3 -N 1 -L 20 -i S,1,0.50"
+
+        # samtools sort needs a temporary directory
+        tempdir = tempfile.mkdtemp(dir=sub_outdir)
+        pm.clean_add(tempdir)
+
         # Build bowtie2 command
         cmd = "(" + tools.bowtie2 + " -p " + str(pm.cores)
         cmd += " " + bt2_opts_txt
@@ -180,7 +177,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         cmd += " -U " + unmap_fq1
         cmd += " --un " + out_fastq_tmp
         if args.keep: #  or not paired
-            #cmd += " --un-gz " + out_fastq_bt2 # TODO drop this for paired... because repair-ing with filter_paired_fq.pl
+            #cmd += " --un-gz " + out_fastq_bt2 # TODO drop this for paired... because repairing with filter_paired_fq.pl
             # In this samtools sort command we print to stdout and then use > to
             # redirect instead of  `+ " -o " + mapped_bam` because then samtools
             # uses a random temp file, so it won't choke if the job gets
@@ -202,21 +199,22 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 pm.wait = True
                 pm.run(cmd, [summary_file, out_fastq_r2], container=pm.container)
         else:
+            if pm.cores > 1 and ngstk.check_command("pigz"):
+                compress_cmd = "pigz --keep -f -p {} {}".format(pm.cores, out_fastq_tmp)
+            else:
+                fastqz = out_fastq_tmp + ".gz"
+                compress_cmd = "gzip -f -c < {} > {}".format(out_fastq_tmp, fastqz)
+
             if args.keep:
-                pm.run(cmd, mapped_bam, container=pm.container)
+                pm.run([cmd, compress_cmd], mapped_bam, container=pm.container)
             else:
                 # TODO: switch to this once filter_paired_fq works with SE
                 #pm.run(cmd2, summary_file, container=pm.container)
                 #pm.run(cmd1, out_fastq_r1, container=pm.container)
-                pm.run(cmd, out_fastq_bt2, container=pm.container)
+                pm.run([cmd, compress_cmd], out_fastq_tmp, container=pm.container)
 
         pm.clean_add(out_fastq_tmp)
 
-        # get aligned read counts
-        #if args.keep and paired:
-        #    cmd = ("grep 'aligned concordantly exactly 1 time' " +
-        #           summary_file + " | awk '{print $1}'")
-        #else:
         cmd = ("grep 'aligned exactly 1 time' " + summary_file +
                " | awk '{print $1}'")
         align_exact = pm.checkprint(cmd)
@@ -243,8 +241,8 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         else:
             # Use alternate once filter_paired_fq is working with SE
             #unmap_fq1 = out_fastq_r1
-            unmap_fq1 = out_fastq_bt2
-            #unmap_fq2 = ""
+            unmap_fq1 = out_fastq_tmp
+            unmap_fq2 = ""
 
         return unmap_fq1, unmap_fq2
     else:
@@ -1104,7 +1102,7 @@ def main():
             cmd2 += " -i " + plus_bam
             cmd2 += " -c " + res.chrom_sizes
             cmd2 += " -w " + plus_bw
-            cmd2 += " -p " + str(max(1, int(pm.cores) * 2/3))
+            cmd2 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd2 += " --variable-step"
             cmd2 += " --tail-edge"
             pm.run([cmd1, cmd2], plus_bw)
@@ -1114,7 +1112,7 @@ def main():
             cmd4 += " -i " + minus_bam
             cmd4 += " -c " + res.chrom_sizes
             cmd4 += " -w " + minus_bw
-            cmd4 += " -p " + str(max(1, int(pm.cores) * 2/3))
+            cmd4 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd4 += " --variable-step"
             cmd4 += " --tail-edge"
             pm.run([cmd3, cmd4], minus_bw)
