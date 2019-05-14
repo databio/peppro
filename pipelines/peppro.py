@@ -613,24 +613,30 @@ def main():
         adapter_cmd = build_command(adapter_cmd_chunks)
 
     elif args.adapter == "cutadapt":
+        cut_version = float(pm.checkprint("cutadapt --version"))
+        #print("cut_version: {}".format(cut_version))  # DEBUG
         if args.paired_end:
             adapter_cmd_chunks = [
                 tools.cutadapt,
-                "--interleaved",
-                ("-j", str(pm.cores)),
+                "--interleaved"]
+            if cut_version >= 1.15:
+                adapter_cmd_chunks.extend(["-j", str(pm.cores)])
+            adapter_cmd_chunks.extend([
                 ("-m", (18 + int(float(args.umi_len)))),
                 ("-a", "TGGAATTCTCGGGTGCCAAGG"),                
                 untrimmed_fastq1,
-                untrimmed_fastq2
-            ]
+                untrimmed_fastq2]
+            )
         else:
-            adapter_cmd_chunks = [
-                tools.cutadapt,
-                ("-j", str(pm.cores)),
+            adapter_cmd_chunks = [tools.cutadapt]
+            if cut_version >= 1.15:
+                adapter_cmd_chunks.extend([("-j", str(pm.cores))])
+            adapter_cmd_chunks.extend([
                 ("-m", (18 + int(float(args.umi_len)))),
                 ("-a", "TGGAATTCTCGGGTGCCAAGG"),
-                untrimmed_fastq1
-            ]
+                untrimmed_fastq1]
+            )
+        #print("adapter_cmd_chunks: {}".format(adapter_cmd_chunks))  # DEBUG
         adapter_cmd = build_command(adapter_cmd_chunks)
 
     else:
