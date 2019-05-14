@@ -31,7 +31,7 @@ my $variableStep = shift;  # Fourth argument is whether to use variable or fixed
 
 $countIndex = 1;
 $currentCount = 0;
-$header =  <>; # Grab the first line (e.g. the header)
+$header =  <>;  # Grab the first line (e.g. the header)
 print $header;
 
 # The strategy here is to make a smoothed signal track (bigwig file) given the
@@ -52,7 +52,6 @@ print $header;
 my @closers;
 
 $cutSite = <>; # Grab the first cut
-chomp($cutSite);
 $cutSite -= $smoothSize;
 $endSite = $cutSite + $smoothSize*2;
 

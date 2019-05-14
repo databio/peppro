@@ -2,6 +2,7 @@
 
 # By Nathan Sheffield, University of Virginia, 2017
 # Update 03.04.19 - Jason Smith - Add option to use variable or fixedStep
+# Update 05.14.19 - Jason Smith - Fix variableStep use
 
 # This is an incredibly fast Perl utility that converts cut sites
 # (coordinates) into a wiggle-like output.
@@ -29,7 +30,7 @@ my $chrSize = shift;       # Size of chromosome is the first argument
 my $variableStep = shift;  # Second argument is whether to use variable or fixed
 $countIndex = 1;
 $currentCount = 1;
-$header =  <>;  # Discard the first line (fixedstep)
+$header =  <>;  # Grab the first line (e.g. the header)
 print $header;
 $cutSite = <>;  # Grab the first cut
 chomp($cutSite);
