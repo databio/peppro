@@ -1084,7 +1084,7 @@ def main():
         param.outfolder, "signal_" + args.genome_assembly)
     ngstk.make_dir(signal_folder)
     plus_bw = os.path.join(
-            signal_folder, args.sample_name + "_plus_body_0-mer.bw")
+        signal_folder, args.sample_name + "_plus_body_0-mer.bw")
     minus_bw = os.path.join(
         signal_folder, args.sample_name + "_minus_body_0-mer.bw")
     
