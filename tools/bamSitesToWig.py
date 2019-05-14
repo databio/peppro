@@ -3,7 +3,7 @@
 __author__ = ["Nathan C. Sheffield", "Jason Smith"]
 __credits__ = []
 __license__ = "BSD2"
-__version__ = "0.3"
+__version__ = "0.3.1"
 __email__ = "nathan@code.databio.org"
 
 from argparse import ArgumentParser
