@@ -103,7 +103,7 @@ class CutTracer(pararead.ParaReadProcessor):
         cutsToWig = os.path.join(os.path.dirname(__file__), "cutsToWig.pl")
 
         cmd = ("sort -n | perl " + cutsToWig + " " +
-               str(chrom_size) + str(self.variable_step))
+               str(chrom_size) + " " + str(self.variable_step))
         # cmd = "awk 'FNR==1 {print;next} { for (i = $1-" + str(self.smooth_length) + \
         #     "; i <= $1+" + str(self.smooth_length) + "; ++i) print i }' | sort -n | perl " + \
         #     cutsToWig + " " + str(chrom_size) 
