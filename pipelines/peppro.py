@@ -1107,7 +1107,7 @@ def main():
             cmd2 = tool_path("bamSitesToWig.py")
             cmd2 += " -i " + plus_bam
             cmd2 += " -c " + res.chrom_sizes
-            cmd2 += " -w " + plus_bw
+            cmd2 += " -o " + plus_bw  # DEBUG formerly smoothed " -w " + plus_bw
             cmd2 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd2 += " --variable-step"
             cmd2 += " --tail-edge"
@@ -1117,7 +1117,7 @@ def main():
             cmd4 = tool_path("bamSitesToWig.py")
             cmd4 += " -i " + minus_bam
             cmd4 += " -c " + res.chrom_sizes
-            cmd4 += " -w " + minus_bw
+            cmd4 += " -o " + minus_bw # DEBUG formerly smoothed " -w " + minus_bw
             cmd4 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd4 += " --variable-step"
             cmd4 += " --tail-edge"
