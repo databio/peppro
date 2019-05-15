@@ -43,8 +43,10 @@ if ($variableStep) {  # Use variableStep wiggle format
 	$previousCut = $cutSite;
 
 	# Loop through cuts, converting to wiggle format
+	$count_chomps = 1;
 	while($cutSite = <>) {
-		chomp($cutSite);		
+		chomp($cutSite);
+		$count_chomps++;		
 		# if it's a duplicate read...
 		if ($cutSite == $previousCut) { # sum up all reads for this spot.
 			$currentCount++;
@@ -63,10 +65,13 @@ if ($variableStep) {  # Use variableStep wiggle format
 		}
 		$previousCut = $cutSite;
 	} # end while
-
 	# Increment until we each the end.
 	while($countIndex <= $chrSize) {
 		$countIndex++;
+	}
+	# If there are no additional cutSites
+	if ($currentCount == 1) {
+		print "$chrSize\t0\n";
 	}
 } else {  # Use fixedStep wiggle format
 	# Print out 0s until the first cut
