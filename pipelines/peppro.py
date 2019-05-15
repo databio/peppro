@@ -493,19 +493,19 @@ def main():
     # Check that the required tools are callable by the pipeline
     tool_list = [v for k,v in tools.items()]    # extract tool list
     if args.trimmer == "fastx":  # update tool call
-        tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tools]
+        tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tool_list]
     else:  # otherwise remove it
         if 'fastx' in tool_list: tool_list.remove('fastx')
 
     if args.scale:
-        tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tools]
+        tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tool_list]
     else:
         if 'seqoutbias' in tool_list: tool_list.remove('seqoutbias')
 
     tool_list = dict((t,t) for t in tool_list)  # convert back to dict
 
     if not check_commands(tool_list):
-        err_msg = "Please install missing tools before continuing."
+        err_msg = "Missing required tools. See message above."
         pm.fail_pipeline(RuntimeError(err_msg))
 
     if args.input2 and not args.paired_end:
