@@ -88,6 +88,10 @@ def parse_arguments():
                         dest="TSS_name", type=str,
                         help="Filename of TSS annotation file.")
 
+    parser.add_argument("--pre-name", default=None,
+                        dest="pre_name", type=str,
+                        help="Filename of pre-mRNA annotation file.")
+
     parser.add_argument("-V", "--version", action="version",
                         version="%(prog)s {v}".format(v=__version__))
 
@@ -551,6 +555,11 @@ def main():
         res.TSS_file = os.path.abspath(args.TSS_name)
     else:
         res.TSS_file = os.path.join(gfolder, args.genome_assembly + "_TSS.tsv")
+
+    if args.pre_name:
+        res.pre_file = os.path.abspath(args.pre_name)
+    else:
+        res.pre_file = os.path.join(gfolder, args.genome_assembly + "_pre-mRNA.tsv")
 
     # Get bowtie2 indexes
     res.bt2_genome = _get_bowtie2_index(res.genomes, args.genome_assembly)
@@ -1141,10 +1150,6 @@ def main():
         cmd += " " + Tss_plus + " pdf"
         pm.run(cmd, Tss_plus_pdf, nofail=True, container=pm.container)
 
-        # Always plot strand specific TSS enrichment.
-        # added by Ryan 2/10/17 to calculate TSS score as numeric and to
-        # include in summary stats. This could be done in prettier ways which
-        # I'm open to. Just adding for the idea.
         with open(Tss_plus) as f:
             floats = list(map(float, f))
         try:
@@ -1159,11 +1164,6 @@ def main():
                                     "_plus_TssEnrichment.png")
         pm.report_object("Plus TSS enrichment", Tss_plus_pdf,
                          anchor_image=Tss_plus_png)
-
-        plus_FRiTSS = calc_frip(plus_bam, res.TSS_file,
-                                frip_func=ngstk.simple_frip,
-                                pipeline_manager=pm)
-        pm.report_result("Plus FRiTSS", plus_FRiTSS)
 
         # Minus
         Tss_minus = os.path.join(QC_folder, args.sample_name +
@@ -1181,7 +1181,6 @@ def main():
         cmd += " " + Tss_minus + " pdf"
         pm.run(cmd, Tss_minus_pdf, nofail=True, container=pm.container)
 
-        # Always plot strand specific TSS enrichment.
         with open(Tss_minus) as f:
             floats = list(map(float, f))
         try:
@@ -1197,10 +1196,24 @@ def main():
         pm.report_object("Minus TSS enrichment", Tss_minus_pdf,
                          anchor_image=Tss_minus_png)
 
-        minus_FRiTSS = calc_frip(minus_bam, res.TSS_file,
-                                 frip_func=ngstk.simple_frip,
-                                 pipeline_manager=pm)
-        pm.report_result("Minus FRiTSS", minus_FRiTSS)
+    # Fraction of reads in Pre-mRNA (FRiP)
+    if not os.path.exists(res.pre_file):
+        print("Skipping FRiP -- Fraction of reads in pre-mRNA requires"
+              "pre-mRNA annotation file: {}"
+              .format(res.pre_file))
+    else:
+        pm.timestamp("### Calculate FRiP")
+        # Plus
+        plus_frip = calc_frip(plus_bam, res.pre_file,
+                              frip_func=ngstk.simple_frip,
+                              pipeline_manager=pm)
+        pm.report_result("Plus FRiP", plus_frip)
+        # Minus
+        minus_frip = calc_frip(minus_bam, res.pre_file,
+                               frip_func=ngstk.simple_frip,
+                               pipeline_manager=pm)
+        pm.report_result("Minus FRiP", minus_frip)
+        
 
     # Shift and produce BigWig's
     genome_fq = os.path.join(
