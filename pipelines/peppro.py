@@ -1213,7 +1213,149 @@ def main():
                                frip_func=ngstk.simple_frip,
                                pipeline_manager=pm)
         pm.report_result("Minus FRiP", minus_frip)
-        
+
+    # Calculate fraction of reads in features of interest
+    pm.timestamp("### Calculate fraction of reads in features (FRiF)")
+
+    # Custom annotation file or direct path to annotation file is specified
+    anno_local = ''
+
+    if args.anno_name:
+        anno_file  = os.path.abspath(args.anno_name)
+        anno_local = os.path.join(raw_folder, os.path.basename(args.anno_name))
+        if not os.path.exists(anno_file):
+            print("Skipping read annotation")
+            print("This requires a valid {} annotation file."
+                  .format(args.genome_assembly))
+            print("Confirm {} is present."
+                  .format(str(os.path.dirname(anno_file))))
+        else:
+            cmd = ("ln -sf " + anno_file + " " + anno_local) 
+            pm.run(cmd, anno_local, container=pm.container)
+    else:
+        # Default annotation file
+        anno_file  = os.path.abspath(anno_path(args.genome_assembly +
+                                     "_annotations.bed.gz"))
+        anno_unzip = os.path.abspath(anno_path(args.genome_assembly +
+                                     "_annotations.bed"))
+
+        if not os.path.exists(anno_file) and not os.path.exists(anno_unzip):
+            print("Skipping read annotation...")
+            print("This requires a {} annotation file."
+                  .format(args.genome_assembly))
+            print("Confirm this file is present in {} or specify using `--anno-name`"
+                  .format(str(os.path.dirname(anno_file))))
+        else:
+            if os.path.exists(anno_file):
+                anno_local = os.path.join(raw_folder,
+                                      args.genome_assembly +
+                                      "_annotations.bed.gz")
+                cmd = ("ln -sf " + anno_file + " " + anno_local)
+            elif os.path.exists(anno_unzip):
+                anno_local = os.path.join(raw_folder,
+                                      args.genome_assembly +
+                                      "_annotations.bed")
+                cmd = ("ln -sf " + anno_unzip + " " + anno_local)
+            else:
+                print("Skipping read annotation...")
+                print("This requires a {} annotation file."
+                      .format(args.genome_assembly))
+                print("Could not find {}.`"
+                      .format(str(os.path.dirname(anno_file))))
+            pm.run(cmd, anno_local, container=pm.container)           
+
+    annoListPlus = list()
+    annoListMinus = list()
+
+    if os.path.isfile(anno_local):
+        # Get list of features
+        cmd1 = (ngstk.ziptool + " -d -c " + anno_local +
+                " | cut -f 4 | sort -u")
+        ftList = pm.checkprint(cmd1, shell=True)
+        ftList = ftList.splitlines()
+
+        # Split annotation file on features
+        cmd2 = (ngstk.ziptool + " -d -c " + anno_local +
+                " | awk -F'\t' '{print>\"" + QC_folder + "/\"$4}'")
+        if len(ftList) >= 1:
+            for pos, anno in enumerate(ftList):
+                # working files
+                annoFile = os.path.join(QC_folder, anno)
+                validName = re.sub('[^\w_.)( -]', '', anno).strip().replace(' ', '_')
+                fileName = os.path.join(QC_folder, validName)
+                annoSort = os.path.join(QC_folder, validName + "_sort.bed")
+                annoCovPlus = os.path.join(QC_folder, args.sample_name + "_" +
+                                           validName + "_plus_coverage.bed")
+                annoCovMinus = os.path.join(QC_folder, args.sample_name + "_" +
+                                            validName + "_minus_coverage.bed")
+
+                # Extract feature files
+                pm.run(cmd2, annoFile.encode('utf-8'), container=pm.container)
+
+                # Rename files to valid filenames
+                cmd = 'mv "{old}" "{new}"'.format(old=annoFile.encode('utf-8'),
+                                                  new=fileName.encode('utf-8'))
+                pm.run(cmd, fileName.encode('utf-8'), container=pm.container)
+
+                # Sort files
+                cmd3 = ("cut -f 1-3 " + fileName.encode('utf-8') +
+                        " | bedtools sort -i stdin -faidx " +
+                        chrOrder + " > " + annoSort.encode('utf-8'))
+                pm.run(cmd3, annoSort.encode('utf-8'), container=pm.container)
+
+                # Calculate coverage
+                annoListPlus.append(annoCovPlus.encode('utf-8'))
+                annoListMinus.append(annoCovMinus.encode('utf-8'))
+                cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
+                        annoSort.encode('utf-8') + " -b " + plus_bam +
+                        " -g " + chrOrder + " > " +
+                        annoCovPlus.encode('utf-8'))
+                cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
+                        annoSort.encode('utf-8') + " -b " + minus_bam +
+                        " -g " + chrOrder + " > " +
+                        annoCovMinus.encode('utf-8'))
+                pm.run(cmd4, annoCovPlus.encode('utf-8'), container=pm.container)
+                pm.run(cmd5, annoCovMinus.encode('utf-8'), container=pm.container)
+                pm.clean_add(fileName.encode('utf-8'))
+                pm.clean_add(annoSort.encode('utf-8'))
+
+                if args.lite:
+                    pm.clean_add(annoCovPlus.encode('utf-8'))
+                    pm.clean_add(annoCovMinus.encode('utf-8'))
+
+    # Plot FRiF or FRiP
+    pm.timestamp("### Plot FRiF")
+    # Plus
+    cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
+           param.samtools.params + " -c -F4 " + plus_bam)
+    totalReads = pm.checkprint(cmd)
+    totalReads = str(totalReads).rstrip()
+
+    frifPDF = os.path.join(QC_folder, args.sample_name + "_plus_frif.pdf")
+    frifPNG = os.path.join(QC_folder, args.sample_name + "_plus_frif.png")
+    frifCmd = [tools.Rscript, tool_path("frif.R"), args.sample_name,
+               totalReads, frifPDF, "--bed"]
+    for cov in annoListPlus:
+        fripCmd.append(cov)
+    cmd = build_command(frifCmd)
+    pm.run(cmd, frifPDF, nofail=False, container=pm.container)
+    pm.report_object("Plus FRiF", frifPDF, anchor_image=fripPNG)
+
+    # Minus
+    cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
+           param.samtools.params + " -c -F4 " + minus_bam)
+    totalReads = pm.checkprint(cmd)
+    totalReads = str(totalReads).rstrip()
+
+    frifPDF = os.path.join(QC_folder, args.sample_name + "_minus_frif.pdf")
+    frifPNG = os.path.join(QC_folder, args.sample_name + "_minus_frif.png")
+    frifCmd = [tools.Rscript, tool_path("frif.R"), args.sample_name,
+               totalReads, frifPDF, "--bed"]
+    for cov in annoListMinus:
+        fripCmd.append(cov)
+    cmd = build_command(frifCmd)
+    pm.run(cmd, frifPDF, nofail=False, container=pm.container)
+    pm.report_object("Minus FRiF", frifPDF, anchor_image=fripPNG)
 
     # Shift and produce BigWig's
     genome_fq = os.path.join(

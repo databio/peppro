@@ -45,12 +45,12 @@ argP <- arg_parser("Produce Fraction of Reads in Features (FRiF) plot(s)")
 # Add command line arguments
 argP <- add_argument(argP, "name",
                      help="Sample name")
-argP <- add_argument(argP, "bed", nargs=Inf,
-                     help="Coverage file(s)")
 argP <- add_argument(argP, "reads", 
                      help="Number of mapped reads")
 argP <- add_argument(argP, "output", 
                      help="Output file")
+argP <- add_argument(argP, "--bed", nargs=Inf,
+                     help="Coverage file(s)")
 
 
 # Parse the command line arguments
@@ -121,9 +121,9 @@ if (file.exists(file.path(argv$bed[1])) && info$size != 0) {
     peakCov$feature <- "Peaks"
 }  else {
     if (info$size == 0) {
-        message("Peak file is empty")
+        message("Coverage file is empty")
     } else {
-        message("Peak file is missing")
+        message("Coverage file is missing")
     }
 }
 
