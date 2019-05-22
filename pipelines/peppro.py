@@ -84,6 +84,10 @@ def parse_arguments():
                         help="Space-delimited list of reference genomes to "
                              "align to before primary alignment.")
 
+    parser.add_argument("--TSS-name", default=None,
+                        dest="TSS_name", type=str,
+                        help="Filename of TSS annotation file.")
+
     parser.add_argument("-V", "--version", action="version",
                         version="%(prog)s {v}".format(v=__version__))
 
@@ -465,6 +469,32 @@ def check_commands(commands, ignore=''):
         return False
 
 
+def calc_frip(bamfile, ftfile, frip_func, pipeline_manager,
+              aligned_reads_key="Aligned_reads"):
+    """
+    Calculate the fraction of reads in feature file.
+
+    Use the given function and data from an aligned reads file and a called
+    peaks file, along with a PipelineManager, to calculate.
+
+    :param str peakfile: path to called peaks file
+    :param callable frip_func: how to calculate the fraction of reads in feat;
+        this must accept the path to the aligned reads file and the path to
+        the called peaks file as arguments.
+    :param str bamfile: path to aligned reads file
+    :param pypiper.PipelineManager pipeline_manager: the PipelineManager in use
+        for the pipeline calling this function
+    :param str aligned_reads_key: name of the key from a stats (key-value) file
+        to use to fetch the count of aligned reads
+    :return float: fraction of reads in peaks
+    """
+    frip_cmd = frip_func(bamfile, ftfile)
+    num_in_reads = pipeline_manager.checkprint(frip_cmd)
+    num_aligned_reads = pipeline_manager.get_stat(aligned_reads_key)
+    print(num_aligned_reads, num_in_reads)
+    return float(num_in_reads) / float(num_aligned_reads)
+
+
 ###############################################################################
 def main():
     """
@@ -516,6 +546,11 @@ def main():
     gfolder = os.path.join(res.genomes, args.genome_assembly)
     res.chrom_sizes = os.path.join(
         gfolder, args.genome_assembly + ".chromSizes")
+
+    if args.TSS_name:
+        res.TSS_file = os.path.abspath(args.TSS_name)
+    else:
+        res.TSS_file = os.path.join(gfolder, args.genome_assembly + "_TSS.tsv")
 
     # Get bowtie2 indexes
     res.bt2_genome = _get_bowtie2_index(res.genomes, args.genome_assembly)
@@ -1082,6 +1117,90 @@ def main():
     ])
     
     pm.run([cmd1,cmd2], minus_bam)
+
+    # TSS enrichment
+    if not os.path.exists(res.TSS_file):
+        print("Skipping TSS -- TSS enrichment requires TSS annotation file: {}"
+              .format(res.TSS_file))
+    else:
+        pm.timestamp("### Calculate TSS enrichment")
+
+        # Plus
+        Tss_plus = os.path.join(QC_folder, args.sample_name +
+                                "_plus_TssEnrichment.txt")
+        cmd = tool_path("pyTssEnrichment.py")
+        cmd += " -a " + plus_bam + " -b " + res.TSS_file + " -p ends"
+        cmd += " -c " + str(pm.cores)
+        cmd += " -e 2000 -u -v -s 4 -o " + Tss_plus
+        pm.run(cmd, Tss_plus, nofail=True, container=pm.container)
+
+        # Call Rscript to plot TSS Enrichment
+        Tss_plus_pdf = os.path.join(QC_folder,  args.sample_name +
+                                    "_TssEnrichment.pdf")
+        cmd = ("Rscript " + tool_path("TSSenrichmentPlot.R"))
+        cmd += " " + Tss_plus + " pdf"
+        pm.run(cmd, Tss_plus_pdf, nofail=True, container=pm.container)
+
+        # Always plot strand specific TSS enrichment.
+        # added by Ryan 2/10/17 to calculate TSS score as numeric and to
+        # include in summary stats. This could be done in prettier ways which
+        # I'm open to. Just adding for the idea.
+        with open(Tss_plus) as f:
+            floats = list(map(float, f))
+        try:
+            # If the TSS enrichment is 0, don't report
+            Tss_score = ((sum(floats[1950:2050]) / 100) /
+                         (sum(floats[1:200]) / 200))
+            pm.report_result("TSS_Score", Tss_score)
+        except ZeroDivisionError:
+            pass
+
+        Tss_plus_png = os.path.join(QC_folder,  args.sample_name +
+                                    "_plus_TssEnrichment.png")
+        pm.report_object("Plus TSS enrichment", Tss_plus_pdf,
+                         anchor_image=Tss_plus_png)
+
+        plus_FRiTSS = calc_frip(plus_bam, res.TSS_file,
+                                frip_func=ngstk.simple_frip,
+                                pipeline_manager=pm)
+        pm.report_result("Plus FRiTSS", plus_FRiTSS)
+
+        # Minus
+        Tss_minus = os.path.join(QC_folder, args.sample_name +
+                                  "_minus_TssEnrichment.txt")
+        cmd = tool_path("pyTssEnrichment.py")
+        cmd += " -a " + minus_bam + " -b " + res.TSS_file + " -p ends"
+        cmd += " -c " + str(pm.cores)
+        cmd += " -e 2000 -u -v -s 4 -o " + Tss_minus
+        pm.run(cmd, Tss_minus, nofail=True, container=pm.container)
+
+        # Call Rscript to plot TSS Enrichment
+        Tss_minus_pdf = os.path.join(QC_folder,  args.sample_name +
+                                     "_minus_TssEnrichment.pdf")
+        cmd = ("Rscript " + tool_path("TSSenrichmentPlot.R"))
+        cmd += " " + Tss_minus + " pdf"
+        pm.run(cmd, Tss_minus_pdf, nofail=True, container=pm.container)
+
+        # Always plot strand specific TSS enrichment.
+        with open(Tss_minus) as f:
+            floats = list(map(float, f))
+        try:
+            # If the TSS enrichment is 0, don't report
+            Tss_score = ((sum(floats[1950:2050]) / 100) /
+                         (sum(floats[1:200]) / 200))
+            pm.report_result("TSS_Score", Tss_score)
+        except ZeroDivisionError:
+            pass
+
+        Tss_minus_png = os.path.join(QC_folder,  args.sample_name +
+                                     "_minus_TssEnrichment.png")
+        pm.report_object("Minus TSS enrichment", Tss_minus_pdf,
+                         anchor_image=Tss_minus_png)
+
+        minus_FRiTSS = calc_frip(minus_bam, res.TSS_file,
+                                 frip_func=ngstk.simple_frip,
+                                 pipeline_manager=pm)
+        pm.report_result("Minus FRiTSS", minus_FRiTSS)
 
     # Shift and produce BigWig's
     genome_fq = os.path.join(
