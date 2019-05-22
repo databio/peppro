@@ -1,0 +1,9 @@
+# ignore local annotation files
+anno/hg19_annotations.bed.gz
+anno/hg19_annotations.bed
+anno/hg38_annotations.bed.gz
+anno/hg38_annotations.bed
+anno/mm10_annotations.bed.gz
+anno/mm10_annotations.bed
+anno/mm9_annotations.bed.gz
+anno/mm9_annotations.bed
