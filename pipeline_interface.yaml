@@ -1,6 +1,10 @@
 protocol_mapping:
   PRO: peppro.py
-  PRO-SEQ: peppro.py 
+  pro: peppro.py
+  PRO-SEQ: peppro.py
+  PRO-seq: peppro.py
+  PROSEQ: peppro.py
+  proseq: peppro.py
 
 pipelines:
   peppro.py:
