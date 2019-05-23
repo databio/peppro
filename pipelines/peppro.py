@@ -18,6 +18,7 @@ import pypiper
 from pypiper import build_command
 
 TOOLS_FOLDER = "tools"
+ANNO_FOLDER  = "anno"
 DEDUPLICATORS = ["seqkit", "fqdedup"]
 ADAPTER_REMOVAL = ["fastp", "cutadapt"]
 TRIMMERS = ["seqtk", "fastx"]
@@ -501,6 +502,19 @@ def calc_frip(bamfile, ftfile, frip_func, pipeline_manager,
     num_aligned_reads = pipeline_manager.get_stat(aligned_reads_key)
     print(num_aligned_reads, num_in_reads)
     return float(num_in_reads) / float(num_aligned_reads)
+
+
+def anno_path(anno_name):
+    """
+    Return the path to an annotation file used by this pipeline.
+
+    :param str anno_name: name of the annotation file 
+                          (e.g., a specific genome's annotations)
+    :return str: real, absolute path to tool (expansion and symlink resolution)
+    """
+
+    return os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                        ANNO_FOLDER, anno_name)
 
 
 ###############################################################################
@@ -1202,7 +1216,7 @@ def main():
 
     # Fraction of reads in Pre-mRNA (FRiP)
     if not os.path.exists(res.pre_file):
-        print("Skipping FRiP -- Fraction of reads in pre-mRNA requires"
+        print("Skipping FRiP -- Fraction of reads in pre-mRNA requires "
               "pre-mRNA annotation file: {}"
               .format(res.pre_file))
     else:
@@ -1282,6 +1296,13 @@ def main():
         cmd2 = (ngstk.ziptool + " -d -c " + anno_local +
                 " | awk -F'\t' '{print>\"" + QC_folder + "/\"$4}'")
         if len(ftList) >= 1:
+            chrOrder = os.path.join(QC_folder, "chr_order.txt")
+            cmd = (tools.samtools + " view -H " + mapping_genome_bam +
+                   " | grep 'SN:' | awk -F':' '{print $2,$3}' | " +
+                   "awk -F' ' -v OFS='\t' '{print $1,$3}' > " + chrOrder)
+            pm.run(cmd, chrOrder, container=pm.container)
+            pm.clean_add(chrOrder)
+
             for pos, anno in enumerate(ftList):
                 # working files
                 annoFile = os.path.join(QC_folder, anno)
@@ -1294,38 +1315,36 @@ def main():
                                             validName + "_minus_coverage.bed")
 
                 # Extract feature files
-                pm.run(cmd2, annoFile.encode('utf-8'), container=pm.container)
+                pm.run(cmd2, annoFile, container=pm.container)
 
                 # Rename files to valid filenames
-                cmd = 'mv "{old}" "{new}"'.format(old=annoFile.encode('utf-8'),
-                                                  new=fileName.encode('utf-8'))
-                pm.run(cmd, fileName.encode('utf-8'), container=pm.container)
+                cmd = 'mv "{old}" "{new}"'.format(old=annoFile,
+                                                  new=fileName)
+                pm.run(cmd, fileName, container=pm.container)
 
                 # Sort files
-                cmd3 = ("cut -f 1-3 " + fileName.encode('utf-8') +
+                cmd3 = ("cut -f 1-3 " + fileName +
                         " | bedtools sort -i stdin -faidx " +
-                        chrOrder + " > " + annoSort.encode('utf-8'))
-                pm.run(cmd3, annoSort.encode('utf-8'), container=pm.container)
+                        chrOrder + " > " + annoSort)
+                pm.run(cmd3, annoSort, container=pm.container)
 
                 # Calculate coverage
-                annoListPlus.append(annoCovPlus.encode('utf-8'))
-                annoListMinus.append(annoCovMinus.encode('utf-8'))
+                annoListPlus.append(annoCovPlus)
+                annoListMinus.append(annoCovMinus)
                 cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        annoSort.encode('utf-8') + " -b " + plus_bam +
+                        annoSort + " -b " + plus_bam +
                         " -g " + chrOrder + " > " +
-                        annoCovPlus.encode('utf-8'))
+                        annoCovPlus)
                 cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        annoSort.encode('utf-8') + " -b " + minus_bam +
+                        annoSort + " -b " + minus_bam +
                         " -g " + chrOrder + " > " +
-                        annoCovMinus.encode('utf-8'))
-                pm.run(cmd4, annoCovPlus.encode('utf-8'), container=pm.container)
-                pm.run(cmd5, annoCovMinus.encode('utf-8'), container=pm.container)
-                pm.clean_add(fileName.encode('utf-8'))
-                pm.clean_add(annoSort.encode('utf-8'))
-
-                if args.lite:
-                    pm.clean_add(annoCovPlus.encode('utf-8'))
-                    pm.clean_add(annoCovMinus.encode('utf-8'))
+                        annoCovMinus)
+                pm.run(cmd4, annoCovPlus, container=pm.container)
+                pm.run(cmd5, annoCovMinus, container=pm.container)
+                pm.clean_add(fileName)
+                pm.clean_add(annoSort)
+                pm.clean_add(annoCovPlus)
+                pm.clean_add(annoCovMinus)
 
     # Plot FRiF
     pm.timestamp("### Plot FRiF")
@@ -1340,10 +1359,10 @@ def main():
     frifCmd = [tools.Rscript, tool_path("frif.R"), args.sample_name,
                totalReads, frifPDF, "--bed"]
     for cov in annoListPlus:
-        fripCmd.append(cov)
+        frifCmd.append(cov)
     cmd = build_command(frifCmd)
     pm.run(cmd, frifPDF, nofail=False, container=pm.container)
-    pm.report_object("Plus FRiF", frifPDF, anchor_image=fripPNG)
+    pm.report_object("Plus FRiF", frifPDF, anchor_image=frifPNG)
 
     # Minus
     cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
@@ -1356,10 +1375,10 @@ def main():
     frifCmd = [tools.Rscript, tool_path("frif.R"), args.sample_name,
                totalReads, frifPDF, "--bed"]
     for cov in annoListMinus:
-        fripCmd.append(cov)
+        frifCmd.append(cov)
     cmd = build_command(frifCmd)
     pm.run(cmd, frifPDF, nofail=False, container=pm.container)
-    pm.report_object("Minus FRiF", frifPDF, anchor_image=fripPNG)
+    pm.report_object("Minus FRiF", frifPDF, anchor_image=frifPNG)
 
     # Shift and produce BigWig's
     genome_fq = os.path.join(
