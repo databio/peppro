@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # bamQC.py
 #
 # Last updated 8/4/18: Jason Smith
@@ -127,7 +127,7 @@ class bamQC(pararead.ParaReadProcessor):
                 mitoCount = mitoCount + float(flags['num_pairs'])
                 chrStats = {'mitoReads':mitoCount}         
                 #chrStats.update(flags)
-                np.save(chrom_out_file, chrStats)
+                np.save(chrom_out_file, chrStats, allow_pickle=True)
                 return chrom
             if isPE:
                 readVals = getRead(self.fetch_chunk(chrom), isPE)
@@ -144,7 +144,7 @@ class bamQC(pararead.ParaReadProcessor):
                         M2 = value
                 chrStats = {'M_DISTINCT':M_DISTINCT, 'M1':M1, 'M2':M2}         
                 chrStats.update(flags)
-                np.save(chrom_out_file, chrStats)
+                np.save(chrom_out_file, chrStats, allow_pickle=True)
             else:
                 readSE = getRead(self.fetch_chunk(chrom), isPE)
                 readSE = readSE.drop(columns='query_name')
@@ -159,7 +159,7 @@ class bamQC(pararead.ParaReadProcessor):
                             M2 += 1
                 chrStats = {'M_DISTINCT':M_DISTINCT, 'M1':M1, 'M2':M2}         
                 chrStats.update(flags)
-                np.save(chrom_out_file, chrStats)
+                np.save(chrom_out_file, chrStats, allow_pickle=True)
             return chrom
         else:
             _LOGGER.warn("{} could not be found.".format(self.reads_filename))
@@ -190,7 +190,7 @@ class bamQC(pararead.ParaReadProcessor):
                 if not os.path.exists(temp_files[i] + '.npy'):
                     continue
                 # load chrom data and add to dict                
-                chrStats = np.load(temp_files[i] + '.npy')
+                chrStats = np.load(temp_files[i] + '.npy', allow_pickle=True)
                 stats = {k: stats.get(k, 0) + chrStats.item().get(k, 0) for k in set(stats) | set(chrStats.item())}
             if stats['num_pairs'] == 0:
                 total = max(1, float(stats['num_reads'])) 
