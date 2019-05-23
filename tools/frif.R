@@ -86,7 +86,7 @@ for (i in required_libraries) {
 ###############################################################################
 
 #### FUNCTIONS ####
-calcFRiP <- function(bedFile) {
+calcFRiF <- function(bedFile) {
     colnames(bedFile) <- c("chromosome","start","end","count")
     grObj   <- makeGRangesFromDataFrame(bedFile)
     grObj   <- reduce(grObj)
@@ -111,94 +111,85 @@ palette <- colorRampPalette(c("#999999", "#FFC107", "#27C6AB", "#004D40",
                               "#B97BC8", "#009E73", "#C92404", "#E3E550",
                               "#372B4C", "#E3DAC7", "#27CAE6", "#B361BC",
                               "#897779", "#6114F8", "#19C42B", "#56B4E9"))
-
+plotColors <- palette(length(argv$bed))
 info    <- file.info(file.path(argv$bed[1]))
+
 if (file.exists(file.path(argv$bed[1])) && info$size != 0) {
-    peaks      <- read.table(file.path(argv$bed[1]))
-    peakCov    <- calcFRiP(peaks)
-    labels[1,] <- c(0.95*max(log10(peakCov$cumSize)), max(peakCov$frip)+0.001,
-                    "Peaks", round(max(peakCov$frip),2), "#FF0703")
-    peakCov$feature <- "Peaks"
+    bed        <- read.table(file.path(argv$bed[1]))
+    bedCov     <- calcFRiF(bed)
+    name       <- basename(tools::file_path_sans_ext(argv$bed[1]))
+    name       <- gsub(argv$name, "", name)
+    name       <- gsub("^.*?_", "", name)
+    numFields  <- 2
+    for(i in 1:numFields) name <- gsub("_[^_]*$", "", name)  
+    labels[1,] <- c(0.95*max(log10(bedCov$cumSize)), max(bedCov$frip)+0.001,
+                    name, round(max(bedCov$frip),2), "#FF0703")
+    bedCov$feature <- name
 }  else {
     if (info$size == 0) {
-        message("Coverage file is empty")
+        message(paste0(name, " coverage file is empty"))
     } else {
-        message("Coverage file is missing")
+        message(paste0(name, " coverage file is missing"))
     }
 }
 
-if (exists("peakCov")) {
-    covDF <- peakCov
+if (exists("bedCov")) {
+    covDF <- bedCov
 }
 
-plotColors <- palette(length(argv$bed))
+if (length(argv$bed) > 1) {
+    for (i in 2:length(argv$bed)) {
+        name       <- basename(tools::file_path_sans_ext(argv$bed[i]))
+        name       <- gsub(argv$name, "", name)
+        name       <- gsub("^.*?_", "", name)
+        numFields  <- 2
+        for(j in 1:numFields) name <- gsub("_[^_]*$", "", name) 
 
-for (i in 2:length(argv$bed)) {
-    name <- basename(tools::file_path_sans_ext(argv$bed[i]))
-    name <- gsub("_coverage", "", name)
-    name <- gsub(argv$name, "", name)
-    name <- gsub("^.*?_", "", name)
-    if (file.exists(file.path(argv$bed[i])) && info$size != 0) {
-        bed     <- read.table(file.path(argv$bed[i]))
-    }  else {
-        outFile <- file.path(argv$output)
-        system2(paste("touch"), outFile)
-        quit()
-    }
-    if (max(bed[,4] > 0)) {
-        if (exists("covDF")) {
-            covFile <- calcFRiP(bed)
-            covFile$feature <- name
-            covDF   <- rbind(covDF, covFile)
-            labels  <- rbind(labels, c(0.95*max(log10(covFile$cumSize)),
-                                       max(covFile$frip)+0.001,
-                                       name, round(max(covFile$frip),2),
-                                       plotColors[i]))           
-        } else {
-            covDF         <- calcFRiP(bed)
-            covDF$feature <- name
-            labels        <- rbind(labels, c(0.95*max(log10(covDF$cumSize)),
-                                             max(covDF$frip)+0.001,
-                                             name, round(max(covDF$frip),2),
-                                             plotColors[i]))
+        if (file.exists(file.path(argv$bed[i])) && info$size != 0) {
+            bed     <- read.table(file.path(argv$bed[i]))
+        }  else {
+            outFile <- file.path(argv$output)
+            system2(paste("touch"), outFile)
+            quit()
+        }
+        if (max(bed[,4] > 0)) {
+            if (exists("covDF")) {
+                covFile <- calcFRiF(bed)
+                covFile$feature <- name
+                covDF   <- rbind(covDF, covFile)
+                labels  <- rbind(labels, c(0.95*max(log10(covFile$cumSize)),
+                                           max(covFile$frip)+0.001,
+                                           name, round(max(covFile$frip),2),
+                                           plotColors[i]))           
+            } else {
+                covDF         <- calcFRiF(bed)
+                covDF$feature <- name
+                labels        <- rbind(labels, c(0.95*max(log10(covDF$cumSize)),
+                                                 max(covDF$frip)+0.001,
+                                                 name, round(max(covDF$frip),2),
+                                                 plotColors[i]))
+            }
         }
     }
 }
 
-# Reorder to make peaks first if they are present
+# Reorder by labels
 if (exists("covDF")) {
     covDF$feature <- factor(covDF$feature, levels=(labels$name))
 }
 
-if (length(argv$bed) == 0 &&
-    file.exists(file.path(argv$peaks)) &&
-    file.info(file.path(argv$peaks))$size != 0) {
-    # Only plot FRiP
-    p <- ggplot(covDF, aes(x=numfeats, y=frip,
-                           group=feature, color=feature)) +
-        geom_line() +
-        labs(x="Number of peaks", y="FRiP") +
-        #scale_x_continuous(labels = scales::comma) +
-        theme_classic() +
-        theme(panel.border = element_rect(colour = "black", fill=NA,
-                                          size=0.5))
-    p <- p + scale_color_manual(labels=paste0(labels$name, ": ", labels$val),
-                                values=labels$color) +
-             theme(legend.position=c(0.05,0.95),
-                   legend.justification=c(0.1,0.9))
-} else if (!is.null(argv$bed)) {
+if (!is.null(argv$bed)) {
     # Produce plot with bed files
     p <- ggplot(covDF, aes(x=log10(cumSize), y=frip,
                            group=feature, color=feature)) +
         geom_line() +
         labs(x="log(number of bases)", y="FRiF") +
-        #scale_x_continuous(labels = scales::comma) +
         theme_classic() +
         theme(panel.border = element_rect(colour = "black", fill=NA, size=0.5))
     
     # Recolor and reposition legend
     p <- p + scale_color_manual(labels=paste0(labels$name, ": ", labels$val),
-                           values=labels$color) +
+                                values=labels$color) +
              theme(legend.position=c(0.05,0.95),
                    legend.justification=c(0.1,0.9))
 } else {
@@ -219,11 +210,7 @@ p
 invisible(dev.off())
 
 if (exists("p")) {
-    if (length(argv$bed) == 0) {
-        write("Cumulative FRiP plot completed!\n", stdout())
-    } else {
-        write("Cumulative FRiF plots completed!\n", stdout())
-    }
+    write("Cumulative FRiF plot completed!\n", stdout())
 } else {
     write("Unable to produce FRiF plot!\n", stdout())
 }
