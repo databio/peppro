@@ -5,7 +5,7 @@ PEPPRO - PRO-seq pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 
 
 from argparse import ArgumentParser
@@ -1003,6 +1003,15 @@ def main():
         ar = ngstk.count_mapped_reads(mapping_genome_bam, args.paired_end)
         rr = float(pm.get_stat("Raw_reads"))
         tr = float(pm.get_stat("Trimmed_reads"))
+        if os.path.exists(res.pre_file):
+            cmd = (tools.samtools + " depth -b " +
+                   res.pre_file + mapping_genome_bam +
+                   " | awk '{counter++;sum+=$3}END{print sum/counter}'")
+            rd = pm.checkprint(cmd)
+        else:
+            cmd = (tools.samtools + " depth " + mapping_genome_bam +
+                   " | awk '{counter++;sum+=$3}END{print sum/counter}'")
+            rd = pm.checkprint(cmd)
         pm.report_result("Mapped_reads", mr)
         pm.report_result("QC_filtered_reads",
                          round(float(mr)) - round(float(ar)))
@@ -1011,6 +1020,8 @@ def main():
                          float(tr), 2))
         pm.report_result("Total_efficiency", round(float(ar) * 100 /
                          float(rr), 2))
+        if rd and rd.strip():
+            pm.report_result("Read_depth", round(float(rd), 2))
 
     pm.run([cmd, cmd2], mapping_genome_bam,
            follow=check_alignment_genome, container=pm.container)
