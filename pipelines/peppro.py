@@ -18,9 +18,9 @@ import pypiper
 from pypiper import build_command
 
 TOOLS_FOLDER = "tools"
-DEDUPLICATORS = ["fqdedup", "seqkit"]
-ADAPTER_REMOVAL = ["cutadapt", "fastp"]
-TRIMMERS = ["fastx", "seqtk"]
+DEDUPLICATORS = ["seqkit", "fqdedup"]
+ADAPTER_REMOVAL = ["fastp", "cutadapt"]
+TRIMMERS = ["seqtk", "fastx"]
 
 # TODO: if PE and I interleave for fastq processing, do I split before running
 # bowtie2 or just run it interleaved?
