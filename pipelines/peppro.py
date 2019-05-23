@@ -92,6 +92,10 @@ def parse_arguments():
                         dest="pre_name", type=str,
                         help="Filename of pre-mRNA annotation file.")
 
+    parser.add_argument("--anno-name", default=None,
+                        dest="anno_name", type=str,
+                        help="Filename of genomic annotation file.")
+
     parser.add_argument("-V", "--version", action="version",
                         version="%(prog)s {v}".format(v=__version__))
 
@@ -1323,7 +1327,7 @@ def main():
                     pm.clean_add(annoCovPlus.encode('utf-8'))
                     pm.clean_add(annoCovMinus.encode('utf-8'))
 
-    # Plot FRiF or FRiP
+    # Plot FRiF
     pm.timestamp("### Plot FRiF")
     # Plus
     cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
