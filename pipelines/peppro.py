@@ -750,7 +750,7 @@ def main():
             ]
 
         if args.complexity:
-            adapter_cmd_chunks.extend([(">", noadap_fastq)]
+            adapter_cmd_chunks.extend([(">", noadap_fastq)])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
     
