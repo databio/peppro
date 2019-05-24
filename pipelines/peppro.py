@@ -816,7 +816,7 @@ def main():
                     ])
                 if args.complexity:
                     # Need undeduplicated results for complexity calculation
-                    trim_cmd_chunks2 = trim_cmd_chunks
+                    trim_cmd_chunks2 = trim_cmd_chunks.copy()
                     trim_cmd_chunks2.extend([noadap_fastq])
                     trim_cmd_chunks.extend([dedup_fastq])
                 else:
@@ -850,7 +850,7 @@ def main():
                 ])
                 if args.complexity:
                     # Need undeduplicated results for complexity calculation
-                    trim_cmd_chunks2 = trim_cmd_chunks
+                    trim_cmd_chunks2 = trim_cmd_chunks.copy()
                     trim_cmd_chunks2.extend([
                         ("-i", noadap_fastq)
                     ])
@@ -888,7 +888,7 @@ def main():
                 if args.complexity:
                     trim_cmd_chunks.extend([dedup_fastq])
                     # Need undeduplicated results for complexity calculation
-                    trim_cmd_chunks2 = trim_cmd_chunks
+                    trim_cmd_chunks2 = trim_cmd_chunks.copy()
                     trim_cmd_chunks2.extend([noadap_fastq])
                 else:
                     trim_cmd_chunks.extend(["-"])
@@ -914,7 +914,7 @@ def main():
                         tools.fastp,
                         ("--thread", str(pm.cores))
                     ]
-                    trim_cmd_chunks2 = trim_cmd_chunks
+                    trim_cmd_chunks2 = trim_cmd_chunks.copy()
                     trim_cmd_chunks.extend([
                         ("-i", dedup_fastq),
                         "--stdout",
@@ -975,7 +975,7 @@ def main():
                         tools.fastp,
                         ("--thread", str(pm.cores))
                     ]
-                    trim_cmd_chunks2 = trim_cmd_chunks
+                    trim_cmd_chunks2 = trim_cmd_chunks.copy()
                     trim_cmd_chunks2.extend([
                         ("-i", noadap_fastq),
                         "--stdout",
@@ -1039,7 +1039,7 @@ def main():
                     ("-L", str(args.max_len))
                 ])
             if args.complexity:
-                trim_cmd_chunks2 = trim_cmd_chunks
+                trim_cmd_chunks2 = trim_cmd_chunks.copy()
                 trim_cmd_chunks2.extend([
                     (noadap_fastq, "|"),
                     (tools.seqtk, "seq"),
@@ -1074,7 +1074,7 @@ def main():
             ])
             if args.complexity:
                 # Need undeduplicated results for complexity calculation
-                trim_cmd_chunks2 = trim_cmd_chunks
+                trim_cmd_chunks2 = trim_cmd_chunks.copy()
                 trim_cmd_chunks2.extend([
                     ("-i", noadap_fastq)
                 ])
@@ -1110,7 +1110,7 @@ def main():
                     ("-L", str(args.max_len))
                 ])
             if args.complexity:
-                trim_cmd_chunks2 = trim_cmd_chunks
+                trim_cmd_chunks2 = trim_cmd_chunks.copy()
                 trim_cmd_chunks2.extend([
                     (noadap_fastq, "|"),
                     (tools.seqtk, "seq"),
@@ -1134,6 +1134,8 @@ def main():
     trim_cmd = build_command(trim_cmd_chunks)
     if args.complexity:
         trim_cmd2 = build_command(trim_cmd_chunks2)
+    print("trim_cmd: {}".format(trim_cmd))  # DEBUG
+    print("trim_cmd2: {}".format(trim_cmd2))  # DEBUG
 
     # Put it all together
     if not args.complexity:
@@ -1143,7 +1145,7 @@ def main():
            follow=ngstk.check_trim(processed_fastq, False, None))
     else:
         pm.run([adapter_cmd, dedup_cmd, trim_cmd, trim_cmd2],
-               [noadap_fastq, dedup_fastq, trimmed_fastq, processed_fastq],
+               [noadap_fastq, dedup_fastq, processed_fastq, trimmed_fastq],
                follow=ngstk.check_trim(processed_fastq, False, None))
         pm.clean_add(noadap_fastq)
         pm.clean_add(dedup_cmd)
