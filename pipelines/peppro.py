@@ -771,15 +771,13 @@ def main():
         dedup_cmd = build_command(dedup_cmd_chunks)
 
     elif args.dedup == "fqdedup":
-        dedup_cmd_chunks = [
-            tools.fqdedup,
-            ("-i", "-"),
-            "-o"
-        ]
+        dedup_cmd_chunks = [tools.fqdedup]
         if args.complexity:
-            dedup_cmd_chunks.extend([dedup_fastq])
+            dedup_cmd_chunks.extend([("-i", noadap_fastq)])
+            dedup_cmd_chunks.extend([("-o", dedup_fastq)])
         else:
-            dedup_cmd_chunks.extend(["-"])
+            dedup_cmd_chunks.extend([("-i", "-")])
+            dedup_cmd_chunks.extend([("-o", "-")])
 
         dedup_cmd = build_command(dedup_cmd_chunks)
 
