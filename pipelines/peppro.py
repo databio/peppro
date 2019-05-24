@@ -1005,7 +1005,7 @@ def main():
         tr = float(pm.get_stat("Trimmed_reads"))
         if os.path.exists(res.pre_file):
             cmd = (tools.samtools + " depth -b " +
-                   res.pre_file + mapping_genome_bam +
+                   res.pre_file + " " + mapping_genome_bam +
                    " | awk '{counter++;sum+=$3}END{print sum/counter}'")
             rd = pm.checkprint(cmd)
         else:
