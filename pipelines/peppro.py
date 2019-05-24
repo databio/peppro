@@ -689,13 +689,10 @@ def main():
 
         if args.complexity:
             if args.paired_end:
-                adapter_cmd_chunks.extend("-o")
-                adapter_cmd_chunks.extend(noadap_fastq)
-                adapter_cmd_chunks.extend("-O")
-                adapter_cmd_chunks.extend(noadap_fastq_R2)
+                adapter_cmd_chunks.extend([("-o", noadap_fastq)])
+                adapter_cmd_chunks.extend([("-O", noadap_fastq_R2)])
             else:
-                adapter_cmd_chunks.extend("-o")
-                adapter_cmd_chunks.extend(noadap_fastq)
+                adapter_cmd_chunks.extend([("-o", noadap_fastq)])
         else:
             adapter_cmd_chunks.extend("--stdout")
 
@@ -723,10 +720,8 @@ def main():
             adapter_cmd_chunks.extend([
                 untrimmed_fastq1])
 
-        #print("adapter_cmd_chunks: {}".format(adapter_cmd_chunks))  # DEBUG
         if args.complexity:
-            adapter_cmd_chunks.extend("-o")
-            adapter_cmd_chunks.extend(noadap_fastq)
+            adapter_cmd_chunks.extend([("-o", noadap_fastq)])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
 
@@ -755,8 +750,7 @@ def main():
             ]
 
         if args.complexity:
-            adapter_cmd_chunks.extend(">")
-            adapter_cmd_chunks.extend(noadap_fastq)
+            adapter_cmd_chunks.extend([(">", noadap_fastq)]
 
         adapter_cmd = build_command(adapter_cmd_chunks)
     
@@ -770,9 +764,9 @@ def main():
             "-o"           
         ]
         if args.complexity:
-            dedup_cmd_chunks.extend(dedup_fastq)
+            dedup_cmd_chunks.extend([dedup_fastq])
         else:
-            dedup_cmd_chunks.extend("-")
+            dedup_cmd_chunks.extend(["-"])
 
         dedup_cmd = build_command(dedup_cmd_chunks)
 
@@ -783,9 +777,9 @@ def main():
             "-o"
         ]
         if args.complexity:
-            dedup_cmd_chunks.extend(dedup_fastq)
+            dedup_cmd_chunks.extend([dedup_fastq])
         else:
-            dedup_cmd_chunks.extend("-")
+            dedup_cmd_chunks.extend(["-"])
 
         dedup_cmd = build_command(dedup_cmd_chunks)
 
@@ -799,9 +793,9 @@ def main():
             "-o"           
         ]
         if args.complexity:
-            dedup_cmd_chunks.extend(dedup_fastq)
+            dedup_cmd_chunks.extend([dedup_fastq])
         else:
-            dedup_cmd_chunks.extend("-")
+            dedup_cmd_chunks.extend(["-"])
 
         dedup_cmd = build_command(dedup_cmd_chunks)
 
@@ -825,18 +819,18 @@ def main():
                 if args.complexity:
                     # Need undeduplicated results for complexity calculation
                     trim_cmd_chunks2 = trim_cmd_chunks
-                    trim_cmd_chunks2.extend(noadap_fastq)
-                    trim_cmd_chunks.extend(dedup_fastq)
+                    trim_cmd_chunks2.extend([noadap_fastq])
+                    trim_cmd_chunks.extend([dedup_fastq])
                 else:
-                    trim_cmd_chunks.extend("-")
-                trim_cmd_chunks.extend("|")
+                    trim_cmd_chunks.extend(["-"])
+                trim_cmd_chunks.extend(["|"])
                 trim_cmd_chunks.extend([
                     tools.seqtk,
                     ("seq", "-r"),
                     ("-", ">"),
                     processed_fastq
                 ])
-                trim_cmd_chunks2.extend("|")
+                trim_cmd_chunks2.extend(["|"])
                 trim_cmd_chunks2.extend([
                     tools.seqtk,
                     ("seq", "-r"),
@@ -894,20 +888,20 @@ def main():
                         ("-L", str(args.max_len))
                     ])
                 if args.complexity:
-                    trim_cmd_chunks.extend(dedup_fastq)
+                    trim_cmd_chunks.extend([dedup_fastq])
                     # Need undeduplicated results for complexity calculation
                     trim_cmd_chunks2 = trim_cmd_chunks
-                    trim_cmd_chunks2.extend(noadap_fastq)
+                    trim_cmd_chunks2.extend([noadap_fastq])
                 else:
-                    trim_cmd_chunks.extend("-")
-                trim_cmd_chunks.extend("|")
+                    trim_cmd_chunks.extend(["-"])
+                trim_cmd_chunks.extend(["|"])
                 trim_cmd_chunks.extend([
                     tools.seqtk,
                     ("seq", "-r"),
                     ("-", ">"),
                     processed_fastq
                 ])
-                trim_cmd_chunks2.extend("|")
+                trim_cmd_chunks2.extend(["|"])
                 trim_cmd_chunks2.extend([
                     tools.seqtk,
                     ("seq", "-r"),
