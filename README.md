@@ -34,9 +34,9 @@ export GENOMES="/path/to/genomes/folder/"
 
 ## Example use
 
-Using the [K562 sample](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM1480327) as our staring point, we can perform FASTQ preparation, alignment, and bigWig production in a single command.  As written, the pipeline looks for the mappability information in a subfolder titled `mappability/` within the parent genome folder.  For example, if I'm using hg38, I'd need a folder like so: `/the/path/to/hg38/mappability/`. To work with this central repository of mappability information, a slightly [modified version of seqOutBias](https://github.com/jpsmith5/seqOutBias/) is required.
+Using the [K562 sample](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM1480327) as our staring point, we can perform FASTQ preparation, alignment, and bigWig production in a single command.  As written, the pipeline looks for the mappability information in a subfolder titled `mappability/` within the parent genome folder.  For example, if I'm using hg38, I'd need a folder like so: `/the/path/to/hg38/mappability/`.
 
-You can build that modified version like so (requires Python3 to build):
+To build seqOutBias (requires Python3):
 * clone the repository and move into it
 * `cargo build --release`
 * copy the `target/release/seqOutBias` file to `/usr/bin` or update your `$PATH` variable to include seqOutBias
