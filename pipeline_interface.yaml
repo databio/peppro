@@ -21,12 +21,22 @@ pipelines:
       "--single-or-paired": read_type
     optional_arguments:
       "--input2": read2
-      "--prealignments": prealignments
+      "--runon": runon
       "--adapter": adapter
       "--dedup": dedup
       "--trimmer": trimmer
+      "--umi": umi
+      "--umi_len": umi_len
+      "--max_len": max_len
+      "--scale": scale
+      "--parts": parts
+      "--prealignments": prealignments
+      "--TSS-name": TSS_name
+      "--pre-name": pre_name
+      "--anno-name": anno_name
       "--keep": keep
       "--noFIFO": no_fifo
+      "--complexity": complexity
     compute:
       singularity_image: ${SIMAGES}peppro
       docker_image: databio/peppro
