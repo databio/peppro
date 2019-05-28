@@ -1459,8 +1459,6 @@ def main():
     if args.complexity:
         pm.run([cmd_dups, cmd2_dups],
                [mapping_genome_bam_temp_dups, mapping_genome_bam_dups],
-               follow=lambda: check_alignment_genome(mapping_genome_bam_temp_dups,
-                                                     mapping_genome_bam_dups),
                container=pm.container)
 
     if not args.prealignments:
