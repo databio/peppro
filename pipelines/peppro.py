@@ -115,7 +115,7 @@ def parse_arguments():
 
 def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                     assembly_identifier, assembly_bt2, outfolder,
-                    aligndir=None, bt2_opts_txt=None):
+                    aligndir=None, bt2_opts_txt=None, dups=False):
     """
     A helper function to run alignments in series, so you can run one alignment
     followed by another; this is useful for successive decoy alignments.
@@ -146,27 +146,44 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             sub_outdir = os.path.join(outfolder, aligndir)
 
         ngstk.make_dir(sub_outdir)
-        bamname = "{}_{}.bam".format(args.sample_name, assembly_identifier)
+        if dups:
+            bamname = "{}_{}_dups.bam".format(args.sample_name, assembly_identifier)
+            summary_name = "{}_{}_bt_aln_dups_summary.log".format(args.sample_name,
+                                                                  assembly_identifier)
+        else:
+            bamname = "{}_{}.bam".format(args.sample_name, assembly_identifier)
+            summary_name = "{}_{}_bt_aln_summary.log".format(args.sample_name,
+                                                             assembly_identifier)
         mapped_bam = os.path.join(sub_outdir, bamname)
-        summary_name = "{}_{}_bt_aln_summary.log".format(args.sample_name,
-                                                          assembly_identifier)
         summary_file = os.path.join(sub_outdir, summary_name)
 
         out_fastq_pre = os.path.join(
             sub_outdir, args.sample_name + "_" + assembly_identifier)
-        out_fastq_r1 = out_fastq_pre + '_unmap_R1.fq.gz'
-        out_fastq_r2 = out_fastq_pre + '_unmap_R2.fq.gz'
+        if dups:
+            out_fastq_r1 = out_fastq_pre + '_unmap_dups_R1.fq.gz'
+            out_fastq_r2 = out_fastq_pre + '_unmap_dups_R2.fq.gz'
+        else:
+            out_fastq_r1 = out_fastq_pre + '_unmap_R1.fq.gz'
+            out_fastq_r2 = out_fastq_pre + '_unmap_R2.fq.gz'
 
         if useFIFO and paired and not args.keep:
-            out_fastq_tmp = os.path.join(sub_outdir,
-                    assembly_identifier + "_bt2")
+            if dups:
+                out_fastq_tmp = os.path.join(sub_outdir,
+                                             assembly_identifier + "_dups_bt2")
+            else:
+                out_fastq_tmp = os.path.join(sub_outdir,
+                                             assembly_identifier + "_bt2")
             cmd = "mkfifo " + out_fastq_tmp
-            
+
             if os.path.exists(out_fastq_tmp):
                 os.remove(out_fastq_tmp)
             pm.run(cmd, out_fastq_tmp, container=pm.container)
+
         else:
-            out_fastq_tmp = out_fastq_pre + '_unmap.fq'
+            if dups:
+                out_fastq_tmp = out_fastq_pre + '_unmap_dups.fq'
+            else:
+                out_fastq_tmp = out_fastq_pre + '_unmap.fq'
 
         filter_pair = build_command([tools.perl,
             tool_path("filter_paired_fq.pl"), out_fastq_tmp,
@@ -1227,7 +1244,8 @@ def main():
                     args, tools, args.paired_end, False, unmap_fq1_dups,
                     unmap_fq2_dups, reference,
                     assembly_bt2=_get_bowtie2_index(res.genomes, reference),
-                    outfolder=param.outfolder, aligndir="prealignments")
+                    outfolder=param.outfolder, aligndir="prealignments",
+                    dups=True)
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                     args, tools, args.paired_end, True, unmap_fq1,
@@ -1239,7 +1257,8 @@ def main():
                     args, tools, args.paired_end, True, unmap_fq1_dups,
                     unmap_fq2_dups, reference,
                     assembly_bt2=_get_bowtie2_index(res.genomes, reference),
-                    outfolder=param.outfolder, aligndir="prealignments")
+                    outfolder=param.outfolder, aligndir="prealignments",
+                    dups=True)
             else:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
