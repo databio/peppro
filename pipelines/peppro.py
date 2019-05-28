@@ -1173,49 +1173,57 @@ def main():
         Report QC metrics on intermediate steps of fastq file preparation
         """
         if args.adapter == "fastp":
-            adapter_contamination_term = "reads with adapter trimmed:"
+            adapter_term = "reads with adapter trimmed:"
             too_short_term = "reads failed due to too short:"
-            total_reads_term = "total reads:"
+            total_bases_term = "total bases:"
 
-            ac_cmd = ("grep '" + adapter_contamination_term + "' " +
-               adapter_report + " | head -n 1 | awk '{print $NF}'")
+            ac_cmd = ("grep '" + adapter_term + "' " +
+                       adapter_report + " | head -n 1 | awk '{print $NF}'")
             ts_cmd = ("grep '" + too_short_term + "' " +
-               adapter_report + " | head -n 1 | awk '{print $NF}'")
-            tr_cmd = ("grep '" + total_reads_term + "' " +
-               adapter_report + " | head -n 1 | awk '{print $NF}'")
+                       adapter_report + " | head -n 1 | awk '{print $NF}'")
+            bases = ("grep '" + total_bases_term + "' " +
+                     adapter_report + " | head -n 1 | awk '{print $NF}'")
+            adapter_bases = ("grep 'bases trimmed due to adapters:' " +
+                             adapter_report + " | awk '{print $NF}'")
 
             pm.report_object("FastP_report", adapter_html)
 
         elif args.adapter == "cutadapt":
-            adapter_contamination_term = "Reads with adapters:"
+            adapter_term = "Reads with adapters:"
             too_short_term = "Reads that were too short:"
-            total_reads_term = "Total reads processed:"
+            total_bases_term = "Total basepairs processed:"
 
-            ac_cmd = ("grep '" + adapter_contamination_term + "' " +
-               adapter_report + " | awk '{print $(NF-1)}'")
+            ac_cmd = ("grep '" + adapter_term + "' " +
+                      adapter_report + " | awk '{print $(NF-1)}'")
             ts_cmd = ("grep '" + too_short_term + "' " +
-               adapter_report + " | awk '{print $(NF-1)}'")
-            tr_cmd = ("grep '" + total_reads_term + "' " +
-               adapter_report + " | awk '{print $NF}'")
+                      adapter_report + " | awk '{print $(NF-1)}'")
+            bases = ("grep '" + total_bases_term + "' " +
+                     adapter_report + " | awk '{print $(NF-1)}'")
+            adapter_bp = ("awk '{sum+=$1*$2} END {printf \"%.0f\", sum}'" +
+                          adapter_report)
 
         else:  # default to fastp
-            adapter_contamination_term = "reads with adapter trimmed:"
+            adapter_term = "reads with adapter trimmed:"
             too_short_term = "reads failed due to too short:"
-            total_reads_term = "total reads:"
+            total_bases_term = "total bases:"
 
-            ac_cmd = ("grep '" + adapter_contamination_term + "' " +
-               adapter_report + " | head -n 1 | awk '{print $NF}'")
+            ac_cmd = ("grep '" + adapter_term + "' " +
+                       adapter_report + " | head -n 1 | awk '{print $NF}'")
             ts_cmd = ("grep '" + too_short_term + "' " +
-               adapter_report + " | head -n 1 | awk '{print $NF}'")
-            tr_cmd = ("grep '" + total_reads_term + "' " +
-               adapter_report + " | head -n 1 | awk '{print $NF}'")
+                       adapter_report + " | head -n 1 | awk '{print $NF}'")
+            bases = ("grep '" + total_bases_term + "' " +
+                     adapter_report + " | head -n 1 | awk '{print $NF}'")
+            adapter_bases = ("grep 'bases trimmed due to adapters:' " +
+                             adapter_report + " | awk '{print $NF}'")
 
             pm.report_object("FastP_report", adapter_html)
 
         ac = float(pm.checkprint(ac_cmd).replace(',',''))
         pm.report_result("Reads_with_adapter", ac)
-        total = float(pm.get_stat("Raw_reads"))
-        pm.report_result("Adapter_contamination", round(float(ac/total), 2))
+        total_bases = float(pm.checkprint(bases).replace(',',''))
+        total_adapter = float(pm.checkprint(adapter_bases).replace(',',''))
+        pm.report_result("Pct_adapter_contamination",
+                         round(float(total_adapter/total_bases), 2))
 
         ts = float(pm.checkprint(ts_cmd).replace(',',''))
         pm.report_result("Reads_too_short", ts)
@@ -1513,7 +1521,6 @@ def main():
         mr_dups = pm.checkprint(cmd_dups)
 
         if mr_dups and mr_dups.strip():
-            #pm.report_result("Mitochondrial_reads_dups", round(float(mr_dups)))
             # Index the sort'ed BAM file first
             mapping_genome_index_dups = os.path.join(mapping_genome_bam_dups + ".bai")
             noMT_mapping_genome_bam_dups = os.path.join(
