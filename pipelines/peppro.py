@@ -1199,8 +1199,8 @@ def main():
                       adapter_report + " | awk '{print $(NF-1)}'")
             bases = ("grep '" + total_bases_term + "' " +
                      adapter_report + " | awk '{print $(NF-1)}'")
-            adapter_bp = ("awk '{sum+=$1*$2} END {printf \"%.0f\", sum}'" +
-                          adapter_report)
+            adapter_bases = ("awk '{sum+=$1*$2} END {printf \"%.0f\", sum}' " +
+                             adapter_report)
 
         else:  # default to fastp
             adapter_term = "reads with adapter trimmed:"
