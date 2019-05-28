@@ -793,7 +793,9 @@ def main():
             "-o"           
         ]
         if args.complexity:
-            dedup_cmd_chunks.extend([dedup_fastq])
+            dedup_cmd_chunks.extend([
+                (dedup_fastq, noadap_fastq)
+            ])
         else:
             dedup_cmd_chunks.extend(["-"])
 
@@ -820,7 +822,9 @@ def main():
             "-o"           
         ]
         if args.complexity:
-            dedup_cmd_chunks.extend([dedup_fastq])
+            dedup_cmd_chunks.extend([
+                (dedup_fastq, noadap_fastq)
+            ])
         else:
             dedup_cmd_chunks.extend(["-"])
 
@@ -1220,9 +1224,6 @@ def main():
         dr = int(ngstk.count_lines(dedup_fastq).strip())
         dups = max(0, (float(tr)/4 - float(dr)/4))
         pm.report_result("Duplicate_reads", dups)
-
-        #pm.run(ngstk.check_trim(processed_fastq, False, None),
-        #       lock_name="check_trim")
 
     # Put it all together
     if args.complexity:
