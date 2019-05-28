@@ -249,25 +249,26 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
 
         pm.clean_add(out_fastq_tmp)
 
-        cmd = ("grep 'aligned exactly 1 time' " + summary_file +
-               " | awk '{print $1}'")
-        align_exact = pm.checkprint(cmd)
-        if align_exact:
-            ar = float(align_exact)*2
-        else:
-            ar = 0
+        if not dups:
+            cmd = ("grep 'aligned exactly 1 time' " + summary_file +
+                   " | awk '{print $1}'")
+            align_exact = pm.checkprint(cmd)
+            if align_exact:
+                ar = float(align_exact)*2
+            else:
+                ar = 0
 
-        # report aligned reads
-        pm.report_result("Aligned_reads_" + assembly_identifier, ar)
-        try:
-            # wrapped in try block in case Trimmed_reads is not reported in this
-            # pipeline.
-            tr = float(pm.get_stat("Trimmed_reads"))
-        except:
-            print("Trimmed reads is not reported.")
-        else:
-            res_key = "Alignment_rate_" + assembly_identifier
-            pm.report_result(res_key, round(float(ar) * 100 / float(tr), 2))
+            # report aligned reads
+            pm.report_result("Aligned_reads_" + assembly_identifier, ar)
+            try:
+                # wrapped in try block in case Trimmed_reads is not reported 
+                # in this pipeline.
+                tr = float(pm.get_stat("Trimmed_reads"))
+            except:
+                print("Trimmed reads is not reported.")
+            else:
+                res_key = "Alignment_rate_" + assembly_identifier
+                pm.report_result(res_key, round(float(ar) * 100 / float(tr), 2))
         
         if paired:
             unmap_fq1 = out_fastq_r1
@@ -1395,8 +1396,6 @@ def main():
     cmd += " -T " + tempdir
     cmd += " -o " + mapping_genome_bam_temp
 
-    #pm.run(cmd, mapping_genome_bam_temp, container=pm.container)
-
     if args.complexity:
         cmd_dups = tools.bowtie2 + " -p " + str(pm.cores)
         cmd_dups += bt2_options
@@ -1410,8 +1409,6 @@ def main():
         cmd_dups += " | " + tools.samtools + " sort - -@ 1"
         cmd_dups += " -T " + tempdir
         cmd_dups += " -o " + mapping_genome_bam_temp_dups
-
-        #pm.run(cmd_dups, mapping_genome_bam_temp_dups, container=pm.container)
 
     # Split genome mapping result bamfile into two: high-quality aligned
     # reads (keepers) and unmapped reads (in case we want to analyze the
