@@ -661,19 +661,15 @@ def main():
         fastq_folder, args.sample_name + "_R2_noadap.fastq")
     dedup_fastq = os.path.join(
         fastq_folder, args.sample_name + "_R1_dedup.fastq")
-    dedup_fastq_R2 = os.path.join(
-        fastq_folder, args.sample_name + "_R2_dedup.fastq")
     trimmed_fastq = os.path.join(
         fastq_folder, args.sample_name + "_R1_trimmed.fastq")
-    trimmed_fastq_R2 = os.path.join(
-        fastq_folder, args.sample_name + "_R2_trimmed.fastq")
     processed_fastq = os.path.join(
         fastq_folder, args.sample_name + "_R1_processed.fastq")
-    processed_fastq_R2 = os.path.join(
-        fastq_folder, args.sample_name + "_R2_processed.fastq")
     
-    adapter_report = os.path.join(
+    adapter_html = os.path.join(
         fastqc_folder, args.sample_name + "_rmAdapter.html")
+    adapter_report = os.path.join(
+        fastqc_folder, args.sample_name + "_rmAdapter.txt")
     umi_report = os.path.join(
         fastqc_folder, args.sample_name + "_rmUmi.html")
 
@@ -686,22 +682,22 @@ def main():
     if args.adapter == "fastp":
         if args.paired_end:
             adapter_cmd_chunks = [
-                tools.fastp,
+                ("(" + tools.fastp),
                 ("--thread", str(pm.cores)),
                 ("--in1", untrimmed_fastq1),
                 ("--in2", untrimmed_fastq2),
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_report)
+                ("--html", adapter_html)
             ]
         else:
             adapter_cmd_chunks = [
-                tools.fastp,
+                ("(" + tools.fastp),
                 ("--thread", str(pm.cores)),
                 ("--in1", untrimmed_fastq1),
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_report)
+                ("--html", adapter_html)
             ]
 
         if args.complexity:
@@ -711,15 +707,19 @@ def main():
             else:
                 adapter_cmd_chunks.extend([("-o", noadap_fastq)])
         else:
-            adapter_cmd_chunks.extend("--stdout")
+            adapter_cmd_chunks.extend([("--stdout")])
+
+        adapter_cmd_chunks.extend([
+            (") 2>", adapter_report)
+        ])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
 
     elif args.adapter == "cutadapt":
         cut_version = float(pm.checkprint("cutadapt --version"))
-        #print("cut_version: {}".format(cut_version))  # DEBUG
-        adapter_cmd_chunks = [tools.cutadapt]
 
+        adapter_cmd_chunks = ["(" + tools.cutadapt]
+        # old versions of cutadapt can not use multiple cores
         if cut_version >= 1.15:
             adapter_cmd_chunks.extend([("-j", str(pm.cores))])
 
@@ -731,14 +731,18 @@ def main():
             adapter_cmd_chunks.extend([
                 "--interleaved",               
                 untrimmed_fastq1,
-                untrimmed_fastq2]
-            )
+                untrimmed_fastq2
+            ])
         else:
             adapter_cmd_chunks.extend([
-                untrimmed_fastq1])
+                untrimmed_fastq1
+            ])
 
         if args.complexity:
-            adapter_cmd_chunks.extend([("-o", noadap_fastq)])
+            adapter_cmd_chunks.extend([
+                ("-o", noadap_fastq + ")"),
+                (">", adapter_report)
+            ])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
 
@@ -746,31 +750,39 @@ def main():
         # Default to fastp
         if args.paired_end:
             adapter_cmd_chunks = [
-                tools.fastp,
+                ("(" + tools.fastp),
                 ("--thread", str(pm.cores)),
                 ("--in1", untrimmed_fastq1),
                 ("--in2", untrimmed_fastq2),
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_report),
-                "--stdout"
+                ("--html", adapter_html)
             ]
         else:
             adapter_cmd_chunks = [
-                tools.fastp,
+                ("(" + tools.fastp),
                 ("--thread", str(pm.cores)),
                 ("--in1", untrimmed_fastq1),
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_report),
-                "--stdout"
+                ("--html", adapter_html)
             ]
 
         if args.complexity:
-            adapter_cmd_chunks.extend([(">", noadap_fastq)])
+            if args.paired_end:
+                adapter_cmd_chunks.extend([("-o", noadap_fastq)])
+                adapter_cmd_chunks.extend([("-O", noadap_fastq_R2)])
+            else:
+                adapter_cmd_chunks.extend([("-o", noadap_fastq)])
+        else:
+            adapter_cmd_chunks.extend([("--stdout")])
+
+        adapter_cmd_chunks.extend([
+            (") 2>", adapter_report)
+        ])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
-    
+
     # Create deduplication command(s).
     if args.dedup == "seqkit":
         dedup_cmd_chunks = [
@@ -1151,22 +1163,81 @@ def main():
     trim_cmd = build_command(trim_cmd_chunks)
     if args.complexity:
         trim_cmd2 = build_command(trim_cmd_chunks2)
-    print("trim_cmd: {}".format(trim_cmd))  # DEBUG
-    print("trim_cmd2: {}".format(trim_cmd2))  # DEBUG
+
+    def report_fastq():
+        """
+        Report QC metrics on intermediate steps of fastq file preparation
+        """
+        if args.adapter == "fastp":
+            adapter_contamination_term = "reads with adapter trimmed:"
+            too_short_term = "reads failed due to too short:"
+            total_reads_term = "total reads:"
+
+            ac_cmd = ("grep '" + adapter_contamination_term + "' " +
+               adapter_report + " | head -n 1 | awk '{print $NF}'")
+            ts_cmd = ("grep '" + too_short_term + "' " +
+               adapter_report + " | head -n 1 | awk '{print $NF}'")
+            tr_cmd = ("grep '" + total_reads_term + "' " +
+               adapter_report + " | head -n 1 | awk '{print $NF}'")
+
+            pm.report_object("FastP_report", adapter_html)
+
+        elif args.adapter == "cutadapt":
+            adapter_contamination_term = "Reads with adapters:"
+            too_short_term = "Reads that were too short:"
+            total_reads_term = "Total reads processed:"
+
+            ac_cmd = ("grep '" + adapter_contamination_term + "' " +
+               adapter_report + " | awk '{print $(NF-1)}'")
+            ts_cmd = ("grep '" + too_short_term + "' " +
+               adapter_report + " | awk '{print $(NF-1)}'")
+            tr_cmd = ("grep '" + total_reads_term + "' " +
+               adapter_report + " | awk '{print $NF}'")
+
+        else:  # default to fastp
+            adapter_contamination_term = "reads with adapter trimmed:"
+            too_short_term = "reads failed due to too short:"
+            total_reads_term = "total reads:"
+
+            ac_cmd = ("grep '" + adapter_contamination_term + "' " +
+               adapter_report + " | head -n 1 | awk '{print $NF}'")
+            ts_cmd = ("grep '" + too_short_term + "' " +
+               adapter_report + " | head -n 1 | awk '{print $NF}'")
+            tr_cmd = ("grep '" + total_reads_term + "' " +
+               adapter_report + " | head -n 1 | awk '{print $NF}'")
+
+            pm.report_object("FastP_report", adapter_html)
+
+        ac = float(pm.checkprint(ac_cmd).replace(',',''))
+        pm.report_result("Reads_with_adapter", ac)
+        total = float(pm.get_stat("Raw_reads"))
+        pm.report_result("Adapter_contamination", round(float(ac/total), 2))
+
+        ts = float(pm.checkprint(ts_cmd).replace(',',''))
+        pm.report_result("Reads_too_short", ts)
+
+        tr = int(ngstk.count_lines(noadap_fastq).strip())
+        dr = int(ngstk.count_lines(dedup_fastq).strip())
+        dups = max(0, (float(tr)/4 - float(dr)/4))
+        pm.report_result("Duplicate_reads", dups)
+
+        #pm.run(ngstk.check_trim(processed_fastq, False, None),
+        #       lock_name="check_trim")
 
     # Put it all together
-    if not args.complexity:
+    if args.complexity:
+        pm.run([adapter_cmd, dedup_cmd, trim_cmd2],
+               trimmed_fastq, follow=report_fastq)
+        pm.run(trim_cmd, processed_fastq,
+               follow=ngstk.check_trim(processed_fastq, False, None))
+        pm.clean_add(noadap_fastq)
+        pm.clean_add(dedup_fastq)
+        pm.clean_add(trimmed_fastq)
+    else:
         process_fastq_cmd = build_command([
             adapter_cmd, "|", dedup_cmd, "|", trim_cmd])
         pm.run(process_fastq_cmd, processed_fastq,
            follow=ngstk.check_trim(processed_fastq, False, None))
-    else:
-        pm.run([adapter_cmd, dedup_cmd, trim_cmd, trim_cmd2],
-               [noadap_fastq, dedup_fastq, processed_fastq, trimmed_fastq],
-               follow=ngstk.check_trim(processed_fastq, False, None))
-        pm.clean_add(noadap_fastq)
-        pm.clean_add(dedup_cmd)
-        pm.clean_add(trim_cmd)
 
     pm.clean_add(os.path.join(fastq_folder, "*.fq"), conditional=True)
     pm.clean_add(os.path.join(fastq_folder, "*.log"), conditional=True)
@@ -1315,6 +1386,8 @@ def main():
     cmd += " -T " + tempdir
     cmd += " -o " + mapping_genome_bam_temp
 
+    #pm.run(cmd, mapping_genome_bam_temp, container=pm.container)
+
     if args.complexity:
         cmd_dups = tools.bowtie2 + " -p " + str(pm.cores)
         cmd_dups += bt2_options
@@ -1328,6 +1401,8 @@ def main():
         cmd_dups += " | " + tools.samtools + " sort - -@ 1"
         cmd_dups += " -T " + tempdir
         cmd_dups += " -o " + mapping_genome_bam_temp_dups
+
+        #pm.run(cmd_dups, mapping_genome_bam_temp_dups, container=pm.container)
 
     # Split genome mapping result bamfile into two: high-quality aligned
     # reads (keepers) and unmapped reads (in case we want to analyze the
@@ -1375,15 +1450,16 @@ def main():
         if rd and rd.strip():
             pm.report_result("Read_depth", round(float(rd), 2))
 
-    pm.run([cmd, cmd2], mapping_genome_bam,
-           follow=check_alignment_genome(mapping_genome_bam_temp,
-                                         mapping_genome_bam),
+    pm.run([cmd, cmd2], [mapping_genome_bam_temp, mapping_genome_bam],
+           follow=lambda: check_alignment_genome(mapping_genome_bam_temp,
+                                                 mapping_genome_bam),
            container=pm.container)
 
     if args.complexity:
-        pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups,
-               follow=check_alignment_genome(mapping_genome_bam_temp_dups,
-                                             mapping_genome_bam_dups),
+        pm.run([cmd_dups, cmd2_dups],
+               [mapping_genome_bam_temp_dups, mapping_genome_bam_dups],
+               follow=lambda: check_alignment_genome(mapping_genome_bam_temp_dups,
+                                                     mapping_genome_bam_dups),
                container=pm.container)
 
     if not args.prealignments:
@@ -1459,6 +1535,9 @@ def main():
 
         # Calculate library complexity
         pm.timestamp("### Calculate library complexity")
+        QC_folder = os.path.join(param.outfolder, "QC_" + args.genome_assembly)
+        ngstk.make_dir(QC_folder)
+
         preseq_output = os.path.join(
             QC_folder, args.sample_name + "_preseq_out.txt")
         preseq_yield = os.path.join(
@@ -1485,8 +1564,8 @@ def main():
         cmd4 = (tools.preseq + " gc_extrap -v -o " + preseq_cov +
                 " " + preseq_mr)
         cmd5 = ("echo '" + preseq_yield +
-                "'$(" + tools.samtools + " view -c -F 4 " + 
-                mapping_genome_bam_dups + ") " +
+                " '$(" + tools.samtools + " view -c -F 4 " + 
+                mapping_genome_bam_dups + ")" + "' '" +
                 "$(" + tools.samtools + " view -c -F 4 " +
                 mapping_genome_bam + ") > " + preseq_counts)
 
@@ -1498,15 +1577,13 @@ def main():
         genome_size = int(pm.checkprint(cmd))
 
         cmd = (tool_path("preseq_complexity_curves.py") +
-               "-c " + genome_size + " -l 30 -r " +
-               preseq_counts + "-o " + preseq_plot + " " + preseq_yield)
+               " -c " + str(genome_size) + " -l 30 -r " +
+               preseq_counts + " -o " + preseq_plot + " " + preseq_yield)
 
         pm.run(cmd, [preseq_pdf, preseq_png])
 
     # Calculate quality control metrics for the alignment file
     pm.timestamp("### Calculate NRF, PBC1, and PBC2")
-    QC_folder = os.path.join(param.outfolder, "QC_" + args.genome_assembly)
-    ngstk.make_dir(QC_folder)
 
     # Need index for mapping_genome_bam before calculating bamQC metrics
     mapping_genome_index = os.path.join(mapping_genome_bam + ".bai")
