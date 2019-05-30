@@ -99,6 +99,28 @@ for (i in required_libraries) {
 ###############################################################################
 # FUNCTIONS
 
+#' Plot library complexity curves
+#'
+#' This function plots library complexity curves using data from
+#' preseq.
+#' @param ccurves A single preseq output file from one sample.
+#' @param more_ccurves A list of additional preseq output files from more samples
+#' @param coverage Use coverage on axes instead of read counts. Enter the number
+#'                 of base pairs of your reference genome.
+#' @param read_length Sequence read length, for use in coverage calculations.
+#' @param real_counts_path File name for a file with three columns -
+#'                         preseq filename, total number of reads, number of
+#'                         unique reads
+#'                         (unique is optional, file is whitespace delimited)
+#' @param use_unique If FALSE, ignore information about unique read counts
+#'                   found in real_counts_path file.
+#' @param output_name Desired output name (produces both .pdf and .png files).
+#' @param x_min Lower x-limit (default 0)
+#' @param x_max Upper x-limit (default 500 million)
+#' @keywords preseq library complexity
+#' @export
+#' @examples
+#' plot_complexity_curves()
 plot_complexity_curves <- function(ccurves, more_ccurves,
                                    coverage=0, read_length=0,
                                    real_counts_path=FALSE, use_unique=TRUE,
@@ -371,7 +393,16 @@ plot_complexity_curves <- function(ccurves, more_ccurves,
     }
 }
 
-
+#' Compute the axis value limit
+#'
+#' This function returns the index of ccurve_TOTAL_READS containing the
+#' closest value to x_max
+#' @param value An axis limit value.
+#' @param ccurve_TOTAL_READS A vector of read counts from a sample.
+#' @keywords preseq limit
+#' @export
+#' @examples
+#' computeLimit()
 computeLimit <- function(value, ccurve_TOTAL_READS) {
     # This function returns the index of ccurve_TOTAL_READS containing the 
     # closest value to x_max
