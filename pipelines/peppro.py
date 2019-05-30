@@ -1740,7 +1740,10 @@ def main():
                " -c " + str(genome_size) + " -l " + max_len +
                " -r " + preseq_counts + " -o " + preseq_plot)
 
-        pm.run(cmd, [preseq_pdf, preseq_png])
+        pm.run(cmd, [preseq_pdf, preseq_png], container=pm.container)
+
+        pm.report_object("Library complexity", preseq_pdf,
+                         anchor_image=preseq_png)
 
     # Calculate quality control metrics for the alignment file
     pm.timestamp("### Calculate NRF, PBC1, and PBC2")
