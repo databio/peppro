@@ -1,5 +1,14 @@
 # Getting started
 
+## 1: Clone the `PEPPRO` pipeline
+
+Clone the pipeline:
+```
+git clone https://github.com/databio/peppro.git
+```
+
+## 2: Install required software
+
 PEPPRO uses a series of publicly-available, common bioinformatics tools including:
 
 * [samtools](http://www.htslib.org/)
@@ -7,57 +16,73 @@ PEPPRO uses a series of publicly-available, common bioinformatics tools includin
 * [seqkit](https://bioinf.shenwei.me/seqkit/)
 * [fastp](https://github.com/OpenGene/fastp)
 * [seqtk](https://github.com/lh3/seqtk)
-* [seqOutBias](https://github.com/guertinlab/seqOutBias)
-  
-## Optional software
+* [preseq](http://smithlabresearch.org/software/preseq/)
+* [wigToBigWig, bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/)
 
-Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming, deduplication, and reverse complementation.  The use of `fqdedup`, in particular, is useful if you wish to minimize memory use at the expense of speed.  I also suggest using the default required tools simply due to the fact that the `fastx toolkit` has not been supported since 2012 and issues with reads utilizing newer Phred quality scores can cause problems.
+### Python packages
+
+`PEPATAC` uses several packages under the hood. Make sure you're up-to-date with a user-specific install:
+
+```{bash}
+cd peppro
+pip install --user -r requirements.txt
+```
+  
+### Optional software
+
+Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming, deduplication, and reverse complementation.  The use of `fqdedup`, in particular, is useful if you wish to minimize memory use at the expense of speed.  I suggest using the default required tools simply due to the fact that the `fastx toolkit` has not been supported since 2012.
+
+`seqOutBias` can be used to take into account the mappability at a given read length to filter the sample signal.
 
 *Optional tools:*
 
 * [fqdedup](https://github.com/guertinlab/fqdedup)
 * [cutadapt](https://cutadapt.readthedocs.io/)
 * [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
+* [seqOutBias](https://github.com/guertinlab/seqOutBias)
+* [pigz (v2.3.4+)](https://zlib.net/pigz/)
 
-## Reference genomes
+## 3: Download `refgenie` assemblies
 
 The pipeline relies on [`Refgenie` assemblies](https://github.com/databio/refgenie) for alignment.  You have two options for using `refgenie` assemblies. If you're using a common genome, there's a good chance there's already a [downloadable pre-built `refgenie` assembly](http://big.databio.org/refgenomes) for your genome. Otherwise, you can follow the [`refgenie` instructions to create your own](https://github.com/databio/refgenie).
 
-The pipeline looks for genomes stored in a folder specified by the `resources.genomes` attribute in the [pipeline config file](https://github.com/databio/peppro/blob/master/pipelines/peppro.yaml). By default, this points to the shell variable `GENOMES`, so all you have to do is set an environment variable to the location of your refgenie genomes:
+```console
+wget http://big.databio.org/refgenomes/hg38.tgz
+wget http://big.databio.org/refgenomes/human_repeats_170502.tgz
+wget http://big.databio.org/refgenomes/rCRSd_170502.tgz
+tar -xf hg38.tgz
+tar -xf human_repeats_170502.tgzz
+tar -xf rCRSd_170502.tgz
 ```
-export GENOMES="/path/to/genomes/folder/"
+
+## 4: Point the pipeline to your Refgenie assemblies
+
+Once you've obtained assemblies for all genomes you wish to use, you must point the pipeline to where you store them. You can do this by adjusting the `resources.genomes` attribute in the [pipeline config file](https://github.com/databio/pepatac/blob/master/pipelines/pepatac.yaml). By default, this points to the shell variable `$GENOMES`, so all you have to do is set an environment variable to the location of your refgenie genomes:
+
+```
+export GENOMES="/path/to/genomes/"
 ```
 (Add this to your .bashrc or .profile to ensure it persists). Alternatively, you can skip the `GENOMES` variable and simply change the value of the r`resources.genomes` configuration option to point to the folder where you stored the assemblies. 
 
-## Example use
+## 5: Run the pipeline script directly
 
-Using the [K562 sample](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM1480327) as our staring point, we can perform FASTQ preparation, alignment, and bigWig production in a single command.  As written, the pipeline looks for the mappability information in a subfolder titled `mappability/` within the parent genome folder.  For example, if I'm using hg38, I'd need a folder like so: `/the/path/to/hg38/mappability/`. To work with this central repository of mappability information, a slightly [modified version of seqOutBias](https://github.com/jpsmith5/seqOutBias/) is required.
+Using a [K562 sample](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM1480327) as our staring point, we can perform FASTQ preparation, alignment, and bigWig production in a single command.  The pipeline at its core is just a python script, and you can run it on the command line for a single sample (see [command-line usage](usage)), which you can also get on the command line by running `pipelines/peppro.py --help`. You just need to pass a few command-line parameters to specify sample name, reference genome, input files, etc. Here's the basic command to run a small test example through the pipeline:
 
-You can build that modified version like so (requires Python3 to build):
-* clone the repository and move into it
-* `cargo build --release`
-* copy the `target/release/seqOutBias` file to `/usr/bin` or update your `$PATH` variable to include seqOutBias
+We use a shell variable that points to raw data, `DATA`, and another pointing to where all processed data should be stored, which we name `PROCESSED`.  You can either define those variables for your environment or just change the example below to the full path to each on your system.
 
-### From command line:
-
-We use a shell variable that points to where all processed data should be stored, which we name `PROCESSED`.  You can either define that variable for your environment or just change the example below to the full path you'd like to store the processed output from the pipeline.
-
-```
+```console
 /pipelines/peppro.py --single-or-paired single 
   --genome hg38 
   --sample-name K562_pro
   --input $DATA/K562_pro.fastq
-  --adapter cutadapt
-  --dedup fqdedup
-  --trimmer fastx
+  --adapter fasto
+  --dedup seqkit
+  --trimmer seqtk
   -O $PROCESSED/pro_example/
 ```
 
-### Use `Looper`:
+# 6. Next steps
 
-If using `looper` and the configuration files provided in the `examples/` folder:
+This is just the beginning. For your next step, take a look at one of these user guides:
 
-```
-looper run examples/K562_example.yaml
-```
-
+- See other detailed user guide links in the side menu
