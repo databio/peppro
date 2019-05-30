@@ -895,9 +895,12 @@ def main():
                         ("-Q", str(33))
                     ])
                 trim_cmd_chunks.extend([
-                    ("-f", str(int(float(args.umi_len)) + 1)),
-                    ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                    ("-f", str(int(float(args.umi_len)) + 1))
                 ])
+                if args.max_len != -1:
+                    trim_cmd_chunks.extend([
+                        ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                    ])
 
                 if args.complexity:
                     # Need undeduplicated results for complexity calculation
@@ -995,10 +998,13 @@ def main():
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
                         "|",
-                        (tools.seqtk, "trimfq"),
-                        ("-L", args.max_len),
-                        "-"
-                    ])
+                        (tools.seqtk, "trimfq")
+                    ]
+                    if args.max_len != -1:
+                        trim_cmd_chunks.extend([
+                            ("-L", args.max_len)
+                        ])
+                    trim_cmd_chunks.extend(["-"])
                     if args.runon.lower() == "gro":
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)                        
@@ -1019,10 +1025,13 @@ def main():
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
                         "|",
-                        (tools.seqtk, "trimfq"),
-                        ("-L", args.max_len),
-                        "-"
-                    ])
+                        (tools.seqtk, "trimfq")
+                    ]
+                    if args.max_len != -1:
+                        trim_cmd_chunks2.extend([
+                            ("-L", args.max_len)
+                        ])
+                    trim_cmd_chunks2.extend(["-"])
                     if args.runon.lower() == "gro":
                         trim_cmd_chunks2.extend([
                             (">", trimmed_fastq)                        
@@ -1046,10 +1055,13 @@ def main():
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
                         "|",
-                        (tools.seqtk, "trimfq"),
-                        ("-L", args.max_len),
-                        "-"
+                        (tools.seqtk, "trimfq")
                     ]
+                    if args.max_len != -1:
+                        trim_cmd_chunks.extend([
+                            ("-L", args.max_len)
+                        ])
+                    trim_cmd_chunks.extend(["-"])
                     if args.runon.lower() == "gro":
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)                        
@@ -1077,10 +1089,13 @@ def main():
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
                         "|",
-                        (tools.seqtk, "trimfq"),
-                        ("-L", args.max_len),
-                        "-"
-                    ])
+                        (tools.seqtk, "trimfq")
+                    ]
+                    if args.max_len != -1:
+                        trim_cmd_chunks2.extend([
+                            ("-L", args.max_len)
+                        ])
+                    trim_cmd_chunks2.extend(["-"])
                     if args.runon.lower() == "gro":
                         trim_cmd_chunks2.extend([
                             (">", trimmed_fastq)
@@ -1100,10 +1115,13 @@ def main():
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
                         "|",
-                        (tools.seqtk, "trimfq"),
-                        ("-L", args.max_len),
-                        "-"
-                    ])
+                        (tools.seqtk, "trimfq")
+                    ]
+                    if args.max_len != -1:
+                        trim_cmd_chunks.extend([
+                            ("-L", args.max_len)
+                        ])
+                    trim_cmd_chunks.extend(["-"])
                     if args.runon.lower() == "gro":
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)
@@ -1126,10 +1144,13 @@ def main():
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
                         "|",
-                        (tools.seqtk, "trimfq"),
-                        ("-L", args.max_len),
-                        "-"
+                        (tools.seqtk, "trimfq")
                     ]
+                    if args.max_len != -1:
+                        trim_cmd_chunks.extend([
+                            ("-L", args.max_len)
+                        ])
+                    trim_cmd_chunks.extend(["-"])
                     if args.runon.lower() == "gro":
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)
@@ -1202,9 +1223,12 @@ def main():
                     ("-Q", str(33))
                 ])
             trim_cmd_chunks.extend([
-                ("-f", str(int(float(args.umi_len)) + 1)),
-                ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                ("-f", str(int(float(args.umi_len)) + 1))
             ])
+            if args.max_len != -1:
+                trim_cmd_chunks.extend([
+                    ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                ])
             if args.complexity:
                 # Need undeduplicated results for complexity calculation
                 trim_cmd_chunks2 = trim_cmd_chunks.copy()
@@ -1634,6 +1658,14 @@ def main():
         pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam)
         pm.clean_add(mapping_genome_index)
 
+    # Determine maximum read length
+    cmd = (tools.samtools + " stats " + mapping_genome_bam +
+           " | grep '^SN' | cut -f 2- | grep 'maximum length:' | cut -f 2-")
+    max_len = int(pm.checkprint(cmd))
+
+    if args.max_len != -1:
+        max_len = args.max_len
+
     if args.complexity:
         cmd_dups = (tools.samtools + " idxstats " +
                     mapping_genome_bam_temp_dups + " | grep")
@@ -1704,9 +1736,9 @@ def main():
         cmd = ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " + res.chrom_sizes)
         genome_size = int(pm.checkprint(cmd))
 
-        cmd = (tool_path("preseq_complexity_curves.py") +
-               " -c " + str(genome_size) + " -l 30 -r " +
-               preseq_counts + " -o " + preseq_plot + " " + preseq_yield)
+        cmd = ("Rscript " + tool_path("preseq_plot.R ") + preseq_yield +
+               " -c " + str(genome_size) + " -l " + max_len +
+               " -r " + preseq_counts + " -o " + preseq_plot)
 
         pm.run(cmd, [preseq_pdf, preseq_png])
 
@@ -2096,16 +2128,19 @@ def main():
             cmd = "ln -sf " + genome_fq + " " + genome_fq_ln
             pm.run(cmd, genome_fq_ln)
 
+        if args.max_len != -1:
+            max_len = args.max_len
+
         suffix_index = os.path.join(res.genomes, args.genome_assembly,
             mappability_folder, (args.genome_assembly + ".sft"))
         suffix_check = os.path.join(res.genomes, args.genome_assembly,
             mappability_folder, (args.genome_assembly + ".sft.suf"))
         tally_index = os.path.join(res.genomes, args.genome_assembly,
-            mappability_folder, (args.genome_assembly + ".tal_" + str(args.max_len)))
+            mappability_folder, (args.genome_assembly + ".tal_" + str(max_len)))
         tally_check = os.path.join(res.genomes, args.genome_assembly,
-            mappability_folder, (args.genome_assembly + ".tal_" + str(args.max_len) + ".mer"))
+            mappability_folder, (args.genome_assembly + ".tal_" + str(max_len) + ".mer"))
         search_file = os.path.join(res.genomes, args.genome_assembly,
-            mappability_folder, (args.genome_assembly + ".tal_" + str(args.max_len) + ".gtTxt"))
+            mappability_folder, (args.genome_assembly + ".tal_" + str(max_len) + ".gtTxt"))
 
         map_files = [suffix_check, tally_check, search_file]
         already_mapped = False
@@ -2137,7 +2172,7 @@ def main():
             tally_cmd_chunks = [
                 ("gt", "tallymer"),
                 "mkindex",
-                ("-mersize", args.max_len),
+                ("-mersize", max_len),
                 ("-minocc", 2),
                 ("-indexname", tally_index),
                 "-counts",
@@ -2170,7 +2205,7 @@ def main():
             genome_fq_ln,
             str("--tallymer=" + search_file),
             str("--gt-workdir=" + mappability_folder),  # TODO
-            str("--read-size=" + args.max_len),
+            str("--read-size=" + max_len),
             str("--out=" + seqtable)
         ])
 
