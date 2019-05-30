@@ -9,7 +9,6 @@ tools:  # absolute paths to required tools
   seqkit: seqkit
   fastp: fastp
   seqtk: seqtk
-  seqoutbias: seqOutBias
   # UCSC tools
   bigWigCat: bigWigCat
   wigToBigWig: wigToBigWig
@@ -17,6 +16,7 @@ tools:  # absolute paths to required tools
   fqdedup: fqdedup
   cutadapt: cutadapt
   fastx: fastx
+  seqoutbias: seqOutBias
 
 # user configure 
 resources:
