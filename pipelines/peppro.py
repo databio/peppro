@@ -1026,7 +1026,7 @@ def main():
                         ("--html", umi_report),
                         "|",
                         (tools.seqtk, "trimfq")
-                    ]
+                    ])
                     if args.max_len != -1:
                         trim_cmd_chunks2.extend([
                             ("-L", args.max_len)
@@ -1090,7 +1090,7 @@ def main():
                         ("--html", umi_report),
                         "|",
                         (tools.seqtk, "trimfq")
-                    ]
+                    ])
                     if args.max_len != -1:
                         trim_cmd_chunks2.extend([
                             ("-L", args.max_len)
@@ -1116,7 +1116,7 @@ def main():
                         ("--html", umi_report),
                         "|",
                         (tools.seqtk, "trimfq")
-                    ]
+                    ])
                     if args.max_len != -1:
                         trim_cmd_chunks.extend([
                             ("-L", args.max_len)
