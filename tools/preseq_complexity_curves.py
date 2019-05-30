@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """
 preseq_complexity_curves.py
 
@@ -14,6 +14,7 @@ import subprocess
 import argparse
 import pandas as pd
 from matplotlib import pyplot as plt
+from cycler import cycler
 import numpy as np
 
 def plot_complexity_curves(ccurves, coverage=0, read_length=0, real_counts_path=False, use_unique=True, output_name='complexity_curves', x_min=0, x_max=500000000):
@@ -65,9 +66,9 @@ def plot_complexity_curves(ccurves, coverage=0, read_length=0, real_counts_path=
 
     # Covert real counts to coverage
     if coverage > 0:
-        for f, c in real_counts_total.iteritems():
+        for f, c in real_counts_total.items():
             real_counts_total[f] = float(c) / coverage
-        for f, c in real_counts_unique.iteritems():
+        for f, c in real_counts_unique.items():
             real_counts_unique[f] = float(c) / coverage
 
 
@@ -81,11 +82,12 @@ def plot_complexity_curves(ccurves, coverage=0, read_length=0, real_counts_path=
 
     # Each ccurve will get a different color
     colormap = plt.cm.gist_ncar
-    plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 0.9, len(ccurves))])
+    colors = [colormap(i) for i in np.linspace(0, 0.9, len(ccurves))]
+    plt.gca().set_prop_cycle(cycler('color', colors))
 
     # Go through inputs and plot line
     for ccurve in ccurves:
-        print "Processing {}".format(ccurve)
+        print("Processing {}".format(ccurve))
         ccurve_table             = pd.io.parsers.read_csv(ccurve, sep='\t', header=0)
         ccurve_TOTAL_READS       = []
         ccurve_EXPECTED_DISTINCT = []
@@ -145,16 +147,16 @@ def plot_complexity_curves(ccurves, coverage=0, read_length=0, real_counts_path=
             if real_key in real_counts_unique:
                 u_reads = int(real_counts_unique[real_key])
                 ax.plot(t_reads, u_reads, 'o', color=p.get_color())
-                print "INFO: Found real counts for {} - Total: {}, Unique: {}".format(sample_name, t_reads, u_reads)
+                print("INFO: Found real counts for {} - Total: {}, Unique: {}".format(sample_name, t_reads, u_reads))
             else:
                 xvalues = p.get_xdata()
                 yvalues = p.get_ydata()
                 if t_reads > max(xvalues):
-                    print "WARNING: Total reads for {} ({}) > max preseq value ({}) - skipping this point..".format(sample_name, t_reads, max(xvalues))
+                    print("WARNING: Total reads for {} ({}) > max preseq value ({}) - skipping this point..".format(sample_name, t_reads, max(xvalues)))
                 else:
                     interp = np.interp(t_reads, xvalues, yvalues)
                     ax.plot(t_reads, interp, 'o', color=p.get_color())
-                    print "INFO: Found real count for {} - Total: {:.2f} (preseq unique reads: {:.2f})".format(sample_name, t_reads, interp)
+                    print("INFO: Found real count for {} - Total: {:.2f} (preseq unique reads: {:.2f})".format(sample_name, t_reads, interp))
 
     # plot perfect library as dashed line
     ax.plot([0, x_max], [0, x_max], color='black', linestyle='--', linewidth=1)
@@ -164,7 +166,7 @@ def plot_complexity_curves(ccurves, coverage=0, read_length=0, real_counts_path=
     if len(real_counts_total) > 0:
         max_total = int(max(d for d in real_counts_total.values()))
     if x_max < max_total:
-        print "WARNING: x-max value {} is less than max real data {}".format(x_max, max_total)
+        print("WARNING: x-max value {} is less than max real data {}".format(x_max, max_total))
     plt.xlim(x_min, x_max)
 
     max_unique = 0
@@ -180,7 +182,7 @@ def plot_complexity_curves(ccurves, coverage=0, read_length=0, real_counts_path=
 
     plt.ylim(default_ylim, max(preseq_ymax, max_unique))
     if preseq_ymax < max_unique:
-        print "WARNING: y-max value changed from default {} to the max real data {}".format(int(preseq_ymax), max_unique )
+        print("WARNING: y-max value changed from default {} to the max real data {}".format(int(preseq_ymax), max_unique))
 
     # label the axis
     plt.ylabel('Unique Molecules')
@@ -232,7 +234,7 @@ def computeLimit(value, ccurve_TOTAL_READS):
     last_point  = len(ccurve_TOTAL_READS)
     iterations = 0
     while first_point != last_point:
-        middle_point = (first_point + last_point)/2
+        middle_point = int((first_point + last_point)/2)
         middle_value = ccurve_TOTAL_READS[middle_point]
         if middle_value == value or iterations >= 10000:
             return middle_point
