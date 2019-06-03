@@ -5,11 +5,15 @@
 ## Installing PEPPROr
 PEPPROr may be installed from Github:
 
+```
 devtools::install_github("databio/peppro", subdir="PEPPROr")
+```
 
 or locally after downloading/cloning the source code:
 
+```
 install.packages("path/to/PEPPROr/directory", repos=NULL, type="source")
+```
 
 ## Usage
 ```

@@ -12,7 +12,16 @@ PEPPRO uses a series of publicly-available, common bioinformatics tools includin
 * [fastp](https://github.com/OpenGene/fastp)
 * [seqtk](https://github.com/lh3/seqtk)
 * [seqOutBias](https://github.com/guertinlab/seqOutBias)
-  
+
+PEPPRO uses R to produce QC plots and we include an R package for these functions:
+```
+Rscript -e "devtools::install_github("databio/peppro", subdir="PEPPROr")"
+```
+**Note**: this requires the common R package `'devtools'`
+```
+Rscript -e "install.packages("devtools")"
+```
+
 ## Optional software
 
 Alternatively, `PEPPRO` can mix and match tools for adapter removal, read trimming, deduplication, and reverse complementation.  The use of `fqdedup`, in particular, is useful if you wish to minimize memory use at the expense of speed.  I also suggest using the default required tools simply due to the fact that the `fastx toolkit` has not been supported since 2012 and issues with reads utilizing newer Phred quality scores can cause problems.
