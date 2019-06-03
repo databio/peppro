@@ -17,6 +17,11 @@ PEPPRO uses R to produce QC plots and we include an R package for these function
 ```
 Rscript -e "devtools::install_github('databio/peppro', subdir='PEPPROr')"
 ```
+Alternatively, from the pipeline directory, install directly from source.
+```
+Rscript -e 'install.packages("PEPPROr", repos=NULL, type="source")'
+```
+
 **Note**: this requires the common R package `'devtools'`
 ```
 Rscript -e "install.packages('devtools')"
