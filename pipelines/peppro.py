@@ -1744,7 +1744,8 @@ def main():
         cmd = ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " + res.chrom_sizes)
         genome_size = int(pm.checkprint(cmd))
 
-        cmd = ("Rscript " + tool_path("preseq_plot.R ") + preseq_yield +
+        cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
+               " preseq " + "-i " + preseq_yield +
                " -c " + str(genome_size) + " -l " + max_len +
                " -r " + preseq_counts + " -o " + preseq_plot)
 
@@ -1863,8 +1864,8 @@ def main():
         # Call Rscript to plot TSS Enrichment
         Tss_plus_pdf = os.path.join(QC_folder,  args.sample_name +
                                     "_TssEnrichment.pdf")
-        cmd = ("Rscript " + tool_path("TSSenrichmentPlot.R"))
-        cmd += " " + Tss_plus + " pdf"
+        cmd = (tools.Rscript + " " + tool_path("PEPPRO.R"))
+        cmd += " tss -i " + Tss_plus
         pm.run(cmd, Tss_plus_pdf, nofail=True, container=pm.container)
 
         with open(Tss_plus) as f:
@@ -1894,8 +1895,8 @@ def main():
         # Call Rscript to plot TSS Enrichment
         Tss_minus_pdf = os.path.join(QC_folder,  args.sample_name +
                                      "_minus_TssEnrichment.pdf")
-        cmd = ("Rscript " + tool_path("TSSenrichmentPlot.R"))
-        cmd += " " + Tss_minus + " pdf"
+        cmd = (tools.Rscript + " " + tool_path("PEPPRO.R"))
+        cmd += " tss -i " + Tss_minus
         pm.run(cmd, Tss_minus_pdf, nofail=True, container=pm.container)
 
         with open(Tss_minus) as f:
@@ -2014,36 +2015,38 @@ def main():
                                             validName + "_minus_coverage.bed")
 
                 # Extract feature files
-                pm.run(cmd2, annoFile, container=pm.container)
+                pm.run(cmd2, annoFile.encode('utf-8'), container=pm.container)
 
                 # Rename files to valid filenames
-                cmd = 'mv "{old}" "{new}"'.format(old=annoFile,
-                                                  new=fileName)
-                pm.run(cmd, fileName, container=pm.container)
+                cmd = 'mv "{old}" "{new}"'.format(old=annoFile.encode('utf-8'),
+                                                  new=fileName.encode('utf-8'))
+                pm.run(cmd, fileName.encode('utf-8'), container=pm.container)
 
                 # Sort files
-                cmd3 = ("cut -f 1-3 " + fileName +
+                cmd3 = ("cut -f 1-3 " + fileName.encode('utf-8') +
                         " | bedtools sort -i stdin -faidx " +
-                        chrOrder + " > " + annoSort)
-                pm.run(cmd3, annoSort, container=pm.container)
+                        chrOrder + " > " + annoSort.encode('utf-8'))
+                pm.run(cmd3, annoSort.encode('utf-8'), container=pm.container)
 
                 # Calculate coverage
-                annoListPlus.append(annoCovPlus)
-                annoListMinus.append(annoCovMinus)
+                annoListPlus.append(annoCovPlus.encode('utf-8'))
+                annoListMinus.append(annoCovMinus.encode('utf-8'))
                 cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        annoSort + " -b " + plus_bam +
+                        annoSort.encode('utf-8') + " -b " + plus_bam +
                         " -g " + chrOrder + " > " +
-                        annoCovPlus)
+                        annoCovPlus.encode('utf-8'))
                 cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        annoSort + " -b " + minus_bam +
+                        annoSort.encode('utf-8') + " -b " + minus_bam +
                         " -g " + chrOrder + " > " +
-                        annoCovMinus)
-                pm.run(cmd4, annoCovPlus, container=pm.container)
-                pm.run(cmd5, annoCovMinus, container=pm.container)
-                pm.clean_add(fileName)
-                pm.clean_add(annoSort)
-                pm.clean_add(annoCovPlus)
-                pm.clean_add(annoCovMinus)
+                        annoCovMinus.encode('utf-8'))
+                pm.run(cmd4, annoCovPlus.encode('utf-8'), 
+                       container=pm.container)
+                pm.run(cmd5, annoCovMinus.encode('utf-8'),
+                       container=pm.container)
+                pm.clean_add(fileName.encode('utf-8'))
+                pm.clean_add(annoSort.encode('utf-8'))
+                pm.clean_add(annoCovPlus.encode('utf-8'))
+                pm.clean_add(annoCovMinus.encode('utf-8'))
 
     # Plot FRiF
     pm.timestamp("### Plot FRiF")
@@ -2055,8 +2058,9 @@ def main():
 
     frifPDF = os.path.join(QC_folder, args.sample_name + "_plus_frif.pdf")
     frifPNG = os.path.join(QC_folder, args.sample_name + "_plus_frif.png")
-    frifCmd = [tools.Rscript, tool_path("frif.R"), args.sample_name,
-               totalReads, frifPDF, "--bed"]
+    frifCmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+               "-n", args.sample_name, "-r", totalReads,
+               "-o", frifPDF, "--bed"]
     for cov in annoListPlus:
         frifCmd.append(cov)
     cmd = build_command(frifCmd)
@@ -2071,8 +2075,9 @@ def main():
 
     frifPDF = os.path.join(QC_folder, args.sample_name + "_minus_frif.pdf")
     frifPNG = os.path.join(QC_folder, args.sample_name + "_minus_frif.png")
-    frifCmd = [tools.Rscript, tool_path("frif.R"), args.sample_name,
-               totalReads, frifPDF, "--bed"]
+    frifCmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+               "-n", args.sample_name, "-r", totalReads,
+               "-o", frifPDF, "--bed"]
     for cov in annoListMinus:
         frifCmd.append(cov)
     cmd = build_command(frifCmd)
