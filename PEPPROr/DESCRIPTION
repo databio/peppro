@@ -1,0 +1,11 @@
+Package: PEPPROr
+Title: Functions and libraries to analyze pro-seq (or gro-seq) data
+Version: 0.0.1.0000
+Authors@R: person("Jason", "Smith", email = "jasonsmith@virginia.edu", role = c("aut", "cre"))
+Maintainer: Jason Smith <jasonsmith@virginia.edu>
+Description: Installs required libraries to calculate the fraction of reads in features, to plot library complexity curves, and to plot TSS enrichment. 
+Depends: R (>= 3.5.3), data.table, ggplot2, optigrab, GenomicDistributions
+License: BSD 2-Clause "Simplified" License
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1.9000
