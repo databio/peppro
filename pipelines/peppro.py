@@ -1435,8 +1435,8 @@ def main():
             deinterleave_fq1_dups, deinterleave_fq2_dups = deinterleave(
                 trimmed_fastq, deinterleave_fq1_dups, deinterleave_fq2_dups)
 
-            unmap_fq1_dups = deinterleave_fq1
-            unmap_fq2_dups = deinterleave_fq2
+            unmap_fq1_dups = deinterleave_fq1_dups
+            unmap_fq2_dups = deinterleave_fq2_dups
 
         deinterleave_fq1 = os.path.join(
             fastq_folder, args.sample_name + "_R1_deinterleave.fastq")
