@@ -15,15 +15,6 @@ PEPPRO uses a series of publicly-available, common bioinformatics tools includin
 
 PEPPRO uses R to produce QC plots and we include an R package for these functions:
 ```
-Rscript -e "devtools::install_github('databio/peppro', subdir='PEPPROr')"
-```
-**Note**: this requires the common R package `'devtools'`
-```
-Rscript -e "install.packages('devtools')"
-```
-
-Alternatively, from the pipeline directory, install directly from source.
-```
 Rscript -e 'install.packages("PEPPROr", repos=NULL, type="source")'
 ```
 
