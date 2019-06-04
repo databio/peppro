@@ -31,10 +31,10 @@ open(my $fh_fq2, "<", $file_fq2);
 
 # write output files here
 if ($file_fq1_filtered =~ /\.gz$/i) {
-	print STDERR "gzipping output";
+	print STDERR "gzipping output\n";
 	open(FH_FQ1_FILT, "| /bin/gzip -c > $file_fq1_filtered");
 } else {
-	print STDERR "not gzipping output";
+	print STDERR "not gzipping output\n";
 	open(FH_FQ1_FILT, ">", $file_fq1_filtered);
 }
 
