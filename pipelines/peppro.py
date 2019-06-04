@@ -1425,11 +1425,11 @@ def main():
     ###########################################################################
     # Deinterleave if paired-end
     ###########################################################################
-    def deinterleave(interleaved_file, fq1, fq2):
-        with open(fq1, 'w') as r1, open(fq2, 'w') as r2:
-            [r1.write(line) if (i % 8 < 4) else r2.write(line)
-             for i, line in enumerate(open(interleaved_file))]
-        return fq1, fq2
+    # def deinterleave(interleaved_file, fq1, fq2):
+    #     with open(fq1, 'w') as r1, open(fq2, 'w') as r2:
+    #         [r1.write(line) if (i % 8 < 4) else r2.write(line)
+    #          for i, line in enumerate(open(interleaved_file))]
+    #     return fq1, fq2
     
     if args.paired_end:
         pm.timestamp("### Deinterleave processed FASTQ files")
@@ -1440,13 +1440,17 @@ def main():
             deinterleave_fq2_dups = os.path.join(
                 fastq_folder, args.sample_name + "_R2_deinterleave_dups.fastq")
 
-            if not os.path.exists(deinterleave_fq1_dups):
-                deinterleave_fq1_dups, deinterleave_fq2_dups = deinterleave(
-                    trimmed_fastq, deinterleave_fq1_dups, deinterleave_fq2_dups)
-
             unmap_fq1_dups = deinterleave_fq1_dups
             unmap_fq2_dups = deinterleave_fq2_dups
 
+            cmd1 = ('paste - - - - - - - - < ',
+                    trimmed_fastq,
+                    ' | tee >(cut -f 1-4 | tr "\t" "\n" > ',
+                    deinterleave_fq1_dups,
+                    ') | cut -f 5-8 | tr "\t" "\n" > ',
+                    deinterleave_fq2_dups)
+
+            pm.run(cmd1, [deinterleave_fq1_dups, deinterleave_fq2_dups])
             pm.clean_add(deinterleave_fq1_dups)
             pm.clean_add(deinterleave_fq2_dups)
 
@@ -1455,10 +1459,14 @@ def main():
         deinterleave_fq2 = os.path.join(
             fastq_folder, args.sample_name + "_R2_deinterleave.fastq")
 
-        if not os.path.exists(deinterleave_fq1):
-            deinterleave_fq1, deinterleave_fq2 = deinterleave(
-                processed_fastq, deinterleave_fq1, deinterleave_fq2)
+        cmd2 = ('paste - - - - - - - - < ',
+                processed_fastq,
+                ' | tee >(cut -f 1-4 | tr "\t" "\n" > ',
+                deinterleave_fq1,
+                ') | cut -f 5-8 | tr "\t" "\n" > ',
+                deinterleave_fq2)
 
+        pm.run(cmd2, [deinterleave_fq1, deinterleave_fq2])
         pm.clean_add(deinterleave_fq1)
         pm.clean_add(deinterleave_fq2)
 
@@ -1501,6 +1509,7 @@ def main():
                     assembly_bt2=_get_bowtie2_index(res.genomes, reference),
                     outfolder=param.outfolder, aligndir="prealignments",
                     dups=True)
+                    
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                     args, tools, args.paired_end, True, unmap_fq1,
@@ -1514,6 +1523,14 @@ def main():
                     assembly_bt2=_get_bowtie2_index(res.genomes, reference),
                     outfolder=param.outfolder, aligndir="prealignments",
                     dups=True)
+                if args.paired_end:
+                    to_compress.extend((unmap_fq1_dups.encode('utf-8'),
+                                        unmap_fq2_dups.encode('utf-8')))
+                    to_compress.extend((unmap_fq1.encode('utf-8'),
+                                        unmap_fq2.encode('utf-8')))
+                else:
+                    to_compress.extend(unmap_fq1_dups.encode('utf-8'))
+                    to_compress.extend(unmap_fq1.encode('utf-8'))
             else:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
@@ -1525,10 +1542,12 @@ def main():
                     args, tools, args.paired_end, True, unmap_fq1, unmap_fq2, reference,
                     assembly_bt2=_get_bowtie2_index(res.genomes, reference),
                     outfolder=param.outfolder, aligndir="prealignments")
-            if args.paired_end:
-                to_compress.extend((unmap_fq1, unmap_fq2))
-            else:
-                to_compress.extend(unmap_fq1)
+                if args.paired_end:
+                    to_compress.extend((unmap_fq1.encode('utf-8'),
+                                        unmap_fq2.encode('utf-8')))
+                else:
+                    to_compress.extend(unmap_fq1.encode('utf-8'))
+            
 
     pm.timestamp("### Compress all unmapped read files")
     for unmapped_fq in to_compress:
