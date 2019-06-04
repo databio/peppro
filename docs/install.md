@@ -9,7 +9,7 @@ git clone https://github.com/databio/peppro.git
 
 ## 2: Install required software
 
-PEPPRO uses a series of publicly-available, common bioinformatics tools including:
+`PEPPRO` uses a series of publicly-available, common bioinformatics tools including:
 
 * [samtools](http://www.htslib.org/)
 * [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
@@ -21,16 +21,23 @@ PEPPRO uses a series of publicly-available, common bioinformatics tools includin
 
 ### Python packages
 
-`PEPATAC` uses several packages under the hood. Make sure you're up-to-date with a user-specific install:
+`PEPPRO` uses several packages under the hood. Make sure you're up-to-date with a user-specific install:
 
 ```{bash}
 cd peppro
 pip install --user -r requirements.txt
 ```
-  
+
+### R package
+
+`PEPPRO` uses R to produce QC plots, and we include an R package for these functions. From the `peppro/` directory:
+```console
+Rscript -e 'install.packages("PEPPROr", repos=NULL, type="source")'
+```
+
 ### Optional software
 
-Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming, deduplication, and reverse complementation.  The use of `fqdedup`, in particular, is useful if you wish to minimize memory use at the expense of speed.  I suggest using the default required tools simply due to the fact that the `fastx toolkit` has not been supported since 2012.
+Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming, deduplication, and reverse complementation.  The use of `fqdedup`, in particular, is useful if you wish to minimize memory use at the expense of speed.  We suggest using the default tools simply due to the fact that `fastx toolkit` has not been supported since 2012.
 
 `seqOutBias` can be used to take into account the mappability at a given read length to filter the sample signal.
 
@@ -57,9 +64,9 @@ tar -xf rCRSd_170502.tgz
 
 ## 4: Point the pipeline to your Refgenie assemblies
 
-Once you've obtained assemblies for all genomes you wish to use, you must point the pipeline to where you store them. You can do this by adjusting the `resources.genomes` attribute in the [pipeline config file](https://github.com/databio/pepatac/blob/master/pipelines/pepatac.yaml). By default, this points to the shell variable `$GENOMES`, so all you have to do is set an environment variable to the location of your refgenie genomes:
+Once you've obtained assemblies for all genomes you wish to use, you must point the pipeline to where you store them. You can do this by adjusting the `resources.genomes` attribute in the [pipeline config file](https://github.com/databio/peppro/blob/master/pipelines/peppro.yaml). By default, this points to the shell variable `$GENOMES`, so all you have to do is set an environment variable to the location of your refgenie genomes:
 
-```
+```console
 export GENOMES="/path/to/genomes/"
 ```
 (Add this to your .bashrc or .profile to ensure it persists). Alternatively, you can skip the `GENOMES` variable and simply change the value of the r`resources.genomes` configuration option to point to the folder where you stored the assemblies. 
@@ -75,7 +82,7 @@ We use a shell variable that points to raw data, `DATA`, and another pointing to
   --genome hg38 
   --sample-name K562_pro
   --input $DATA/K562_pro.fastq
-  --adapter fasto
+  --adapter fastp
   --dedup seqkit
   --trimmer seqtk
   -O $PROCESSED/pro_example/
