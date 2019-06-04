@@ -252,12 +252,12 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             #     compress_cmd = "gzip -f -c < {} > {}".format(out_fastq_tmp, fastqz)
 
             if args.keep:
-                pm.run([cmd, compress_cmd], mapped_bam, container=pm.container)
+                pm.run(cmd, mapped_bam, container=pm.container)
             else:
                 # TODO: switch to this once filter_paired_fq works with SE
                 #pm.run(cmd2, summary_file, container=pm.container)
                 #pm.run(cmd1, out_fastq_r1, container=pm.container)
-                pm.run([cmd, compress_cmd], out_fastq_tmp, container=pm.container)
+                pm.run(cmd, out_fastq_tmp, container=pm.container)
 
         pm.clean_add(out_fastq_tmp)
 
@@ -1440,8 +1440,9 @@ def main():
             deinterleave_fq2_dups = os.path.join(
                 fastq_folder, args.sample_name + "_R2_deinterleave_dups.fastq")
 
-            deinterleave_fq1_dups, deinterleave_fq2_dups = deinterleave(
-                trimmed_fastq, deinterleave_fq1_dups, deinterleave_fq2_dups)
+            if not os.path.exists(deinterleave_fq1_dups):
+                deinterleave_fq1_dups, deinterleave_fq2_dups = deinterleave(
+                    trimmed_fastq, deinterleave_fq1_dups, deinterleave_fq2_dups)
 
             unmap_fq1_dups = deinterleave_fq1_dups
             unmap_fq2_dups = deinterleave_fq2_dups
@@ -1454,8 +1455,9 @@ def main():
         deinterleave_fq2 = os.path.join(
             fastq_folder, args.sample_name + "_R2_deinterleave.fastq")
 
-        deinterleave_fq1, deinterleave_fq2 = deinterleave(
-            processed_fastq, deinterleave_fq1, deinterleave_fq2)
+        if not os.path.exists(deinterleave_fq1):
+            deinterleave_fq1, deinterleave_fq2 = deinterleave(
+                processed_fastq, deinterleave_fq1, deinterleave_fq2)
 
         pm.clean_add(deinterleave_fq1)
         pm.clean_add(deinterleave_fq2)
