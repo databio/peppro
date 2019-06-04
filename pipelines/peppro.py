@@ -670,8 +670,8 @@ def main():
     # Create names for processed FASTQ files.
     noadap_fastq = os.path.join(
         fastq_folder, args.sample_name + "_R1_noadap.fastq")
-    noadap_fastq_R2 = os.path.join(
-        fastq_folder, args.sample_name + "_R2_noadap.fastq")
+    # noadap_fastq_R2 = os.path.join(
+    #     fastq_folder, args.sample_name + "_R2_noadap.fastq")
     dedup_fastq = os.path.join(
         fastq_folder, args.sample_name + "_R1_dedup.fastq")
     trimmed_fastq = os.path.join(
@@ -715,8 +715,8 @@ def main():
 
         if args.complexity:
             if args.paired_end:
-                adapter_cmd_chunks.extend([("-o", noadap_fastq)])
-                adapter_cmd_chunks.extend([("-O", noadap_fastq_R2)])
+                adapter_cmd_chunks.extend([("--stdout")])
+                adapter_cmd_chunks.extend([(">", noadap_fastq)])
             else:
                 adapter_cmd_chunks.extend([("-o", noadap_fastq)])
         else:
@@ -783,8 +783,8 @@ def main():
 
         if args.complexity:
             if args.paired_end:
-                adapter_cmd_chunks.extend([("-o", noadap_fastq)])
-                adapter_cmd_chunks.extend([("-O", noadap_fastq_R2)])
+                adapter_cmd_chunks.extend([("--stdout")])
+                adapter_cmd_chunks.extend([(">", noadap_fastq)])
             else:
                 adapter_cmd_chunks.extend([("-o", noadap_fastq)])
         else:
