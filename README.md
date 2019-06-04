@@ -35,7 +35,7 @@ The pipeline looks for genomes stored in a folder specified by the `resources.ge
 ```
 export GENOMES="/path/to/genomes/folder/"
 ```
-(Add this to your .bashrc or .profile to ensure it persists). Alternatively, you can skip the `GENOMES` variable and simply change the value of the r`resources.genomes` configuration option to point to the folder where you stored the assemblies. 
+(Add this to your .bashrc or .profile to ensure it persists). Alternatively, you can skip the `GENOMES` variable and simply change the value of the `resources.genomes` configuration option to point to the folder where you stored the assemblies. 
 
 ## Example use
 
