@@ -345,7 +345,7 @@ plot_complexity_curves <- function(ccurves,
                            linetype="dotted") +
                 theme_classic(base_size=14) +
                 zoom_theme
-            g <- ggplotGrob(zoom_fig)
+            g   <- ggplotGrob(zoom_fig)
             fig <- fig +
                 annotation_custom(grob = g,
                                   xmin = x_max / 2,
@@ -367,7 +367,7 @@ plot_complexity_curves <- function(ccurves,
                            linetype="dotted") +
                 theme_classic(base_size=14) +
                 zoom_theme
-            g <- ggplotGrob(zoom_fig)
+            g   <- ggplotGrob(zoom_fig)
             fig <- fig +
                 annotation_custom(grob = g,
                                   xmin = x_max / 2,
