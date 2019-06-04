@@ -138,6 +138,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
     :param str outfolder: path to output directory for the pipeline
     :param str aligndir: name of folder for temporary output
     :param str bt2_opts_txt: command-line text for bowtie2 options
+    :param bool dups: if True, produce alternative named output
     :return (str, str): pair (R1, R2) of paths to FASTQ files
     """
     if os.path.exists(os.path.dirname(assembly_bt2)):
@@ -164,11 +165,14 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         out_fastq_pre = os.path.join(
             sub_outdir, args.sample_name + "_" + assembly_identifier)
         if dups:
-            out_fastq_r1 = out_fastq_pre + '_unmap_dups_R1.fq.gz'
-            out_fastq_r2 = out_fastq_pre + '_unmap_dups_R2.fq.gz'
+            out_fastq_r1 = out_fastq_pre + '_unmap_dups_R1.fq'
+            out_fastq_r2 = out_fastq_pre + '_unmap_dups_R2.fq'
         else:
-            out_fastq_r1 = out_fastq_pre + '_unmap_R1.fq.gz'
-            out_fastq_r2 = out_fastq_pre + '_unmap_R2.fq.gz'
+            out_fastq_r1 = out_fastq_pre + '_unmap_R1.fq'
+            out_fastq_r2 = out_fastq_pre + '_unmap_R2.fq'
+
+        out_fastq_r1_gz = out_fastq_r1  + '.gz'
+        out_fastq_r2_gz = out_fastq_r2  + '.gz'
 
         if useFIFO and paired and not args.keep:
             if dups:
@@ -188,6 +192,8 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 out_fastq_tmp = out_fastq_pre + '_unmap_dups.fq'
             else:
                 out_fastq_tmp = out_fastq_pre + '_unmap.fq'
+
+        out_fastq_tmp_gz = out_fastq_tmp + ".gz"
 
         filter_pair = build_command([tools.perl,
             tool_path("filter_paired_fq.pl"), out_fastq_tmp,
@@ -233,15 +239,17 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 pm.run([cmd, filter_pair], mapped_bam, container=pm.container)
             else:
                 pm.wait = False
-                pm.run(filter_pair, [summary_file, out_fastq_r2], container=pm.container)
+                pm.run(filter_pair, [summary_file, out_fastq_r2_gz],
+                       container=pm.container)
                 pm.wait = True
-                pm.run(cmd, [summary_file, out_fastq_r2], container=pm.container)
+                pm.run(cmd, [summary_file, out_fastq_r2_gz],
+                       container=pm.container)
         else:
-            if pm.cores > 1 and ngstk.check_command("pigz"):
-                compress_cmd = "pigz --keep -f -p {} {}".format(pm.cores, out_fastq_tmp)
-            else:
-                fastqz = out_fastq_tmp + ".gz"
-                compress_cmd = "gzip -f -c < {} > {}".format(out_fastq_tmp, fastqz)
+            # if pm.cores > 1 and ngstk.check_command("pigz"):
+            #     compress_cmd = "pigz --keep -f -p {} {}".format(pm.cores, out_fastq_tmp)
+            # else:
+            #     fastqz = out_fastq_tmp + ".gz"
+            #     compress_cmd = "gzip -f -c < {} > {}".format(out_fastq_tmp, fastqz)
 
             if args.keep:
                 pm.run([cmd, compress_cmd], mapped_bam, container=pm.container)
@@ -1438,6 +1446,9 @@ def main():
             unmap_fq1_dups = deinterleave_fq1_dups
             unmap_fq2_dups = deinterleave_fq2_dups
 
+            pm.clean_add(deinterleave_fq1_dups)
+            pm.clean_add(deinterleave_fq2_dups)
+
         deinterleave_fq1 = os.path.join(
             fastq_folder, args.sample_name + "_R1_deinterleave.fastq")
         deinterleave_fq2 = os.path.join(
@@ -1445,6 +1456,9 @@ def main():
 
         deinterleave_fq1, deinterleave_fq2 = deinterleave(
             processed_fastq, deinterleave_fq1, deinterleave_fq2)
+
+        pm.clean_add(deinterleave_fq1)
+        pm.clean_add(deinterleave_fq2)
 
         # Prepare variables for alignment step
         unmap_fq1 = deinterleave_fq1
@@ -1463,6 +1477,7 @@ def main():
     # Map to any requested prealignments
     # We recommend mapping to chrM first for PRO-seq data
     pm.timestamp("### Prealignments")
+    to_compress = []
     if len(args.prealignments) == 0:
         print("You may use `--prealignments` to align to references before "
               "the genome alignment step. See docs.")
@@ -1508,6 +1523,18 @@ def main():
                     args, tools, args.paired_end, True, unmap_fq1, unmap_fq2, reference,
                     assembly_bt2=_get_bowtie2_index(res.genomes, reference),
                     outfolder=param.outfolder, aligndir="prealignments")
+            if args.paired_end:
+                to_compress.extend((unmap_fq1, unmap_fq2))
+            else:
+                to_compress.extend(unmap_fq1)
+
+    pm.timestamp("### Compress all unmapped read files")
+    for unmapped_fq in to_compress:
+        # Compress unmapped fastq reads
+        if not pypiper.is_gzipped_fastq(unmapped_fq) and not unmapped_fq == '':
+            cmd = (ngstk.ziptool + " " + unmapped_fq)
+            unmapped_fq = unmapped_fq + ".gz"
+            pm.run(cmd, unmapped_fq, container=pm.container)
 
     pm.timestamp("### Map to genome")
     map_genome_folder = os.path.join(
