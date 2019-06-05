@@ -257,7 +257,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 # TODO: switch to this once filter_paired_fq works with SE
                 #pm.run(cmd2, summary_file, container=pm.container)
                 #pm.run(cmd1, out_fastq_r1, container=pm.container)
-                pm.run(cmd, out_fastq_tmp, container=pm.container)
+                pm.run(cmd, out_fastq_tmp_gz, container=pm.container)
 
         pm.clean_add(out_fastq_tmp)
 
@@ -1425,11 +1425,6 @@ def main():
     ###########################################################################
     # Deinterleave if paired-end
     ###########################################################################
-    # def deinterleave(interleaved_file, fq1, fq2):
-    #     with open(fq1, 'w') as r1, open(fq2, 'w') as r2:
-    #         [r1.write(line) if (i % 8 < 4) else r2.write(line)
-    #          for i, line in enumerate(open(interleaved_file))]
-    #     return fq1, fq2
     
     if args.paired_end:
         pm.timestamp("### Deinterleave processed FASTQ files")
@@ -1524,13 +1519,17 @@ def main():
                     outfolder=param.outfolder, aligndir="prealignments",
                     dups=True)
                 if args.paired_end:
-                    to_compress.extend((unmap_fq1_dups.encode('utf-8'),
-                                        unmap_fq2_dups.encode('utf-8')))
-                    to_compress.extend((unmap_fq1.encode('utf-8'),
-                                        unmap_fq2.encode('utf-8')))
+                    to_compress.append((unmap_fq1_dups, unmap_fq2_dups))
+                    to_compress.append((unmap_fq1, unmap_fq2))
                 else:
-                    to_compress.extend(unmap_fq1_dups.encode('utf-8'))
-                    to_compress.extend(unmap_fq1.encode('utf-8'))
+                    #print("unmap_fq1_dups: {}".format(unmap_fq1_dups))  # DEBUG
+                    #print("unmap_fq1: {}".format(unmap_fq1))  # DEBUG
+                    #print("unmap_fq1_dups: {}".format(unmap_fq1_dups.encode('utf-8')))  # DEBUG
+                    #print("unmap_fq1: {}".format(unmap_fq1.encode('utf-8')))  # DEBUG
+                    to_compress.append(unmap_fq1_dups)
+                    to_compress.append(unmap_fq1)
+                    #print("to_compress: {}".format(to_compress))  # DEBUG
+                    #pm.fail_pipeline()
             else:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
@@ -1543,19 +1542,9 @@ def main():
                     assembly_bt2=_get_bowtie2_index(res.genomes, reference),
                     outfolder=param.outfolder, aligndir="prealignments")
                 if args.paired_end:
-                    to_compress.extend((unmap_fq1.encode('utf-8'),
-                                        unmap_fq2.encode('utf-8')))
+                    to_compress.append((unmap_fq1, unmap_fq2))
                 else:
-                    to_compress.extend(unmap_fq1.encode('utf-8'))
-            
-
-    pm.timestamp("### Compress all unmapped read files")
-    for unmapped_fq in to_compress:
-        # Compress unmapped fastq reads
-        if not pypiper.is_gzipped_fastq(unmapped_fq) and not unmapped_fq == '':
-            cmd = (ngstk.ziptool + " " + unmapped_fq)
-            unmapped_fq = unmapped_fq + ".gz"
-            pm.run(cmd, unmapped_fq, container=pm.container)
+                    to_compress.append(unmap_fq1)
 
     pm.timestamp("### Map to genome")
     map_genome_folder = os.path.join(
@@ -1670,6 +1659,16 @@ def main():
         pm.run([cmd_dups, cmd2_dups],
                [mapping_genome_bam_temp_dups, mapping_genome_bam_dups],
                container=pm.container)
+
+    pm.timestamp("### Compress all unmapped read files")
+    #print("to_compress: {}".format(to_compress))  # DEBUG
+    for unmapped_fq in to_compress:
+        #print("fq file: {}".format(unmapped_fq))  # DEBUG
+        # Compress unmapped fastq reads
+        if not pypiper.is_gzipped_fastq(unmapped_fq) and not unmapped_fq == '':
+            cmd = (ngstk.ziptool + " " + unmapped_fq)
+            unmapped_fq = unmapped_fq + ".gz"
+            pm.run(cmd, unmapped_fq, container=pm.container)
 
     if not args.prealignments:
         # Index the temporary bam file
@@ -2063,38 +2062,65 @@ def main():
                                             validName + "_minus_coverage.bed")
 
                 # Extract feature files
-                pm.run(cmd2, annoFile.encode('utf-8'), container=pm.container)
+                #pm.run(cmd2, annoFile.encode('utf-8'), container=pm.container)
+                pm.run(cmd2, annoFile, container=pm.container)
 
                 # Rename files to valid filenames
-                cmd = 'mv "{old}" "{new}"'.format(old=annoFile.encode('utf-8'),
-                                                  new=fileName.encode('utf-8'))
-                pm.run(cmd, fileName.encode('utf-8'), container=pm.container)
+                #cmd = 'mv "{old}" "{new}"'.format(old=annoFile.encode('utf-8'),
+                #                                  new=fileName.encode('utf-8'))
+                #pm.run(cmd, fileName.encode('utf-8'), container=pm.container)
+                cmd = 'mv "{old}" "{new}"'.format(old=annoFile,
+                                                  new=fileName)
+                pm.run(cmd, fileName, container=pm.container)
 
                 # Sort files
-                cmd3 = ("cut -f 1-3 " + fileName.encode('utf-8') +
+                #cmd3 = ("cut -f 1-3 " + fileName.encode('utf-8') +
+                #        " | bedtools sort -i stdin -faidx " +
+                #        chrOrder + " > " + annoSort.encode('utf-8'))
+                #pm.run(cmd3, annoSort.encode('utf-8'), container=pm.container)
+                cmd3 = ("cut -f 1-3 " + fileName +
                         " | bedtools sort -i stdin -faidx " +
-                        chrOrder + " > " + annoSort.encode('utf-8'))
-                pm.run(cmd3, annoSort.encode('utf-8'), container=pm.container)
+                        chrOrder + " > " + annoSort)
+                pm.run(cmd3, annoSort, container=pm.container)
 
                 # Calculate coverage
-                annoListPlus.append(annoCovPlus.encode('utf-8'))
-                annoListMinus.append(annoCovMinus.encode('utf-8'))
+                # annoListPlus.append(annoCovPlus.encode('utf-8'))
+                # annoListMinus.append(annoCovMinus.encode('utf-8'))
+                # cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
+                        # annoSort.encode('utf-8') + " -b " + plus_bam +
+                        # " -g " + chrOrder + " > " +
+                        # annoCovPlus.encode('utf-8'))
+                # cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
+                        # annoSort.encode('utf-8') + " -b " + minus_bam +
+                        # " -g " + chrOrder + " > " +
+                        # annoCovMinus.encode('utf-8'))
+                # pm.run(cmd4, annoCovPlus.encode('utf-8'), 
+                       # container=pm.container)
+                # pm.run(cmd5, annoCovMinus.encode('utf-8'),
+                       # container=pm.container)
+                # pm.clean_add(fileName.encode('utf-8'))
+                # pm.clean_add(annoSort.encode('utf-8'))
+                # pm.clean_add(annoCovPlus.encode('utf-8'))
+                # pm.clean_add(annoCovMinus.encode('utf-8'))
+                
+                annoListPlus.append(annoCovPlus)
+                annoListMinus.append(annoCovMinus)
                 cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        annoSort.encode('utf-8') + " -b " + plus_bam +
+                        annoSort + " -b " + plus_bam +
                         " -g " + chrOrder + " > " +
-                        annoCovPlus.encode('utf-8'))
+                        annoCovPlus)
                 cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        annoSort.encode('utf-8') + " -b " + minus_bam +
+                        annoSort + " -b " + minus_bam +
                         " -g " + chrOrder + " > " +
-                        annoCovMinus.encode('utf-8'))
-                pm.run(cmd4, annoCovPlus.encode('utf-8'), 
+                        annoCovMinus)
+                pm.run(cmd4, annoCovPlus, 
                        container=pm.container)
-                pm.run(cmd5, annoCovMinus.encode('utf-8'),
+                pm.run(cmd5, annoCovMinus,
                        container=pm.container)
-                pm.clean_add(fileName.encode('utf-8'))
-                pm.clean_add(annoSort.encode('utf-8'))
-                pm.clean_add(annoCovPlus.encode('utf-8'))
-                pm.clean_add(annoCovMinus.encode('utf-8'))
+                pm.clean_add(fileName)
+                pm.clean_add(annoSort)
+                pm.clean_add(annoCovPlus)
+                pm.clean_add(annoCovMinus)
 
     # Plot FRiF
     pm.timestamp("### Plot FRiF")
@@ -2306,9 +2332,7 @@ def main():
             str("--bw=" + plus_bw)
         ]
         if args.runon.lower() == "pro":
-            scale_plus_chunks.extend=([
-                "--tail-edge"
-            ])
+            scale_plus_chunks.extend([("--tail-edge")])
         scale_plus_cmd = build_command(scale_plus_chunks)
 
         scale_minus_chunks = [
@@ -2320,9 +2344,7 @@ def main():
             str("--bw=" + minus_bw),
         ]
         if args.runon.lower() == "pro":
-            scale_minus_chunks.extend=([
-                "--tail-edge"
-            ])
+            scale_minus_chunks.extend([("--tail-edge")])
         scale_minus_cmd = build_command(scale_minus_chunks)
 
         pm.run([scale_plus_cmd, scale_minus_cmd], minus_bw)
