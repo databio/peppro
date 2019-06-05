@@ -4,7 +4,7 @@ Version: 0.0.1.0000
 Authors@R: person("Jason", "Smith", email = "jasonsmith@virginia.edu", role = c("aut", "cre"))
 Maintainer: Jason Smith <jasonsmith@virginia.edu>
 Description: Installs required libraries to calculate the fraction of reads in features, to plot library complexity curves, and to plot TSS enrichment. 
-Depends: R (>= 3.5.3), data.table, ggplot2, optigrab, GenomicDistributions
+Depends: R (>= 3.5.1), data.table, ggplot2, optigrab, GenomicDistributions
 License: BSD 2-Clause "Simplified" License
 Encoding: UTF-8
 LazyData: true
