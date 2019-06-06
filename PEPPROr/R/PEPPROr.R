@@ -45,7 +45,7 @@ NULL
 #'                        real_counts_path=counts)
 plot_complexity_curves <- function(ccurves,
                                    coverage=0, read_length=0,
-                                   real_counts_path=FALSE, use_unique=TRUE,
+                                   real_counts_path=NA, use_unique=TRUE,
                                    output_name='complexity_curves',
                                    x_min=0, x_max=500000000) {
 
@@ -107,7 +107,6 @@ plot_complexity_curves <- function(ccurves,
     # Set up plot params
     global_x_max_ccurve_limit <- 0
     global_y_max_ccurve_limit <- 0
-    fig <- ggplot()
     max_label_length <- 0
 
     # Each ccurve will get a different color
@@ -117,10 +116,9 @@ plot_complexity_curves <- function(ccurves,
                                   "#897779", "#6114F8", "#19C42B", "#56B4E9"))
 
     clist <- data.table(TOTAL_READS = list(), EXPECTED_DISTINCT = list())
-    ccurves  <- list(ccurves)
+    ccurves  <- as.list(ccurves)
     colormap <- palette(length(ccurves))
     for (c in 1:length(ccurves)) {
-        message(paste0("c: ", c))
         name        <- basename(tools::file_path_sans_ext(ccurves[[c]]))
         numFields   <- 2
         for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
@@ -162,230 +160,253 @@ plot_complexity_curves <- function(ccurves,
         }
         if (c == 1) {
             clist <- data.table(
+                SAMPLE_NAME = list(rep(sample_name,
+                                   length(ccurve_TOTAL_READS))),
                 TOTAL_READS = list(ccurve_TOTAL_READS),
-                EXPECTED_DISTINCT = list(ccurve_EXPECTED_DISTINCT)
+                EXPECTED_DISTINCT = list(ccurve_EXPECTED_DISTINCT),
+                COLOR = list(rep(colormap[c], length(ccurve_TOTAL_READS)))
             )
         } else {
             clist <- rbindlist(list(clist,
-                data.table(TOTAL_READS = list(ccurve_TOTAL_READS),
-                           EXPECTED_DISTINCT = list(ccurve_EXPECTED_DISTINCT))),
+                data.table(SAMPLE_NAME = list(rep(sample_name,
+                                              length(ccurve_TOTAL_READS))),
+                           TOTAL_READS = list(ccurve_TOTAL_READS),
+                           EXPECTED_DISTINCT = list(ccurve_EXPECTED_DISTINCT),
+                           COLOR = list(rep(colormap[c],
+                                        length(ccurve_TOTAL_READS))))),
                 use.names=TRUE)
         }
+    }
 
-        x_min_ccurve_limit <- computeLimit(x_min, ccurve_TOTAL_READS)
-        x_max_ccurve_limit <- computeLimit(x_max, ccurve_TOTAL_READS)
-        if (x_max_ccurve_limit > global_x_max_ccurve_limit) {
-            global_x_max_ccurve_limit <- x_max_ccurve_limit
+    x_min_ccurve_limit <- computeLimit(x_min, unlist(clist$TOTAL_READS))
+    x_max_ccurve_limit <- computeLimit(x_max, unlist(clist$TOTAL_READS))
+    if (x_max_ccurve_limit > global_x_max_ccurve_limit) {
+        global_x_max_ccurve_limit <- x_max_ccurve_limit
+    }
+    if (unlist(clist$EXPECTED_DISTINCT)[x_max_ccurve_limit] > global_y_max_ccurve_limit) {
+        if (x_max_ccurve_limit <= length(unlist(clist$EXPECTED_DISTINCT))) {
+            global_y_max_ccurve_limit <- unlist(clist$EXPECTED_DISTINCT)[x_max_ccurve_limit]
+        } else {
+            x_max_ccurve_limit <- length(unlist(clist$EXPECTED_DISTINCT))
         }
-        if (ccurve_EXPECTED_DISTINCT[x_max_ccurve_limit] > global_y_max_ccurve_limit) {
-            if (x_max_ccurve_limit <= length(ccurve_EXPECTED_DISTINCT)) {
-                global_y_max_ccurve_limit <- ccurve_EXPECTED_DISTINCT[x_max_ccurve_limit]
-            } else {
-                x_max_ccurve_limit <- length(ccurve_EXPECTED_DISTINCT)
-            }
-        }
-        # Add a few points to be sure
-        x_max_ccurve_limit <- x_max_ccurve_limit + 3
+    }
+    # Add a few points to be sure
+    x_max_ccurve_limit <- x_max_ccurve_limit + 3
 
-        # Plot the curve
-        fig <- ggplot() +
+    sn <- clist$SAMPLE_NAME[[1]][x_min_ccurve_limit:x_max_ccurve_limit]
+    tr <- clist$TOTAL_READS[[1]][x_min_ccurve_limit:x_max_ccurve_limit]
+    ed <- clist$EXPECTED_DISTINCT[[1]][x_min_ccurve_limit:x_max_ccurve_limit]
+    co <- clist$COLOR[[1]][x_min_ccurve_limit:x_max_ccurve_limit]
+    df <- data.frame(sample_name = sn,
+                     total_reads = tr,
+                     expected_distinct = ed,
+                     color = co)
+    for (i in 2:nrow(clist)) {
+        sn <- clist$SAMPLE_NAME[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
+        tr <- clist$TOTAL_READS[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
+        ed <- clist$EXPECTED_DISTINCT[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
+        co <- clist$COLOR[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
+        df <- rbind(df, data.frame(sample_name = sn,
+                                   total_reads = tr,
+                                   expected_distinct = ed,
+                                   color = co))
+    }
+    # Plot the curve
+    fig <- ggplot(df, aes(total_reads,
+                          expected_distinct,
+                          group = sample_name,
+                          col=color)) + geom_line()
+
+    # Plot the real data if we have it
+    if (length(real_counts_total) > 0 && length(real_counts_unique) > 0) {
+        fig <- fig +
+            geom_point(aes(real_counts_total,
+                           real_counts_unique,
+                           col=colormap[c]),
+                       shape=23, size=3)
+        message(paste0("INFO: Found real counts for ", sample_name,
+                       " - Total: ", real_counts_total, " Unique: ",
+                       real_counts_unique))
+    } else if (length(real_counts_total) > 0) {
+        ggp <- ggplot_build(fig)
+        xvalues <- ggp$layout$panel_scales_x[[1]]$range$range
+        yvalues <- ggp$layout$panel_scales_y[[1]]$range$range
+        if (real_counts_total > max(xvalues)) {
+            message(paste0("WARNING: Total reads for ",  sample_name,
+                           "(", real_counts_total,
+                           ") > max preseq value (", max(xvalues),
+                           ") - skipping this point..."))
+        }
+        else {
+            interp <- approx(xvalues, yvalues, real_counts_total)$y
+            fig <- fig + geom_point(aes(real_counts_total,
+                                        interp, col=colormap[c]))
+            message(paste0("INFO: Found real count for ",
+                           sample_name, " - Total: ",
+                           real_counts_total, "(preseq unique reads: ",
+                           interp, ")"))
+        }
+    } else {
+        message(paste0("INFO: No real counts file provided."))
+    }
+
+    # plot perfect library as dashed line
+    fig <- fig + geom_segment(aes(x = 0, xend=x_max, y=0, yend=x_max),
+                              linetype=2, col ='black')
+
+    # Set the axis limits
+    max_total <- 0
+    if (length(real_counts_total) > 0) {
+        max_total <- as.integer(max(real_counts_total))
+    }
+
+    if (x_max < max_total) {
+        message(paste0("WARNING: x-max value ", x_max,
+                       " is less than max real data ", max_total))
+    }
+
+    max_unique <- 0
+    if (length(real_counts_unique) > 0) {
+        max_unique <- as.integer(max(real_counts_unique))
+        max_unique <- max_unique + (max_unique * 0.1)
+    }
+    preseq_ymax <- global_y_max_ccurve_limit
+    preseq_ymax <- preseq_ymax + (global_y_max_ccurve_limit * 0.1)
+
+    default_ylim <- 100000
+    if (coverage > 0) {
+        default_ylim <- as.numeric(default_ylim) / coverage
+    }
+    fig <- fig +
+        coord_cartesian(xlim=c(x_min, x_max),
+                        ylim = c(default_ylim,
+                                 max(preseq_ymax, max_unique)))
+
+    if (preseq_ymax < max_unique) {
+        message(paste0("WARNING: y-max value changed from default ",
+                       int(preseq_ymax), " to the max real data ",
+                       max_unique))
+    }
+
+    # label the axis
+    # Change labels if we're using coverage
+    if (coverage > 0) {
+        if (length(real_counts_unique) > 0) {
+            fig <- fig +
+                xlab(paste0("Total Coverage (incl. duplicates)\n",
+                            "Points show read count versus deduplicated ",
+                            "read counts (externally calculated)"))
+        } else if (length(real_counts_total) > 0) {
+            fig <- fig +
+                xlab(paste0("Total Coverage (incl. duplicates)\n",
+                            "Points show externally calculated read ",
+                            "counts on the curves"))
+        } else {
+            fig <- fig +
+                xlab(paste0("Total Coverage (incl. duplicates)"))
+        }
+        fig <- fig +
+            ylab("Unique Coverage") +
+            ggtitle("Complexity Curve: preseq")
+    } else {
+        if (length(real_counts_unique) > 0) {
+            fig <- fig +
+                xlab(paste0("Total Molecules (incl. duplicates)\n",
+                            "Points show read count versus deduplicated ",
+                            "read counts (externally calculated)"))
+        } else if (length(real_counts_total) > 0) {
+            fig <- fig +
+                xlab(paste0("Total Molecules (incl. duplicates)\n",
+                            "Points show externally calculated read ",
+                            "counts on the curves"))
+        } else {
+            fig <- fig +
+                xlab(paste0("Total Molecules (incl. duplicates)"))
+        }
+        fig <- fig +
+            ylab("Unique Molecules") +
+            ggtitle("Complexity Curve: preseq")
+    }
+
+    fig <- fig +
+        labs(col = "") +
+        scale_color_discrete(labels=c(clist$SAMPLE_NAME)) +
+        theme_classic(base_size=14) +
+        theme(axis.line = element_line(size = 0.5)) +
+        theme(panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(),
+              panel.border = element_rect(colour = "black",
+                                          fill=NA, size=0.5)) +
+        theme(plot.title = element_text(hjust = 0.5))
+
+    # inset zoom plot
+    zoom_theme <- theme(legend.position = "none",
+                        axis.line = element_blank(),
+                        axis.text.x = element_blank(),
+                        axis.text.y = element_blank(),
+                        axis.ticks = element_blank(),
+                        axis.title.x = element_blank(),
+                        axis.title.y = element_blank(),
+                        panel.grid.major = element_blank(),
+                        panel.grid.minor = element_blank(),
+                        panel.background = element_rect(color='black'),
+                        plot.margin = unit(c(0,0,-6,-6),"mm"))
+
+    if (length(real_counts_unique) > 0) {
+        zoom_fig <- ggplot() +
             geom_line(aes(
                 ccurve_TOTAL_READS[x_min_ccurve_limit:x_max_ccurve_limit],
                 ccurve_EXPECTED_DISTINCT[x_min_ccurve_limit:x_max_ccurve_limit],
-                col=colormap[c])
-            )
-
-        # Plot the real data if we have it
-        if (length(real_counts_total) > 0 && length(real_counts_unique) > 0) {
-            fig <- fig +
-                geom_point(aes(real_counts_total,
-                               real_counts_unique,
-                               col=colormap[c]),
-                           shape=23, size=3)
-            message(paste0("INFO: Found real counts for ", sample_name,
-                           " - Total: ", real_counts_total, " Unique: ",
-                           real_counts_unique))
-        } else if (length(real_counts_total) > 0) {
-            ggp <- ggplot_build(fig)
-            xvalues <- ggp$layout$panel_scales_x[[1]]$range$range
-            yvalues <- ggp$layout$panel_scales_y[[1]]$range$range
-            if (real_counts_total > max(xvalues)) {
-                message(paste0("WARNING: Total reads for ",  sample_name,
-                               "(", real_counts_total,
-                               ") > max preseq value (", max(xvalues),
-                               ") - skipping this point..."))
-            }
-            else {
-                interp <- approx(xvalues, yvalues, real_counts_total)$y
-                fig <- fig + geom_point(aes(real_counts_total,
-                                            interp, col=colormap[c]))
-                message(paste0("INFO: Found real count for ",
-                               sample_name, " - Total: ",
-                               real_counts_total, "(preseq unique reads: ",
-                               interp, ")"))
-            }
-        } else {
-            message(paste0("INFO: No real counts found for ", sample_name))
-        }
-
-        # plot perfect library as dashed line
-        fig <- fig + geom_segment(aes(x = 0, xend=x_max, y=0, yend=x_max),
-                                  linetype=2)
-
-        # Set the axis limits
-        max_total <- 0
-        if (length(real_counts_total) > 0) {
-            max_total <- as.integer(max(real_counts_total))
-        }
-
-        if (x_max < max_total) {
-            message(paste0("WARNING: x-max value ", x_max,
-                           " is less than max real data ", max_total))
-        }
-
-        max_unique <- 0
-        if (length(real_counts_unique) > 0) {
-            max_unique <- as.integer(max(real_counts_unique))
-            max_unique <- max_unique + (max_unique * 0.1)
-        }
-        preseq_ymax <- global_y_max_ccurve_limit
-        preseq_ymax <- preseq_ymax + (global_y_max_ccurve_limit * 0.1)
-
-        default_ylim <- 100000
-        if (coverage > 0) {
-            default_ylim <- as.numeric(default_ylim) / coverage
-        }
-        fig <- fig +
-            coord_cartesian(xlim=c(x_min, x_max),
-                            ylim = c(default_ylim,
-                                     max(preseq_ymax, max_unique)))
-
-        if (preseq_ymax < max_unique) {
-            message(paste0("WARNING: y-max value changed from default ",
-                           int(preseq_ymax), " to the max real data ",
-                           max_unique))
-        }
-
-        # label the axis
-        # Change labels if we're using coverage
-        if (coverage > 0) {
-            if (length(real_counts_unique) > 0) {
-                fig <- fig +
-                    xlab(paste0("Total Coverage (incl. duplicates)\n",
-                                "Points show read count versus deduplicated ",
-                                "read counts (externally calculated)"))
-            } else if (length(real_counts_total) > 0) {
-                fig <- fig +
-                    xlab(paste0("Total Coverage (incl. duplicates)\n",
-                                "Points show externally calculated read ",
-                                "counts on the curves"))
-            } else {
-                fig <- fig +
-                    xlab(paste0("Total Coverage (incl. duplicates)"))
-            }
-            fig <- fig +
-                ylab("Unique Coverage") +
-                ggtitle("Complexity Curve: preseq")
-        } else {
-            if (length(real_counts_unique) > 0) {
-                fig <- fig +
-                    xlab(paste0("Total Molecules (incl. duplicates)\n",
-                                "Points show read count versus deduplicated ",
-                                "read counts (externally calculated)"))
-            } else if (length(real_counts_total) > 0) {
-                fig <- fig +
-                    xlab(paste0("Total Molecules (incl. duplicates)\n",
-                                "Points show externally calculated read ",
-                                "counts on the curves"))
-            } else {
-                fig <- fig +
-                    xlab(paste0("Total Molecules (incl. duplicates)"))
-            }
-            fig <- fig +
-                ylab("Unique Molecules") +
-                ggtitle("Complexity Curve: preseq")
-        }
-
-        fig <- fig +
-            labs(col = "") +
-            scale_color_discrete(labels=c(sample_name)) +
+                colour = colormap[c])) +
+            geom_abline(intercept = 0, slope = 1, linetype="dashed") +
+            coord_cartesian(xlim = c(0,real_counts_unique*2),
+                            ylim=c(0,real_counts_unique*2)) +
+            geom_hline(aes(yintercept=real_counts_unique),
+                       linetype="dotted") +
+            geom_vline(aes(xintercept=real_counts_unique),
+                       linetype="dotted") +
             theme_classic(base_size=14) +
-            theme(axis.line = element_line(size = 0.5)) +
-            theme(panel.grid.major = element_blank(),
-                  panel.grid.minor = element_blank(),
-                  panel.border = element_rect(colour = "black",
-                                              fill=NA, size=0.5)) +
-            theme(plot.title = element_text(hjust = 0.5))
-
-        # inset zoom plot
-        zoom_theme <- theme(legend.position = "none",
-                            axis.line = element_blank(),
-                            axis.text.x = element_blank(),
-                            axis.text.y = element_blank(),
-                            axis.ticks = element_blank(),
-                            axis.title.x = element_blank(),
-                            axis.title.y = element_blank(),
-                            panel.grid.major = element_blank(),
-                            panel.grid.minor = element_blank(),
-                            panel.background = element_rect(color='black'),
-                            plot.margin = unit(c(0,0,-6,-6),"mm"))
-
-        if (length(real_counts_unique) > 0) {
-            zoom_fig <- ggplot() +
-                geom_line(aes(
-                    ccurve_TOTAL_READS[x_min_ccurve_limit:x_max_ccurve_limit],
-                    ccurve_EXPECTED_DISTINCT[x_min_ccurve_limit:x_max_ccurve_limit],
-                    colour = colormap[c])) +
-                geom_abline(intercept = 0, slope = 1, linetype="dashed") +
-                coord_cartesian(xlim = c(0,real_counts_unique*2),
-                                ylim=c(0,real_counts_unique*2)) +
-                geom_hline(aes(yintercept=real_counts_unique),
-                           linetype="dotted") +
-                geom_vline(aes(xintercept=real_counts_unique),
-                           linetype="dotted") +
-                theme_classic(base_size=14) +
-                zoom_theme
-            g   <- ggplotGrob(zoom_fig)
-            fig <- fig +
-                annotation_custom(grob = g,
-                                  xmin = x_max / 2,
-                                  xmax = x_max,
-                                  ymin = 0,
-                                  ymax = max(preseq_ymax, max_unique)/2)
-        } else if (length(real_counts_total) > 0) {
-            zoom_fig <- ggplot() +
-                geom_line(aes(
-                    ccurve_TOTAL_READS[x_min_ccurve_limit:x_max_ccurve_limit],
-                    ccurve_EXPECTED_DISTINCT[x_min_ccurve_limit:x_max_ccurve_limit],
-                    colour = colormap[c])) +
-                geom_abline(intercept = 0, slope = 1, linetype="dashed") +
-                coord_cartesian(xlim = c(0,real_counts_total*2),
-                                ylim=c(0,real_counts_total*2)) +
-                geom_hline(aes(yintercept=real_counts_total),
-                           linetype="dotted") +
-                geom_vline(aes(xintercept=real_counts_total),
-                           linetype="dotted") +
-                theme_classic(base_size=14) +
-                zoom_theme
-            g   <- ggplotGrob(zoom_fig)
-            fig <- fig +
-                annotation_custom(grob = g,
-                                  xmin = x_max / 2,
-                                  xmax = x_max,
-                                  ymin = 0,
-                                  ymax = max(preseq_ymax, max_unique)/2)
-        }
-
-        # now save the plot
-        pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-            width= 9, height = 7, useDingbats=F)
-        print(fig)
-        invisible(dev.off())
-        png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-            width = 617, height = 480)
-        print(fig)
-        invisible(dev.off())
+            zoom_theme
+        g   <- ggplotGrob(zoom_fig)
+        fig <- fig +
+            annotation_custom(grob = g,
+                              xmin = x_max / 2,
+                              xmax = x_max,
+                              ymin = 0,
+                              ymax = max(preseq_ymax, max_unique)/2)
+    } else if (length(real_counts_total) > 0) {
+        zoom_fig <- ggplot() +
+            geom_line(aes(
+                ccurve_TOTAL_READS[x_min_ccurve_limit:x_max_ccurve_limit],
+                ccurve_EXPECTED_DISTINCT[x_min_ccurve_limit:x_max_ccurve_limit],
+                colour = colormap[c])) +
+            geom_abline(intercept = 0, slope = 1, linetype="dashed") +
+            coord_cartesian(xlim = c(0,real_counts_total*2),
+                            ylim=c(0,real_counts_total*2)) +
+            geom_hline(aes(yintercept=real_counts_total),
+                       linetype="dotted") +
+            geom_vline(aes(xintercept=real_counts_total),
+                       linetype="dotted") +
+            theme_classic(base_size=14) +
+            zoom_theme
+        g   <- ggplotGrob(zoom_fig)
+        fig <- fig +
+            annotation_custom(grob = g,
+                              xmin = x_max / 2,
+                              xmax = x_max,
+                              ymin = 0,
+                              ymax = max(preseq_ymax, max_unique)/2)
     }
+
+    # now save the plot
+    pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+        width= 9, height = 7, useDingbats=F)
+    print(fig)
+    invisible(dev.off())
+    png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+        width = 617, height = 480)
+    print(fig)
+    invisible(dev.off())
 }
 
 #' Compute the axis value limit
