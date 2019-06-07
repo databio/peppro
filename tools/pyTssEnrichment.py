@@ -40,6 +40,7 @@ opts.add_option("-e",default="1000", help="number of bases to extend to each sid
 opts.add_option("-p",default="center", help="options:center,ends, default=center")
 opts.add_option("-c",default="20",help="number of threads to use, default=20")
 opts.add_option("-s",default='4',help="column in which strand information is located (1 being first), default=4")
+opts.add_option("-k", action="store_true", default=False, help="Keep reverse reads in calculation, default=false")
 opts.add_option("-u", action="store_true", default=False, help="Print uncompressed output file")
 opts.add_option("-v", action="store_true", default=False, help="Print profile around bed file")
 opts.add_option("-i", action="store_true", default=False, help="Print insert sizes across intervals")
@@ -89,8 +90,9 @@ def sub_Mat(start):
             if p2_rds.mapq<30:# or p2_rds.is_proper_pair==False:
                 continue
             # get read positions
-            if p2_rds.is_reverse:
-                continue
+            if not options.k:
+                if p2_rds.is_reverse:
+                    continue
             else:
                 l_pos = p2_rds.pos+4
                 # calculate center point
