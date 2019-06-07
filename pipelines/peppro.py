@@ -1522,14 +1522,8 @@ def main():
                     to_compress.append((unmap_fq1_dups, unmap_fq2_dups))
                     to_compress.append((unmap_fq1, unmap_fq2))
                 else:
-                    #print("unmap_fq1_dups: {}".format(unmap_fq1_dups))  # DEBUG
-                    #print("unmap_fq1: {}".format(unmap_fq1))  # DEBUG
-                    #print("unmap_fq1_dups: {}".format(unmap_fq1_dups.encode('utf-8')))  # DEBUG
-                    #print("unmap_fq1: {}".format(unmap_fq1.encode('utf-8')))  # DEBUG
                     to_compress.append(unmap_fq1_dups)
                     to_compress.append(unmap_fq1)
-                    #print("to_compress: {}".format(to_compress))  # DEBUG
-                    #pm.fail_pipeline()
             else:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
@@ -1577,6 +1571,15 @@ def main():
     tempdir = tempfile.mkdtemp(dir=map_genome_folder)
     pm.clean_add(tempdir)
 
+    # check input for zipped or not
+    if pypiper.is_gzipped_fastq(unmap_fq1):
+        cmd = (ngstk.ziptool + " -d " + (unmap_fq1 + ".gz"))
+        pm.run(cmd, mapping_genome_bam, container=pm.container)
+    if args.paired_end:
+        if pypiper.is_gzipped_fastq(unmap_fq2):
+            cmd = (ngstk.ziptool + " -d " + (unmap_fq2 + ".gz"))
+            pm.run(cmd, mapping_genome_bam, container=pm.container)
+
     cmd = tools.bowtie2 + " -p " + str(pm.cores)
     cmd += bt2_options
     cmd += " --rg-id " + args.sample_name
@@ -1591,6 +1594,15 @@ def main():
     cmd += " -o " + mapping_genome_bam_temp
 
     if args.complexity:
+        # check input for zipped or not
+        if pypiper.is_gzipped_fastq(unmap_fq1_dups):
+            cmd = (ngstk.ziptool + " -d " + (unmap_fq1_dups + ".gz"))
+            pm.run(cmd, mapping_genome_bam, container=pm.container)
+        if args.paired_end:
+            if pypiper.is_gzipped_fastq(unmap_fq2_dups):
+                cmd = (ngstk.ziptool + " -d " + (unmap_fq2_dups + ".gz"))
+                pm.run(cmd, mapping_genome_bam, container=pm.container)
+
         cmd_dups = tools.bowtie2 + " -p " + str(pm.cores)
         cmd_dups += bt2_options
         cmd_dups += " --rg-id " + args.sample_name
@@ -1650,20 +1662,17 @@ def main():
         if rd and rd.strip():
             pm.report_result("Read_depth", round(float(rd), 2))
 
-    pm.run([cmd, cmd2], [mapping_genome_bam_temp, mapping_genome_bam],
+    pm.run([cmd, cmd2], mapping_genome_bam,
            follow=lambda: check_alignment_genome(mapping_genome_bam_temp,
                                                  mapping_genome_bam),
            container=pm.container)
 
     if args.complexity:
-        pm.run([cmd_dups, cmd2_dups],
-               [mapping_genome_bam_temp_dups, mapping_genome_bam_dups],
+        pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups,
                container=pm.container)
 
     pm.timestamp("### Compress all unmapped read files")
-    #print("to_compress: {}".format(to_compress))  # DEBUG
     for unmapped_fq in to_compress:
-        #print("fq file: {}".format(unmapped_fq))  # DEBUG
         # Compress unmapped fastq reads
         if not pypiper.is_gzipped_fastq(unmapped_fq) and not unmapped_fq == '':
             cmd = (ngstk.ziptool + " " + unmapped_fq)
@@ -1900,6 +1909,17 @@ def main():
         pm.timestamp("### Calculate TSS enrichment")
 
         # Plus
+        plus_bai = os.path.join(
+            map_genome_folder, args.sample_name + "_plus.bam.bai")
+        # pyTssEnrichment requires indexed bam
+        if not os.path.exists(plus_bai):
+            cmd = build_command([
+                tools.samtools,
+                "index",
+                plus_bam
+            ])
+            pm.run(cmd, plus_bai)
+
         Tss_plus = os.path.join(QC_folder, args.sample_name +
                                 "_plus_TssEnrichment.txt")
         cmd = tool_path("pyTssEnrichment.py")
@@ -1931,6 +1951,17 @@ def main():
                          anchor_image=Tss_plus_png)
 
         # Minus
+        minus_bai = os.path.join(
+            map_genome_folder, args.sample_name + "_minus.bam.bai")
+        # pyTssEnrichment requires indexed bam
+        if not os.path.exists(minus_bai):
+            cmd = build_command([
+                tools.samtools,
+                "index",
+                minus_bam
+            ])
+            pm.run(cmd, minus_bai)
+
         Tss_minus = os.path.join(QC_folder, args.sample_name +
                                   "_minus_TssEnrichment.txt")
         cmd = tool_path("pyTssEnrichment.py")
@@ -2062,46 +2093,18 @@ def main():
                                             validName + "_minus_coverage.bed")
 
                 # Extract feature files
-                #pm.run(cmd2, annoFile.encode('utf-8'), container=pm.container)
                 pm.run(cmd2, annoFile, container=pm.container)
 
                 # Rename files to valid filenames
-                #cmd = 'mv "{old}" "{new}"'.format(old=annoFile.encode('utf-8'),
-                #                                  new=fileName.encode('utf-8'))
-                #pm.run(cmd, fileName.encode('utf-8'), container=pm.container)
                 cmd = 'mv "{old}" "{new}"'.format(old=annoFile,
                                                   new=fileName)
                 pm.run(cmd, fileName, container=pm.container)
 
                 # Sort files
-                #cmd3 = ("cut -f 1-3 " + fileName.encode('utf-8') +
-                #        " | bedtools sort -i stdin -faidx " +
-                #        chrOrder + " > " + annoSort.encode('utf-8'))
-                #pm.run(cmd3, annoSort.encode('utf-8'), container=pm.container)
                 cmd3 = ("cut -f 1-3 " + fileName +
                         " | bedtools sort -i stdin -faidx " +
                         chrOrder + " > " + annoSort)
                 pm.run(cmd3, annoSort, container=pm.container)
-
-                # Calculate coverage
-                # annoListPlus.append(annoCovPlus.encode('utf-8'))
-                # annoListMinus.append(annoCovMinus.encode('utf-8'))
-                # cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        # annoSort.encode('utf-8') + " -b " + plus_bam +
-                        # " -g " + chrOrder + " > " +
-                        # annoCovPlus.encode('utf-8'))
-                # cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        # annoSort.encode('utf-8') + " -b " + minus_bam +
-                        # " -g " + chrOrder + " > " +
-                        # annoCovMinus.encode('utf-8'))
-                # pm.run(cmd4, annoCovPlus.encode('utf-8'), 
-                       # container=pm.container)
-                # pm.run(cmd5, annoCovMinus.encode('utf-8'),
-                       # container=pm.container)
-                # pm.clean_add(fileName.encode('utf-8'))
-                # pm.clean_add(annoSort.encode('utf-8'))
-                # pm.clean_add(annoCovPlus.encode('utf-8'))
-                # pm.clean_add(annoCovMinus.encode('utf-8'))
                 
                 annoListPlus.append(annoCovPlus)
                 annoListMinus.append(annoCovMinus)
