@@ -31,7 +31,7 @@ NULL
 #'                         preseq filename, total number of reads, number of
 #'                         unique reads
 #'                         (unique is optional, file is whitespace delimited)
-#' @param use_unique If FALSE, ignore information about unique read counts
+#' @param ignore_unique If FALSE, ignore information about unique read counts
 #'                   found in real_counts_path file.
 #' @param output_name Desired output name (produces both .pdf and .png files).
 #' @param x_min Lower x-limit (default 0)
@@ -45,7 +45,7 @@ NULL
 #'                        real_counts_path=counts)
 plot_complexity_curves <- function(ccurves,
                                    coverage=0, read_length=0,
-                                   real_counts_path=NA, use_unique=TRUE,
+                                   real_counts_path=NA, ignore_unique=FALSE,
                                    output_name='complexity_curves',
                                    x_min=0, x_max=500000000) {
 
@@ -68,46 +68,66 @@ plot_complexity_curves <- function(ccurves,
     }
 
     # Get the real counts if we have them
-    real_counts_total  <- character()
-    real_counts_unique <- character()
-    real_counts_name   <- character()
-    if ("data.frame" %in% class(real_counts_path)) {
-        rc_file            <- real_counts_path
-        real_counts_name   <- basename(rc_file$V1)
-        real_counts_total  <- as.integer(rc_file$V2)
-        if (ncol(rc_file) == 3 && use_unique) {
-            real_counts_unique <- as.integer(rc_file$V3)
-        }
-    } else if (!is.na(real_counts_path)) {
-        info <- file.info(file.path(real_counts_path))
-        if (file.exists(real_counts_path) && info$size != 0) {
-            rc_file            <- fread(real_counts_path)
-            real_counts_name   <- basename(rc_file$V1)
-            real_counts_total  <- as.integer(rc_file$V2)
-            if (ncol(rc_file) == 3 && use_unique) {
-                real_counts_unique <- as.integer(rc_file$V3)
-            }
+    rcDT <- data.table(name = character(length(real_counts_path)),
+                       total = integer(length(real_counts_path)),
+                       unique = integer(length(real_counts_path)))
+    if ("data.frame" %in% class(real_counts_path[1])) {
+        rc_file    <- real_counts_path[1]
+        rcDT$name  <- basename(rc_file$V1)
+        rcDT$total <- as.integer(rc_file$V2)
+        if (ncol(rc_file) == 3 && !ignore_unique) {
+            rcDT$unique <- as.integer(rc_file$V3)
         } else {
-            message(paste0("Error loading real counts file: ", real_counts_path))
-            if (!file.exists(real_counts_path)) {
-                message("File could not be found.")
-            } else if (info$size == 0) {
-                message("File is empty.")
+            rcDT$unique <- NA
+        }
+
+        if (length(real_counts_path) > 1) {
+            for (rc in 2:length(real_counts_path)) {
+                rc_file <- real_counts_path[rc]
+                rcDT$name[rc]  <- basename(rc_file$V1)
+                rcDT$total[rc] <- as.integer(rc_file$V2)
+                if (ncol(rc_file) == 3 && !ignore_unique) {
+                    rcDT$unique[rc] <- as.integer(rc_file$V3)
+                } else {
+                    rcDT$unique[rc] <- NA
+                }
             }
-            quit()
+        }
+    } else if (!is.na(real_counts_path[1])) {
+        for (rc in 1:length(real_counts_path)) {
+            info <- file.info(file.path(real_counts_path[rc]))
+            if (file.exists(real_counts_path[rc]) && info$size != 0) {
+                rc_file        <- fread(real_counts_path[rc])
+                rcDT$name[rc]  <- basename(rc_file$V1)
+                rcDT$total[rc] <- as.integer(rc_file$V2)
+                if (ncol(rc_file) == 3 && !ignore_unique) {
+                    rcDT$unique[rc] <- as.integer(rc_file$V3)
+                } else {
+                    rcDT$unique[rc] <- NA
+                }
+            } else {
+                message(paste0("Error loading real counts file: ",
+                               real_counts_path[rc]))
+                if (!file.exists(real_counts_path[rc])) {
+                    message("File could not be found.")
+                } else if (info$size == 0) {
+                    message("File is empty.")
+                }
+                quit()
+            }
         }
     }
 
     # Convert real counts to coverage
     if (coverage > 0) {
-        real_counts_total  <- as.numeric(real_counts_total)  / coverage
-        real_counts_unique <- as.numeric(real_counts_unique) / coverage
+        rcDT[,total  := as.numeric(total)  / coverage]
+        rcDT[,unique := as.numeric(unique) / coverage]
     }
 
     # Set up plot params
     global_x_max_ccurve_limit <- 0
     global_y_max_ccurve_limit <- 0
-    max_label_length <- 0
+    max_label_length          <- 0
 
     # Each ccurve will get a different color
     palette <- colorRampPalette(c("#999999", "#FFC107", "#27C6AB", "#004D40",
@@ -201,16 +221,19 @@ plot_complexity_curves <- function(ccurves,
                      total_reads = tr,
                      expected_distinct = ed,
                      color = co)
-    for (i in 2:nrow(clist)) {
-        sn <- clist$SAMPLE_NAME[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
-        tr <- clist$TOTAL_READS[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
-        ed <- clist$EXPECTED_DISTINCT[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
-        co <- clist$COLOR[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
-        df <- rbind(df, data.frame(sample_name = sn,
-                                   total_reads = tr,
-                                   expected_distinct = ed,
-                                   color = co))
+    if (nrow(clist) > 1) {
+        for (i in 2:nrow(clist)) {
+            sn <- clist$SAMPLE_NAME[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
+            tr <- clist$TOTAL_READS[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
+            ed <- clist$EXPECTED_DISTINCT[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
+            co <- clist$COLOR[[i]][x_min_ccurve_limit:x_max_ccurve_limit]
+            df <- rbind(df, data.frame(sample_name = sn,
+                                       total_reads = tr,
+                                       expected_distinct = ed,
+                                       color = co))
+        }
     }
+
     # Plot the curve
     fig <- ggplot(df, aes(total_reads,
                           expected_distinct,
@@ -218,36 +241,38 @@ plot_complexity_curves <- function(ccurves,
                           col=color)) + geom_line()
 
     # Plot the real data if we have it
-    if (length(real_counts_total) > 0 && length(real_counts_unique) > 0) {
-        fig <- fig +
-            geom_point(aes(real_counts_total,
-                           real_counts_unique,
-                           col=colormap[c]),
-                       shape=23, size=3)
-        message(paste0("INFO: Found real counts for ", sample_name,
-                       " - Total: ", real_counts_total, " Unique: ",
-                       real_counts_unique))
-    } else if (length(real_counts_total) > 0) {
-        ggp <- ggplot_build(fig)
+    numFields   <- 2
+    for(j in 1:numFields) rcDT$name <- gsub("_[^_]*$", "", rcDT$name)
+    rcDT$color <- colormap
+
+    if (any(rcDT$total > 0) && !any(is.na(rcDT$unique))) {
+        fig <- fig + geom_point(data=rcDT,
+                                aes(total, unique, col=color),
+                                shape=23, size=3)
+        message(paste0("INFO: Found real counts for ",
+                       paste(rcDT$name, sep=","), " - Total: ",
+                       rcDT$total, " Unique: ",
+                       rcDT$unique, "\n"))
+    } else if (any(rcDT$total > 0)) {
+        ggp     <- ggplot_build(fig)
         xvalues <- ggp$layout$panel_scales_x[[1]]$range$range
         yvalues <- ggp$layout$panel_scales_y[[1]]$range$range
-        if (real_counts_total > max(xvalues)) {
-            message(paste0("WARNING: Total reads for ",  sample_name,
-                           "(", real_counts_total,
-                           ") > max preseq value (", max(xvalues),
-                           ") - skipping this point..."))
-        }
-        else {
-            interp <- approx(xvalues, yvalues, real_counts_total)$y
-            fig <- fig + geom_point(aes(real_counts_total,
-                                        interp, col=colormap[c]))
-            message(paste0("INFO: Found real count for ",
-                           sample_name, " - Total: ",
-                           real_counts_total, "(preseq unique reads: ",
-                           interp, ")"))
+        if (max(rcDT$total) > max(xvalues)) {
+            message(paste0("WARNING: Max total reads (", max(rcDT$total),
+                           ") > ", "max preseq value (", max(xvalues),
+                           ") - skipping..."))
+        } else {
+            interp <- approx(xvalues, yvalues, rcDT$total)$y
+            fig <- fig + geom_point(data=rcDT,
+                                    aes(total, interp, col=color),
+                                    shape=23, size=3)
+            message(paste0("INFO: Found real counts for ",
+                           paste(rcDT$name, sep=","), " - Total: ",
+                           rcDT$total, " (preseq unique reads: ",
+                           interp, ")\n"))
         }
     } else {
-        message(paste0("INFO: No real counts file provided."))
+        message(paste0("INFO: No real counts provided."))
     }
 
     # plot perfect library as dashed line
@@ -256,8 +281,8 @@ plot_complexity_curves <- function(ccurves,
 
     # Set the axis limits
     max_total <- 0
-    if (length(real_counts_total) > 0) {
-        max_total <- as.integer(max(real_counts_total))
+    if (any(rcDT$total > 0)) {
+        max_total <- as.numeric(max(rcDT$total))
     }
 
     if (x_max < max_total) {
@@ -266,8 +291,8 @@ plot_complexity_curves <- function(ccurves,
     }
 
     max_unique <- 0
-    if (length(real_counts_unique) > 0) {
-        max_unique <- as.integer(max(real_counts_unique))
+    if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
+        max_unique <- as.numeric(max(rcDT$unique))
         max_unique <- max_unique + (max_unique * 0.1)
     }
     preseq_ymax <- global_y_max_ccurve_limit
@@ -291,16 +316,16 @@ plot_complexity_curves <- function(ccurves,
     # label the axis
     # Change labels if we're using coverage
     if (coverage > 0) {
-        if (length(real_counts_unique) > 0) {
+        if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
                 xlab(paste0("Total Coverage (incl. duplicates)\n",
                             "Points show read count versus deduplicated ",
                             "read counts (externally calculated)"))
-        } else if (length(real_counts_total) > 0) {
+        } else if (any(rcDT$total > 0)) {
             fig <- fig +
                 xlab(paste0("Total Coverage (incl. duplicates)\n",
-                            "Points show externally calculated read ",
-                            "counts on the curves"))
+                            "Points show read count versus projected unique ",
+                            "read counts on the curves"))
         } else {
             fig <- fig +
                 xlab(paste0("Total Coverage (incl. duplicates)"))
@@ -309,12 +334,12 @@ plot_complexity_curves <- function(ccurves,
             ylab("Unique Coverage") +
             ggtitle("Complexity Curve: preseq")
     } else {
-        if (length(real_counts_unique) > 0) {
+        if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
                 xlab(paste0("Total Molecules (incl. duplicates)\n",
                             "Points show read count versus deduplicated ",
                             "read counts (externally calculated)"))
-        } else if (length(real_counts_total) > 0) {
+        } else if (any(rcDT$total > 0)) {
             fig <- fig +
                 xlab(paste0("Total Molecules (incl. duplicates)\n",
                             "Points show externally calculated read ",
@@ -352,19 +377,22 @@ plot_complexity_curves <- function(ccurves,
                         panel.background = element_rect(color='black'),
                         plot.margin = unit(c(0,0,-6,-6),"mm"))
 
-    if (length(real_counts_unique) > 0) {
-        zoom_fig <- ggplot() +
-            geom_line(aes(
-                ccurve_TOTAL_READS[x_min_ccurve_limit:x_max_ccurve_limit],
-                ccurve_EXPECTED_DISTINCT[x_min_ccurve_limit:x_max_ccurve_limit],
-                colour = colormap[c])) +
+    if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
+        zoom_fig <- ggplot(df, aes(total_reads,
+                       expected_distinct,
+                       group = sample_name,
+                       col=color)) +
+            geom_line() +
             geom_abline(intercept = 0, slope = 1, linetype="dashed") +
-            coord_cartesian(xlim = c(0,real_counts_unique*2),
-                            ylim=c(0,real_counts_unique*2)) +
-            geom_hline(aes(yintercept=real_counts_unique),
-                       linetype="dotted") +
-            geom_vline(aes(xintercept=real_counts_unique),
-                       linetype="dotted") +
+            coord_cartesian(xlim = c(0,max(rcDT$unique)*2),
+                            ylim = c(0,max(rcDT$unique)*2)) +
+            #geom_hline(data=rcDT, aes(yintercept=unique, col=color),
+            #           linetype="dotted") +
+            #geom_vline(data=rcDT, aes(xintercept=unique, col=color),
+            #           linetype="dotted") +
+            geom_point(data=rcDT,
+                       aes(total, unique, col=color),
+                       shape=23, size=3) +
             theme_classic(base_size=14) +
             zoom_theme
         g   <- ggplotGrob(zoom_fig)
@@ -374,19 +402,23 @@ plot_complexity_curves <- function(ccurves,
                               xmax = x_max,
                               ymin = 0,
                               ymax = max(preseq_ymax, max_unique)/2)
-    } else if (length(real_counts_total) > 0) {
-        zoom_fig <- ggplot() +
-            geom_line(aes(
-                ccurve_TOTAL_READS[x_min_ccurve_limit:x_max_ccurve_limit],
-                ccurve_EXPECTED_DISTINCT[x_min_ccurve_limit:x_max_ccurve_limit],
-                colour = colormap[c])) +
+    } else if (any(rcDT$total > 0)) {
+        interp   <- approx(xvalues, yvalues, rcDT$total)$y
+        zoom_fig <- ggplot(df, aes(total_reads,
+                                   expected_distinct,
+                                   group = sample_name,
+                                   col=color)) +
+            geom_line() +
             geom_abline(intercept = 0, slope = 1, linetype="dashed") +
-            coord_cartesian(xlim = c(0,real_counts_total*2),
-                            ylim=c(0,real_counts_total*2)) +
-            geom_hline(aes(yintercept=real_counts_total),
-                       linetype="dotted") +
-            geom_vline(aes(xintercept=real_counts_total),
-                       linetype="dotted") +
+            coord_cartesian(xlim = c(0,max(rcDT$total)*2),
+                            ylim = c(0,max(rcDT$total)*2)) +
+            # geom_hline(data=rcDT, aes(yintercept=total, col=color),
+            #            linetype="dotted") +
+            # geom_vline(data=rcDT, aes(xintercept=total, col=color),
+            #            linetype="dotted") +
+            geom_point(data=rcDT,
+                       aes(total, interp, col=color),
+                       shape=23, size=3) +
             theme_classic(base_size=14) +
             zoom_theme
         g   <- ggplotGrob(zoom_fig)
@@ -400,11 +432,11 @@ plot_complexity_curves <- function(ccurves,
 
     # now save the plot
     pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-        width= 9, height = 7, useDingbats=F)
+        width= 10, height = 7, useDingbats=F)
     print(fig)
     invisible(dev.off())
     png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-        width = 617, height = 480)
+        width = 686, height = 480)
     print(fig)
     invisible(dev.off())
 }
