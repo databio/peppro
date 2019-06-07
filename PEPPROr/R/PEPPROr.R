@@ -245,7 +245,7 @@ plot_complexity_curves <- function(ccurves,
     for(j in 1:numFields) rcDT$name <- gsub("_[^_]*$", "", rcDT$name)
     rcDT$color <- colormap
 
-    if (any(rcDT$total > 0) && !any(is.na(rcDT$unique))) {
+    if (any(rcDT$total > 0) && !any(is.na(rcDT$unique)) && !ignore_unique) {
         fig <- fig + geom_point(data=rcDT,
                                 aes(total, unique, col=color),
                                 shape=23, size=3)
@@ -254,15 +254,12 @@ plot_complexity_curves <- function(ccurves,
                        rcDT$total, " Unique: ",
                        rcDT$unique, "\n"))
     } else if (any(rcDT$total > 0)) {
-        ggp     <- ggplot_build(fig)
-        xvalues <- ggp$layout$panel_scales_x[[1]]$range$range
-        yvalues <- ggp$layout$panel_scales_y[[1]]$range$range
-        if (max(rcDT$total) > max(xvalues)) {
+        if (max(rcDT$total) > max(df$total_reads)) {
             message(paste0("WARNING: Max total reads (", max(rcDT$total),
-                           ") > ", "max preseq value (", max(xvalues),
+                           ") > ", "max preseq value (", max(df$total_reads),
                            ") - skipping..."))
         } else {
-            interp <- approx(xvalues, yvalues, rcDT$total)$y
+            interp <- approx(df$total_reads, df$expected_distinct, rcDT$total)$y
             fig <- fig + geom_point(data=rcDT,
                                     aes(total, interp, col=color),
                                     shape=23, size=3)
@@ -403,7 +400,7 @@ plot_complexity_curves <- function(ccurves,
                               ymin = 0,
                               ymax = max(preseq_ymax, max_unique)/2)
     } else if (any(rcDT$total > 0)) {
-        interp   <- approx(xvalues, yvalues, rcDT$total)$y
+        interp <- approx(df$total_reads, df$expected_distinct, rcDT$total)$y
         zoom_fig <- ggplot(df, aes(total_reads,
                                    expected_distinct,
                                    group = sample_name,
