@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.6"
+__version__ = "0.7"
 
 
 from argparse import ArgumentParser
@@ -16,6 +16,7 @@ import tempfile
 import tarfile
 import pypiper
 from pypiper import build_command
+from refgenconf import RefGenConf as RGC, select_genome_config
 
 TOOLS_FOLDER = "tools"
 ANNO_FOLDER  = "anno"
@@ -23,6 +24,7 @@ RUNON_SOURCE = ["pro", "gro"]
 ADAPTER_REMOVAL = ["fastp", "cutadapt"]
 DEDUPLICATORS = ["seqkit", "fqdedup"]
 TRIMMERS = ["seqtk", "fastx"]
+BT2_IDX_KEY = "bowtie2"
 
 
 def parse_arguments():
@@ -318,7 +320,7 @@ def _get_bowtie2_index(genomes_folder, genome_assembly):
                         "indexed_bowtie2", genome_assembly)
 
 
-def _check_bowtie2_index(genomes_folder, genome_assembly):
+def _check_bowtie2_index(rgc, genome_assembly):
     """
     Confirm bowtie2 index is present.
 
@@ -326,27 +328,29 @@ def _check_bowtie2_index(genomes_folder, genome_assembly):
     assembly (as produced by the RefGenie reference builder) contains the
     correct number of non-empty files.
 
-    :param str genomes_folder: path to central genomes directory, i.e. the
-        root for multiple assembly subdirectories
+    :param str genomes_folder: refgenconf.RefGenConf rgc: a genome configuration
+        instance, which provides relevant genome asset pointers
     :param str genome_assembly: name of the specific assembly of interest,
         e.g. 'mm10'
     """
-    bt2_path = os.path.join(genomes_folder, genome_assembly, "indexed_bowtie2")
+    try:
+        bt2_path = rgc.get_asset(
+            genome_assembly, BT2_IDX_KEY, check_exist=os.path.isdir)
+    except IOError as e:
+        pm.fail_pipeline(e)
     
-    if os.path.isdir(bt2_path):
-        if not os.listdir(bt2_path):
-            err_msg = "{} does not contain any files."
-            pm.fail_pipeline(IOError(err_msg.format(bt2_path)))
-        else:
-            path, dirs, files = next(os.walk(bt2_path))
-    elif os.path.isfile(os.path.join(genomes_folder, (genome_assembly + ".tar.gz"))):
-        print("Did you mean this: {}".format(os.path.join(
-            genomes_folder, (genome_assembly + ".tar.gz"))))
-        err_msg = "Extract {} before proceeding."
-        pm.fail_pipeline(IOError(err_msg.format(genome_assembly + ".tar.gz")))
+    if not os.listdir(bt2_path):
+        err_msg = "'{}' does not contain any files.\n{}\n{}"
+        loc_msg = ("Try updating/confirming the 'genomes' variable in "
+                   "'pipelines/pepatac.yaml'.")
+        typ_msg = ("Confirm that '{}' "
+                   "is the correct genome, and that you have successfully "
+                   "built a refgenie genome "
+                   "by that name.".format(genome_assembly))
+        pm.fail_pipeline(IOError(err_msg.format(bt2_path, loc_msg, typ_msg)))
     else:
-        err_msg = "Could not find the {} index located at: {}"
-        pm.fail_pipeline(IOError(err_msg.format(genome_assembly, bt2_path)))
+        path, dirs, files = next(os.walk(bt2_path))
+
     # check for bowtie small index
     if [bt for bt in files if bt.endswith('bt2')]:
         bt = ['.1.bt2', '.2.bt2', '.3.bt2', '.4.bt2',
@@ -398,6 +402,19 @@ def tool_path(tool_name):
 
     return os.path.join(os.path.dirname(os.path.dirname(__file__)),
                         TOOLS_FOLDER, tool_name)
+
+
+def anno_path(anno_name):
+    """
+    Return the path to an annotation file used by this pipeline.
+
+    :param str anno_name: name of the annotation file 
+                          (e.g., a specific genome's annotations)
+    :return str: real, absolute path to tool (expansion and symlink resolution)
+    """
+
+    return os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                        ANNO_FOLDER, anno_name)
 
 
 def guess_encoding(fq):
@@ -538,17 +555,36 @@ def calc_frip(bamfile, ftfile, frip_func, pipeline_manager,
     return float(num_in_reads) / float(num_aligned_reads)
 
 
-def anno_path(anno_name):
+def _add_resources(args, res):
     """
-    Return the path to an annotation file used by this pipeline.
+    Add additional resources needed for pipeline.
 
-    :param str anno_name: name of the annotation file 
-                          (e.g., a specific genome's annotations)
-    :return str: real, absolute path to tool (expansion and symlink resolution)
+    :param argparse.Namespace args: binding between option name and argument,
+        e.g. from parsing command-line options
+    :param pm.config.resources res: pipeline manager resources list
     """
+    rgc = RGC(select_genome_config(res.get("genome_config")))
+    # REQ
+    for asset in ["chrom_sizes", BT2_IDX_KEY]:
+        res[asset] = rgc.get_asset(args.genome_assembly, asset)
+    # OPT
+    asset = "tss_annotation"
+    if args.TSS_name:        
+        res[asset] = os.path.abspath(args.TSS_name)
+    else:
+        res[asset] = rgc.get_asset(args.genome_assembly, asset)
 
-    return os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                        ANNO_FOLDER, anno_name)
+    asset = "pre_mRNA_annotation"
+    if args.pre_name:
+        res.pre_file = os.path.abspath(args.pre_name)
+    else:
+        res[asset] = rgc.get_asset(args.genome_assembly, asset)
+
+    for asset in ["blacklist"]:
+        res[asset] = rgc.get_asset(args.genome_assembly, asset,
+                                   strict_exists=False)
+    res.rgc = rgc
+    return res
 
 
 ###############################################################################
@@ -599,25 +635,12 @@ def main():
         pm.fail_pipeline(RuntimeError(err_msg))
 
     # Set up reference resource according to genome prefix.
-    gfolder = os.path.join(res.genomes, args.genome_assembly)
-    res.chrom_sizes = os.path.join(
-        gfolder, args.genome_assembly + ".chromSizes")
-
-    if args.TSS_name:
-        res.TSS_file = os.path.abspath(args.TSS_name)
-    else:
-        res.TSS_file = os.path.join(gfolder, args.genome_assembly + "_TSS.tsv")
-
-    if args.pre_name:
-        res.pre_file = os.path.abspath(args.pre_name)
-    else:
-        res.pre_file = os.path.join(gfolder, args.genome_assembly + "_pre-mRNA.tsv")
+    res = _add_resources(args, res)
 
     # Get bowtie2 indexes
-    res.bt2_genome = _get_bowtie2_index(res.genomes, args.genome_assembly)
-    _check_bowtie2_index(res.genomes, args.genome_assembly)
+    _check_bowtie2_index(res.rgc, args.genome_assembly)
     for reference in args.prealignments:
-        _check_bowtie2_index(res.genomes, reference)
+        _check_bowtie2_index(res.rgc, reference)
 
     # Adapter file can be set in the config; if left null, we use a default.
     # TODO: use this option or just specify directly the adapter sequence as I do now
@@ -625,9 +648,31 @@ def main():
 
     param.outfolder = outfolder
 
-    print("Local input file: " + args.input[0])
+    # Check that the input file(s) exist before continuing
+    if os.path.isfile(args.input[0]) and os.stat(args.input[0]).st_size > 0:
+        print("Local input file: " + args.input[0])
+    elif os.path.isfile(args.input[0]) and os.stat(args.input[0]).st_size == 0:
+        # The read1 file exists but is empty
+        err_msg = "File exists but is empty: {}"
+        pm.fail_pipeline(IOError(err_msg.format(args.input[0])))
+    else:
+        # The read1 file does not exist
+        err_msg = "Could not find: {}"
+        pm.fail_pipeline(IOError(err_msg.format(args.input[0])))
+
     if args.input2:
-        print("Local input file: " + args.input2[0])
+        if os.path.isfile(args.input2[0]) and os.stat(args.input2[0]).st_size > 0:
+            print("Local input file: " + args.input2[0])
+        elif os.path.isfile(args.input2[0]) and os.stat(args.input2[0]).st_size == 0:
+            # The read1 file exists but is empty
+            err_msg = "File exists but is empty: {}"
+            pm.fail_pipeline(IOError(err_msg.format(args.input2[0])))
+        else:
+            # The read1 file does not exist
+            err_msg = "Could not find: {}"
+            pm.fail_pipeline(IOError(err_msg.format(args.input2[0])))
+
+    container = None
 
     ###########################################################################
 
@@ -1495,28 +1540,36 @@ def main():
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                     args, tools, args.paired_end, False, unmap_fq1,
                     unmap_fq2, reference,
-                    assembly_bt2=_get_bowtie2_index(res.genomes, reference),
-                    outfolder=param.outfolder, aligndir="prealignments")
+                    assembly_bt2=os.path.join(
+                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                    outfolder=param.outfolder,
+                    aligndir="prealignments")
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                     args, tools, args.paired_end, False, unmap_fq1_dups,
                     unmap_fq2_dups, reference,
-                    assembly_bt2=_get_bowtie2_index(res.genomes, reference),
-                    outfolder=param.outfolder, aligndir="prealignments",
+                    assembly_bt2=os.path.join(
+                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                    outfolder=param.outfolder,
+                    aligndir="prealignments",
                     dups=True)
                     
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                     args, tools, args.paired_end, True, unmap_fq1,
                     unmap_fq2, reference,
-                    assembly_bt2=_get_bowtie2_index(res.genomes, reference),
-                    outfolder=param.outfolder, aligndir="prealignments")
+                    assembly_bt2=os.path.join(
+                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                    outfolder=param.outfolder,
+                    aligndir="prealignments")
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                     args, tools, args.paired_end, True, unmap_fq1_dups,
                     unmap_fq2_dups, reference,
-                    assembly_bt2=_get_bowtie2_index(res.genomes, reference),
-                    outfolder=param.outfolder, aligndir="prealignments",
+                    assembly_bt2=os.path.join(
+                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                    outfolder=param.outfolder,
+                    aligndir="prealignments",
                     dups=True)
                 if args.paired_end:
                     to_compress.append((unmap_fq1_dups, unmap_fq2_dups))
@@ -1527,14 +1580,20 @@ def main():
             else:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
-                    args, tools, args.paired_end, False, unmap_fq1, unmap_fq2, reference,
-                    assembly_bt2=_get_bowtie2_index(res.genomes, reference),
-                    outfolder=param.outfolder, aligndir="prealignments")
+                    args, tools, args.paired_end, False,
+                    unmap_fq1, unmap_fq2, reference,
+                    assembly_bt2=os.path.join(
+                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                    outfolder=param.outfolder,
+                    aligndir="prealignments")
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
-                    args, tools, args.paired_end, True, unmap_fq1, unmap_fq2, reference,
-                    assembly_bt2=_get_bowtie2_index(res.genomes, reference),
-                    outfolder=param.outfolder, aligndir="prealignments")
+                    args, tools, args.paired_end, True,
+                    unmap_fq1, unmap_fq2, reference,
+                    assembly_bt2=os.path.join(
+                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                    outfolder=param.outfolder,
+                    aligndir="prealignments")
                 if args.paired_end:
                     to_compress.append((unmap_fq1, unmap_fq2))
                 else:
@@ -1583,7 +1642,9 @@ def main():
     cmd = tools.bowtie2 + " -p " + str(pm.cores)
     cmd += bt2_options
     cmd += " --rg-id " + args.sample_name
-    cmd += " -x " + res.bt2_genome
+    cmd += " -x " + os.path.join(
+        res.rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
+                          args.genome_assembly)
     if args.paired_end:
         cmd += " -1 " + unmap_fq1 + " -2 " + unmap_fq2
     else:
@@ -1606,7 +1667,9 @@ def main():
         cmd_dups = tools.bowtie2 + " -p " + str(pm.cores)
         cmd_dups += bt2_options
         cmd_dups += " --rg-id " + args.sample_name
-        cmd_dups += " -x " + res.bt2_genome
+        cmd_dups += " -x " + os.path.join(
+            res.rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
+                              args.genome_assembly)
         if args.paired_end:
             cmd_dups += " -1 " + unmap_fq1_dups + " -2 " + unmap_fq2_dups
         else:
