@@ -1835,11 +1835,9 @@ def main():
 
         cmd2 = (tools.preseq + " lc_extrap -v -o " + preseq_yield +
                 " -B " + mapping_genome_bam_dups)
-        try:
-            pm.run(cmd2, preseq_yield)
-        except ValueError as e:
-            print(e)
-        else:
+        pm.run(cmd2, preseq_yield, nofail=True)
+
+        if os.path.exists(preseq_yield):
             cmd3 = ("bam2mr " + mapping_genome_bam_dups +
                     " > " + preseq_mr)
             cmd4 = (tools.preseq + " gc_extrap -v -o " + preseq_cov +
@@ -1865,6 +1863,8 @@ def main():
 
             pm.report_object("Library complexity", preseq_pdf,
                              anchor_image=preseq_png)
+        else:
+            print("Unable to calculate library complexity.")
 
     # Calculate quality control metrics for the alignment file
     pm.timestamp("### Calculate NRF, PBC1, and PBC2")
