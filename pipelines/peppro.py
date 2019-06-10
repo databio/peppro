@@ -1938,16 +1938,21 @@ def main():
         with open(Tss_plus) as f:
             floats = list(map(float, f))
         try:
-            # If the TSS enrichment is 0, don't report
-            Tss_score = ((sum(floats[1950:2050]) / 100) /
-                         (sum(floats[1:200]) / 200))
-            pm.report_result("TSS_Score", Tss_score)
+            # If the TSS enrichment is 0, don't report            
+            Tss_score = (
+                (sum(floats[int((len(floats)/2)-50):
+                            int((len(floats)/2)+50)]) / 100) /
+                (sum(floats[1:int(len(floats)*0.025)] +
+                     floats[int(len(floats)-(len(floats)*0.025)):
+                            int(len(floats))]) / 200))
+            pm.report_result("TSS_Plus_Score", round(Tss_score, 1))
         except ZeroDivisionError:
             pass
 
         Tss_plus_png = os.path.join(QC_folder,  args.sample_name +
                                     "_plus_TssEnrichment.png")
-        pm.report_object("Plus TSS enrichment", Tss_plus_pdf,
+        pm.report_object("Plus TSS enrichment",
+                         Tss_plus_pdf,
                          anchor_image=Tss_plus_png)
 
         # Minus
@@ -1967,7 +1972,7 @@ def main():
         cmd = tool_path("pyTssEnrichment.py")
         cmd += " -a " + minus_bam + " -b " + res.TSS_file + " -p ends"
         cmd += " -c " + str(pm.cores)
-        cmd += " -e 2000 -u -v -s 4 -o " + Tss_minus
+        cmd += " -e 2000 -u -v -s 4 -k -o " + Tss_minus
         pm.run(cmd, Tss_minus, nofail=True, container=pm.container)
 
         # Call Rscript to plot TSS Enrichment
@@ -1981,15 +1986,20 @@ def main():
             floats = list(map(float, f))
         try:
             # If the TSS enrichment is 0, don't report
-            Tss_score = ((sum(floats[1950:2050]) / 100) /
-                         (sum(floats[1:200]) / 200))
-            pm.report_result("TSS_Score", Tss_score)
+            Tss_score = (
+                (sum(floats[int((len(floats)/2)-50):
+                            int((len(floats)/2)+50)]) / 100) /
+                (sum(floats[1:int(len(floats)*0.025)] +
+                     floats[int(len(floats)-(len(floats)*0.025)):
+                            int(len(floats))]) / 200))
+            pm.report_result("TSS_Minus_Score", round(Tss_score, 1))
         except ZeroDivisionError:
             pass
 
         Tss_minus_png = os.path.join(QC_folder,  args.sample_name +
                                      "_minus_TssEnrichment.png")
-        pm.report_object("Minus TSS enrichment", Tss_minus_pdf,
+        pm.report_object("Minus TSS enrichment",
+                         Tss_minus_pdf,
                          anchor_image=Tss_minus_png)
 
     # Fraction of reads in Pre-mRNA (FRiP)
