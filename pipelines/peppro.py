@@ -2162,9 +2162,11 @@ def main():
                 pm.run(cmd2, annoFile, container=pm.container)
 
                 # Rename files to valid filenames
-                cmd = 'mv "{old}" "{new}"'.format(old=annoFile,
-                                                  new=fileName)
-                pm.run(cmd, fileName, container=pm.container)
+                # Avoid 'mv' "are the same file" error
+                if not os.path.exists(fileName):
+                    cmd = 'mv "{old}" "{new}"'.format(old=annoFile,
+                                                      new=fileName)
+                    pm.run(cmd, fileName, container=pm.container)
 
                 # Sort files
                 cmd3 = ("cut -f 1-3 " + fileName +
