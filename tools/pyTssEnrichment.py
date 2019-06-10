@@ -90,9 +90,10 @@ def sub_Mat(start):
             if p2_rds.mapq<30:# or p2_rds.is_proper_pair==False:
                 continue
             # get read positions
-            if not options.k:
-                if p2_rds.is_reverse:
-                    continue
+            if not options.k and p2_rds.is_reverse:
+                continue
+            elif options.k and not p2_rds.is_reverse:
+                continue
             else:
                 l_pos = p2_rds.pos+4
                 # calculate center point
