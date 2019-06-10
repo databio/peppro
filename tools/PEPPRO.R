@@ -229,6 +229,54 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         plotTSS(TSSfile = TSSfile)
     }
+} else if (!is.na(subcmd) && tolower(subcmd) == "summarize") {
+    usage <- paste0(
+        "\n",
+        "Usage:   PEPPRO.R [command] {args}\n",
+        "Version: ", version, "\n\n",
+        "Command: summarize \t plot combined library complexity curves\n\n",
+        " -i, --input\t project_config.yaml\n"
+    )
+
+    help <- opt_get(name = c("help", "?", "h"), required=FALSE,
+                    default=FALSE, n=0)
+    if (!help) {
+        help <- suppressWarnings(
+            if(length(opt_get_args()) == 1) {TRUE} else {FALSE}
+        )
+    }
+    if (help) {
+        message(usage)
+        quit()
+    } else {
+        configFile <- opt_get(name = c("input", "i"), required=TRUE,
+                              description="project_config.yaml")
+        prj        <- suppressWarnings(Project(configFile))
+        # Produce output directory (if needed)
+        dir.create(
+            suppressMessages(
+                file.path(config(prj)$metadata$output_dir, "summary")),
+            showWarnings = FALSE)
+        cc <- paste(config(prj)$metadata$output_dir,
+                    "results_pipeline",
+                    samples(prj)$sample_name,
+                    paste0("QC_", samples(prj)$genome),
+                    paste0(samples(prj)$sample_name, "_preseq_yield.txt"),
+                    sep="/")
+        rc <- paste(config(prj)$metadata$output_dir,
+                    "results_pipeline",
+                    samples(prj)$sample_name,
+                    paste0("QC_", samples(prj)$genome),
+                    paste0(samples(prj)$sample_name, "_preseq_counts.txt"),
+                    sep="/")
+        plot_complexity_curves(ccurves = cc,
+            coverage = 0, read_length = 0,
+            real_counts_path = rc, ignore_unique = FALSE,
+            output_name = paste(config(prj)$metadata$output_dir,
+                                "summary",
+                                paste0(config(prj)$name, "_libComplexity"),
+                                sep="/"))
+        }
 } else {
     usage <- paste0(
         "\n",
