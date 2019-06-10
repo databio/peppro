@@ -41,7 +41,7 @@ pipelines:
       singularity_image: ${SIMAGES}peppro
       docker_image: databio/peppro
     summarizers:
-      - tools/PEPPRO.R summarize -i
+      - tools/PEPPRO_summarizer.R
     summary_results:
       - library_complexity_file:
         caption: "Library complexity file"
