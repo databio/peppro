@@ -1993,7 +1993,7 @@ def main():
 
         # Call Rscript to plot TSS Enrichment
         Tss_plus_pdf = os.path.join(QC_folder,  args.sample_name +
-                                    "_TssEnrichment.pdf")
+                                    "_plus_TssEnrichment.pdf")
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R"))
         cmd += " tss -i " + Tss_plus
         pm.run(cmd, Tss_plus_pdf, nofail=True, container=pm.container)
