@@ -301,25 +301,6 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         return unmap_fq1, unmap_fq2
 
 
-def _get_bowtie2_index(genomes_folder, genome_assembly):
-    """
-    Create path to genome assembly folder with refgenie structure.
-
-    Convenience function that returns the bowtie2 index prefix (to be passed
-    to bowtie2) for a genome assembly that follows the folder structure
-    produced by the RefGenie reference builder.
-
-    :param str genomes_folder: path to central genomes directory, i.e. the
-        root for multiple assembly subdirectories
-    :param str genome_assembly: name of the specific assembly of interest,
-        e.g. 'mm10'
-    :return str: path to bowtie2 index subfolder within central assemblies
-        home, for assembly indicated
-    """   
-    return os.path.join(genomes_folder, genome_assembly,
-                        "indexed_bowtie2", genome_assembly)
-
-
 def _check_bowtie2_index(rgc, genome_assembly):
     """
     Confirm bowtie2 index is present.
@@ -579,6 +560,12 @@ def _add_resources(args, res):
         res.pre_file = os.path.abspath(args.pre_name)
     else:
         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+
+    # asset = "feat_annotation"
+    # if args.anno_name:
+    #     res.anno_file = os.path.abspath(args.anno_name)
+    # else:
+    #     res[asset] = rgc.get_asset(args.genome_assembly, asset)
 
     for asset in ["blacklist"]:
         res[asset] = rgc.get_asset(args.genome_assembly, asset,
@@ -1844,34 +1831,40 @@ def main():
 
         cmd1 = (tools.preseq + " c_curve -v -o " + preseq_output +
                 " -B " + mapping_genome_bam_dups)
+        pm.run(cmd1, preseq_output)
+
         cmd2 = (tools.preseq + " lc_extrap -v -o " + preseq_yield +
                 " -B " + mapping_genome_bam_dups)
-        cmd3 = ("bam2mr " + mapping_genome_bam_dups +
-                " > " + preseq_mr)
-        cmd4 = (tools.preseq + " gc_extrap -v -o " + preseq_cov +
-                " " + preseq_mr)
-        cmd5 = ("echo '" + preseq_yield +
-                " '$(" + tools.samtools + " view -c -F 4 " + 
-                mapping_genome_bam_dups + ")" + "' '" +
-                "$(" + tools.samtools + " view -c -F 4 " +
-                mapping_genome_bam + ") > " + preseq_counts)
+        try:
+            pm.run(cmd2, preseq_yield)
+        except ValueError as e:
+            print(e)
+        else:
+            cmd3 = ("bam2mr " + mapping_genome_bam_dups +
+                    " > " + preseq_mr)
+            cmd4 = (tools.preseq + " gc_extrap -v -o " + preseq_cov +
+                    " " + preseq_mr)
+            cmd5 = ("echo '" + preseq_yield +
+                    " '$(" + tools.samtools + " view -c -F 4 " + 
+                    mapping_genome_bam_dups + ")" + "' '" +
+                    "$(" + tools.samtools + " view -c -F 4 " +
+                    mapping_genome_bam + ") > " + preseq_counts)
 
-        pm.run([cmd1, cmd2, cmd3, cmd4, cmd5],
-               [preseq_output, preseq_yield, preseq_mr,
-                preseq_cov, preseq_counts])
+            pm.run([cmd3, cmd4, cmd5],
+                   [preseq_mr, preseq_cov, preseq_counts])
 
-        cmd = ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " + res.chrom_sizes)
-        genome_size = int(pm.checkprint(cmd))
+            cmd = ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " + res.chrom_sizes)
+            genome_size = int(pm.checkprint(cmd))
 
-        cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
-               " preseq " + "-i " + preseq_yield +
-               " -c " + str(genome_size) + " -l " + max_len +
-               " -r " + preseq_counts + " -o " + preseq_plot)
+            cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
+                   " preseq " + "-i " + preseq_yield +
+                   " -c " + str(genome_size) + " -l " + max_len +
+                   " -r " + preseq_counts + " -o " + preseq_plot)
 
-        pm.run(cmd, [preseq_pdf, preseq_png], container=pm.container)
+            pm.run(cmd, [preseq_pdf, preseq_png], container=pm.container)
 
-        pm.report_object("Library complexity", preseq_pdf,
-                         anchor_image=preseq_png)
+            pm.report_object("Library complexity", preseq_pdf,
+                             anchor_image=preseq_png)
 
     # Calculate quality control metrics for the alignment file
     pm.timestamp("### Calculate NRF, PBC1, and PBC2")
