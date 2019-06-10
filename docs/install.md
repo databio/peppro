@@ -78,13 +78,13 @@ Using a [K562 sample](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM1480
 We use a shell variable that points to raw data, `DATA`, and another pointing to where all processed data should be stored, which we name `PROCESSED`.  You can either define those variables for your environment or just change the example below to the full path to each on your system.
 
 ```console
-/pipelines/peppro.py --single-or-paired single 
-  --genome hg38 
-  --sample-name K562_pro
-  --input $DATA/K562_pro.fastq
-  --adapter fastp
-  --dedup seqkit
-  --trimmer seqtk
+/pipelines/peppro.py --single-or-paired single \
+  --genome hg38 \
+  --sample-name K562_pro \
+  --input $DATA/K562_pro.fastq \
+  --adapter fastpn \
+  --dedup seqkit \
+  --trimmer seqtk \
   -O $PROCESSED/pro_example/
 ```
 
