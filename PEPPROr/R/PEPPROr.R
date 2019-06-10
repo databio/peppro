@@ -708,9 +708,13 @@ plotTSS <- function(TSSfile) {
                                     as.is=TRUE, check.names=FALSE)
     }
 
-    normTSS <- insertionsMat / mean(insertionsMat[1:200,])
+    val      <- 0.025*nrow(insertionsMat)
+    normTSS  <- (insertionsMat /
+                 mean(insertionsMat[c(1:val,
+                     (nrow(insertionsMat)-val):nrow(insertionsMat)),]))
     colnames(normTSS) <- c("score")
-    TSSscore <- round(mean(normTSS[1950:2050,]),1)
+    midpt    <- nrow(normTSS)/2 
+    TSSscore <- round(mean(normTSS[(midpt-50):(midpt+50),]),1)
     if (is.nan(TSSscore)) {
         message(paste("\nNaN produced.  Check ", TSSfile, "\n", sep=""))
         quit()
@@ -724,7 +728,7 @@ plotTSS <- function(TSSfile) {
 
     png(filename = paste(tools::file_path_sans_ext(TSSfile), ".png", sep=""),
         width = 480, height = 480)
-    pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-2000), y=score,
+    pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-midpt), y=score,
                                group=1, colour="black")) +
         geom_hline(yintercept = 6, linetype = 2,
                    color = "grey", size = 0.25) +
@@ -746,7 +750,7 @@ plotTSS <- function(TSSfile) {
 
     pdf(file = paste(tools::file_path_sans_ext(TSSfile), ".pdf", sep=""),
         width= 7, height = 7, useDingbats=F)
-    pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-2000), y=score,
+    pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-midpt), y=score,
                                group=1, colour="black")) +
         geom_hline(yintercept = 6, linetype = 2,
                    color = "grey", size = 0.25) +
