@@ -1,6 +1,20 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] -- 2019-06-11
+
+### Changed
+- Fix multiple input file handling
+- Update preseq calculation and plotting and handle small samples
+- Fix TSS plotting and score calculation
+- Include bedtools in required software
+
+### Added
+- Add project level library complexity summarizer
+- Add docs
+- Add container
+- Add small test example
+
 ## [0.6.0] -- 2019-06-04
 
 ### Changed
