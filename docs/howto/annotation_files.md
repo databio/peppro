@@ -1,7 +1,5 @@
 # How to download or create annotation files
 
-## Obtain annotation files
-
 For each annotation type (TSS, premature mRNA, or general features), we provide [downloadable defaults](http://big.databio.org/peppro/) for common genomes.  You may also recreate these yourself as described below.
 
 ### TSS
@@ -20,7 +18,7 @@ To determine the *F*raction of *R*eads *i*n *P*re-mature mRNA (*FRiP*), you will
 ```console
 wget -O hg38_refGene.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz
 zcat hg38_refGene.txt.gz | grep 'cmpl' | \
-  awk  '{if($4=="+"){print $3"\t"$5"\t"$8"\t"$4"\t"$13}else{print $3"\t"$7"\t"$6"\t"$4"\t"$13}}' | \
+  awk  '{print $3"\t"$5"\t"$6"\t"$4"\t"$13}' | \
   LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_pre-mRNA.tsv
 ```
 The pipeline will look in the reference genome directory automatically.  Alternatively, you can use the `--pre-name` pipeline option to provide a path to this file.
