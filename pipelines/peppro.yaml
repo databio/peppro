@@ -5,6 +5,7 @@
 tools:  # absolute paths to required tools
   python: python
   samtools: samtools
+  bedtools: bedtools
   bowtie2: bowtie2
   seqkit: seqkit
   fastp: fastp
