@@ -1,0 +1,35 @@
+# Run test sample through PEPPRO
+name: test
+
+metadata:
+  sample_annotation: "peppro_test.csv"
+  output_dir: "$PROCESSED/peppro_test/"
+  pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
+  
+derived_columns: [read1]
+
+data_sources:
+  R1: "$CODE/peppro/examples/data/{sample_name}_r1.fq.gz"
+  
+implied_columns:
+  organism:
+    human:
+      genome: hg38
+      prealignments: rCRSd human_repeats
+      adapter: fastp  # Default
+      dedup: seqkit   # Default
+      trimmer: seqtk  # Default
+      runon: pro      # Default
+      umi_len: 8      # Default
+      max_len: 30     # Default
+      TSS_name: $GENOMES/hg38/hg38_TSS.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
+      pre_name: $GENOMES/hg38/hg38_pre-mRNA.tsv         # Default. Pipeline checks corresponding genome folder without specifying.
+      anno_name: $GENOMES/hg38/hg38_annotations.bed.gz  # Default. Pipeline checks corresponding genome folder without specifying.
+
+pipeline_args:
+  peppro.py:
+    #"--scale": null      # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
+    #"--parts": 4         # Default. Split suffix tree generation into <4> parts. Higher number == less memory use.
+    #"--keep": null       # Default is FALSE. Pass flag to keep prealignment BAM files.
+    #"--noFIFO": null     # Default is FALSE. Pass flag to NOT use named pipes during prealignments.
+    #"--complexity": null # Default is TRUE.  Pass flag to disable library complexity calculation. Faster.
