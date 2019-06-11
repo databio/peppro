@@ -27,9 +27,9 @@ implied_columns:
       anno_name: $GENOMES/hg38/hg38_annotations.bed.gz  # Default. Pipeline checks corresponding genome folder without specifying.
 
 pipeline_args:
-  peppro.py:
-    #"--scale": null      # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
-    #"--parts": 4         # Default. Split suffix tree generation into <4> parts. Higher number == less memory use.
-    #"--keep": null       # Default is FALSE. Pass flag to keep prealignment BAM files.
-    #"--noFIFO": null     # Default is FALSE. Pass flag to NOT use named pipes during prealignments.
-    #"--complexity": null # Default is TRUE.  Pass flag to disable library complexity calculation. Faster.
+#  peppro.py:
+#    "--scale": null      # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
+#    "--parts": 4         # Default. Split suffix tree generation into <4> parts. Higher number == less memory use.
+#    "--keep": null       # Default is FALSE. Pass flag to keep prealignment BAM files.
+#    "--noFIFO": null     # Default is FALSE. Pass flag to NOT use named pipes during prealignments.
+#    "--complexity": null # Default is TRUE.  Pass flag to disable library complexity calculation. Faster.
