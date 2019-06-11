@@ -12,6 +12,7 @@ git clone https://github.com/databio/peppro.git
 `PEPPRO` uses a series of publicly-available, common bioinformatics tools including:
 
 * [samtools](http://www.htslib.org/)
+* [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html)
 * [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
 * [seqkit](https://bioinf.shenwei.me/seqkit/)
 * [fastp](https://github.com/OpenGene/fastp)
@@ -47,6 +48,7 @@ Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming,
 * [cutadapt](https://cutadapt.readthedocs.io/)
 * [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
 * [seqOutBias](https://github.com/guertinlab/seqOutBias)
+* [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc)
 * [pigz (v2.3.4+)](https://zlib.net/pigz/)
 
 ## 3: Download `refgenie` assemblies
@@ -73,23 +75,24 @@ export GENOMES="/path/to/genomes/"
 
 ## 5: Run the pipeline script directly
 
-Using a [K562 sample](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM1480327) as our staring point, we can perform FASTQ preparation, alignment, and bigWig production in a single command.  The pipeline at its core is just a python script, and you can run it on the command line for a single sample (see [command-line usage](usage)), which you can also get on the command line by running `pipelines/peppro.py --help`. You just need to pass a few command-line parameters to specify sample name, reference genome, input files, etc. Here's the basic command to run a small test example through the pipeline:
-
-We use a shell variable that points to raw data, `DATA`, and another pointing to where all processed data should be stored, which we name `PROCESSED`.  You can either define those variables for your environment or just change the example below to the full path to each on your system.
+The pipeline at its core is just a python script, and you can run it on the command line for a single sample (see [command-line usage](usage)), which you can also get on the command line by running `pipelines/peppro.py --help`. You just need to pass a few command-line parameters to specify sample name, reference genome, input files, etc. Here's the basic command to run the included small test example through the pipeline:
 
 ```console
-/pipelines/peppro.py --single-or-paired single \
+/pipelines/peppro.py \
+  --sample-name test \
   --genome hg38 \
-  --sample-name K562_pro \
-  --input $DATA/K562_pro.fastq \
-  --adapter fastpn \
-  --dedup seqkit \
-  --trimmer seqtk \
-  -O $PROCESSED/pro_example/
+  --input examples/data/test_r1.fq.gz \
+  --single-or-paired single \
+  -O $HOME/peppro_example/
 ```
+
+This test example takes less than 5 minutes to complete. Read more about how to [run the test sample using `Looper`](howto/run-looper.md) with the included [example `peppro_test.yaml` file](https://github.com/databio/peppro/blob/master/examples/meta/peppro_test.yaml).
 
 # 6. Next steps
 
 This is just the beginning. For your next step, take a look at one of these user guides:
 
+- [Extended tutorial for running a single sample](tutorial.md)
+- [Running on multiple samples with looper](howto/run-looper.md)
+- [Running the pipeline directly in a container](howto/use-container.md)
 - See other detailed user guide links in the side menu
