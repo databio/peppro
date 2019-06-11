@@ -1741,6 +1741,7 @@ def main():
             cmd_dups = tools.samtools + " index " + mapping_genome_bam_temp_dups
             pm.run(cmd_dups, temp_mapping_index_dups, container=pm.container)
             pm.clean_add(temp_mapping_index_dups)
+            pm.clean_add(mapping_genome_bam_temp_dups)
 
     # Determine mitochondrial read counts
     mito_name = ["chrM", "chrMT", "M", "MT"]
