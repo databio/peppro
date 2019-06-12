@@ -55,7 +55,7 @@ docker run --rm -it --volume /home/jps3ag/:/home/jps3ag/ \
   --prealignments rCRSd human_repeats \
   --genome hg38 \
   --sample-name test1 \
-  --input /home/jps3ag/src/peppro/examples/data/test_r1.fastq.gz \
+  --input /home/jps3ag/src/peppro/examples/data/test_r1.fq.gz \
   --genome-size hs \
   -O $HOME/peppro_test
 ```
@@ -78,7 +78,7 @@ docker run --rm -it --volume /Users/jps3ag/:/Users/jps3ag/ \
   --prealignments rCRSd human_repeats \
   --genome hg38 \
   --sample-name test1 \
-  --input /Users/jps3ag/src/peppro/examples/data/test_r1.fastq.gz \
+  --input /Users/jps3ag/src/peppro/examples/data/test_r1.fq.gz \
   --genome-size hs \
   -O $HOME/peppro_test
 ```

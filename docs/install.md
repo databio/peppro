@@ -57,15 +57,15 @@ The pipeline relies on [`refgenie` assemblies](http://refgenie.databio.org/en/de
 
 ```console
 export REFGENIE=your_genome_folder/genome_config.yaml
-refgenie init $REFGENIE
+refgenie init -c $REFGENIE
 ```
 
 Then, just pull the assets you need.
 
 ```console
-refgenie pull -g hg38 -a bowtie2_index
-refgenie pull -g rCRSD -a bowtie2_index
-refgenie pull -g human_repeats -a bowtie2_index
+refgenie pull -g hg38 -a bowtie2
+refgenie pull -g rCRSd -a bowtie2
+refgenie pull -g human_repeats -a bowtie2
 ```
 
 ## 4: Point the pipeline to your `refgenie` assemblies
