@@ -1,6 +1,12 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.7.1] -- 2019-06-12
+
+### Changed
+- Update to new refgenie usage
+- Update container
+
 ## [0.7.0] -- 2019-06-11
 
 ### Changed

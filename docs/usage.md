@@ -10,13 +10,16 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-C CONFIG_FILE] -O
                  PARENT_OUTPUT_FOLDER [-M MEMORY_LIMIT] [-P NUMBER_OF_CORES]
                  -S SAMPLE_NAME -I INPUT_FILES [INPUT_FILES ...]
                  [-I2 [INPUT_FILES2 [INPUT_FILES2 ...]]] -G GENOME_ASSEMBLY
-                 [-Q SINGLE_OR_PAIRED] [--keep] [--noFIFO] [--umi]
-                 [--umi_len UMI_LEN] [--max_len MAX_LEN] [--parts PARTS]
-                 [--scale] [--adapter {cutadapt,fastp}]
-                 [--trimmer {fastx,seqtk}] [--dedup {fqdedup,seqkit}]
-                 [--prealignments PREALIGNMENTS [PREALIGNMENTS ...]] [-V]
+                 [-Q SINGLE_OR_PAIRED] [--runon {pro,gro}]
+                 [--adapter {fastp,cutadapt}] [--dedup {seqkit,fqdedup}]
+                 [--trimmer {seqtk,fastx}] [--umi] [--umi_len UMI_LEN]
+                 [--max_len MAX_LEN] [--scale] [--parts PARTS]
+                 [--prealignments PREALIGNMENTS [PREALIGNMENTS ...]]
+                 [--TSS-name TSS_NAME] [--pre-name PRE_NAME]
+                 [--anno-name ANNO_NAME] [--keep] [--noFIFO] [--complexity]
+                 [-V]
 
-PEPPRO version 0.5.1
+PEPPRO version 0.7.1
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -37,26 +40,32 @@ optional arguments:
                         Secondary input files, such as read2
   -Q SINGLE_OR_PAIRED, --single-or-paired SINGLE_OR_PAIRED
                         Single- or paired-end sequencing protocol
-  --keep                Keep prealignment BAM files
-  --noFIFO              Do NOT use named pipes during prealignments
+  --runon {pro,gro}     Run on sequencing type.
+  --adapter {fastp,cutadapt}
+                        Name of adapter removal program
+  --dedup {seqkit,fqdedup}
+                        Name of program that removes duplicate reads
+  --trimmer {seqtk,fastx}
+                        Name of read trimming program
   --umi                 Remove umi with fastp
   --umi_len UMI_LEN     Specify the length of the UMI.If your data does not
                         utilize UMIs, set to 0.
   --max_len MAX_LEN     Trim reads to maximum length. Set to -1 to disable
                         length trimming.
+  --scale               Scale output using seqOutBias when producing signal
+                        tracks.
   --parts PARTS         Split suffix tree generation into <n> parts. Increase
                         this value to lower memory use.
-  --scale               Scale output using seqOutBias when producing signal
-                        tracks
-  --adapter {cutadapt,fastp}
-                        Name of adapter removal program
-  --trimmer {fastx,seqtk}
-                        Name of read trimming program
-  --dedup {fqdedup,seqkit}
-                        Name of program that removes duplicate reads
   --prealignments PREALIGNMENTS [PREALIGNMENTS ...]
                         Space-delimited list of reference genomes to align to
                         before primary alignment.
+  --TSS-name TSS_NAME   Filename of TSS annotation file.
+  --pre-name PRE_NAME   Filename of pre-mRNA annotation file.
+  --anno-name ANNO_NAME
+                        Filename of genomic annotation file.
+  --keep                Keep prealignment BAM files
+  --noFIFO              Do NOT use named pipes during prealignments.
+  --complexity          Disable library complexity calculation (faster).
   -V, --version         show program's version number and exit
 
 required named arguments:
