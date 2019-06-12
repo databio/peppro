@@ -5,7 +5,7 @@ FROM phusion/baseimage:0.11
 LABEL maintainer Jason Smith "jasonsmith@virginia.edu"
 
 # Version info
-LABEL version 0.7
+LABEL version 0.7.2
 
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
@@ -46,23 +46,25 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes mysql-server \
     
 # Install python tools
 RUN pip install --upgrade pip
-RUN pip install cutadapt && \
-    pip install numpy && \
-    pip install https://github.com/pepkit/looper/zipball/master && \
-    pip install pararead && \
-    pip install pandas && \
-    pip install piper && \
-    pip install refgenie
+RUN pip install --upgrade cutadapt && \
+    pip install --upgrade numpy && \
+    pip install --upgrade https://github.com/pepkit/looper/zipball/master && \
+    pip install --upgrade pararead && \
+    pip install --upgrade pandas && \
+    pip install --upgrade piper && \
+    pip install --upgrade psutil && \
+    pip install --upgrade refgenie
     
 
 RUN pip3 install --upgrade pip
-RUN pip3 install cutadapt && \
-    pip3 install numpy && \
-    pip3 install https://github.com/pepkit/looper/zipball/master && \
-    pip3 install pararead && \
-    pip3 install pandas && \
-    pip3 install piper && \
-    pip3 install refgenie
+RUN pip3 install --upgrade cutadapt && \
+    pip3 install --upgrade numpy && \
+    pip3 install --upgrade https://github.com/pepkit/looper/zipball/master && \
+    pip3 install --upgrade pararead && \
+    pip3 install --upgrade pandas && \
+    pip3 install --upgrade piper && \
+    pip3 install --upgrade psutil && \
+    pip3 install --upgrade refgenie
 
 # Install R
 RUN echo '# Ubuntu 18.04 (Bionic) - R' >> /etc/apt/sources.list && \
