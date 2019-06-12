@@ -1,5 +1,5 @@
 # Pull base image
-FROM phusion/baseimage:latest
+FROM phusion/baseimage:0.11
 
 # Who maintains this image
 LABEL maintainer Jason Smith "jasonsmith@virginia.edu"
@@ -12,7 +12,10 @@ CMD ["/sbin/my_init"]
 
 # Install dependencies
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes \    
+    DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes \
+    autoconf \
+    automake \
+    autotools-dev \
     curl \
     default-jre \
     default-jdk \
@@ -27,10 +30,13 @@ RUN apt-get update && \
     libssl-dev \
     libtbb2 \
     libtbb-dev \
+    libtool \
     openssl \
     pigz \
     python \
     python-pip python-dev build-essential \
+    python3 \
+    python3-pip \
     wget
 
 # Install MySQL server
@@ -40,18 +46,38 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes mysql-server \
     
 # Install python tools
 RUN pip install --upgrade pip
-RUN pip install numpy && \
+RUN pip install cutadapt && \
+    pip install numpy && \
     pip install https://github.com/pepkit/looper/zipball/master && \
     pip install pararead && \
     pip install pandas && \
     pip install piper && \
-    pip install cutadapt
+    pip install refgenie
+    
+
+RUN pip3 install --upgrade pip
+RUN pip3 install cutadapt && \
+    pip3 install numpy && \
+    pip3 install https://github.com/pepkit/looper/zipball/master && \
+    pip3 install pararead && \
+    pip3 install pandas && \
+    pip3 install piper && \
+    pip3 install refgenie
 
 # Install R
-RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes install r-base r-base-dev && \
-    echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile && \
+RUN echo '# Ubuntu 18.04 (Bionic) - R' >> /etc/apt/sources.list && \
+    echo 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/' >> /etc/apt/sources.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get --assume-yes install r-base r-base-dev && \
+    echo "r <- getOption('repos'); r['CRAN'] <- 'https://cloud.r-project.org/'; options(repos = r);" > ~/.Rprofile && \
     Rscript -e "install.packages('devtools')" && \
-    Rscript -e "devtools::install_github('databio/peppro', subdir='PEPPROr')"
+    Rscript -e "devtools::install_github('pepkit/pepr')" && \
+    Rscript -e "install.packages('BiocManager')" && \
+    Rscript -e "BiocManager::install(); BiocManager::install('GenomicRanges')" && \
+    Rscript -e "devtools::install_github('databio/GenomicDistributions')"
+ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
+RUN Rscript -e "devtools::install_github('databio/peppro', subdir='PEPPROr')"
 
 # Install htslib
 WORKDIR /home/src/
@@ -130,17 +156,22 @@ RUN wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/wigToBigWig && \
 # OPTIONAL REQUIREMENTS
 # Install fastqc
 WORKDIR /home/tools/
-RUN wget http://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.7.zip && \
-    unzip fastqc_v0.11.7.zip && \
-    cd /home/tools/FastQC && \
+RUN wget https://github.com/s-andrews/FastQC/archive/v0.11.8.zip && \
+    unzip v0.11.8.zip && \
+    cd /home/tools/FastQC-0.11.8 && \
     chmod 755 fastqc && \ 
-    ln -s /home/tools/FastQC/fastqc /usr/bin/
+    ln -s /home/tools/FastQC-0.11.8/fastqc /usr/bin/
+
+# Install cargo
+WORKDIR /home/tools/
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
 
 # Install fqdedup
 WORKDIR /home/tools/
 RUN git clone https://github.com/guertinlab/fqdedup.git && \
     cd fqdedup && \
-    cargo build --release && \
+    bash -c 'source $HOME/.cargo/env; cargo build --release' && \
     ln -s /home/tools/fqdedup/target/release/fqdedup /usr/bin/
 
 # Install fastx_toolkit
@@ -150,29 +181,22 @@ RUN git clone https://github.com/agordon/libgtextutils.git && \
     ./reconf && \
     ./configure && \
     make && \
-    make install && \
-    cd /home/tools/ && \
-    git clone https://github.com/agordon/fastx_toolkit && \
+    make install
+WORKDIR /home/tools/
+RUN git clone https://github.com/agordon/fastx_toolkit && \
     cd fastx_toolkit && \
     ./reconf && \
     ./configure && \
+    find . -type f -exec sed -ie 's/-Werror//g' {} \; && \
     make && \
     make install
 
 # Install seqOutBias
 WORKDIR /home/tools/
-RUN curl https://sh.rustup.rs -sSf | sh && \
-    source $HOME/.cargo/env && \
-    git clone https://github.com/guertinlab/seqOutBias.git && \
+RUN git clone https://github.com/guertinlab/seqOutBias.git && \
     cd seqOutBias && \
-    cargo build --release && \
+    bash -c 'source $HOME/.cargo/env; cargo build --release' && \
     ln -s /home/tools/seqOutBias/target/release/seqOutBias /usr/bin/
-
-# Install pigz
-WORKDIR /home/tools/
-RUN wget https://zlib.net/pigz/pigz-2.4.tar.gz && \
-    tar -zxvf pigz-2.4.tar.gz && \
-    ln -s /home/tools/pigz-2.4/pigz /usr/bin/
 
 
 # Set environment variables
