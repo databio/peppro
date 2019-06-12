@@ -53,25 +53,29 @@ Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming,
 
 ## 3: Download `refgenie` assemblies
 
-The pipeline relies on [`Refgenie` assemblies](https://github.com/databio/refgenie) for alignment.  You have two options for using `refgenie` assemblies. If you're using a common genome, there's a good chance there's already a [downloadable pre-built `refgenie` assembly](http://big.databio.org/refgenomes) for your genome. Otherwise, you can follow the [`refgenie` instructions to create your own](https://github.com/databio/refgenie).
+The pipeline relies on [`refgenie` assemblies](http://refgenie.databio.org/en/dev/install/) for alignment.  First, initialize a folder for genome indexes and the `refgenie` config file.
 
 ```console
-wget http://big.databio.org/refgenomes/hg38.tgz
-wget http://big.databio.org/refgenomes/human_repeats_170502.tgz
-wget http://big.databio.org/refgenomes/rCRSd_170502.tgz
-tar -xf hg38.tgz
-tar -xf human_repeats_170502.tgzz
-tar -xf rCRSd_170502.tgz
+export REFGENIE=your_genome_folder/genome_config.yaml
+refgenie init $REFGENIE
 ```
 
-## 4: Point the pipeline to your Refgenie assemblies
+Then, just pull the assets you need.
+
+```console
+refgenie pull -g hg38 -a bowtie2_index
+refgenie pull -g rCRSD -a bowtie2_index
+refgenie pull -g human_repeats -a bowtie2_index
+```
+
+## 4: Point the pipeline to your `refgenie` assemblies
 
 Once you've obtained assemblies for all genomes you wish to use, you must point the pipeline to where you store them. You can do this by adjusting the `resources.genomes` attribute in the [pipeline config file](https://github.com/databio/peppro/blob/master/pipelines/peppro.yaml). By default, this points to the shell variable `$GENOMES`, so all you have to do is set an environment variable to the location of your refgenie genomes:
 
 ```console
 export GENOMES="/path/to/genomes/"
 ```
-(Add this to your .bashrc or .profile to ensure it persists). Alternatively, you can skip the `GENOMES` variable and simply change the value of the r`resources.genomes` configuration option to point to the folder where you stored the assemblies. 
+(Add this to your .bashrc or .profile to ensure it persists). Alternatively, you can skip the `GENOMES` variable and simply change the value of the `resources.genomes` configuration option to point to the folder where you stored the assemblies. 
 
 ## 5: Run the pipeline script directly
 

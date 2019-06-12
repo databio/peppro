@@ -3,3 +3,4 @@ https://github.com/pepkit/looper/zipball/master
 pararead
 pandas
 piper
+refgenie
