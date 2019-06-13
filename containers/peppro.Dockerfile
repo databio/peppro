@@ -130,7 +130,8 @@ RUN wget http://smithlabresearch.org/downloads/preseq_linux_v2.0.tar.bz2 && \
     tar -jxvf preseq_linux_v2.0.tar.bz2 && \
     rm preseq_linux_v2.0.tar.bz2 && \
     cd preseq_v2.0/ && \
-    ln /usr/lib/x86_64-linux-gnu/libgsl.so /usr/lib/x86_64-linux-gnu/libgsl.so.0 && \
+    ln -s /usr/lib/x86_64-linux-gnu/libgsl.so /usr/lib/x86_64-linux-gnu/libgsl.so.0 && \
+    ln -s /usr/lib/x86_64-linux-gnu/libgsl.so /usr/local/lib/libgsl.so.0 && \
     ln -s /home/src/preseq_v2.0/preseq /usr/bin/ && \
     ln -s /home/src/preseq_v2.0/bam2mr /usr/bin/
 
@@ -197,6 +198,7 @@ RUN rm -f /usr/bin/python && \
 
 ENV PATH=/home/tools/bin:/home/tools/:/home/src/bowtie2-2.3.5.1:/home/src/samtools-1.7:/home/src/htslib-1.7:$PATH \
     R_LIBS_USER=/usr/local/lib/R/site-library/ \
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/:/usr/local/lib/ \
     PYTHONPATH=/usr/local/lib/python3.6/dist-packages:$PYTHONPATH
 
 # Define default command
