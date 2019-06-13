@@ -68,16 +68,9 @@ refgenie pull -g rCRSd -a bowtie2
 refgenie pull -g human_repeats -a bowtie2
 ```
 
-## 4: Point the pipeline to your `refgenie` assemblies
+(Add `REFGENIE` to your .bashrc or .profile to ensure it persists). Alternatively, you can skip the `REFGENIE` variable and simply change the value of the `resources.genome_config` option in the [`pipeline_config.yaml`](https://github.com/databio/peppro/blob/master/pipelines/peppro.yaml) file to point to the folder where you stored the assemblies. 
 
-Once you've obtained assemblies for all genomes you wish to use, you must point the pipeline to where you store them. You can do this by adjusting the `resources.genomes` attribute in the [pipeline config file](https://github.com/databio/peppro/blob/master/pipelines/peppro.yaml). By default, this points to the shell variable `$GENOMES`, so all you have to do is set an environment variable to the location of your refgenie genomes:
-
-```console
-export GENOMES="/path/to/genomes/"
-```
-(Add this to your .bashrc or .profile to ensure it persists). Alternatively, you can skip the `GENOMES` variable and simply change the value of the `resources.genomes` configuration option to point to the folder where you stored the assemblies. 
-
-## 5: Run the pipeline script directly
+## 4: Run the pipeline script directly
 
 The pipeline at its core is just a python script, and you can run it on the command line for a single sample (see [command-line usage](usage)), which you can also get on the command line by running `pipelines/peppro.py --help`. You just need to pass a few command-line parameters to specify sample name, reference genome, input files, etc. Here's the basic command to run the included small test example through the pipeline:
 
@@ -92,7 +85,7 @@ The pipeline at its core is just a python script, and you can run it on the comm
 
 This test example takes less than 5 minutes to complete. Read more about how to [run the test sample using `Looper`](howto/run-looper.md) with the included [example `peppro_test.yaml` file](https://github.com/databio/peppro/blob/master/examples/meta/peppro_test.yaml).
 
-# 6. Next steps
+# 5. Next steps
 
 This is just the beginning. For your next step, take a look at one of these user guides:
 
