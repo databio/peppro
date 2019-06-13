@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.7.1"
+__version__ = "0.7.2"
 
 
 from argparse import ArgumentParser
@@ -553,13 +553,33 @@ def _add_resources(args, res):
     if args.TSS_name:        
         res[asset] = os.path.abspath(args.TSS_name)
     else:
-        res[asset] = rgc.get_asset(args.genome_assembly, asset)
+        try:
+            res[asset] = rgc.get_asset(args.genome_assembly, asset)
+        except KeyError:
+            msg = "The '{}' asset is not present in your REFGENIE config file."
+            print(msg.format(asset))
+        except:
+            err = "The '{}' asset does not exist."
+            msg = ("Update your REFGENIE config file to include this asset, or "
+                   "point directly to the file using --TSS-name.\n")
+            print(err.format(asset))
+            print(msg)
 
     asset = "pre_mRNA_annotation"
     if args.pre_name:
         res.pre_file = os.path.abspath(args.pre_name)
     else:
-        res[asset] = rgc.get_asset(args.genome_assembly, asset)
+        try:
+            res[asset] = rgc.get_asset(args.genome_assembly, asset)
+        except KeyError:
+            msg = "The '{}' asset is not present in your REFGENIE config file."
+            print(msg.format(asset))
+        except:
+            err = "The '{}' asset does not exist."
+            msg = ("Update your REFGENIE config file to include this asset, or "
+                   "point directly to the file using --pre-name.\n")
+            print(err.format(asset))
+            print(msg)
 
     # asset = "feat_annotation"
     # if args.anno_name:
@@ -567,9 +587,6 @@ def _add_resources(args, res):
     # else:
     #     res[asset] = rgc.get_asset(args.genome_assembly, asset)
 
-    for asset in ["blacklist"]:
-        res[asset] = rgc.get_asset(args.genome_assembly, asset,
-                                   strict_exists=False)
     res.rgc = rgc
     return res
 
@@ -1729,7 +1746,7 @@ def main():
             unmapped_fq = unmapped_fq + ".gz"
             pm.run(cmd, unmapped_fq, container=pm.container)
 
-    if not args.prealignments:
+    if not args.prealignments and os.path.exists(mapping_genome_bam_temp):
         # Index the temporary bam file
         temp_mapping_index = os.path.join(mapping_genome_bam_temp + ".bai")
         cmd = tools.samtools + " index " + mapping_genome_bam_temp
@@ -1744,13 +1761,16 @@ def main():
             pm.clean_add(mapping_genome_bam_temp_dups)
 
     # Determine mitochondrial read counts
-    mito_name = ["chrM", "chrMT", "M", "MT"]
-    cmd = (tools.samtools + " idxstats " + mapping_genome_bam_temp +
-           " | grep")
-    for name in mito_name:
-        cmd += " -we '" + name + "'"
-    cmd += "| cut -f 3"
-    mr = pm.checkprint(cmd)
+    if os.path.exists(mapping_genome_bam_temp):
+        mito_name = ["chrM", "chrMT", "M", "MT"]
+        cmd = (tools.samtools + " idxstats " + mapping_genome_bam_temp +
+               " | grep")
+        for name in mito_name:
+            cmd += " -we '" + name + "'"
+        cmd += "| cut -f 3"
+        mr = pm.checkprint(cmd)
+    else:
+        mr = ''
 
     # If there are mitochondrial reads, report and remove them
     if mr and mr.strip():
@@ -1782,16 +1802,20 @@ def main():
         max_len = args.max_len
 
     if args.complexity:
-        cmd_dups = (tools.samtools + " idxstats " +
-                    mapping_genome_bam_temp_dups + " | grep")
-        for name in mito_name:
-            cmd_dups += " -we '" + name + "'"
-        cmd_dups += "| cut -f 3"
-        mr_dups = pm.checkprint(cmd_dups)
+        if os.path.exists(mapping_genome_bam_temp_dups):
+            cmd_dups = (tools.samtools + " idxstats " +
+                        mapping_genome_bam_temp_dups + " | grep")
+            for name in mito_name:
+                cmd_dups += " -we '" + name + "'"
+            cmd_dups += "| cut -f 3"
+            mr_dups = pm.checkprint(cmd_dups)
+        else:
+            mr_dups = ''
 
         if mr_dups and mr_dups.strip():
             # Index the sort'ed BAM file first
-            mapping_genome_index_dups = os.path.join(mapping_genome_bam_dups + ".bai")
+            mapping_genome_index_dups = os.path.join(
+                mapping_genome_bam_dups + ".bai")
             noMT_mapping_genome_bam_dups = os.path.join(
                 map_genome_folder, args.sample_name + "_noMT_dups.bam")
 
@@ -1803,7 +1827,8 @@ def main():
             cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
                      str(pm.cores) + " " + mapping_genome_bam_dups + " > " +
                      noMT_mapping_genome_bam_dups)
-            cmd3 = ("mv " + noMT_mapping_genome_bam_dups + " " + mapping_genome_bam_dups)
+            cmd3 = ("mv " + noMT_mapping_genome_bam_dups + " " +
+                    mapping_genome_bam_dups)
             cmd4 = tools.samtools + " index " + mapping_genome_bam_dups
             pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam_dups)
             pm.clean_add(mapping_genome_index_dups)
