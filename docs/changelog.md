@@ -1,6 +1,12 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.7.3] -- 2019-06-13
+
+### Changed
+- Fix missing gt in container
+- Fix mappability bug with new refgenie
+
 ## [0.7.2] -- 2019-06-13
 
 ### Changed
