@@ -20,8 +20,11 @@ RUN apt-get update && \
     default-jre \
     default-jdk \
     gcc \
+    genometools \
     git \
     gsl-bin \
+    libgenometools0 \
+    libgenometools0-dev \
     libgsl-dbg \
     libgsl-dev \
     libcommons-math3-java \

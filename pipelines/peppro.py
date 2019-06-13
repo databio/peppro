@@ -2314,8 +2314,8 @@ def main():
         ngstk.make_dir(mappability_folder)
         
         # Link fasta file
-        genome_fq_ln = os.path.join(res.genomes, args.genome_assembly,
-            mappability_folder, (args.genome_assembly + ".fa"))
+        genome_fq_ln = os.path.join(mappability_folder,
+                                   (args.genome_assembly + ".fa"))
         if not os.path.isfile(genome_fq_ln):
             cmd = "ln -sf " + genome_fq + " " + genome_fq_ln
             pm.run(cmd, genome_fq_ln)
