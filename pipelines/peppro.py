@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.7.2"
+__version__ = "0.7.3"
 
 
 from argparse import ArgumentParser
@@ -572,7 +572,7 @@ def _add_resources(args, res):
 
     asset = "pre_mRNA_annotation"
     if args.pre_name:
-        res.pre_file = os.path.abspath(args.pre_name)
+        res[asset] = os.path.abspath(args.pre_name)
     else:
         try:
             res[asset] = rgc.get_asset(args.genome_assembly, asset)
@@ -590,8 +590,7 @@ def _add_resources(args, res):
     # if args.anno_name:
     #     res.anno_file = os.path.abspath(args.anno_name)
     # else:
-    #     res[asset] = rgc.get_asset(args.genome_assembly, asset)
-
+    #     res[asset] = rgc.get_asset(args.genome_assembly, asset)\
     res.rgc = rgc
     return res
 
@@ -1714,9 +1713,9 @@ def main():
         ar = ngstk.count_mapped_reads(bam, args.paired_end)
         rr = float(pm.get_stat("Raw_reads"))
         tr = float(pm.get_stat("Trimmed_reads"))
-        if os.path.exists(res.pre_file):
+        if os.path.exists(res.pre_mRNA_annotation):
             cmd = (tools.samtools + " depth -b " +
-                   res.pre_file + " " + bam +
+                   res.pre_mRNA_annotation + " " + bam +
                    " | awk '{counter++;sum+=$3}END{print sum/counter}'")
             rd = pm.checkprint(cmd)
         else:
@@ -1751,52 +1750,56 @@ def main():
             unmapped_fq = unmapped_fq + ".gz"
             pm.run(cmd, unmapped_fq, container=pm.container)
 
+    temp_mapping_index = os.path.join(mapping_genome_bam_temp + ".bai")
+    temp_mapping_index_dups = os.path.join(mapping_genome_bam_temp_dups + ".bai")
+
     if not args.prealignments and os.path.exists(mapping_genome_bam_temp):
         # Index the temporary bam file
-        temp_mapping_index = os.path.join(mapping_genome_bam_temp + ".bai")
         cmd = tools.samtools + " index " + mapping_genome_bam_temp
         pm.run(cmd, temp_mapping_index, container=pm.container)
         pm.clean_add(temp_mapping_index)
 
         if args.complexity:
-            temp_mapping_index_dups = os.path.join(mapping_genome_bam_temp_dups + ".bai")
             cmd_dups = tools.samtools + " index " + mapping_genome_bam_temp_dups
             pm.run(cmd_dups, temp_mapping_index_dups, container=pm.container)
             pm.clean_add(temp_mapping_index_dups)
             pm.clean_add(mapping_genome_bam_temp_dups)
 
     # Determine mitochondrial read counts
+    mito_name = ["chrM", "chrMT", "M", "MT", "rCRSd", "rCRSd_3k"]
     if os.path.exists(mapping_genome_bam_temp):
-        mito_name = ["chrM", "chrMT", "M", "MT"]
+        if not os.path.exists(temp_mapping_index):
+            cmd = tools.samtools + " index " + mapping_genome_bam_temp
+            pm.run(cmd, temp_mapping_index, container=pm.container)
+            pm.clean_add(temp_mapping_index)
+
         cmd = (tools.samtools + " idxstats " + mapping_genome_bam_temp +
                " | grep")
         for name in mito_name:
             cmd += " -we '" + name + "'"
         cmd += "| cut -f 3"
         mr = pm.checkprint(cmd)
-    else:
-        mr = ''
+    
+        # If there are mitochondrial reads, report and remove them
+        if mr and mr.strip():
+            pm.report_result("Mitochondrial_reads", round(float(mr)))
+            # Index the sort'ed BAM file first
+            mapping_genome_index = os.path.join(mapping_genome_bam + ".bai")
+            noMT_mapping_genome_bam = os.path.join(
+                map_genome_folder, args.sample_name + "_noMT.bam")
 
-    # If there are mitochondrial reads, report and remove them
-    if mr and mr.strip():
-        pm.report_result("Mitochondrial_reads", round(float(mr)))
-        # Index the sort'ed BAM file first
-        mapping_genome_index = os.path.join(mapping_genome_bam + ".bai")
-        noMT_mapping_genome_bam = os.path.join(
-            map_genome_folder, args.sample_name + "_noMT.bam")
-
-        cmd1 = tools.samtools + " index " + mapping_genome_bam
-        cmd2 = (tools.samtools + " idxstats " + mapping_genome_bam +
-                " | cut -f 1 | grep")
-        for name in mito_name:
-            cmd2 += " -vwe '" + name + "'"
-        cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
-                 str(pm.cores) + " " + mapping_genome_bam + " > " +
-                 noMT_mapping_genome_bam)
-        cmd3 = ("mv " + noMT_mapping_genome_bam + " " + mapping_genome_bam)
-        cmd4 = tools.samtools + " index " + mapping_genome_bam
-        pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam)
-        pm.clean_add(mapping_genome_index)
+            cmd1 = tools.samtools + " index " + mapping_genome_bam
+            cmd2 = (tools.samtools + " idxstats " + mapping_genome_bam +
+                    " | cut -f 1 | grep")
+            for name in mito_name:
+                cmd2 += " -vwe '" + name + "'"
+            cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
+                     str(pm.cores) + " " + mapping_genome_bam + " > " +
+                     noMT_mapping_genome_bam)
+            cmd3 = ("mv " + noMT_mapping_genome_bam + " " + mapping_genome_bam)
+            cmd4 = tools.samtools + " index " + mapping_genome_bam
+            pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam)
+            pm.clean_add(mapping_genome_index)
 
     # Determine maximum read length
     cmd = (tools.samtools + " stats " + mapping_genome_bam +
@@ -1808,35 +1811,38 @@ def main():
 
     if args.complexity:
         if os.path.exists(mapping_genome_bam_temp_dups):
+            if not os.path.exists(temp_mapping_index_dups):
+                cmd = tools.samtools + " index " + mapping_genome_bam_temp_dups
+                pm.run(cmd, temp_mapping_index_dups, container=pm.container)
+                pm.clean_add(temp_mapping_index_dups)
+
             cmd_dups = (tools.samtools + " idxstats " +
                         mapping_genome_bam_temp_dups + " | grep")
             for name in mito_name:
                 cmd_dups += " -we '" + name + "'"
             cmd_dups += "| cut -f 3"
             mr_dups = pm.checkprint(cmd_dups)
-        else:
-            mr_dups = ''
 
-        if mr_dups and mr_dups.strip():
-            # Index the sort'ed BAM file first
-            mapping_genome_index_dups = os.path.join(
-                mapping_genome_bam_dups + ".bai")
-            noMT_mapping_genome_bam_dups = os.path.join(
-                map_genome_folder, args.sample_name + "_noMT_dups.bam")
+            if mr_dups and mr_dups.strip():
+                # Index the sort'ed BAM file first
+                mapping_genome_index_dups = os.path.join(
+                    mapping_genome_bam_dups + ".bai")
+                noMT_mapping_genome_bam_dups = os.path.join(
+                    map_genome_folder, args.sample_name + "_noMT_dups.bam")
 
-            cmd1 = tools.samtools + " index " + mapping_genome_bam_dups
-            cmd2 = (tools.samtools + " idxstats " + mapping_genome_bam_dups +
-                    " | cut -f 1 | grep")
-            for name in mito_name:
-                cmd2 += " -vwe '" + name + "'"
-            cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
-                     str(pm.cores) + " " + mapping_genome_bam_dups + " > " +
-                     noMT_mapping_genome_bam_dups)
-            cmd3 = ("mv " + noMT_mapping_genome_bam_dups + " " +
-                    mapping_genome_bam_dups)
-            cmd4 = tools.samtools + " index " + mapping_genome_bam_dups
-            pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam_dups)
-            pm.clean_add(mapping_genome_index_dups)
+                cmd1 = tools.samtools + " index " + mapping_genome_bam_dups
+                cmd2 = (tools.samtools + " idxstats " +
+                        mapping_genome_bam_dups + " | cut -f 1 | grep")
+                for name in mito_name:
+                    cmd2 += " -vwe '" + name + "'"
+                cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
+                         str(pm.cores) + " " + mapping_genome_bam_dups +
+                         " > " + noMT_mapping_genome_bam_dups)
+                cmd3 = ("mv " + noMT_mapping_genome_bam_dups + " " +
+                        mapping_genome_bam_dups)
+                cmd4 = tools.samtools + " index " + mapping_genome_bam_dups
+                pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam_dups)
+                pm.clean_add(mapping_genome_index_dups)
 
         # Calculate library complexity
         pm.timestamp("### Calculate library complexity")
@@ -1989,9 +1995,9 @@ def main():
     pm.run([cmd1,cmd2], minus_bam)
 
     # TSS enrichment
-    if not os.path.exists(res.TSS_file):
+    if not os.path.exists(res.tss_annotation):
         print("Skipping TSS -- TSS enrichment requires TSS annotation file: {}"
-              .format(res.TSS_file))
+              .format(res.tss_annotation))
     else:
         pm.timestamp("### Calculate TSS enrichment")
 
@@ -2010,7 +2016,7 @@ def main():
         Tss_plus = os.path.join(QC_folder, args.sample_name +
                                 "_plus_TssEnrichment.txt")
         cmd = tool_path("pyTssEnrichment.py")
-        cmd += " -a " + plus_bam + " -b " + res.TSS_file + " -p ends"
+        cmd += " -a " + plus_bam + " -b " + res.tss_annotation + " -p ends"
         cmd += " -c " + str(pm.cores)
         cmd += " -e 2000 -u -v -s 4 -o " + Tss_plus
         pm.run(cmd, Tss_plus, nofail=True, container=pm.container)
@@ -2057,7 +2063,7 @@ def main():
         Tss_minus = os.path.join(QC_folder, args.sample_name +
                                   "_minus_TssEnrichment.txt")
         cmd = tool_path("pyTssEnrichment.py")
-        cmd += " -a " + minus_bam + " -b " + res.TSS_file + " -p ends"
+        cmd += " -a " + minus_bam + " -b " + res.tss_annotation + " -p ends"
         cmd += " -c " + str(pm.cores)
         cmd += " -e 2000 -u -v -s 4 -k -o " + Tss_minus
         pm.run(cmd, Tss_minus, nofail=True, container=pm.container)
@@ -2090,19 +2096,19 @@ def main():
                          anchor_image=Tss_minus_png)
 
     # Fraction of reads in Pre-mRNA (FRiP)
-    if not os.path.exists(res.pre_file):
+    if not os.path.exists(res.pre_mRNA_annotation):
         print("Skipping FRiP -- Fraction of reads in pre-mRNA requires "
               "pre-mRNA annotation file: {}"
-              .format(res.pre_file))
+              .format(res.pre_mRNA_annotation))
     else:
         pm.timestamp("### Calculate FRiP")
         # Plus
-        plus_frip = calc_frip(plus_bam, res.pre_file,
+        plus_frip = calc_frip(plus_bam, res.pre_mRNA_annotation,
                               frip_func=ngstk.simple_frip,
                               pipeline_manager=pm)
         pm.report_result("Plus FRiP", plus_frip)
         # Minus
-        minus_frip = calc_frip(minus_bam, res.pre_file,
+        minus_frip = calc_frip(minus_bam, res.pre_mRNA_annotation,
                                frip_func=ngstk.simple_frip,
                                pipeline_manager=pm)
         pm.report_result("Minus FRiP", minus_frip)
@@ -2261,8 +2267,9 @@ def main():
     pm.report_object("Minus FRiF", frifPDF, anchor_image=frifPNG)
 
     # Shift and produce BigWig's
-    genome_fq = os.path.join(
-        res.genomes, args.genome_assembly, (args.genome_assembly + ".fa"))
+    genome_fq = os.path.join(res.rgc.genome_folder,
+                             args.genome_assembly,
+                             (args.genome_assembly + ".fa"))
     signal_folder = os.path.join(
         param.outfolder, "signal_" + args.genome_assembly)
     ngstk.make_dir(signal_folder)
@@ -2309,10 +2316,11 @@ def main():
         # Do that in the $GENOMES folder, in a subfolder called "mappability"
         # Only need to do that once for each read-size of interest
         # default would be read-size 30 (args.max_len)
-        mappability_folder = os.path.join(
-            res.genomes, args.genome_assembly, "mappability")
+        mappability_folder = os.path.join(res.rgc.genome_folder,
+                                          args.genome_assembly,
+                                          "mappability")
         ngstk.make_dir(mappability_folder)
-        
+
         # Link fasta file
         genome_fq_ln = os.path.join(mappability_folder,
                                    (args.genome_assembly + ".fa"))
@@ -2323,16 +2331,19 @@ def main():
         if args.max_len != -1:
             max_len = args.max_len
 
-        suffix_index = os.path.join(res.genomes, args.genome_assembly,
-            mappability_folder, (args.genome_assembly + ".sft"))
-        suffix_check = os.path.join(res.genomes, args.genome_assembly,
-            mappability_folder, (args.genome_assembly + ".sft.suf"))
-        tally_index = os.path.join(res.genomes, args.genome_assembly,
-            mappability_folder, (args.genome_assembly + ".tal_" + str(max_len)))
-        tally_check = os.path.join(res.genomes, args.genome_assembly,
-            mappability_folder, (args.genome_assembly + ".tal_" + str(max_len) + ".mer"))
-        search_file = os.path.join(res.genomes, args.genome_assembly,
-            mappability_folder, (args.genome_assembly + ".tal_" + str(max_len) + ".gtTxt"))
+        suffix_index = os.path.join(mappability_folder,
+                                    (args.genome_assembly + ".sft"))
+        suffix_check = os.path.join(mappability_folder,
+                                    (args.genome_assembly + ".sft.suf"))
+        tally_index = os.path.join(mappability_folder,
+                                   (args.genome_assembly + ".tal_" +
+                                   str(max_len)))
+        tally_check = os.path.join(mappability_folder,
+                                   (args.genome_assembly + ".tal_" + 
+                                   str(max_len) + ".mer"))
+        search_file = os.path.join(mappability_folder,
+                                   (args.genome_assembly + ".tal_" +
+                                   str(max_len) + ".gtTxt"))
 
         map_files = [suffix_check, tally_check, search_file]
         already_mapped = False
