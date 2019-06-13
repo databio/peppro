@@ -19,6 +19,7 @@ RUN apt-get update && \
     curl \
     default-jre \
     default-jdk \
+    gcc \
     git \
     gsl-bin \
     libgsl-dbg \
@@ -33,10 +34,10 @@ RUN apt-get update && \
     libtool \
     openssl \
     pigz \
-    python \
-    python-pip python-dev build-essential \
+    build-essential \
     python3 \
     python3-pip \
+    python3-dev \
     wget
 
 # Install MySQL server
@@ -44,18 +45,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes mysql-server \
     mysql-client \
     libmysqlclient-dev
     
-# Install python tools
-RUN pip install --upgrade pip
-RUN pip install --upgrade cutadapt && \
-    pip install --upgrade numpy && \
-    pip install --upgrade https://github.com/pepkit/looper/zipball/master && \
-    pip install --upgrade pararead && \
-    pip install --upgrade pandas && \
-    pip install --upgrade piper && \
-    pip install --upgrade psutil && \
-    pip install --upgrade refgenie
-    
-
+# Install Python tools
 RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade cutadapt && \
     pip3 install --upgrade numpy && \
@@ -63,7 +53,6 @@ RUN pip3 install --upgrade cutadapt && \
     pip3 install --upgrade pararead && \
     pip3 install --upgrade pandas && \
     pip3 install --upgrade piper && \
-    pip3 install --upgrade psutil && \
     pip3 install --upgrade refgenie
 
 # Install R
@@ -201,7 +190,11 @@ RUN git clone https://github.com/guertinlab/seqOutBias.git && \
     ln -s /home/tools/seqOutBias/target/release/seqOutBias /usr/bin/
 
 
-# Set environment variables
+# Set environment variables and make python3 default
+RUN rm -f /usr/bin/python && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    ln -s /usr/bin/pip3 /usr/bin/pip
+
 ENV PATH=/home/tools/bin:/home/tools/:/home/src/bowtie2-2.3.5.1:/home/src/samtools-1.7:/home/src/htslib-1.7:$PATH \
     R_LIBS_USER=/usr/local/lib/R/site-library/ \
     PYTHONPATH=/usr/local/lib/python3.6/dist-packages:$PYTHONPATH
