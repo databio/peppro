@@ -5,7 +5,7 @@ FROM phusion/baseimage:0.11
 LABEL maintainer Jason Smith "jasonsmith@virginia.edu"
 
 # Version info
-LABEL version 0.7.2
+LABEL version 0.7.3
 
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
