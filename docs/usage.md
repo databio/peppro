@@ -13,13 +13,13 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-C CONFIG_FILE] -O
                  [-Q SINGLE_OR_PAIRED] [--runon {pro,gro}]
                  [--adapter {fastp,cutadapt}] [--dedup {seqkit,fqdedup}]
                  [--trimmer {seqtk,fastx}] [--umi] [--umi_len UMI_LEN]
-                 [--max_len MAX_LEN] [--scale] [--parts PARTS]
+                 [--max_len MAX_LEN] [--sob] [--scale] [--parts PARTS]
                  [--prealignments PREALIGNMENTS [PREALIGNMENTS ...]]
                  [--TSS-name TSS_NAME] [--pre-name PRE_NAME]
                  [--anno-name ANNO_NAME] [--keep] [--noFIFO] [--complexity]
                  [-V]
 
-PEPPRO version 0.7.1
+PEPPRO version 0.7.2
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -52,7 +52,9 @@ optional arguments:
                         utilize UMIs, set to 0.
   --max_len MAX_LEN     Trim reads to maximum length. Set to -1 to disable
                         length trimming.
-  --scale               Scale output using seqOutBias when producing signal
+  --sob                 Use seqOutBias to produce signal tracks and
+                        incorporate mappability information.
+  --scale               Scale output with seqOutBias when producing signal
                         tracks.
   --parts PARTS         Split suffix tree generation into <n> parts. Increase
                         this value to lower memory use.

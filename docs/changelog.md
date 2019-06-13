@@ -1,6 +1,13 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.7.2] -- 2019-06-13
+
+### Changed
+- Fix --new-start bug
+- Fix container libgsl library
+- Adjust seqOutBias usage and flexibility
+
 ## [0.7.1] -- 2019-06-12
 
 ### Changed

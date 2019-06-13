@@ -28,6 +28,7 @@ pipelines:
       "--umi": umi
       "--umi_len": umi_len
       "--max_len": max_len
+      "--sob": sob
       "--scale": scale
       "--parts": parts
       "--prealignments": prealignments
