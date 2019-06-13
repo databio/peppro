@@ -11,7 +11,7 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-C CONFIG_FILE] -O
                  [--anno-name ANNO_NAME] [--keep] [--noFIFO] [--complexity]
                  [-V]
 
-PEPPRO version 0.7.2
+PEPPRO version 0.7.3
 
 optional arguments:
   -h, --help            show this help message and exit
