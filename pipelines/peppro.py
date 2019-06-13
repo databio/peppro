@@ -69,10 +69,15 @@ def parse_arguments():
                         help="Trim reads to maximum length."
                              " Set to -1 to disable length trimming.")
 
+    parser.add_argument("--sob", action='store_true',
+                        dest="sob", default=False,
+                        help="Use seqOutBias to produce signal tracks and "
+                             "incorporate mappability information.")
+
     parser.add_argument("--scale", action='store_true',
                         dest="scale", default=False,
-                        help="Scale output using seqOutBias when producing "
-                             "signal tracks.")
+                        help="Scale output with seqOutBias when producing"
+                             " signal tracks.")
 
     parser.add_argument("--parts", dest="parts",
                         default="4",
@@ -623,7 +628,7 @@ def main():
     else:  # otherwise remove it
         if 'fastx' in tool_list: tool_list.remove('fastx')
 
-    if args.scale:
+    if args.sob:
         tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tool_list]
     else:
         if 'seqoutbias' in tool_list: tool_list.remove('seqoutbias')
@@ -2266,7 +2271,7 @@ def main():
     minus_bw = os.path.join(
         signal_folder, args.sample_name + "_minus_body_0-mer.bw")
     
-    if not args.scale:
+    if not args.sob:
         # If not scaling we don't need to use seqOutBias to generate the
         # separate strand bigWigs; just convert the BAM's directly with 
         # bamSitesToWig.py which uses UCSC wigToBigWig
@@ -2382,7 +2387,7 @@ def main():
             search_cmd = build_command(search_cmd_chunks)
             pm.run(search_cmd, search_file)
 
-        pm.timestamp("### Scale read counts and produce bigWig files")
+        pm.timestamp("### Use seqOutBias to produce bigWig files")
 
         seqtable = os.path.join(res.genomes, args.genome_assembly,
             mappability_folder, (args.genome_assembly + ".tbl"))
@@ -2420,29 +2425,52 @@ def main():
 
         pm.run([table_plus_cmd, table_minus_cmd], minus_table)
 
-        scale_plus_chunks = [
-            (tools.seqoutbias, "scale"),
-            seqtable,
-            plus_bam,
-            "--no-scale",
-            "--skip-bed",
-            str("--bw=" + plus_bw)
-        ]
-        if args.runon.lower() == "pro":
-            scale_plus_chunks.extend([("--tail-edge")])
-        scale_plus_cmd = build_command(scale_plus_chunks)
+        if args.scale:
+            scale_plus_chunks = [
+                (tools.seqoutbias, "scale"),
+                seqtable,
+                plus_bam,
+                "--skip-bed",
+                str("--bw=" + plus_bw)
+            ]
+            if args.runon.lower() == "pro":
+                scale_plus_chunks.extend([("--tail-edge")])
+            scale_plus_cmd = build_command(scale_plus_chunks)
 
-        scale_minus_chunks = [
-            (tools.seqoutbias, "scale"),
-            seqtable,
-            minus_bam,
-            "--no-scale",
-            "--skip-bed",
-            str("--bw=" + minus_bw),
-        ]
-        if args.runon.lower() == "pro":
-            scale_minus_chunks.extend([("--tail-edge")])
-        scale_minus_cmd = build_command(scale_minus_chunks)
+            scale_minus_chunks = [
+                (tools.seqoutbias, "scale"),
+                seqtable,
+                minus_bam,
+                "--skip-bed",
+                str("--bw=" + minus_bw),
+            ]
+            if args.runon.lower() == "pro":
+                scale_minus_chunks.extend([("--tail-edge")])
+            scale_minus_cmd = build_command(scale_minus_chunks)
+        else:
+            scale_plus_chunks = [
+                (tools.seqoutbias, "scale"),
+                seqtable,
+                plus_bam,
+                "--no-scale",
+                "--skip-bed",
+                str("--bw=" + plus_bw)
+            ]
+            if args.runon.lower() == "pro":
+                scale_plus_chunks.extend([("--tail-edge")])
+            scale_plus_cmd = build_command(scale_plus_chunks)
+
+            scale_minus_chunks = [
+                (tools.seqoutbias, "scale"),
+                seqtable,
+                minus_bam,
+                "--no-scale",
+                "--skip-bed",
+                str("--bw=" + minus_bw),
+            ]
+            if args.runon.lower() == "pro":
+                scale_minus_chunks.extend([("--tail-edge")])
+            scale_minus_cmd = build_command(scale_minus_chunks)
 
         pm.run([scale_plus_cmd, scale_minus_cmd], minus_bw)
 
