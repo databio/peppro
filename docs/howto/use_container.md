@@ -41,6 +41,7 @@ Be sure to mount the volumes you need with `--volume`. If you're utilizing any e
 
 ### Container details 
 
+#### Using `docker`
 The pipeline has been successfully run in both a Linux and MacOS environment. With `docker` you need to bind mount your volume that contains the pipeline and your `$GENOMES` location, as well as provide the container the same environment variables your host environment is using.
 
 In the first example, we're mounting our home user directory (`/home/jps3ag/`) which contains the parent directories to our `$GENOMES` folder and to the pipeline itself. We'll also provide the pipeline two environment variables, `$GENOMES` and `$HOME`.
@@ -56,7 +57,6 @@ docker run --rm -it --volume /home/jps3ag/:/home/jps3ag/ \
   --genome hg38 \
   --sample-name test1 \
   --input /home/jps3ag/src/peppro/examples/data/test_r1.fq.gz \
-  --genome-size hs \
   -O $HOME/peppro_test
 ```
 
@@ -79,8 +79,31 @@ docker run --rm -it --volume /Users/jps3ag/:/Users/jps3ag/ \
   --genome hg38 \
   --sample-name test1 \
   --input /Users/jps3ag/src/peppro/examples/data/test_r1.fq.gz \
-  --genome-size hs \
   -O $HOME/peppro_test
+```
+
+#### Using `singularity`
+
+First, build a singularity container from the docker image and create a running instance (be sure to mount your directories containing your `$GENOMES` folder and pipeline.
+```
+singularity build peppro docker://databio/peppro:latest
+singularity instance.start -B /home/jps3ag/:/home/jps3aq/ peppro peppro_instance
+```
+
+Second, run your command.
+```
+singularity exec instance://peppro_instance \
+  /home/jps3ag/src/peppro/pipelines/peppro.py --single-or-paired single \
+  --prealignments rCRSd human_repeats \
+  --genome hg38 \
+  --sample-name test1 \
+  --input /home/jps3ag/src/peppro/examples/data/test_r1.fq.gz \
+  -O $HOME/peppro_test
+```
+
+Third, close your instance when finished.
+```
+singularity instance.stop peppro_instance
 ```
 
 ## Running multiple samples in a container with looper
