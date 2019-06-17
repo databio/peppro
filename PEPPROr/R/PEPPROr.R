@@ -788,7 +788,7 @@ plotTSS <- function(TSSfile) {
     name        <- basename(tools::file_path_sans_ext(TSSfile[1]))
     numFields   <- 2
     for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
-    sample_name <- name
+    sample_name <- paste(dirname(TSSfile[1]), name, sep="/")
 
     pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-midpt), y=score,
                                group=1, colour="black")) +

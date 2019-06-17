@@ -2001,7 +2001,15 @@ def main():
     else:
         pm.timestamp("### Calculate TSS enrichment")
 
-        # Plus
+        # Split TSS file
+        plus_TSS  = os.path.join(QC_folder, "plus_TSS.tsv")
+        minus_TSS = os.path.join(QC_folder, "minus_TSS.tsv")
+        cmd = ("sed -n -e '/[[:space:]]+[[:space:]]/w " +
+               plus_TSS + "' -e '/[[:space:]]-[[:space:]]/w " +
+               minus_TSS + "' " + res.tss_annotation)
+        pm.run(cmd, [plus_TSS, minus_TSS])
+
+        # Plus TSS enrichment
         plus_bai = os.path.join(
             map_genome_folder, args.sample_name + "_plus.bam.bai")
         # pyTssEnrichment requires indexed bam
@@ -2016,17 +2024,11 @@ def main():
         Tss_plus = os.path.join(QC_folder, args.sample_name +
                                 "_plus_TssEnrichment.txt")
         cmd = tool_path("pyTssEnrichment.py")
-        cmd += " -a " + plus_bam + " -b " + res.tss_annotation + " -p ends"
+        cmd += " -a " + plus_bam + " -b " + plus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
         cmd += " -e 2000 -u -v -s 4 -o " + Tss_plus
         pm.run(cmd, Tss_plus, nofail=True, container=pm.container)
-
-        # Call Rscript to plot TSS Enrichment
-        Tss_plus_pdf = os.path.join(QC_folder,  args.sample_name +
-                                    "_plus_TssEnrichment.pdf")
-        cmd = (tools.Rscript + " " + tool_path("PEPPRO.R"))
-        cmd += " tss -i " + Tss_plus
-        pm.run(cmd, Tss_plus_pdf, nofail=True, container=pm.container)
+        pm.clean_add(plus_TSS)
 
         with open(Tss_plus) as f:
             floats = list(map(float, f))
@@ -2042,13 +2044,7 @@ def main():
         except ZeroDivisionError:
             pass
 
-        Tss_plus_png = os.path.join(QC_folder,  args.sample_name +
-                                    "_plus_TssEnrichment.png")
-        pm.report_object("Plus TSS enrichment",
-                         Tss_plus_pdf,
-                         anchor_image=Tss_plus_png)
-
-        # Minus
+        # Minus TSS enrichment
         minus_bai = os.path.join(
             map_genome_folder, args.sample_name + "_minus.bam.bai")
         # pyTssEnrichment requires indexed bam
@@ -2063,17 +2059,11 @@ def main():
         Tss_minus = os.path.join(QC_folder, args.sample_name +
                                   "_minus_TssEnrichment.txt")
         cmd = tool_path("pyTssEnrichment.py")
-        cmd += " -a " + minus_bam + " -b " + res.tss_annotation + " -p ends"
+        cmd += " -a " + minus_bam + " -b " + minus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
         cmd += " -e 2000 -u -v -s 4 -k -o " + Tss_minus
         pm.run(cmd, Tss_minus, nofail=True, container=pm.container)
-
-        # Call Rscript to plot TSS Enrichment
-        Tss_minus_pdf = os.path.join(QC_folder,  args.sample_name +
-                                     "_minus_TssEnrichment.pdf")
-        cmd = (tools.Rscript + " " + tool_path("PEPPRO.R"))
-        cmd += " tss -i " + Tss_minus
-        pm.run(cmd, Tss_minus_pdf, nofail=True, container=pm.container)
+        pm.clean_add(minus_TSS)
 
         with open(Tss_minus) as f:
             floats = list(map(float, f))
@@ -2089,11 +2079,16 @@ def main():
         except ZeroDivisionError:
             pass
 
-        Tss_minus_png = os.path.join(QC_folder,  args.sample_name +
-                                     "_minus_TssEnrichment.png")
-        pm.report_object("Minus TSS enrichment",
-                         Tss_minus_pdf,
-                         anchor_image=Tss_minus_png)
+        # Call Rscript to plot TSS Enrichment
+        TSS_pdf = os.path.join(QC_folder,  args.sample_name +
+                               "_TSSenrichment.pdf")
+        cmd = (tools.Rscript + " " + tool_path("PEPPRO.R"))
+        cmd += " tss -i " + Tss_plus + " " + Tss_minus
+        pm.run(cmd, TSS_pdf, nofail=True, container=pm.container)
+
+        TSS_png = os.path.join(QC_folder,  args.sample_name +
+                               "_TSSenrichment.png")
+        pm.report_object("TSS enrichment", TSS_pdf, anchor_image=TSS_png)
 
     # Fraction of reads in Pre-mRNA (FRiP)
     if not os.path.exists(res.pre_mRNA_annotation):
