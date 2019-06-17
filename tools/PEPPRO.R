@@ -222,7 +222,25 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         quit()
     } else {
         TSS_CUTOFF <- 6
-        TSSfile    <- opt_get(name = c("input", "i"), required=TRUE,
+        # get arguments
+        a   <- opt_get_args()
+        # Determine the number of input files
+        inArgs <- 0
+        p      <- 1
+        val    <- a[p]
+        while (!(val %in% c("-i", "--input"))) {
+            p   <- p + 1
+            val <- a[p]
+        }
+        while (p < length(opt_get_args())) {
+            p   <- p + 1
+            val <- a[p]
+            if (!(val %in% c("-i", "--input"))) {
+                inArgs <- inArgs + 1
+            }
+        }
+
+        TSSfile    <- opt_get(name = c("input", "i"), required=TRUE, n=inArgs,
                               description="TSS enrichment file.")
 
         plotTSS(TSSfile = TSSfile)

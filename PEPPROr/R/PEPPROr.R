@@ -678,7 +678,21 @@ plotFRiF <- function(sample_name, num_reads, output_name, bedFile) {
 #' plotTSS(TSSfile = "TSSfile")
 #' @export
 plotTSS <- function(TSSfile) {
-    write(paste("\nGenerating TSS plot with ", TSSfile, sep=""), stdout())
+    if (length(TSSfile) == 1) {
+        write(paste0("\nGenerating TSS plot with ", TSSfile), stdout())
+    } else {
+        if (length(TSSfile) == 2) {
+            write(paste0("\nGenerating TSS plot with ",
+                         paste(TSSfile, collapse=" and ")),
+                  stdout())
+        } else {
+            write(paste0("\nNot sure how to merge the following: ",
+                         paste(TSSfile, collapse=", ")),
+                  stdout())
+            write(paste0("Did you mean to pass more than 2 files?"), stdout())
+            quit()
+        }
+    }
 
     t1 <- theme(
         plot.background  = element_blank(),
@@ -701,33 +715,81 @@ plotTSS <- function(TSSfile) {
         axis.ticks.length = unit(2, "mm")
     )
 
-    if (exists(TSSfile)) {
-        insertionsMat <- data.frame(get(TSSfile))
+    iMat <- data.table(V1 = numeric())
+    if (length(TSSfile) == 1) {
+        if (exists(TSSfile[i])) {
+            iMat <- data.table(get(TSSfile))
+        } else {
+            iMat <- fread(TSSfile)
+        }
+    } else if (length(TSSfile) == 2) {
+        for (i in 1:length(TSSfile)) {
+            if (exists(TSSfile[i])) {
+                if (i == 1) {
+                    iMat <- data.table(get(TSSfile[i]))
+                } else {
+                    iMat <- list(iMat, data.table(get(TSSfile[i])))
+                }
+            } else {
+                if (i == 1) {
+                    iMat <- fread(TSSfile[i])
+                } else {
+                    iMat <- list(iMat, fread(TSSfile[i]))
+                }
+            }
+        }
     } else {
-        insertionsMat <- read.table(TSSfile, header=FALSE, row.names=NULL,
-                                    as.is=TRUE, check.names=FALSE)
-    }
-
-    val      <- 0.025*nrow(insertionsMat)
-    normTSS  <- (insertionsMat /
-                 mean(insertionsMat[c(1:val,
-                     (nrow(insertionsMat)-val):nrow(insertionsMat)),]))
-    colnames(normTSS) <- c("score")
-    midpt    <- nrow(normTSS)/2 
-    TSSscore <- round(mean(normTSS[(midpt-50):(midpt+50),]),1)
-    if (is.nan(TSSscore)) {
-        message(paste("\nNaN produced.  Check ", TSSfile, "\n", sep=""))
+        write(paste0("\nNot sure how to merge the following: ",
+                     paste(TSSfile, collapse=", ")),
+              stdout())
+        write(paste0("Did you mean to pass more than 2 files?"), stdout())
         quit()
     }
+
+    if (length(TSSfile) == 1) {
+        plusMinus <- iMat
+    } else {
+        plus      <- iMat[[1]]
+        minus     <- iMat[[2]]
+    }
+
+    if (exists("plusMinus")) {
+        val      <- 0.025*nrow(plusMinus)
+        #normTSS  <- (plusMinus / mean(plusMinus[c(1:val,
+        #            (nrow(plusMinus)-val):nrow(plusMinus)), V1]))
+        normTSS           <- plusMinus / mean(plusMinus[c(1:val), V1])
+        colnames(normTSS) <- c("score")
+        midpt    <- nrow(normTSS)/2 
+        TSSscore <- round(mean(normTSS[(midpt-50):(midpt+50), score]),1)
+        if (is.nan(TSSscore)) {
+            message(paste0("\nNaN produced.  Check ", TSSfile, "\n"))
+            quit()
+        }
+    } else {
+        val      <- 0.025*nrow(plus)
+        #normTSS  <- (plus / mean(plus[c(1:val,
+        #            (nrow(plus)-val):nrow(plus)), V1]))
+        normTSS           <- plus / mean(plus[c(1:val), V1])
+        colnames(normTSS) <- c("score")
+        midpt    <- nrow(normTSS)/2 
+        TSSscore <- round(mean(normTSS[(midpt-50):(midpt+50), score]),1)
+        if (is.nan(TSSscore)) {
+            message(paste0("\nNaN produced.  Check ", TSSfile[1], "\n"))
+            quit()
+        }
+    }
+    
     lineColor <- "red2"
     if (TSSscore > TSS_CUTOFF)
     {
         lineColor <- "springgreen4"
     }
 
+    name        <- basename(tools::file_path_sans_ext(TSSfile[1]))
+    numFields   <- 2
+    for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
+    sample_name <- name
 
-    png(filename = paste(tools::file_path_sans_ext(TSSfile), ".png", sep=""),
-        width = 480, height = 480)
     pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-midpt), y=score,
                                group=1, colour="black")) +
         geom_hline(yintercept = 6, linetype = 2,
@@ -735,38 +797,56 @@ plotTSS <- function(TSSfile) {
         geom_smooth(method="loess", span=0.02,
                     se=FALSE, colour=lineColor) +
         labs(x = "Distance from TSS (bp)", y = "TSS Enrichment Score")
-    p <- pre + t1 + scale_x_continuous(expand=c(0,0)) +
-        scale_y_continuous(expand=c(0,0)) +
-        coord_cartesian(xlim=c(-2300,2300), ylim=c(0,32)) +
-        #ylim(0,30) + xlim(-2100,2100) +
-        annotate("rect", xmin=1200, xmax=2300, ymin=27, ymax=32,
-                 fill="gray95", size = 0.5) +
-        annotate("text", x=1750, y=31, label="TSS Score", fontface = 1,
-                 size=6, hjust=0.5) +
-        annotate("text", x=1750, y=29, label=TSSscore, fontface = 2,
-                 size=10, hjust=0.5)
+    p <- pre + t1 +
+         scale_x_continuous(expand=c(0,0)) +
+         scale_y_continuous(expand=c(0,0)) +
+         coord_cartesian(xlim=c(-2300,2300), ylim=c(0,32))
+    if (exists("minus")) {
+        val      <- 0.025*nrow(minus)
+        # normTSS  <- (minus / mean(minus[c(1:val,
+        #             (nrow(minus)-val):nrow(minus)), V1]))
+        minusNormTSS           <- minus / mean(minus[c(1:val), V1])
+        colnames(minusNormTSS) <- c("score")
+        midpt         <- nrow(minusNormTSS)/2 
+        minusTSSscore <- round(mean(minusNormTSS[(midpt-50):(midpt+50),
+                                                 score]),1)
+        if (is.nan(minusTSSscore)) {
+            message(paste0("\nNaN produced.  Check ", TSSfile[2], "\n"))
+            quit()
+        }
+        p <- p + geom_smooth(data=minusNormTSS,
+                             aes(x=(as.numeric(rownames(minusNormTSS))-midpt),
+                                 y=score, group=1, colour="black"),
+                             method="loess", span=0.02,
+                             se=FALSE, colour="blue") +
+                 annotate("rect", xmin=1200, xmax=2300, ymin=25, ymax=32,
+                          fill="gray95", size = 0.5) +
+                 annotate("text", x=1750, y=31, label="TSS Score", fontface = 1,
+                          size=6, hjust=0.5) +
+                 annotate("text", x=1500, y=29, label="+", fontface = 2,
+                          size=8, hjust=0.5, color=lineColor) +
+                 annotate("text", x=1500, y=27, label=TSSscore, fontface = 2,
+                          size=8, hjust=0.5, color=lineColor) +
+                 annotate("text", x=2000, y=29, label="-",
+                          fontface = 2, size=8, hjust=0.5, color="blue") +
+                 annotate("text", x=2000, y=27, label=minusTSSscore,
+                          fontface = 2, size=8, hjust=0.5, color="blue")
+    } else {
+        p <- p + annotate("rect", xmin=1200, xmax=2300, ymin=27, ymax=32,
+                          fill="gray95", size = 0.5) +
+                 annotate("text", x=1750, y=31, label="TSS Score",
+                          fontface = 1, size=6, hjust=0.5) +
+                 annotate("text", x=1750, y=29, label=TSSscore, fontface = 2,
+                          size=10, hjust=0.5)
+    }
+
+    png(filename = paste0(sample_name, "_TSSenrichment.png"),
+        width = 480, height = 480)
     print(p)
     invisible(dev.off())
 
-    pdf(file = paste(tools::file_path_sans_ext(TSSfile), ".pdf", sep=""),
+    pdf(file = paste0(sample_name, "_TSSenrichment.pdf"),
         width= 7, height = 7, useDingbats=F)
-    pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-midpt), y=score,
-                               group=1, colour="black")) +
-        geom_hline(yintercept = 6, linetype = 2,
-                   color = "grey", size = 0.25) +
-        geom_smooth(method="loess", span=0.02,
-                    se=FALSE, colour=lineColor) +
-        labs(x = "Distance from TSS (bp)", y = "TSS Enrichment Score")
-    p <- pre + t1 + scale_x_continuous(expand=c(0,0)) +
-        scale_y_continuous(expand=c(0,0)) +
-        coord_cartesian(xlim=c(-2300,2300), ylim=c(0,32)) +
-        #ylim(0,30) + xlim(-2100,2100) +
-        annotate("rect", xmin=1200, xmax=2300, ymin=27, ymax=32,
-                 fill="gray95", size = 0.5) +
-        annotate("text", x=1750, y=31, label="TSS Score", fontface = 1,
-                 size=6, hjust=0.5) +
-        annotate("text", x=1750, y=29, label=TSSscore, fontface = 2,
-                 size=10, hjust=0.5)
     print(p)
     invisible(dev.off())
 
