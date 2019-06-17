@@ -759,8 +759,8 @@ plotTSS <- function(TSSfile) {
         #            (nrow(plusMinus)-val):nrow(plusMinus)), V1]))
         normTSS           <- plusMinus / mean(plusMinus[c(1:val), V1])
         colnames(normTSS) <- c("score")
-        midpt    <- nrow(normTSS)/2 
-        TSSscore <- round(mean(normTSS[(midpt-50):(midpt+50), score]),1)
+        peakPos  <- which.max(normTSS$score)
+        TSSscore <- round(mean(normTSS[(peakPos-50):(peakPos+50), score]),1)
         if (is.nan(TSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile, "\n"))
             quit()
@@ -771,8 +771,8 @@ plotTSS <- function(TSSfile) {
         #            (nrow(plus)-val):nrow(plus)), V1]))
         normTSS           <- plus / mean(plus[c(1:val), V1])
         colnames(normTSS) <- c("score")
-        midpt    <- nrow(normTSS)/2 
-        TSSscore <- round(mean(normTSS[(midpt-50):(midpt+50), score]),1)
+        peakPos  <- which.max(normTSS$score)
+        TSSscore <- round(mean(normTSS[(peakPos-50):(peakPos+50), score]),1)
         if (is.nan(TSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile[1], "\n"))
             quit()
@@ -790,8 +790,9 @@ plotTSS <- function(TSSfile) {
     for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
     sample_name <- paste(dirname(TSSfile[1]), name, sep="/")
 
-    pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-midpt), y=score,
-                               group=1, colour="black")) +
+    pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-
+                                 (nrow(normTSS)/2)),
+                               y=score, group=1, colour="black")) +
         geom_hline(yintercept = 6, linetype = 2,
                    color = "grey", size = 0.25) +
         geom_smooth(method="loess", span=0.02,
@@ -807,15 +808,16 @@ plotTSS <- function(TSSfile) {
         #             (nrow(minus)-val):nrow(minus)), V1]))
         minusNormTSS           <- minus / mean(minus[c(1:val), V1])
         colnames(minusNormTSS) <- c("score")
-        midpt         <- nrow(minusNormTSS)/2 
-        minusTSSscore <- round(mean(minusNormTSS[(midpt-50):(midpt+50),
+        peakPos       <- which.max(minusNormTSS$score)
+        minusTSSscore <- round(mean(minusNormTSS[(peakPos-50):(peakPos+50),
                                                  score]),1)
         if (is.nan(minusTSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile[2], "\n"))
             quit()
         }
         p <- p + geom_smooth(data=minusNormTSS,
-                             aes(x=(as.numeric(rownames(minusNormTSS))-midpt),
+                             aes(x=(as.numeric(rownames(minusNormTSS))-
+                                   (nrow(normTSS)/2)),
                                  y=score, group=1, colour="black"),
                              method="loess", span=0.02,
                              se=FALSE, colour="blue") +

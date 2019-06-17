@@ -2009,22 +2009,20 @@ def main():
                minus_TSS + "' " + res.tss_annotation)
         pm.run(cmd, [plus_TSS, minus_TSS])
 
-        # Plus TSS enrichment
-        plus_bai = os.path.join(
-            map_genome_folder, args.sample_name + "_plus.bam.bai")
         # pyTssEnrichment requires indexed bam
-        if not os.path.exists(plus_bai):
+        if not os.path.exists(mapping_genome_index):
             cmd = build_command([
                 tools.samtools,
                 "index",
-                plus_bam
+                mapping_genome_bam
             ])
-            pm.run(cmd, plus_bai)
+            pm.run(cmd, mapping_genome_index)
 
+        # Plus TSS enrichment
         Tss_plus = os.path.join(QC_folder, args.sample_name +
                                 "_plus_TssEnrichment.txt")
         cmd = tool_path("pyTssEnrichment.py")
-        cmd += " -a " + plus_bam + " -b " + plus_TSS + " -p ends"
+        cmd += " -a " + mapping_genome_bam + " -b " + plus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
         cmd += " -e 2000 -u -v -s 4 -o " + Tss_plus
         pm.run(cmd, Tss_plus, nofail=True, container=pm.container)
@@ -2035,31 +2033,20 @@ def main():
         try:
             # If the TSS enrichment is 0, don't report            
             Tss_score = (
-                (sum(floats[int((len(floats)/2)-50):
-                            int((len(floats)/2)+50)]) / 100) /
+                (sum(floats[int(floats.index(max(floats))-49):
+                            int(floats.index(max(floats))+51)]) / 100) /
                 (sum(floats[1:int(len(floats)*0.05)]) / int(len(floats)*0.05)))
             pm.report_result("TSS_Plus_Score", round(Tss_score, 1))
         except ZeroDivisionError:
             pass
 
         # Minus TSS enrichment
-        minus_bai = os.path.join(
-            map_genome_folder, args.sample_name + "_minus.bam.bai")
-        # pyTssEnrichment requires indexed bam
-        if not os.path.exists(minus_bai):
-            cmd = build_command([
-                tools.samtools,
-                "index",
-                minus_bam
-            ])
-            pm.run(cmd, minus_bai)
-
         Tss_minus = os.path.join(QC_folder, args.sample_name +
-                                  "_minus_TssEnrichment.txt")
+                                 "_minus_TssEnrichment.txt")
         cmd = tool_path("pyTssEnrichment.py")
-        cmd += " -a " + minus_bam + " -b " + minus_TSS + " -p ends"
+        cmd += " -a " + mapping_genome_bam + " -b " + minus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
-        cmd += " -e 2000 -u -v -s 4 -k -o " + Tss_minus
+        cmd += " -e 2000 -u -v -s 4 -o " + Tss_minus
         pm.run(cmd, Tss_minus, nofail=True, container=pm.container)
         pm.clean_add(minus_TSS)
 
@@ -2068,8 +2055,8 @@ def main():
         try:
             # If the TSS enrichment is 0, don't report
             Tss_score = (
-                (sum(floats[int((len(floats)/2)-50):
-                            int((len(floats)/2)+50)]) / 100) /
+                (sum(floats[int(floats.index(max(floats))-49):
+                            int(floats.index(max(floats))+51)]) / 100) /
                 (sum(floats[1:int(len(floats)*0.05)]) / int(len(floats)*0.05)))
             pm.report_result("TSS_Minus_Score", round(Tss_score, 1))
         except ZeroDivisionError:
