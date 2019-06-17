@@ -28,7 +28,8 @@ implied_columns:
 
 pipeline_args:
 #  peppro.py:
-#    "--scale": null      # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
+#    "--sob": null        # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
+#    "--scale": null      # Default is FALSE. Pass flag to scale seqOutBias signal tracks
 #    "--parts": 4         # Default. Split suffix tree generation into <4> parts. Higher number == less memory use.
 #    "--keep": null       # Default is FALSE. Pass flag to keep prealignment BAM files.
 #    "--noFIFO": null     # Default is FALSE. Pass flag to NOT use named pipes during prealignments.
