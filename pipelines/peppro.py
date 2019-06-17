@@ -2037,9 +2037,7 @@ def main():
             Tss_score = (
                 (sum(floats[int((len(floats)/2)-50):
                             int((len(floats)/2)+50)]) / 100) /
-                (sum(floats[1:int(len(floats)*0.025)] +
-                     floats[int(len(floats)-(len(floats)*0.025)):
-                            int(len(floats))]) / 200))
+                (sum(floats[1:int(len(floats)*0.05)]  / 200))
             pm.report_result("TSS_Plus_Score", round(Tss_score, 1))
         except ZeroDivisionError:
             pass
@@ -2072,9 +2070,7 @@ def main():
             Tss_score = (
                 (sum(floats[int((len(floats)/2)-50):
                             int((len(floats)/2)+50)]) / 100) /
-                (sum(floats[1:int(len(floats)*0.025)] +
-                     floats[int(len(floats)-(len(floats)*0.025)):
-                            int(len(floats))]) / 200))
+                (sum(floats[1:int(len(floats)*0.05)]  / 200))
             pm.report_result("TSS_Minus_Score", round(Tss_score, 1))
         except ZeroDivisionError:
             pass

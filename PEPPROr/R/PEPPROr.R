@@ -754,7 +754,7 @@ plotTSS <- function(TSSfile) {
     }
 
     if (exists("plusMinus")) {
-        val      <- 0.025*nrow(plusMinus)
+        val      <- 0.05*nrow(plusMinus)
         #normTSS  <- (plusMinus / mean(plusMinus[c(1:val,
         #            (nrow(plusMinus)-val):nrow(plusMinus)), V1]))
         normTSS           <- plusMinus / mean(plusMinus[c(1:val), V1])
@@ -766,7 +766,7 @@ plotTSS <- function(TSSfile) {
             quit()
         }
     } else {
-        val      <- 0.025*nrow(plus)
+        val      <- 0.05*nrow(plus)
         #normTSS  <- (plus / mean(plus[c(1:val,
         #            (nrow(plus)-val):nrow(plus)), V1]))
         normTSS           <- plus / mean(plus[c(1:val), V1])
