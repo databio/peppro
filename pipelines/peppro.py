@@ -19,7 +19,6 @@ from pypiper import build_command
 from refgenconf import RefGenConf as RGC, select_genome_config
 
 TOOLS_FOLDER = "tools"
-ANNO_FOLDER  = "anno"
 RUNON_SOURCE = ["pro", "gro"]
 ADAPTER_REMOVAL = ["fastp", "cutadapt"]
 DEDUPLICATORS = ["seqkit", "fqdedup"]
@@ -90,15 +89,24 @@ def parse_arguments():
 
     parser.add_argument("--TSS-name", default=None,
                         dest="TSS_name", type=str,
-                        help="Filename of TSS annotation file.")
+                        help="file_name of TSS annotation file.")
+
+    parser.add_argument("--cpa-name", default=None,
+                        dest="CpA_name", type=str,
+                        help="file_name of cleavage pA site annotation file.")
 
     parser.add_argument("--pre-name", default=None,
                         dest="pre_name", type=str,
-                        help="Filename of pre-mRNA annotation file.")
+                        help="file_name of pre-mRNA annotation file.")
 
     parser.add_argument("--anno-name", default=None,
                         dest="anno_name", type=str,
-                        help="Filename of genomic annotation file.")
+                        help="file_name of genomic annotation file.")
+
+    parser.add_argument("--coverage", action='store_true', default=False,
+                        dest="coverage",
+                        help="Report library complexity using coverage: "
+                             "reads / (bases in genome / read length)")
 
     parser.add_argument("--keep", action='store_true', default=False,
                         dest="keep",
@@ -382,25 +390,12 @@ def tool_path(tool_name):
     """
     Return the path to a tool used by this pipeline.
 
-    :param str tool_name: name of the tool (e.g., a script filename)
+    :param str tool_name: name of the tool (e.g., a script file_name)
     :return str: real, absolute path to tool (expansion and symlink resolution)
     """
 
     return os.path.join(os.path.dirname(os.path.dirname(__file__)),
                         TOOLS_FOLDER, tool_name)
-
-
-def anno_path(anno_name):
-    """
-    Return the path to an annotation file used by this pipeline.
-
-    :param str anno_name: name of the annotation file 
-                          (e.g., a specific genome's annotations)
-    :return str: real, absolute path to tool (expansion and symlink resolution)
-    """
-
-    return os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                        ANNO_FOLDER, anno_name)
 
 
 def guess_encoding(fq):
@@ -553,7 +548,11 @@ def _add_resources(args, res):
     # REQ
     for asset in ["chrom_sizes", BT2_IDX_KEY]:
         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+
     # OPT
+    msg = "The '{}' asset is not present in your REFGENIE config file."
+    err = "The '{}' asset does not exist."
+
     asset = "tss_annotation"
     if args.TSS_name:        
         res[asset] = os.path.abspath(args.TSS_name)
@@ -561,12 +560,24 @@ def _add_resources(args, res):
         try:
             res[asset] = rgc.get_asset(args.genome_assembly, asset)
         except KeyError:
-            msg = "The '{}' asset is not present in your REFGENIE config file."
             print(msg.format(asset))
-        except:
-            err = "The '{}' asset does not exist."
+        except:            
             msg = ("Update your REFGENIE config file to include this asset, or "
                    "point directly to the file using --TSS-name.\n")
+            print(err.format(asset))
+            print(msg)
+
+    asset = "cpa_annotation"
+    if args.CpA_name:        
+        res[asset] = os.path.abspath(args.CpA_name)
+    else:
+        try:
+            res[asset] = rgc.get_asset(args.genome_assembly, asset)
+        except KeyError:
+            print(msg.format(asset))
+        except:            
+            msg = ("Update your REFGENIE config file to include this asset, or "
+                   "point directly to the file using --cpa-name.\n")
             print(err.format(asset))
             print(msg)
 
@@ -577,20 +588,27 @@ def _add_resources(args, res):
         try:
             res[asset] = rgc.get_asset(args.genome_assembly, asset)
         except KeyError:
-            msg = "The '{}' asset is not present in your REFGENIE config file."
             print(msg.format(asset))
         except:
-            err = "The '{}' asset does not exist."
             msg = ("Update your REFGENIE config file to include this asset, or "
                    "point directly to the file using --pre-name.\n")
             print(err.format(asset))
             print(msg)
 
-    # asset = "feat_annotation"
-    # if args.anno_name:
-    #     res.anno_file = os.path.abspath(args.anno_name)
-    # else:
-    #     res[asset] = rgc.get_asset(args.genome_assembly, asset)\
+    asset = "feat_annotation"
+    if args.anno_name:
+        res[asset] = os.path.abspath(args.anno_name)
+    else:
+        try:
+            res[asset] = rgc.get_asset(args.genome_assembly, asset)
+        except KeyError:
+            print(msg.format(asset))
+        except:
+            msg = ("Update your REFGENIE config file to include this asset, or "
+                   "point directly to the file using --anno-name.\n")
+            print(err.format(asset))
+            print(msg)
+
     res.rgc = rgc
     return res
 
@@ -1891,10 +1909,11 @@ def main():
             cmd = ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " + res.chrom_sizes)
             genome_size = int(pm.checkprint(cmd))
 
-            cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
-                   " preseq " + "-i " + preseq_yield +
-                   " -c " + str(genome_size) + " -l " + max_len +
-                   " -r " + preseq_counts + " -o " + preseq_plot)
+            cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") +
+                   " preseq " + "-i " + preseq_yield)
+            if args.coverage:
+                cmd += (" -c " + str(genome_size) + " -l " + max_len)
+            cmd += (" -r " + preseq_counts + " -o " + preseq_plot)
 
             pm.run(cmd, [preseq_pdf, preseq_png], container=pm.container)
 
@@ -2024,7 +2043,7 @@ def main():
         cmd = tool_path("pyTssEnrichment.py")
         cmd += " -a " + mapping_genome_bam + " -b " + plus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
-        cmd += " -e 2000 -u -v -s 4 -o " + Tss_plus
+        cmd += " -z -v -s 4 -o " + Tss_plus
         pm.run(cmd, Tss_plus, nofail=True, container=pm.container)
         pm.clean_add(plus_TSS)
 
@@ -2046,7 +2065,7 @@ def main():
         cmd = tool_path("pyTssEnrichment.py")
         cmd += " -a " + mapping_genome_bam + " -b " + minus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
-        cmd += " -e 2000 -u -v -s 4 -o " + Tss_minus
+        cmd += " -z -v -s 4 -o " + Tss_minus
         pm.run(cmd, Tss_minus, nofail=True, container=pm.container)
         pm.clean_add(minus_TSS)
 
@@ -2073,6 +2092,53 @@ def main():
                                "_TSSenrichment.png")
         pm.report_object("TSS enrichment", TSS_pdf, anchor_image=TSS_png)
 
+    # Pause index
+    if not os.path.exists(res.cpa_annotation):
+        print("Skipping PI -- Pause index requires CpA annotation file: {}"
+              .format(res.cpa_annotation))
+    elif not os.path.exists(res.tss_annotation):
+        print("Skipping PI -- Pause index requires TSS annotation file: {}"
+              .format(res.tss_annotation))
+    else:
+        pm.timestamp("### Calculate Pause Index (PI)")
+
+        TSS_density = os.path.join(QC_folder, args.sample_name +
+                                   "_TSS_density.txt")
+        cmd = tool_path("pyTssEnrichment.py")
+        cmd += " -a " + mapping_genome_bam + " -b " + res.tss_annotation
+        cmd += " -c " + str(pm.cores)
+        cmd += " -p ends -d -20 -u 80 -z -v -s 4 -o " + TSS_density
+        pm.run(cmd, TSS_density, nofail=True, container=pm.container)
+        pm.clean_add(TSS_density)
+
+        CpA_density = os.path.join(QC_folder, args.sample_name +
+                                   "_CpA_density.txt")
+        cmd = tool_path("pyTssEnrichment.py")
+        cmd += " -a " + mapping_genome_bam + " -b " + res.tss_annotation
+        cmd += " -c " + str(pm.cores)
+        cmd += " -p ends -d 0 -u 500 -z -v -s 4 -o " + CpA_density
+        pm.run(cmd, CpA_density, nofail=True, container=pm.container)
+        pm.clean_add(CpA_density)
+
+        td = 0
+        cd = 0
+        try:
+            with open(TSS_density) as f:
+                td = sum(list(map(float, f)))
+        except NameError:
+            pass
+        try:
+            with open(CpA_density) as f:
+                cd = sum(list(map(float, f)))
+        except NameError:
+            pass
+
+        try:
+            pi = float(td/cd)
+            pm.report_result("Pause index", round(pi, 2))
+        except ZeroDivisionError:
+            pass
+
     # Fraction of reads in Pre-mRNA (FRiP)
     if not os.path.exists(res.pre_mRNA_annotation):
         print("Skipping FRiP -- Fraction of reads in pre-mRNA requires "
@@ -2097,116 +2163,141 @@ def main():
     # Custom annotation file or direct path to annotation file is specified
     anno_local = ''
 
-    if args.anno_name:
-        anno_file  = os.path.abspath(args.anno_name)
-        anno_local = os.path.join(raw_folder, os.path.basename(args.anno_name))
-        if not os.path.exists(anno_file):
-            print("Skipping read annotation")
-            print("This requires a valid {} annotation file."
-                  .format(args.genome_assembly))
-            print("Confirm {} is present."
-                  .format(str(os.path.dirname(anno_file))))
+    if os.path.exists(res.feat_annotation):
+        if res.feat_annotation.endswith(".gz"):
+            anno_local = os.path.join(raw_folder,
+                                      args.genome_assembly +
+                                      "_annotations.bed.gz")
+            cmd = ("ln -sf " + res.feat_annotation + " " + anno_local)
+            pm.run(cmd, anno_local, container=pm.container) 
+        elif res.feat_annotation.endswith(".bed"):
+            anno_local = os.path.join(raw_folder,
+                                      args.genome_assembly +
+                                      "_annotations.bed")
+            cmd = ("ln -sf " + res.feat_annotation + " " + anno_local)
+            pm.run(cmd, anno_local, container=pm.container) 
         else:
-            cmd = ("ln -sf " + anno_file + " " + anno_local) 
-            pm.run(cmd, anno_local, container=pm.container)
-    else:
-        # Default annotation file
-        anno_file  = os.path.abspath(anno_path(args.genome_assembly +
-                                     "_annotations.bed.gz"))
-        anno_unzip = os.path.abspath(anno_path(args.genome_assembly +
-                                     "_annotations.bed"))
-
-        if not os.path.exists(anno_file) and not os.path.exists(anno_unzip):
             print("Skipping read annotation...")
             print("This requires a {} annotation file."
                   .format(args.genome_assembly))
-            print("Confirm this file is present in {} or specify using `--anno-name`"
-                  .format(str(os.path.dirname(anno_file))))
-        else:
-            if os.path.exists(anno_file):
-                anno_local = os.path.join(raw_folder,
-                                      args.genome_assembly +
-                                      "_annotations.bed.gz")
-                cmd = ("ln -sf " + anno_file + " " + anno_local)
-            elif os.path.exists(anno_unzip):
-                anno_local = os.path.join(raw_folder,
-                                      args.genome_assembly +
-                                      "_annotations.bed")
-                cmd = ("ln -sf " + anno_unzip + " " + anno_local)
-            else:
-                print("Skipping read annotation...")
-                print("This requires a {} annotation file."
-                      .format(args.genome_assembly))
-                print("Could not find {}.`"
-                      .format(str(os.path.dirname(anno_file))))
-            pm.run(cmd, anno_local, container=pm.container)           
+            print("Could not find {}.`"
+                  .format(str(os.path.dirname(res.feat_annotation))))
 
-    annoListPlus = list()
-    annoListMinus = list()
+    anno_list_plus = list()
+    anno_list_minus = list()
 
     if os.path.isfile(anno_local):
         # Get list of features
         cmd1 = (ngstk.ziptool + " -d -c " + anno_local +
                 " | cut -f 4 | sort -u")
-        ftList = pm.checkprint(cmd1, shell=True)
-        ftList = ftList.splitlines()
+        ft_list = pm.checkprint(cmd1, shell=True)
+        ft_list = ft_list.splitlines()
 
         # Split annotation file on features
         cmd2 = (ngstk.ziptool + " -d -c " + anno_local +
                 " | awk -F'\t' '{print>\"" + QC_folder + "/\"$4}'")
-        if len(ftList) >= 1:
-            chrOrder = os.path.join(QC_folder, "chr_order.txt")
+        if len(ft_list) >= 1:
+            chr_order = os.path.join(QC_folder, "chr_order.txt")
             cmd = (tools.samtools + " view -H " + mapping_genome_bam +
                    " | grep 'SN:' | awk -F':' '{print $2,$3}' | " +
-                   "awk -F' ' -v OFS='\t' '{print $1,$3}' > " + chrOrder)
-            pm.run(cmd, chrOrder, container=pm.container)
-            pm.clean_add(chrOrder)
+                   "awk -F' ' -v OFS='\t' '{print $1,$3}' > " + chr_order)
+            pm.run(cmd, chr_order, container=pm.container)
+            pm.clean_add(chr_order)
 
-            for pos, anno in enumerate(ftList):
+            for pos, anno in enumerate(ft_list):
                 # working files
-                annoFile = os.path.join(QC_folder, anno)
-                validName = re.sub('[^\w_.)( -]', '', anno).strip().replace(' ', '_')
-                fileName = os.path.join(QC_folder, validName)
-                annoSort = os.path.join(QC_folder, validName + "_sort.bed")
-                annoCovPlus = os.path.join(QC_folder, args.sample_name + "_" +
-                                           validName + "_plus_coverage.bed")
-                annoCovMinus = os.path.join(QC_folder, args.sample_name + "_" +
-                                            validName + "_minus_coverage.bed")
+                anno_file = os.path.join(QC_folder, anno)
+                valid_name = re.sub('[^\w_.)( -]', '', anno).strip().replace(' ', '_')
+                file_name = os.path.join(QC_folder, valid_name)
+                anno_sort = os.path.join(QC_folder, valid_name + "_sort.bed")
+                anno_cov_plus = os.path.join(QC_folder,
+                                             args.sample_name + "_" +
+                                             valid_name + "_plus_coverage.bed")
+                anno_cov_minus = os.path.join(QC_folder,
+                                              args.sample_name + "_" +
+                                              valid_name +
+                                              "_minus_coverage.bed")
 
                 # Extract feature files
-                pm.run(cmd2, annoFile, container=pm.container)
+                pm.run(cmd2, anno_file, container=pm.container)
 
-                # Rename files to valid filenames
+                # Rename files to valid file_names
                 # Avoid 'mv' "are the same file" error
-                if not os.path.exists(fileName):
-                    cmd = 'mv "{old}" "{new}"'.format(old=annoFile,
-                                                      new=fileName)
-                    pm.run(cmd, fileName, container=pm.container)
+                if not os.path.exists(file_name):
+                    cmd = 'mv "{old}" "{new}"'.format(old=anno_file,
+                                                      new=file_name)
+                    pm.run(cmd, file_name, container=pm.container)
 
                 # Sort files
-                cmd3 = ("cut -f 1-3 " + fileName +
+                cmd3 = ("cut -f 1-3 " + file_name +
                         " | bedtools sort -i stdin -faidx " +
-                        chrOrder + " > " + annoSort)
-                pm.run(cmd3, annoSort, container=pm.container)
+                        chr_order + " > " + anno_sort)
+                pm.run(cmd3, anno_sort, container=pm.container)
                 
-                annoListPlus.append(annoCovPlus)
-                annoListMinus.append(annoCovMinus)
+                anno_list_plus.append(anno_cov_plus)
+                anno_list_minus.append(anno_cov_minus)
                 cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        annoSort + " -b " + plus_bam +
-                        " -g " + chrOrder + " > " +
-                        annoCovPlus)
+                        anno_sort + " -b " + plus_bam +
+                        " -g " + chr_order + " > " +
+                        anno_cov_plus)
                 cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        annoSort + " -b " + minus_bam +
-                        " -g " + chrOrder + " > " +
-                        annoCovMinus)
-                pm.run(cmd4, annoCovPlus, 
+                        anno_sort + " -b " + minus_bam +
+                        " -g " + chr_order + " > " +
+                        anno_cov_minus)
+                pm.run(cmd4, anno_cov_plus, 
                        container=pm.container)
-                pm.run(cmd5, annoCovMinus,
+                pm.run(cmd5, anno_cov_minus,
                        container=pm.container)
-                pm.clean_add(fileName)
-                pm.clean_add(annoSort)
-                pm.clean_add(annoCovPlus)
-                pm.clean_add(annoCovMinus)
+                pm.clean_add(file_name)
+                pm.clean_add(anno_sort)
+                pm.clean_add(anno_cov_plus)
+                pm.clean_add(anno_cov_minus)
+
+    # Report mRNA contamination
+    intron_files = list()
+    exon_files = list()
+    for cov in anno_list_plus:
+        if 'intron' in cov.lower():
+            if os.path.exists(cov):
+                intron_files.append(cov)
+        if 'exon' in cov.lower():
+            if os.path.exists(cov):
+                exon_files.append(cov)
+    # for cov in anno_list_minus:
+    #     if 'intron' in cov.lower():
+    #         if os.path.exists(cov):
+    #             intron_files.append(cov)
+    #     if 'exon' in cov.lower():
+    #         if os.path.exists(cov):
+    #             exon_files.append(cov)
+
+    if intron_files and exon_files:
+        pm.timestamp("### Report potential mRNA contamination")
+
+        # need Total Reads (raw or aligned?) divided by 1M
+        tr = float(float(pm.get_stat("Aligned_reads"))/1000000)
+
+        #sum of all introns
+        i_len = 0
+        for f in intron_files:
+            cmd = "awk '{sum+=sqrt(($3-$2)^2);} END {print sum;}' " + f
+            num_bases = pm.checkprint(cmd)
+            i_len += float(num_bases)
+        # need that in Kb, so divide by 1000
+        i_RPKM = i_len/1000
+
+        # sum of all exons
+        e_len = 0
+        for f in exon_files:
+            cmd = "awk '{sum+=sqrt(($3-$2)^2);} END {print sum;}' " + f
+            num_bases = pm.checkprint(cmd)
+            e_len += float(num_bases)
+        # need that in Kb, so divide by 1000
+        e_RPKM = e_len/1000
+
+        # compare intron to exon RPKM and report result
+        mrna_con = float(i_RPKM/e_RPKM)
+        pm.report_result("mRNA contamination", round(mrna_con, 1))
 
     # Plot FRiF
     pm.timestamp("### Plot FRiF")
@@ -2221,7 +2312,7 @@ def main():
     frifCmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
                "-n", args.sample_name, "-r", totalReads,
                "-o", frifPDF, "--bed"]
-    for cov in annoListPlus:
+    for cov in anno_list_plus:
         frifCmd.append(cov)
     cmd = build_command(frifCmd)
     pm.run(cmd, frifPDF, nofail=False, container=pm.container)
@@ -2238,7 +2329,7 @@ def main():
     frifCmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
                "-n", args.sample_name, "-r", totalReads,
                "-o", frifPDF, "--bed"]
-    for cov in annoListMinus:
+    for cov in anno_list_minus:
         frifCmd.append(cov)
     cmd = build_command(frifCmd)
     pm.run(cmd, frifPDF, nofail=False, container=pm.container)
