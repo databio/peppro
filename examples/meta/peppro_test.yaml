@@ -15,7 +15,7 @@ implied_columns:
   organism:
     human:
       genome: hg38
-      prealignments: rCRSd human_repeats
+      prealignments: human_rDNA rCRSd
       adapter: fastp  # Default
       dedup: seqkit   # Default
       trimmer: seqtk  # Default
@@ -23,6 +23,7 @@ implied_columns:
       umi_len: 8      # Default
       max_len: 30     # Default
       TSS_name: $GENOMES/hg38/hg38_TSS.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
+      CpA_name: $GENOMES/hg38/hg38_CpA.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
       pre_name: $GENOMES/hg38/hg38_pre-mRNA.tsv         # Default. Pipeline checks corresponding genome folder without specifying.
       anno_name: $GENOMES/hg38/hg38_annotations.bed.gz  # Default. Pipeline checks corresponding genome folder without specifying.
 
@@ -31,6 +32,7 @@ pipeline_args:
 #    "--sob": null        # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
 #    "--scale": null      # Default is FALSE. Pass flag to scale seqOutBias signal tracks
 #    "--parts": 4         # Default. Split suffix tree generation into <4> parts. Higher number == less memory use.
+#    "--coverage": null   # Default is FALSE. Pass flag to use coverage when producing library complexity plots.
 #    "--keep": null       # Default is FALSE. Pass flag to keep prealignment BAM files.
 #    "--noFIFO": null     # Default is FALSE. Pass flag to NOT use named pipes during prealignments.
 #    "--complexity": null # Default is TRUE.  Pass flag to disable library complexity calculation. Faster.
