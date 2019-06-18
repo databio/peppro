@@ -306,7 +306,7 @@ plot_complexity_curves <- function(ccurves,
 
     if (preseq_ymax < max_unique) {
         message(paste0("WARNING: y-max value changed from default ",
-                       int(preseq_ymax), " to the max real data ",
+                       preseq_ymax, " to the max real data ",
                        max_unique))
     }
 
@@ -333,20 +333,20 @@ plot_complexity_curves <- function(ccurves,
     } else {
         if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
-                xlab(paste0("Total Molecules (incl. duplicates)\n",
+                xlab(paste0("Total Reads (incl. duplicates)\n",
                             "Points show read count versus deduplicated ",
                             "read counts (externally calculated)"))
         } else if (any(rcDT$total > 0)) {
             fig <- fig +
-                xlab(paste0("Total Molecules (incl. duplicates)\n",
+                xlab(paste0("Total Reads (incl. duplicates)\n",
                             "Points show externally calculated read ",
                             "counts on the curves"))
         } else {
             fig <- fig +
-                xlab(paste0("Total Molecules (incl. duplicates)"))
+                xlab(paste0("Total Reads (incl. duplicates)"))
         }
         fig <- fig +
-            ylab("Unique Molecules") +
+            ylab("Unique Reads") +
             ggtitle("Complexity Curve: preseq")
     }
 
@@ -357,6 +357,7 @@ plot_complexity_curves <- function(ccurves,
         theme(axis.line = element_line(size = 0.5)) +
         theme(panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
+              aspect.ratio = 1,
               panel.border = element_rect(colour = "black",
                                           fill=NA, size=0.5)) +
         theme(plot.title = element_text(hjust = 0.5))
@@ -369,6 +370,7 @@ plot_complexity_curves <- function(ccurves,
                         axis.ticks = element_blank(),
                         axis.title.x = element_blank(),
                         axis.title.y = element_blank(),
+                        aspect.ratio = 1,
                         panel.grid.major = element_blank(),
                         panel.grid.minor = element_blank(),
                         panel.background = element_rect(color='black'),
@@ -760,7 +762,8 @@ plotTSS <- function(TSSfile) {
         normTSS           <- plusMinus / mean(plusMinus[c(1:val), V1])
         colnames(normTSS) <- c("score")
         peakPos  <- which.max(normTSS$score)
-        TSSscore <- round(mean(normTSS[(peakPos-50):(peakPos+50), score]),1)
+        TSSscore <- round(mean(normTSS[(max(0, peakPos-50)):(min(nrow(normTSS),
+                                       peakPos+50)), score]),1)
         if (is.nan(TSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile, "\n"))
             quit()
@@ -772,7 +775,8 @@ plotTSS <- function(TSSfile) {
         normTSS           <- plus / mean(plus[c(1:val), V1])
         colnames(normTSS) <- c("score")
         peakPos  <- which.max(normTSS$score)
-        TSSscore <- round(mean(normTSS[(peakPos-50):(peakPos+50), score]),1)
+        TSSscore <- round(mean(normTSS[(max(0, peakPos-50)):(min(nrow(normTSS),
+                                       peakPos+50)), score]),1)
         if (is.nan(TSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile[1], "\n"))
             quit()
@@ -809,8 +813,9 @@ plotTSS <- function(TSSfile) {
         minusNormTSS           <- minus / mean(minus[c(1:val), V1])
         colnames(minusNormTSS) <- c("score")
         peakPos       <- which.max(minusNormTSS$score)
-        minusTSSscore <- round(mean(minusNormTSS[(peakPos-50):(peakPos+50),
-                                                 score]),1)
+        minusTSSscore <- round(
+            mean(minusNormTSS[(max(0, peakPos-50)):(min(nrow(normTSS),
+                               peakPos+50)), score]),1)
         if (is.nan(minusTSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile[2], "\n"))
             quit()
@@ -853,6 +858,71 @@ plotTSS <- function(TSSfile) {
     invisible(dev.off())
 
     write("Completed TSS enrichment plot!\n", stdout())
+}
+
+
+#' Plot fragment length distribution
+#'
+#' This function plots the fragment length distribution of a paired-end sample
+#' and produces pdf/png files.
+#'
+#' @param fragL infile containing single column of fragment lengths
+#' @param fragL_count counts of each fragment length identified
+#' @param fragL_dis1 pdf filename
+#' @param ragL_dis2 fragment length distribution stats file
+#' @keywords fragment distribution
+#' @export
+#' @examples
+#' data("fragL")
+#' data("fragL_count")
+#' plotFLD(fragL = "fragL", fragL_count = "fragL_count",
+#'         fragL_dis1 = "fragLenDistribution_example.pdf",
+#'         fragL_dis2 = "fragLenDistribution_example.txt")
+#' @export
+plotFLD <- function(fragL, fragL_count,
+                    fragL_dis1="fragLenDistribution.pdf",
+                    fragL_dis2="fragLenDistribution.txt") {
+
+    outfile_png <- gsub('pdf', 'png', fragL_dis1)
+
+    dat  <- fread(fragL_count)
+    dat1 <- dat[dat$V2<=600,]
+    tmp  <- seq(1:as.numeric(dat1[1,2]-1))
+    dat0 <- data.table(V1=rep(0,length(tmp)),V2=tmp)
+    dat2 <- rbind(dat0, dat1)
+
+    t1 = theme_classic(base_size=14) +
+         theme(axis.line = element_line(size = 0.5)) +
+         theme(panel.grid.major = element_blank(),
+               panel.grid.minor = element_blank(),
+               legend.position = "none",
+               aspect.ratio = 1,
+               panel.border = element_rect(colour = "black",
+                                          fill=NA, size=0.5)) +
+         theme(plot.title = element_text(hjust = 0.5))
+
+    p <- ggplot(dat1, aes(x=V2, y=V1)) +
+             geom_line(aes(color='red')) +
+             xlab("Read length") + 
+             ylab("Read counts") +
+             ggtitle("Insert size distribution") +
+             t1
+
+    # Save plot to pdf file
+    pdf(file=fragL_dis1, width= 7, height = 7, useDingbats=F)
+    print(p)
+    invisible(dev.off())
+         
+    # Save plot to png file
+    png(filename=outfile_png, width = 480, height = 480)
+    print(p)
+    invisible(dev.off())
+
+    dat  <- fread(fragL)
+    summ <- data.table(Min=min(dat$V1), Max=max(dat$V1), Median=median(dat$V1),
+                       Mean=mean(dat$V1), Stdev=sd(dat$V1))
+    # Write summary table to stats file
+    fwrite(summ, file=fragL_dis2, row.names=F, quote=F, sep="\t")
 }
 
 ################################################################################

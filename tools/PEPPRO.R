@@ -3,7 +3,7 @@
 # PEPPRO R parser
 
 ###############################################################################
-version <- 0.2
+version <- 0.3
 ##### Load dependencies #####
 
 required_libraries <- c("PEPPROr")
@@ -45,7 +45,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Version: ", version, "\n\n",
         "Command: preseq\t plot preseq complexity curves\n",
         "\t frif\t plot fraction of reads in features\n",
-        "\t tss\t plot TSS enrichment\n"
+        "\t tss\t plot TSS enrichment\n",
+        "\t frag\t plot fragment length distribution\n"
     )
     message(usage)
 } else if (!is.na(subcmd) && tolower(subcmd) == "preseq") {
@@ -87,7 +88,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         # Determine the number of input files
         inArgs  <- 0
-        argList <- c("-c", "-l", ",-r", "-u", "-o", "-m", "-x",
+        argList <- c("-c", "-l", "-r", "-u", "-o", "-m", "-x",
                      "--coverage", "--read_length", "--real_counts",
                      "--ignore_unique", "--output_name", "--x_min", "--x_max")
         p       <- 1
@@ -145,7 +146,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                default=FALSE, description=uni_help)
         output_help <- "Output name (.png/.pdf will be automatically added)"
         output_name <- opt_get(name=c("o", "output_name"), required=FALSE,
-                               default='complexity_curves', description=output_help)
+                               default='complexity_curves',
+                               description=output_help)
         x_min       <- opt_get(name=c("m", "x_min"),
                                required=FALSE, default=0,
                                description="Lower x-limit (default 0)")
@@ -168,7 +170,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Usage:   PEPPRO.R [command] {args}\n",
         "Version: ", version, "\n\n",
         "Command: frif \t plot fraction of reads in features\n\n",
-        " -n, --sample_name\t\t Sample name.\n",
+        " -n, --sample_name\t   Sample name.\n",
         " -r, --reads\t\t   Number of mapped reads.\n",
         " -o, --output_name\t   Output file name.\n",
         " -b, --bed\t\t   Coverage file(s).\n"
@@ -245,6 +247,43 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         plotTSS(TSSfile = TSSfile)
     }
+} else if (!is.na(subcmd) && tolower(subcmd) == "frag") {
+    usage <- paste0(
+        "\n",
+        "Usage:   PEPPRO.R [command] {args}\n",
+        "Version: ", version, "\n\n",
+        "Command: frag \t plot fragment length distribution\n\n",
+        " -l, --frag_len\t\t Column of fragment lengths.\n",
+        " -c, --frag_count\t Counts of each fragment length.\n",
+        " -p, --pdf\t\t PDF output file name.\n",
+        " -t, --text\t\t Fragment length distribution stats file.\n"
+    )
+
+    help <- opt_get(name = c("help", "?", "h"), required=FALSE,
+                    default=FALSE, n=0)
+    if (!help) {
+        help <- suppressWarnings(
+            if(length(opt_get_args()) == 1) {TRUE} else {FALSE}
+        )
+    }
+    if (help) {
+        message(usage)
+        quit()
+    } else {
+        fragL       <- opt_get(name = c("frag_len", "l"), required=TRUE,
+                               description="Column of fragment lengths.")
+        fragL_count <- opt_get(name = c("frag_count", "c"), required=TRUE,
+                               description="Counts of each fragment length.")
+        fragL_dis1  <- opt_get(name = c("pdf", "p"), required=TRUE,
+                               description="PDF output file name.")
+        fragL_dis2  <- opt_get(name = c("text", "t"), required=TRUE,
+                               description="Fragment length distribution stats file.")
+
+        plotFLD(fragL = fragL,
+                fragL_count = fragL_count,
+                fragL_dis1 = fragL_dis1,
+                fragL_dis2 = fragL_dis2)
+    }
 } else {
     usage <- paste0(
         "\n",
@@ -252,7 +291,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Version: ", version, "\n\n",
         "Command: preseq\t plot preseq complexity curves\n",
         "\t frif\t plot fraction of reads in features\n",
-        "\t tss\t plot TSS enrichment\n"
+        "\t tss\t plot TSS enrichment\n",
+        "\t frag\t plot fragment length distribution\n"
     )
     message(usage)
     quit()

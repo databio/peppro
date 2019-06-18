@@ -2,4 +2,5 @@
 
 export(plotFRiF)
 export(plotTSS)
+export(plotFLD)
 export(plot_complexity_curves)
