@@ -35,6 +35,7 @@ pipelines:
       "--TSS-name": TSS_name
       "--pre-name": pre_name
       "--anno-name": anno_name
+      "--coverage": coverage
       "--keep": keep
       "--noFIFO": no_fifo
       "--complexity": complexity
