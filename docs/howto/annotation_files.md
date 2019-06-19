@@ -14,16 +14,20 @@ zcat hg38_TSS_full.txt.gz | \
 ```
 This asset (`tss_annotation`) needs to be [included in your `$REFGENIE` configuration file](#Example_PEPPRO_REFGENIE_configuration_file) for the pipeline to detect it automatically.  Alternatively, you can use the `--TSS-name` pipeline option to provide a path directly to this file.
 
-### Cleavage pA site (CpA)
+### Pause index annotation (PI)
 
-To calculate [pause indicies](../glossary.md), you will need a [CpA annotation file](http://big.databio.org/refgenomes/) in your reference genome directory.  If a pre-built version for your genome of interest isn't present, you can quickly create that file yourself. In the reference genome directory, you can perform the following commands for in this example, `hg38`:
+To calculate [pause indicies](../glossary.md), you will need a [PI annotation file](http://big.databio.org/refgenomes/) in your reference genome directory.  If a pre-built version for your genome of interest isn't present, you can quickly create that file yourself. In the reference genome directory, you can perform the following commands for in this example, `hg38`:
 ```console
 wget -O hg38_TSS_full.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz \
 zcat hg38_TSS_full.txt.gz | \
-  awk  '{if($4=="+"){print $3"\t"$6"\t"$6"\t"$4"\t"$13}else{print $3"\t"$5"\t"$5"\t"$4"\t"$13}}' | \
-  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_CpA.tsv
+  awk  '{if($4=="+"){print $3"\t"$5-80"\t"$5-20"\t"$13"\t"1"\t"$4"\t"$3"\t"$5-500"\t"$6"\t"$13"\t"1"\t"$4}else{print $3"\t"$6+20"\t"$6+80"\t"$13"\t"1"\t"$4"\t"$3"\t"$5"\t"$6+500"\t"$13"\t"1"\t"$4}}' | \
+  awk -v OFS='\t' '$2<0{$2=0}1' | \
+  awk -v OFS='\t' '$3<0{$3=0}1' | \
+  awk -v OFS='\t' '$7<0{$7=0}1' | \
+  awk -v OFS='\t' '$8<0{$8=0}1' | \
+  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_PI.tsv
 ```
-This asset (`cpa_annotation`) needs to be [included in your `$REFGENIE` configuration file](#Example_PEPPRO_REFGENIE_configuration_file) for the pipeline to detect it automatically.  Alternatively, you can use the `--cpa-name` pipeline option to provide a path directly to this file.
+This asset (`pi_annotation`) needs to be [included in your `$REFGENIE` configuration file](#Example_PEPPRO_REFGENIE_configuration_file) for the pipeline to detect it automatically.  Alternatively, you can use the `--pi-name` pipeline option to provide a path directly to this file.
 
 ### Premature mRNA
 

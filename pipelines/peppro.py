@@ -91,9 +91,9 @@ def parse_arguments():
                         dest="TSS_name", type=str,
                         help="file_name of TSS annotation file.")
 
-    parser.add_argument("--cpa-name", default=None,
-                        dest="CpA_name", type=str,
-                        help="file_name of cleavage pA site annotation file.")
+    parser.add_argument("--PI-name", default=None,
+                        dest="PI_name", type=str,
+                        help="file_name of pause index annotation file.")
 
     parser.add_argument("--pre-name", default=None,
                         dest="pre_name", type=str,
@@ -200,7 +200,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
 
             if os.path.exists(out_fastq_tmp):
                 os.remove(out_fastq_tmp)
-            pm.run(cmd, out_fastq_tmp, container=pm.container)
+            pm.run(cmd, out_fastq_tmp)
 
         else:
             if dups:
@@ -251,7 +251,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
 
         if paired:
             if args.keep or not useFIFO:
-                pm.run([cmd, filter_pair], mapped_bam, container=pm.container)
+                pm.run([cmd, filter_pair], mapped_bam)
             else:
                 pm.wait = False
                 pm.run(filter_pair, [summary_file, out_fastq_r2_gz],
@@ -267,12 +267,12 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             #     compress_cmd = "gzip -f -c < {} > {}".format(out_fastq_tmp, fastqz)
 
             if args.keep:
-                pm.run(cmd, mapped_bam, container=pm.container)
+                pm.run(cmd, mapped_bam)
             else:
                 # TODO: switch to this once filter_paired_fq works with SE
-                #pm.run(cmd2, summary_file, container=pm.container)
-                #pm.run(cmd1, out_fastq_r1, container=pm.container)
-                pm.run(cmd, out_fastq_tmp_gz, container=pm.container)
+                #pm.run(cmd2, summary_file)
+                #pm.run(cmd1, out_fastq_r1)
+                pm.run(cmd, out_fastq_tmp_gz)
 
         pm.clean_add(out_fastq_tmp)
 
@@ -567,9 +567,9 @@ def _add_resources(args, res):
             print(err.format(asset))
             print(msg)
 
-    asset = "cpa_annotation"
-    if args.CpA_name:        
-        res[asset] = os.path.abspath(args.CpA_name)
+    asset = "pi_annotation"
+    if args.PI_name:        
+        res[asset] = os.path.abspath(args.PI_name)
     else:
         try:
             res[asset] = rgc.get_asset(args.genome_assembly, asset)
@@ -577,7 +577,7 @@ def _add_resources(args, res):
             print(msg.format(asset))
         except:            
             msg = ("Update your REFGENIE config file to include this asset, or "
-                   "point directly to the file using --cpa-name.\n")
+                   "point directly to the file using --PI-name.\n")
             print(err.format(asset))
             print(msg)
 
@@ -1659,11 +1659,11 @@ def main():
     # check input for zipped or not
     if pypiper.is_gzipped_fastq(unmap_fq1):
         cmd = (ngstk.ziptool + " -d " + (unmap_fq1 + ".gz"))
-        pm.run(cmd, mapping_genome_bam, container=pm.container)
+        pm.run(cmd, mapping_genome_bam)
     if args.paired_end:
         if pypiper.is_gzipped_fastq(unmap_fq2):
             cmd = (ngstk.ziptool + " -d " + (unmap_fq2 + ".gz"))
-            pm.run(cmd, mapping_genome_bam, container=pm.container)
+            pm.run(cmd, mapping_genome_bam)
 
     cmd = tools.bowtie2 + " -p " + str(pm.cores)
     cmd += bt2_options
@@ -1684,11 +1684,11 @@ def main():
         # check input for zipped or not
         if pypiper.is_gzipped_fastq(unmap_fq1_dups):
             cmd = (ngstk.ziptool + " -d " + (unmap_fq1_dups + ".gz"))
-            pm.run(cmd, mapping_genome_bam, container=pm.container)
+            pm.run(cmd, mapping_genome_bam)
         if args.paired_end:
             if pypiper.is_gzipped_fastq(unmap_fq2_dups):
                 cmd = (ngstk.ziptool + " -d " + (unmap_fq2_dups + ".gz"))
-                pm.run(cmd, mapping_genome_bam, container=pm.container)
+                pm.run(cmd, mapping_genome_bam)
 
         cmd_dups = tools.bowtie2 + " -p " + str(pm.cores)
         cmd_dups += bt2_options
@@ -1766,7 +1766,7 @@ def main():
         if not pypiper.is_gzipped_fastq(unmapped_fq) and not unmapped_fq == '':
             cmd = (ngstk.ziptool + " " + unmapped_fq)
             unmapped_fq = unmapped_fq + ".gz"
-            pm.run(cmd, unmapped_fq, container=pm.container)
+            pm.run(cmd, unmapped_fq)
 
     temp_mapping_index = os.path.join(mapping_genome_bam_temp + ".bai")
     temp_mapping_index_dups = os.path.join(mapping_genome_bam_temp_dups + ".bai")
@@ -1774,21 +1774,22 @@ def main():
     if not args.prealignments and os.path.exists(mapping_genome_bam_temp):
         # Index the temporary bam file
         cmd = tools.samtools + " index " + mapping_genome_bam_temp
-        pm.run(cmd, temp_mapping_index, container=pm.container)
+        pm.run(cmd, temp_mapping_index)
         pm.clean_add(temp_mapping_index)
 
         if args.complexity:
             cmd_dups = tools.samtools + " index " + mapping_genome_bam_temp_dups
-            pm.run(cmd_dups, temp_mapping_index_dups, container=pm.container)
+            pm.run(cmd_dups, temp_mapping_index_dups)
             pm.clean_add(temp_mapping_index_dups)
             pm.clean_add(mapping_genome_bam_temp_dups)
 
     # Determine mitochondrial read counts
+    # TODO: instead do this to rDNA?
     mito_name = ["chrM", "chrMT", "M", "MT", "rCRSd", "rCRSd_3k"]
     if os.path.exists(mapping_genome_bam_temp):
         if not os.path.exists(temp_mapping_index):
             cmd = tools.samtools + " index " + mapping_genome_bam_temp
-            pm.run(cmd, temp_mapping_index, container=pm.container)
+            pm.run(cmd, temp_mapping_index)
             pm.clean_add(temp_mapping_index)
 
         cmd = (tools.samtools + " idxstats " + mapping_genome_bam_temp +
@@ -1831,7 +1832,7 @@ def main():
         if os.path.exists(mapping_genome_bam_temp_dups):
             if not os.path.exists(temp_mapping_index_dups):
                 cmd = tools.samtools + " index " + mapping_genome_bam_temp_dups
-                pm.run(cmd, temp_mapping_index_dups, container=pm.container)
+                pm.run(cmd, temp_mapping_index_dups)
                 pm.clean_add(temp_mapping_index_dups)
 
             cmd_dups = (tools.samtools + " idxstats " +
@@ -1915,7 +1916,7 @@ def main():
                 cmd += (" -c " + str(genome_size) + " -l " + max_len)
             cmd += (" -r " + preseq_counts + " -o " + preseq_plot)
 
-            pm.run(cmd, [preseq_pdf, preseq_png], container=pm.container)
+            pm.run(cmd, [preseq_pdf, preseq_png])
 
             pm.report_object("Library complexity", preseq_pdf,
                              anchor_image=preseq_png)
@@ -1928,7 +1929,7 @@ def main():
     # Need index for mapping_genome_bam before calculating bamQC metrics
     mapping_genome_index = os.path.join(mapping_genome_bam + ".bai")
     cmd = tools.samtools + " index " + mapping_genome_bam
-    pm.run(cmd, mapping_genome_index, container=pm.container)
+    pm.run(cmd, mapping_genome_index)
 
     bamQC = os.path.join(QC_folder, args.sample_name + "_bamQC.tsv")
     cmd = tool_path("bamQC.py")
@@ -2044,7 +2045,7 @@ def main():
         cmd += " -a " + mapping_genome_bam + " -b " + plus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
         cmd += " -z -v -s 4 -o " + Tss_plus
-        pm.run(cmd, Tss_plus, nofail=True, container=pm.container)
+        pm.run(cmd, Tss_plus, nofail=True)
         pm.clean_add(plus_TSS)
 
         with open(Tss_plus) as f:
@@ -2066,7 +2067,7 @@ def main():
         cmd += " -a " + mapping_genome_bam + " -b " + minus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
         cmd += " -z -v -s 4 -o " + Tss_minus
-        pm.run(cmd, Tss_minus, nofail=True, container=pm.container)
+        pm.run(cmd, Tss_minus, nofail=True)
         pm.clean_add(minus_TSS)
 
         with open(Tss_minus) as f:
@@ -2086,56 +2087,85 @@ def main():
                                "_TSSenrichment.pdf")
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R"))
         cmd += " tss -i " + Tss_plus + " " + Tss_minus
-        pm.run(cmd, TSS_pdf, nofail=True, container=pm.container)
+        pm.run(cmd, TSS_pdf, nofail=True)
 
         TSS_png = os.path.join(QC_folder,  args.sample_name +
                                "_TSSenrichment.png")
         pm.report_object("TSS enrichment", TSS_pdf, anchor_image=TSS_png)
 
     # Pause index
-    if not os.path.exists(res.cpa_annotation):
-        print("Skipping PI -- Pause index requires CpA annotation file: {}"
-              .format(res.cpa_annotation))
-    elif not os.path.exists(res.tss_annotation):
-        print("Skipping PI -- Pause index requires TSS annotation file: {}"
-              .format(res.tss_annotation))
+    chr_order = os.path.join(QC_folder, "chr_order.txt")
+
+    if not os.path.exists(chr_order):
+        cmd = (tools.samtools + " view -H " + mapping_genome_bam +
+               " | grep 'SN:' | awk -F':' '{print $2,$3}' | " +
+               "awk -F' ' -v OFS='\t' '{print $1,$3}' > " + chr_order)
+        pm.run(cmd, chr_order)
+        pm.clean_add(chr_order)
+
+    if not os.path.exists(res.pi_annotation):
+        print("Skipping PI -- Pause index requires PI annotation file: {}"
+              .format(res.pi_annotation))
     else:
         pm.timestamp("### Calculate Pause Index (PI)")
 
+        # Remove missing chr from PI annotation
+        chr_keep = os.path.join(QC_folder, "chr_keep.txt")
+        pi_local = os.path.join(QC_folder, args.genome_assembly + "_PI.tsv")
+        cmd1 = ("cut -f 1 " + chr_order + " > " + chr_keep)
+        cmd2 = ("grep -wf " + chr_keep + " " + res.pi_annotation +
+                " | awk '$2>0 && $3>0' | awk '$8>0 && $9>0'" +
+                " > " + pi_local)
+        pm.run([cmd1, cmd2], [chr_keep, pi_local], nofail=True)
+        pm.clean_add(chr_keep)
+        pm.clean_add(pi_local)
+
+        # Split PI annotation file into TSS and Gene Body windows
+        tss_window = os.path.join(QC_folder, args.genome_assembly +
+                                  "_tss_window.bed")
+        gene_body_window = os.path.join(QC_folder, args.genome_assembly +
+                                        "_gene_body_window.bed")
+        cmd1 = ("cut -f 1-6 " + pi_local + " | " + tools.bedtools +
+                " sort -i stdin -faidx " + chr_order + " > " + tss_window)
+        cmd2 = ("cut -f 7-12 " + pi_local + " | " + tools.bedtools +
+                " sort -i stdin -faidx " + chr_order + " > " + gene_body_window)
+        pm.run([cmd1, cmd2], [tss_window, gene_body_window])
+        pm.clean_add(tss_window)
+        pm.clean_add(gene_body_window)
+
         TSS_density = os.path.join(QC_folder, args.sample_name +
-                                   "_TSS_density.txt")
-        cmd = tool_path("pyTssEnrichment.py")
-        cmd += " -a " + mapping_genome_bam + " -b " + res.tss_annotation
-        cmd += " -c " + str(pm.cores)
-        cmd += " -p ends -d -20 -u 80 -z -v -s 4 -o " + TSS_density
-        pm.run(cmd, TSS_density, nofail=True, container=pm.container)
+                                   "_TSS_density.bed")
+        cmd = (tools.bedtools + " coverage -sorted -counts -s -a " +
+               tss_window + " -b " + mapping_genome_bam +
+               " -g " + chr_order + " > " + TSS_density)
+        pm.run(cmd, TSS_density, nofail=True)
         pm.clean_add(TSS_density)
 
-        CpA_density = os.path.join(QC_folder, args.sample_name +
-                                   "_CpA_density.txt")
-        cmd = tool_path("pyTssEnrichment.py")
-        cmd += " -a " + mapping_genome_bam + " -b " + res.tss_annotation
-        cmd += " -c " + str(pm.cores)
-        cmd += " -p ends -d 0 -u 500 -z -v -s 4 -o " + CpA_density
-        pm.run(cmd, CpA_density, nofail=True, container=pm.container)
-        pm.clean_add(CpA_density)
+        gene_body_density = os.path.join(QC_folder, args.sample_name +
+                                         "_gene_body_density.bed")
+        cmd = (tools.bedtools + " coverage -sorted -counts -s -a " +
+               gene_body_window + " -b " + mapping_genome_bam +
+               " -g " + chr_order + " > " + gene_body_density)
+        pm.run(cmd, gene_body_density, nofail=True)
+        pm.clean_add(gene_body_density)
 
-        td = 0
-        cd = 0
-        try:
-            with open(TSS_density) as f:
-                td = sum(list(map(float, f)))
-        except NameError:
-            pass
-        try:
-            with open(CpA_density) as f:
-                cd = sum(list(map(float, f)))
-        except NameError:
-            pass
+        # Number of reads / window length
+        cmd = ("awk '$7>0' " + TSS_density +
+               " | awk '{sum+=$7/($3-$2);} END {print sum;}'")
+        val = pm.checkprint(cmd)
+        if val and val.strip():
+            tss_val = float(val)
 
+        cmd = ("awk '$7>0' " + gene_body_density +
+               " | awk '{sum+=$7/($3-$2);} END {print sum;}'")
+        val = pm.checkprint(cmd)
+        if val and val.strip():
+            gene_body_val = float(val)
+        
         try:
-            pi = float(td/cd)
-            pm.report_result("Pause index", round(pi, 2))
+            if tss_val and gene_body_val:
+                pi = float(tss_val/gene_body_val)
+                pm.report_result("Pause index", round(pi, 2))
         except ZeroDivisionError:
             pass
 
@@ -2157,6 +2187,35 @@ def main():
                                pipeline_manager=pm)
         pm.report_result("Minus FRiP", minus_frip)
 
+    # Fragment distribution
+    if args.paired_end:
+        pm.timestamp("### Plot fragment distribution")
+        frag_len = os.path.join(QC_folder, args.sample_name + "_fragLen.txt")
+        frag_dist_tool = tool_path("fragment_length_dist.pl")
+        cmd = build_command([tools.perl, frag_dist_tool,
+                             mapping_genome_bam, frag_len])
+
+        fragL_counts_file = args.sample_name + "_fragCount.txt"
+        fragL_count = os.path.join(QC_folder, fragL_counts_file)
+        cmd1 = "sort -n  " + frag_len + " | uniq -c  > " + fragL_count
+
+        fragL_dis1 = os.path.join(QC_folder, args.sample_name +
+                                  "_fragLenDistribution.pdf")
+        fragL_dis2 = os.path.join(QC_folder, args.sample_name +
+                                  "_fragLenDistribution.txt")
+
+        cmd2 = (tools.Rscript + " " + tool_path("PEPPRO.R"))
+        cmd2 += " frag -l " + frag_len + " -c " + fragL_count
+        cmd2 += " -p " + fragL_dis1 + " -t " + fragL_dis2
+
+        pm.run([cmd, cmd1, cmd2], fragL_dis1, nofail=True,
+               container=pm.container)
+
+        fragL_png = os.path.join(QC_folder, args.sample_name +
+                                 "_fragLenDistribution.png")
+        pm.report_object("Fragment distribution", fragL_dis1,
+                         anchor_image=fragL_png)
+
     # Calculate fraction of reads in features of interest
     pm.timestamp("### Calculate fraction of reads in features (FRiF)")
 
@@ -2169,13 +2228,13 @@ def main():
                                       args.genome_assembly +
                                       "_annotations.bed.gz")
             cmd = ("ln -sf " + res.feat_annotation + " " + anno_local)
-            pm.run(cmd, anno_local, container=pm.container) 
+            pm.run(cmd, anno_local) 
         elif res.feat_annotation.endswith(".bed"):
             anno_local = os.path.join(raw_folder,
                                       args.genome_assembly +
                                       "_annotations.bed")
             cmd = ("ln -sf " + res.feat_annotation + " " + anno_local)
-            pm.run(cmd, anno_local, container=pm.container) 
+            pm.run(cmd, anno_local) 
         else:
             print("Skipping read annotation...")
             print("This requires a {} annotation file."
@@ -2197,13 +2256,6 @@ def main():
         cmd2 = (ngstk.ziptool + " -d -c " + anno_local +
                 " | awk -F'\t' '{print>\"" + QC_folder + "/\"$4}'")
         if len(ft_list) >= 1:
-            chr_order = os.path.join(QC_folder, "chr_order.txt")
-            cmd = (tools.samtools + " view -H " + mapping_genome_bam +
-                   " | grep 'SN:' | awk -F':' '{print $2,$3}' | " +
-                   "awk -F' ' -v OFS='\t' '{print $1,$3}' > " + chr_order)
-            pm.run(cmd, chr_order, container=pm.container)
-            pm.clean_add(chr_order)
-
             for pos, anno in enumerate(ft_list):
                 # working files
                 anno_file = os.path.join(QC_folder, anno)
@@ -2219,20 +2271,20 @@ def main():
                                               "_minus_coverage.bed")
 
                 # Extract feature files
-                pm.run(cmd2, anno_file, container=pm.container)
+                pm.run(cmd2, anno_file)
 
                 # Rename files to valid file_names
                 # Avoid 'mv' "are the same file" error
                 if not os.path.exists(file_name):
                     cmd = 'mv "{old}" "{new}"'.format(old=anno_file,
                                                       new=file_name)
-                    pm.run(cmd, file_name, container=pm.container)
+                    pm.run(cmd, file_name)
 
                 # Sort files
                 cmd3 = ("cut -f 1-3 " + file_name +
                         " | bedtools sort -i stdin -faidx " +
                         chr_order + " > " + anno_sort)
-                pm.run(cmd3, anno_sort, container=pm.container)
+                pm.run(cmd3, anno_sort)
                 
                 anno_list_plus.append(anno_cov_plus)
                 anno_list_minus.append(anno_cov_minus)
@@ -2275,29 +2327,41 @@ def main():
         pm.timestamp("### Report potential mRNA contamination")
 
         # need Total Reads (raw or aligned?) divided by 1M
-        tr = float(float(pm.get_stat("Aligned_reads"))/1000000)
+        scaling_factor = float(float(pm.get_stat("Aligned_reads"))/1000000)
 
         #sum of all introns
         i_len = 0
+        i_counts = 0
         for f in intron_files:
             cmd = "awk '{sum+=sqrt(($3-$2)^2);} END {print sum;}' " + f
             num_bases = pm.checkprint(cmd)
             i_len += float(num_bases)
-        # need that in Kb, so divide by 1000
-        i_RPKM = i_len/1000
+            cmd = "awk '{sum+=$4;} END {print sum;}' " + f
+            i_sum = pm.checkprint(cmd)
+            i_counts += float(i_sum)
+
+        i_len_kb = i_len/1000 # need intron length in Kb, so divide by 1000
+        i_RPM = i_counts/scaling_factor # scaled intron read counts
+        i_RPKM = i_RPM/i_len_kb
 
         # sum of all exons
         e_len = 0
+        e_counts = 0
         for f in exon_files:
             cmd = "awk '{sum+=sqrt(($3-$2)^2);} END {print sum;}' " + f
             num_bases = pm.checkprint(cmd)
             e_len += float(num_bases)
-        # need that in Kb, so divide by 1000
-        e_RPKM = e_len/1000
+            cmd = "awk '{sum+=$4;} END {print sum;}' " + f
+            e_sum = pm.checkprint(cmd)
+            e_counts += float(e_sum)
+
+        e_len_kb = e_len/1000 # need exon length in Kb, so divide by 1000
+        e_RPM = e_counts/scaling_factor # scaled exon read counts
+        e_RPKM = e_RPM/e_len_kb
 
         # compare intron to exon RPKM and report result
         mrna_con = float(i_RPKM/e_RPKM)
-        pm.report_result("mRNA contamination", round(mrna_con, 1))
+        pm.report_result("mRNA contamination", round(mrna_con, 2))
 
     # Plot FRiF
     pm.timestamp("### Plot FRiF")
@@ -2315,7 +2379,7 @@ def main():
     for cov in anno_list_plus:
         frifCmd.append(cov)
     cmd = build_command(frifCmd)
-    pm.run(cmd, frifPDF, nofail=False, container=pm.container)
+    pm.run(cmd, frifPDF, nofail=False)
     pm.report_object("Plus FRiF", frifPDF, anchor_image=frifPNG)
 
     # Minus
@@ -2332,7 +2396,7 @@ def main():
     for cov in anno_list_minus:
         frifCmd.append(cov)
     cmd = build_command(frifCmd)
-    pm.run(cmd, frifPDF, nofail=False, container=pm.container)
+    pm.run(cmd, frifPDF, nofail=False)
     pm.report_object("Minus FRiF", frifPDF, anchor_image=frifPNG)
 
     # Shift and produce BigWig's
