@@ -103,6 +103,14 @@ def parse_arguments():
                         dest="anno_name", type=str,
                         help="file_name of genomic annotation file.")
 
+    parser.add_argument("--exon-name", default=None,
+                        dest="exon_name", type=str,
+                        help="file_name of exon annotation file.")
+
+    parser.add_argument("--intron-name", default=None,
+                        dest="intron_name", type=str,
+                        help="file_name of intron annotation file.")
+
     parser.add_argument("--coverage", action='store_true', default=False,
                         dest="coverage",
                         help="Report library complexity using coverage: "
@@ -606,6 +614,34 @@ def _add_resources(args, res):
         except:
             msg = ("Update your REFGENIE config file to include this asset, or "
                    "point directly to the file using --anno-name.\n")
+            print(err.format(asset))
+            print(msg)
+
+    asset = "exon_annotation"
+    if args.exon_name:
+        res[asset] = os.path.abspath(args.exon_name)
+    else:
+        try:
+            res[asset] = rgc.get_asset(args.genome_assembly, asset)
+        except KeyError:
+            print(msg.format(asset))
+        except:
+            msg = ("Update your REFGENIE config file to include this asset, or "
+                   "point directly to the file using --exon-name.\n")
+            print(err.format(asset))
+            print(msg)
+
+    asset = "intron_annotation"
+    if args.intron_name:
+        res[asset] = os.path.abspath(args.intron_name)
+    else:
+        try:
+            res[asset] = rgc.get_asset(args.genome_assembly, asset)
+        except KeyError:
+            print(msg.format(asset))
+        except:
+            msg = ("Update your REFGENIE config file to include this asset, or "
+                   "point directly to the file using --intron-name.\n")
             print(err.format(asset))
             print(msg)
 
@@ -2095,6 +2131,7 @@ def main():
 
     # Pause index
     chr_order = os.path.join(QC_folder, "chr_order.txt")
+    chr_keep = os.path.join(QC_folder, "chr_keep.txt")
 
     if not os.path.exists(chr_order):
         cmd = (tools.samtools + " view -H " + mapping_genome_bam +
@@ -2103,6 +2140,20 @@ def main():
         pm.run(cmd, chr_order)
         pm.clean_add(chr_order)
 
+    if not os.path.exists(chr_keep):
+        if os.path.exists(chr_order):
+            cmd = ("cut -f 1 " + chr_order + " > " + chr_keep)
+            pm.run(cmd, chr_keep)
+            pm.clean_add(chr_keep)
+        else:
+            cmd1 = (tools.samtools + " view -H " + mapping_genome_bam +
+                    " | grep 'SN:' | awk -F':' '{print $2,$3}' | " +
+                    "awk -F' ' -v OFS='\t' '{print $1,$3}' > " + chr_order)
+            cmd2 = ("cut -f 1 " + chr_order + " > " + chr_keep)
+            pm.run([cmd1, cmd2], [chr_order, chr_keep])
+            pm.clean_add(chr_order)
+            pm.clean_add(chr_keep)
+
     if not os.path.exists(res.pi_annotation):
         print("Skipping PI -- Pause index requires PI annotation file: {}"
               .format(res.pi_annotation))
@@ -2110,14 +2161,11 @@ def main():
         pm.timestamp("### Calculate Pause Index (PI)")
 
         # Remove missing chr from PI annotation
-        chr_keep = os.path.join(QC_folder, "chr_keep.txt")
         pi_local = os.path.join(QC_folder, args.genome_assembly + "_PI.tsv")
-        cmd1 = ("cut -f 1 " + chr_order + " > " + chr_keep)
-        cmd2 = ("grep -wf " + chr_keep + " " + res.pi_annotation +
+        cmd = ("grep -wf " + chr_keep + " " + res.pi_annotation +
                 " | awk '$2>0 && $3>0' | awk '$8>0 && $9>0'" +
                 " > " + pi_local)
-        pm.run([cmd1, cmd2], [chr_keep, pi_local], nofail=True)
-        pm.clean_add(chr_keep)
+        pm.run(cmd, pi_local, nofail=True)
         pm.clean_add(pi_local)
 
         # Split PI annotation file into TSS and Gene Body windows
@@ -2306,62 +2354,94 @@ def main():
                 pm.clean_add(anno_cov_minus)
 
     # Report mRNA contamination
-    intron_files = list()
-    exon_files = list()
-    for cov in anno_list_plus:
-        if 'intron' in cov.lower():
-            if os.path.exists(cov):
-                intron_files.append(cov)
-        if 'exon' in cov.lower():
-            if os.path.exists(cov):
-                exon_files.append(cov)
-    # for cov in anno_list_minus:
-    #     if 'intron' in cov.lower():
-    #         if os.path.exists(cov):
-    #             intron_files.append(cov)
-    #     if 'exon' in cov.lower():
-    #         if os.path.exists(cov):
-    #             exon_files.append(cov)
+    if (os.path.exists(res.exon_annotation) and
+        os.path.exists(res.intron_annotation)):
 
-    if intron_files and exon_files:
-        pm.timestamp("### Report potential mRNA contamination")
+        pm.timestamp("### Calculate mRNA contamination")
+
+        # Sort exons and introns
+        exons_sort = os.path.join(QC_folder, args.genome_assembly +
+                                  "_exons_sort.bed")
+        introns_sort = os.path.join(QC_folder, args.genome_assembly +
+                                    "_introns_sort.bed")
+        cmd1 = ("grep -wf " + chr_keep + " " + res.exon_annotation +
+                " | " + tools.bedtools + " sort -i stdin -faidx " +
+                chr_order + " > " + exons_sort)
+        # a single sort fails to sort a 1 bp different start position intron
+        cmd2 = ("grep -wf " + chr_keep + " " + res.intron_annotation +
+                " | " + tools.bedtools + " sort -i stdin -faidx " +
+                chr_order + " | " + tools.bedtools + " sort -i stdin -faidx " +
+                chr_order + " > " + introns_sort)
+        pm.run([cmd1, cmd2], [exons_sort, introns_sort], nofail=True)
+        pm.clean_add(exons_sort)
+        pm.clean_add(introns_sort)
+        
+        # Determine coverage of exons/introns
+        exons_cov = os.path.join(QC_folder, args.sample_name +
+                                 "_exons_coverage.bed")
+        introns_cov = os.path.join(QC_folder, args.sample_name +
+                                   "_introns_coverage.bed")
+        cmd1 = (tools.bedtools + " coverage -sorted -counts -s -a " +
+                exons_sort + " -b " + mapping_genome_bam +
+                " -g " + chr_order + " > " + exons_cov)
+        cmd2 = (tools.bedtools + " coverage -sorted -counts -s -a " +
+                introns_sort + " -b " + mapping_genome_bam +
+                " -g " + chr_order + " > " + introns_cov)
+        pm.run([cmd1, cmd2], [exons_cov, introns_cov], nofail=True)
+        pm.clean_add(exons_cov)
+        pm.clean_add(introns_cov)
 
         # need Total Reads (raw or aligned?) divided by 1M
-        scaling_factor = float(float(pm.get_stat("Aligned_reads"))/1000000)
+        ar = float(pm.get_stat("Aligned_reads"))
+        scaling_factor = float(ar/1000000)
 
-        #sum of all introns
-        i_len = 0
-        i_counts = 0
-        for f in intron_files:
-            cmd = "awk '{sum+=sqrt(($3-$2)^2);} END {print sum;}' " + f
-            num_bases = pm.checkprint(cmd)
-            i_len += float(num_bases)
-            cmd = "awk '{sum+=$4;} END {print sum;}' " + f
-            i_sum = pm.checkprint(cmd)
-            i_counts += float(i_sum)
+        exons_rpkm = os.path.join(QC_folder, args.sample_name +
+                                  "_exons_rpkm.tsv")
+        introns_rpkm = os.path.join(QC_folder, args.sample_name +
+                                    "_introns_rpkm.tsv")
 
-        i_len_kb = i_len/1000 # need intron length in Kb, so divide by 1000
-        i_RPM = i_counts/scaling_factor # scaled intron read counts
-        i_RPKM = i_RPM/i_len_kb
+        # determine exonic RPKM for individual genes
+        if os.path.exists(exons_cov):
+            cmd = ("awk -v OFS='\t' '{readCount[$4] += $7; " + 
+                   "exonCount[$4] += 1; geneSizeKB[$4] += " +
+                   "(sqrt(($3-$2+0.00000001)^2)/1000); " +
+                   "gene[$4] = $4} END { for (a in readCount) " +
+                   "{ print gene[a], (readCount[a]/" +
+                    str(scaling_factor) + ")/geneSizeKB[a]}}' " + exons_cov +
+                    " | awk '$2>0' | sort -k1 > " + exons_rpkm)
+            pm.run(cmd, exons_rpkm, nofail=True)
+            pm.clean_add(exons_rpkm)
 
-        # sum of all exons
-        e_len = 0
-        e_counts = 0
-        for f in exon_files:
-            cmd = "awk '{sum+=sqrt(($3-$2)^2);} END {print sum;}' " + f
-            num_bases = pm.checkprint(cmd)
-            e_len += float(num_bases)
-            cmd = "awk '{sum+=$4;} END {print sum;}' " + f
-            e_sum = pm.checkprint(cmd)
-            e_counts += float(e_sum)
+        # determine intronic RPKM for individual genes
+        if os.path.exists(introns_cov):
+            cmd = ("awk -v OFS='\t' '{readCount[$4] += $7; " + 
+                   "exonCount[$4] += 1; geneSizeKB[$4] += " +
+                   "(sqrt(($3-$2+0.00000001)^2)/1000); " +
+                   "gene[$4] = $4} END { for (a in readCount) " +
+                   "{ print gene[a], (readCount[a]/" +
+                    str(scaling_factor) + ")/geneSizeKB[a]}}' " + introns_cov +
+                    " | awk '$2>0' | sort -k1 > " + introns_rpkm)
+            pm.run(cmd, introns_rpkm, nofail=True)
+            pm.clean_add(introns_rpkm)
 
-        e_len_kb = e_len/1000 # need exon length in Kb, so divide by 1000
-        e_RPM = e_counts/scaling_factor # scaled exon read counts
-        e_RPKM = e_RPM/e_len_kb
+        # join intron, exon RPKM on gene name
+        intron_exon = os.path.join(QC_folder, args.sample_name +
+                                   "_intron_exon.tsv")
+        if os.path.exists(exons_rpkm) and os.path.exists(introns_rpkm):
+            cmd = ("join -a1 -a2 -j1 -e0 -o 0 1.2 2.2 " +
+                   introns_rpkm + " " + exons_rpkm + " > " + intron_exon)
+            pm.run(cmd, intron_exon, nofail=True)
+            pm.clean_add(intron_exon)
 
         # compare intron to exon RPKM and report result
-        mrna_con = float(i_RPKM/e_RPKM)
-        pm.report_result("mRNA contamination", round(mrna_con, 2))
+        if os.path.exists(intron_exon):
+            cmd = ("awk '$2>0' " + intron_exon +
+                   " | awk '{print $3/$2}' | sort -n | awk ' { a[i++]=$1; }" +
+                   " END { x=int((i+1)/2);" +
+                   " if (x < (i+1)/2) print (a[x-1]+a[x])/2;" +
+                   " else print a[x-1]; }'")
+            mrna_con = float(pm.checkprint(cmd))
+            pm.report_result("mRNA contamination", round(mrna_con, 2))
 
     # Plot FRiF
     pm.timestamp("### Plot FRiF")
