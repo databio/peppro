@@ -2391,7 +2391,7 @@ def main():
         pm.clean_add(exons_cov)
         pm.clean_add(introns_cov)
 
-        # need Total Reads (raw or aligned?) divided by 1M
+        # need Total Reads divided by 1M
         ar = float(pm.get_stat("Aligned_reads"))
         scaling_factor = float(ar/1000000)
 
@@ -2442,6 +2442,17 @@ def main():
                    " else print a[x-1]; }'")
             mrna_con = float(pm.checkprint(cmd))
             pm.report_result("mRNA contamination", round(mrna_con, 2))
+
+        # plot mRNA contamination distribution
+        mRNApdf = os.path.join(QC_folder,
+            args.sample_name + "_mRNA_contamination.pdf")
+        mRNApng = os.path.join(QC_folder,
+            args.sample_name + "_mRNA_contamination.png")
+        mRNAplot = [tools.Rscript, tool_path("PEPPRO.R"), "mrna",
+                    "-i", intron_exon]
+        cmd = build_command(mRNAplot)
+        pm.run(cmd, mRNApdf, nofail=False)
+        pm.report_object("mRNA contamination", mRNApdf, anchor_image=mRNApng)
 
     # Plot FRiF
     pm.timestamp("### Plot FRiF")

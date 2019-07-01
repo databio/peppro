@@ -3,7 +3,7 @@
 # PEPPRO R parser
 
 ###############################################################################
-version <- 0.3
+version <- 0.4
 ##### Load dependencies #####
 
 required_libraries <- c("PEPPROr")
@@ -46,7 +46,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Command: preseq\t plot preseq complexity curves\n",
         "\t frif\t plot fraction of reads in features\n",
         "\t tss\t plot TSS enrichment\n",
-        "\t frag\t plot fragment length distribution\n"
+        "\t frag\t plot fragment length distribution\n",
+        "\t mrna\t plot mRNA contamination distribution\n"
     )
     message(usage)
 } else if (!is.na(subcmd) && tolower(subcmd) == "preseq") {
@@ -284,6 +285,34 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                 fragL_dis1 = fragL_dis1,
                 fragL_dis2 = fragL_dis2)
     }
+} else if (!is.na(subcmd) && tolower(subcmd) == "mrna") {
+    usage <- paste0(
+        "\n",
+        "Usage:   PEPPRO.R [command] {args}\n",
+        "Version: ", version, "\n\n",
+        "Command: mrna \t plot mRNA contamination distribution\n\n",
+        " -i, --rpkm\t Three column TSV of intron and exon RPKM by gene.\n",
+        " -w, --raw\t Plot raw exon/intron ratios instead of log10.\n"
+    )
+
+    help <- opt_get(name = c("help", "?", "h"), required=FALSE,
+                    default=FALSE, n=0)
+    if (!help) {
+        help <- suppressWarnings(
+            if(length(opt_get_args()) == 1) {TRUE} else {FALSE}
+        )
+    }
+    if (help) {
+        message(usage)
+        quit()
+    } else {
+        rpkm <- opt_get(name = c("rpkm", "i"), required=TRUE,
+                        description="Three column TSV containing gene exon and intron RPKMs.")
+        raw  <- opt_get(name = c("raw", "w"), required=FALSE, default=FALSE,
+                        description="Plot raw ratios (Default = FALSE).")
+
+        suppressWarnings(mRNAcontamination(rpkm=rpkm, raw=raw))
+    }
 } else {
     usage <- paste0(
         "\n",
@@ -292,7 +321,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Command: preseq\t plot preseq complexity curves\n",
         "\t frif\t plot fraction of reads in features\n",
         "\t tss\t plot TSS enrichment\n",
-        "\t frag\t plot fragment length distribution\n"
+        "\t frag\t plot fragment length distribution\n",
+        "\t mrna\t plot mRNA contamination distribution\n"
     )
     message(usage)
     quit()

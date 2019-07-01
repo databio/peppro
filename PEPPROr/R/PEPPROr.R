@@ -925,4 +925,171 @@ plotFLD <- function(fragL, fragL_count,
     fwrite(summ, file=fragL_dis2, row.names=F, quote=F, sep="\t")
 }
 
+#' Return the count of the plot at 95% of the upper limit.
+#'
+#' From:
+#' DeCicco, L. (2018, August 10). Exploring ggplot2 boxplots - 
+#'  Defining limits and adjusting style [Blog post]. 
+#'  Retrieved from https://waterdata.usgs.gov/blog/boxplots/
+#'
+#' @param x A vector of numbers.
+#' @param lim Upper limit.
+#' @keywords limits
+#' @examples
+#' n_fun()
+n_fun <- function(x, lim=50) {
+    return(data.frame(y = 0.95*log10(lim),
+                      label = length(x)))
+}
+
+#' This function forces the y-axis breaks to be on every 10^x.
+#'
+#' From:
+#' DeCicco, L. (2018, August 10). Exploring ggplot2 boxplots - 
+#'  Defining limits and adjusting style [Blog post]. 
+#'  Retrieved from https://waterdata.usgs.gov/blog/boxplots/
+#'
+#' @param x A vector of numbers.
+#' @keywords limits
+#' @examples
+#' prettyLogs()
+prettyLogs <- function(x){
+    pretty_range    <- range(x[x > 0])
+    pretty_logs     <- 10^(-10:10)
+    log_index       <- which(pretty_logs < pretty_range[2] & 
+                             pretty_logs > pretty_range[1])
+    log_index       <- c(log_index[1]-1,log_index,
+                         log_index[length(log_index)]+1)
+    pretty_logs_new <-  pretty_logs[log_index] 
+    return(pretty_logs_new)
+}
+
+#' Custom formatting function for the log axis.
+#'
+#' From:
+#' DeCicco, L. (2018, August 10). Exploring ggplot2 boxplots - 
+#'  Defining limits and adjusting style [Blog post]. 
+#'  Retrieved from https://waterdata.usgs.gov/blog/boxplots/
+#'
+#' @param n A vector of numbers.
+#' @keywords limits
+#' @examples
+#' fancyNumbers()
+fancyNumbers <- function(n){
+    nNoNA     <- n[!is.na(n)]
+    x         <- gsub(pattern = "1e",replacement = "10^",
+                      x = format(nNoNA, scientific = TRUE))
+    exponents <- as.numeric(sapply(strsplit(x, "\\^"), function(j) j[2]))
+    base      <- ifelse(exponents == 0, "1",
+                 ifelse(exponents == 1, "10","10^"))
+    exponents[base == "1" | base == "10"] <- ""
+     textNums            <- rep(NA, length(n))  
+     textNums[!is.na(n)] <- paste0(base,exponents)
+    textReturn          <- parse(text=textNums)
+     return(textReturn)
+}
+
+#' Plot the distribution of genic exonRPKM/intronRPKM ratios
+#'
+#' This function plots the distribution of by gene exon RPKM divided by
+#' intron RPKM ratios. Can produce raw or log10 distributions, but reports
+#' both median values.
+#'
+#' @param rpkm A three column TSV format file containing
+#'             "gene", "intron RPKM", "exon RPKM" columns.
+#' @param raw Plot raw distribution
+#' @keywords mRNA contamination
+#' @export
+#' @examples
+#' data("rpkm")
+#' mRNAcontamination(rpkm = "rpkm")
+#' @export
+mRNAcontamination <- function(rpkm, raw=FALSE) {
+    if (exists(rpkm)) {
+        RPKM <- data.table(get(rpkm))
+    } else {
+        RPKM <- fread(rpkm)
+    }
+    colnames(RPKM) <- c("gene","intron","exon")
+
+    name           <- basename(tools::file_path_sans_ext(rpkm))
+    numFields      <- 2
+    for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
+    sample_name <- paste(dirname(rpkm), name, sep="/")
+
+    finite_rpkm <- RPKM[is.finite(RPKM$exon/RPKM$intron),]
+
+    if (raw) {
+        q <- ggplot(data = finite_rpkm, 
+                    aes(x="", y=(exon/intron))) +
+                stat_boxplot(geom ='errorbar', width = 0.25) +
+                geom_boxplot(width = 0.25,
+                             outlier.color='red',
+                             outlier.shape=1) +
+                stat_summary(fun.y = "mean", geom = "point",
+                             shape = 1, size = 2) +
+                labs(x=name,
+                     y=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                ylim(c(0, ceiling(summary(finite_rpkm$exon/finite_rpkm$intron)[5]))) +
+                theme_classic(base_size=14) +
+                theme(axis.line = element_line(size = 0.5)) +
+                theme(panel.grid.major = element_blank(),
+                      panel.grid.minor = element_blank(),
+                      aspect.ratio = 1,
+                      panel.border = element_rect(colour = "black",
+                                                  fill=NA, size=0.5))
+    } else {
+        q <- ggplot(data = finite_rpkm, 
+                    aes(x="", y=log10(exon/intron))) +
+                stat_boxplot(geom ='errorbar', width = 0.25) +
+                geom_boxplot(width = 0.25,
+                             outlier.color='red',
+                             outlier.shape=1) +
+                stat_summary(fun.data = n_fun, geom = "text", hjust = 0.5) +
+                stat_summary(fun.y = "mean", geom = "point",
+                             shape = 1, size = 2) +
+                scale_y_log10(limits = c(0.001, 50),
+                              expand = expand_scale(mult = c(0, 0)),
+                              labels=fancyNumbers,
+                              breaks=prettyLogs) +
+                annotation_logticks(sides = c("rl")) +
+                labs(x=name,
+                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                theme_classic(base_size=14) +
+                theme(axis.line = element_line(size = 0.5)) +
+                theme(panel.grid.major = element_blank(),
+                      panel.grid.minor = element_blank(),
+                      aspect.ratio = 1,
+                      panel.border = element_rect(colour = "black",
+                                                  fill=NA, size=0.5))
+    }
+
+    label1 <- c(paste("'median'[log[10]]", ":~",
+                round(median(log10((finite_rpkm$exon/finite_rpkm$intron))), 2)),
+                paste("'median'[raw]", ":",
+                round(median(finite_rpkm$exon/finite_rpkm$intron), 2)))
+
+    max_y  <- layer_scales(q)$y$range$range[2]
+
+    if (raw) {
+        q <- q + annotate("text", x = 0.5, y = c(max_y, 0.95*max_y),
+                      hjust=0, vjust=1, label = label1, parse=TRUE)
+    } else {
+        q <- q + annotate("text", x = 0.5, y = c(10^max_y, 10^max_y-10),
+                      hjust=0, vjust=1, label = label1, parse=TRUE)
+    }
+
+    # Save plot to pdf file
+    pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
+        width= 7, height = 7, useDingbats=F)
+    print(q)
+    invisible(dev.off())
+         
+    # Save plot to png file
+    png(filename = paste0(sample_name, "_mRNA_contamination.png"),
+        width = 480, height = 480)
+    print(q)
+    invisible(dev.off())
+}
+
 ################################################################################
