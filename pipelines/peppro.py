@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.7.3"
+__version__ = "0.7.4"
 
 
 from argparse import ArgumentParser
@@ -1545,11 +1545,11 @@ def main():
             unmap_fq1_dups = deinterleave_fq1_dups
             unmap_fq2_dups = deinterleave_fq2_dups
 
-            cmd1 = ('paste - - - - - - - - < ',
-                    trimmed_fastq,
-                    ' | tee >(cut -f 1-4 | tr "\t" "\n" > ',
-                    deinterleave_fq1_dups,
-                    ') | cut -f 5-8 | tr "\t" "\n" > ',
+            cmd1 = ('paste - - - - - - - - < ' +
+                    trimmed_fastq +
+                    ' | tee >(cut -f 1-4 | tr "\t" "\n" > ' +
+                    deinterleave_fq1_dups +
+                    ') | cut -f 5-8 | tr "\t" "\n" > ' +
                     deinterleave_fq2_dups)
 
             pm.run(cmd1, [deinterleave_fq1_dups, deinterleave_fq2_dups])
@@ -2276,13 +2276,13 @@ def main():
                                       args.genome_assembly +
                                       "_annotations.bed.gz")
             cmd = ("ln -sf " + res.feat_annotation + " " + anno_local)
-            pm.run(cmd, anno_local) 
+            pm.run(cmd, anno_local)
         elif res.feat_annotation.endswith(".bed"):
             anno_local = os.path.join(raw_folder,
                                       args.genome_assembly +
                                       "_annotations.bed")
             cmd = ("ln -sf " + res.feat_annotation + " " + anno_local)
-            pm.run(cmd, anno_local) 
+            pm.run(cmd, anno_local)
         else:
             print("Skipping read annotation...")
             print("This requires a {} annotation file."
