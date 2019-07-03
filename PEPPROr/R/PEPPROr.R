@@ -983,10 +983,10 @@ fancyNumbers <- function(n){
     base      <- ifelse(exponents == 0, "1",
                  ifelse(exponents == 1, "10","10^"))
     exponents[base == "1" | base == "10"] <- ""
-     textNums            <- rep(NA, length(n))  
-     textNums[!is.na(n)] <- paste0(base,exponents)
+    textNums            <- rep(NA, length(n))  
+    textNums[!is.na(n)] <- paste0(base, exponents)
     textReturn          <- parse(text=textNums)
-     return(textReturn)
+    return(textReturn)
 }
 
 #' Plot the distribution of genic exonRPKM/intronRPKM ratios
