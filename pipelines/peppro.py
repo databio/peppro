@@ -1537,38 +1537,44 @@ def main():
         pm.timestamp("### Deinterleave processed FASTQ files")
         
         if args.complexity:
+            interleaved_dups = os.path.join(
+                fastq_folder, args.sample_name + "_interleaved_dups.fastq")
+            deinterleave_prefix_dups = os.path.join(
+                fastq_folder, args.sample_name + "_deinterleave_dups")
             deinterleave_fq1_dups = os.path.join(
-                fastq_folder, args.sample_name + "_R1_deinterleave_dups.fastq")
+                fastq_folder, args.sample_name + "_deinterleave_dups_R1.fastq")
             deinterleave_fq2_dups = os.path.join(
-                fastq_folder, args.sample_name + "_R2_deinterleave_dups.fastq")
+                fastq_folder, args.sample_name + "_deinterleave_dups_R2.fastq")
 
             unmap_fq1_dups = deinterleave_fq1_dups
             unmap_fq2_dups = deinterleave_fq2_dups
 
-            cmd1 = ('paste - - - - - - - - < ' +
-                    trimmed_fastq +
-                    ' | tee >(cut -f 1-4 | tr "\t" "\n" > ' +
-                    deinterleave_fq1_dups +
-                    ') | cut -f 5-8 | tr "\t" "\n" > ' +
-                    deinterleave_fq2_dups)
-
-            pm.run(cmd1, [deinterleave_fq1_dups, deinterleave_fq2_dups])
+            cmd1 = (tools.seqtk + " dropse " + trimmed_fastq +
+                    " > " + interleaved_dups)
+            cmd2 = (tool_path('fastq_split.py') +
+                    " -i " + interleaved_dups +
+                    " -o " + deinterleave_prefix_dups)
+            pm.run([cmd1, cmd2], [deinterleave_fq1_dups, deinterleave_fq2_dups])
+            pm.clean_add(interleaved_dups)
             pm.clean_add(deinterleave_fq1_dups)
             pm.clean_add(deinterleave_fq2_dups)
 
+        interleaved = os.path.join(
+                fastq_folder, args.sample_name + "_interleaved.fastq")
+        deinterleave_prefix = os.path.join(
+                fastq_folder, args.sample_name + "_deinterleave")
         deinterleave_fq1 = os.path.join(
-            fastq_folder, args.sample_name + "_R1_deinterleave.fastq")
+            fastq_folder, args.sample_name + "_deinterleave_R1.fastq")
         deinterleave_fq2 = os.path.join(
-            fastq_folder, args.sample_name + "_R2_deinterleave.fastq")
+            fastq_folder, args.sample_name + "_deinterleave_R2.fastq")
 
-        cmd2 = ('paste - - - - - - - - < ',
-                processed_fastq,
-                ' | tee >(cut -f 1-4 | tr "\t" "\n" > ',
-                deinterleave_fq1,
-                ') | cut -f 5-8 | tr "\t" "\n" > ',
-                deinterleave_fq2)
-
-        pm.run(cmd2, [deinterleave_fq1, deinterleave_fq2])
+        cmd1 = (tools.seqtk + " dropse " + processed_fastq +
+                " > " + interleaved)
+        cmd2 = (tool_path('fastq_split.py') +
+                " -i " + interleaved +
+                " -o " + deinterleave_prefix)
+        pm.run([cmd1, cmd2], [deinterleave_fq1, deinterleave_fq2])
+        pm.clean_add(interleaved)
         pm.clean_add(deinterleave_fq1)
         pm.clean_add(deinterleave_fq2)
 
