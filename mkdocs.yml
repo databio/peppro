@@ -19,11 +19,13 @@ nav:
   - How-to Guides:
     - Annotation files: 'howto/annotation_files.md'
     - Run PEPPRO directly: 'howto/run_direct.md'
+    - PEPPRO in containers: 'howto/use_container.md'
     - Configuring prealignments: 'howto/prealignments.md'
     - Configuring computing: 'howto/configure_compute.md'
   - Reference: 
     - FAQ: 'faq.md'
     - Usage: 'usage.md'
+    - Advanced container reference: 'howto/container_reference.md'
     - Changelog: 'changelog.md'
     - Support: 'https://github.com/databio/peppro/issues'
 
