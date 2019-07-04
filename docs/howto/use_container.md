@@ -2,9 +2,13 @@
 
 We have produced both docker and singularity containers that hold all the necessary software for `PEPPRO`. You can run `PEPPRO` as an individual pipeline on a single sample using these containers by directly calling `docker run` or `singularity exec`. Or, you can rely on `looper`, which is already set up to run any pipeline in existing containers using the `divvy` templating system. Instructions for both follow: 
 
-First, make sure your environment is set up to run either docker or singularity containers. Then, pull the container image:
+## Setting up the container
 
-**Docker**: You can pull the docker [databio/peppro image](https://hub.docker.com/r/databio/peppro/) from dockerhub like this:
+First, make sure your environment is set up to run either docker or singularity containers. Then, pull the container image (choose either docker or singularity). If your containers are set up correctly, then you won't need to install any additional software. 
+
+### Docker
+
+You can pull the docker [databio/peppro image](https://hub.docker.com/r/databio/peppro/) from dockerhub like this:
 
 ```
 docker pull databio/peppro
@@ -16,7 +20,9 @@ cd peppro/
 make docker
 ```
 
-**Singularity**: You can [download the singularity image](http://big.databio.org/simages/peppro) or build it from the docker image using the Makefile:
+### Singularity
+
+You can [download the singularity image](http://big.databio.org/simages/peppro) or build it from the docker image using the Makefile:
 ```
 cd peppro/
 make singularity
@@ -24,7 +30,6 @@ make singularity
 
 Now you'll need to tell the pipeline where you saved the singularity image. You can either create an environment variable called `$SIMAGES` that points to the folder where your image is stored, or you can tweak the `pipeline_interface.yaml` file so that the `compute.singularity_image` attribute is pointing to the right location on disk.
 
-If your containers are set up correctly, then won't need to install any additional software. 
 
 ## Running individual samples in a container
 
@@ -37,11 +42,9 @@ With `docker`, you can use:
 ```
 docker run --rm -it databio/peppro pipelines/peppro.py --help
 ```
-Be sure to mount the volumes you need with `--volume`. If you're utilizing any environment variables (e.g. `$GENOMES`), don't forget to include those in your docker command with the `-e` option. For a more detailed example, check out our guide to learn [how to run peppro in a container](howto/use-container.md).
+Be sure to mount the volumes you need with `--volume`. If you're using any environment variables (e.g. `$GENOMES`), don't forget to include those in your docker command with the `-e` option.
 
-### Container details 
-
-#### Using `docker`
+### Detailed example using `docker`
 The pipeline has been successfully run in both a Linux and MacOS environment. With `docker` you need to bind mount your volume that contains the pipeline and your `$GENOMES` location, as well as provide the container the same environment variables your host environment is using.
 
 In the first example, we're mounting our home user directory (`/home/jps3ag/`) which contains the parent directories to our `$GENOMES` folder and to the pipeline itself. We'll also provide the pipeline two environment variables, `$GENOMES` and `$HOME`.
@@ -82,7 +85,7 @@ docker run --rm -it --volume /Users/jps3ag/:/Users/jps3ag/ \
   -O $HOME/peppro_test
 ```
 
-#### Using `singularity`
+### Detailed example using `singularity`
 
 First, build a singularity container from the docker image and create a running instance (be sure to mount your directories containing your `$GENOMES` folder and pipeline.
 ```
@@ -108,4 +111,4 @@ singularity instance.stop peppro_instance
 
 ## Running multiple samples in a container with looper
 
-To run multiple samples in a container, you simply need to configure `looper` to use a container-compatible template. The looper documentation has detailed instructions for [how to run pipelines in containers](http://code.databio.org/looper/containers/).
+To run multiple samples in a container, you simply need to configure `looper` to use a container-compatible template. The looper documentation has detailed instructions for [how to run pipelines in containers](http://looper.databio.org/containers/).
