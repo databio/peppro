@@ -10,4 +10,4 @@ To use `looper` templates, we must create a `divvy` computing configuration file
 
 This enables you to adjust your computing preferences on-the-fly when you run a project.
 
-The complete description of setting up `looper` to use `DIVCFG` is generic to any pipeline. If you want to use looper with containers or clusters, you should consult the complete docs in the looper documentation on [configuring looper to use a cluster](http://code.databio.org/looper/cluster-computing/).
+The complete description of setting up `looper` to use `DIVCFG` is generic to any pipeline. If you want to use looper with containers or clusters, you should consult the complete docs in the looper documentation on [configuring looper to use a cluster](http://looper.databio.org/en/latest/cluster-computing/).

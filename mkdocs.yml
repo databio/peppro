@@ -24,7 +24,7 @@ nav:
     - Running on a cluster: 'howto/run_cluster/'
     - Running in a container: 'howto/use_container/'
     - Using looper: 'howto/use_looper/'
-  - Reference: 
+  - Reference:
     - Usage: 'usage.md'
     - Changelog: 'changelog.md'
     - Support: 'https://github.com/databio/peppro/issues'
