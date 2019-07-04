@@ -1,4 +1,4 @@
-# Getting started
+# Install and run PEPPRO
 
 ## 1: Clone the `PEPPRO` pipeline
 
@@ -71,7 +71,7 @@ Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming,
 
 ## 4: Run an example project through PEPPRO
 
-Start by running the example project (`peppro_test.yaml`) in the [`examples/meta/`](https://github.com/databio/peppro/tree/master/examples/meta) folder. Let's use `looper`'s `-d` argument to do a *dry run*, which will create job scripts for every sample in a project, but will not execute them:
+Start by running the example project (`peppro_test.yaml`) in the [`examples/meta/`](https://github.com/databio/peppro/tree/master/examples/meta) folder. PEPPRO uses a project management tool called [looper](https://looper.databio.org) to run the pipeline across samples in a project. Let's use `looper`'s `-d` argument to do a *dry run*, which will create job scripts for every sample in a project, but will not execute them:
 
 ```
 cd peppro
@@ -88,7 +88,7 @@ If that worked, let's actually run the example by taking out the `-d` flag:
 looper run examples/meta/peppro_test.yaml
 ```
 
-You could run it in a container like this:
+Or, if you're using containers, adjust the `--compute` argument accordingly:
 
 ```console
 looper run examples/meta/peppro_test.yaml --compute docker
