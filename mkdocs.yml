@@ -18,11 +18,11 @@ nav:
     - Install and run: 'install.md'
   - How-to Guides:
     - Annotation files: 'howto/annotation_files.md'
-    - Using Looper: 'howto/use_looper.md'
+    - Run PEPPRO directly: 'howto/run_direct.md'
     - Configuring prealignments: 'howto/prealignments.md'
-    - Running on a cluster: 'howto/run_cluster.md'
-    - Running in a container: 'howto/use_container.md'
+    - Configuring computing: 'howto/configure_compute.md'
   - Reference: 
+    - FAQ: 'faq.md'
     - Usage: 'usage.md'
     - Changelog: 'changelog.md'
     - Support: 'https://github.com/databio/peppro/issues'

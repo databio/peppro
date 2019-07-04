@@ -1,3 +1,18 @@
+# Configuring <img src="../../img/peppro_logo_black.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> computing settings
+
+## Cluster computing
+
+When you run your PEPPRO project using `looper run`, by default it will simply run each sample locally. You can adjust the computing settings using the `--compute` argument to `looper run`. This enables you to adjust your computing preferences on-the-fly when you run a project. You have several built-in options to change this. Some common examples are these:
+
+- `--compute slurm`. Submit the jobs to a SLURM cluster using `sbatch`.
+- `--compute sge`. Submit the jobs to a SGE cluster using `sbatch`.
+- `--compute docker`. Submit the jobs locally using the `databio/peppro` docker image.
+- `--compute singularity`. Submit the jobs locally using the `peppro` singularity image.
+- `--compute singularity_slurm`. Submit the jobs using `sbatch`, but then run them using the `peppro` singularity image.
+
+These available computing options are actually using a standardized computing system called [divvy](https://divvy.databio.org), and you can view a list of all your available options by typing `divvy list` on the command line. Divvy also allows you to very easily change these templates or add your own, so you can run PEPPRO in any possible computing environment. 
+
+The instructions for changing these computing configuration options are universal for any software that relies on `divvy`. For complete instructions, you should consult the [divvy documentation](https://divvy.databio.org). In a nutshell, you will first create a `divvy` computing configuration file (compute_config.yaml) and point an environment variable (`DIVCFG`) to that file. You then have access to any configured computing packages by using `looper --compute <package>`, where `package` can be any computing system you configure.  
 # Run <img src="../../img/peppro_logo_black.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> in a container
 
 We have produced both docker and singularity containers that hold all the necessary software for `PEPPRO`. You can run `PEPPRO` as an individual pipeline on a single sample using these containers by directly calling `docker run` or `singularity exec`. Or, you can rely on `looper`, which is already set up to run any pipeline in existing containers using the `divvy` templating system. Instructions for both follow: 

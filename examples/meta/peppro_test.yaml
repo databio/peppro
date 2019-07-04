@@ -3,7 +3,7 @@ name: test
 
 metadata:
   sample_annotation: "peppro_test.csv"
-  output_dir: "$PROCESSED/peppro_test/"
+  output_dir: "peppro_test/"
   pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
   
 derived_columns: [read1]

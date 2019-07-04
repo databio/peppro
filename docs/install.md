@@ -2,20 +2,20 @@
 
 ## 1: Clone the `PEPPRO` pipeline
 
-Clone the pipeline:
 ```
 git clone https://github.com/databio/peppro.git
 ```
 ## 2: Download `refgenie` assets
 
-The pipeline relies on [`refgenie` assets](http://refgenie.databio.org/en/dev/install/) for alignment.  First, initialize a folder for genome indexes and the `refgenie` config file.
+PEPPRO uses [`refgenie`](http://refgenie.databio.org/) assets. If you haven't already set it up, initialize your refgenie config file like this:
 
 ```console
+pip install --user refgenie
 export REFGENIE=your_genome_folder/genome_config.yaml
 refgenie init -c $REFGENIE
 ```
 
-Then, just pull the assets you need.
+Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it persists. Then, pull the assets you need. By default, that's these for human:
 
 ```console
 refgenie pull -g hg38 -a bowtie2_index
@@ -23,11 +23,9 @@ refgenie pull -g rCRSd -a bowtie2_index
 refgenie pull -g human_repeats -a bowtie2_index
 ```
 
-(Add `REFGENIE` to your .bashrc or .profile to ensure it persists). Alternatively, you can skip the `REFGENIE` variable and simply change the value of the `resources.genome_config` option in the [`pipeline_config.yaml`](https://github.com/databio/peppro/blob/master/pipelines/peppro.yaml) file to point to the folder where you stored the assemblies. 
-
 ## 3: Install required software
 
-`PEPPRO` uses a series of publicly-available, common bioinformatics tools. If you don't want to install them, you can follow our tutorial on [running PEPPRO directly in a container](howto/use_container.md). If you want to run it natively, you'll need to install the following:
+If you don't want to install the prerequisite software used by PEPPRO, you can follow our tutorial on [running PEPPRO directly in a container](howto/use_container.md) and then skip this step. If you want to run it natively, you'll need to install the following:
 
 * [samtools](http://www.htslib.org/)
 * [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html)
@@ -69,28 +67,51 @@ Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming,
 * [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc)
 * [pigz (v2.3.4+)](https://zlib.net/pigz/)
 
+## 4: Run an example project through PEPPRO
 
+Start by running the example project (`peppro_test.yaml`) in the [`examples/meta/`](https://github.com/databio/peppro/tree/master/examples/meta) folder. Let's use `looper`'s `-d` argument to do a *dry run*, which will create job scripts for every sample in a project, but will not execute them:
 
-## 4: Run the pipeline script directly
-
-The pipeline at its core is just a python script, and you can run it on the command line for a single sample (see [command-line usage](usage)), which you can also get on the command line by running `pipelines/peppro.py --help`. You just need to pass a few command-line parameters to specify sample name, reference genome, input files, etc. Here's the basic command to run the included small test example through the pipeline:
-
-```console
+```
 cd peppro
-./pipelines/peppro.py \
-  --sample-name test \
-  --genome hg38 \
-  --input examples/data/test_r1.fq.gz \
-  --single-or-paired single \
-  -O $HOME/peppro_example/
+looper run -d examples/meta/peppro_test.yaml
 ```
 
-This test example takes less than 5 minutes to complete. Read more about how to [run the test sample using `Looper`](howto/run-looper.md) with the included [example `peppro_test.yaml` file](https://github.com/databio/peppro/blob/master/examples/meta/peppro_test.yaml).
+If the looper executable is not in your `$PATH`, add the following line to your `.bashrc` or `.profile`:
+```
+export PATH=$PATH:~/.local/bin
+```
+If that worked, let's actually run the example by taking out the `-d` flag:
 
-# 5. Next steps
+```console
+looper run examples/meta/peppro_test.yaml
+```
 
-This is just the beginning. For your next step, take a look at one of these user guides:
+You could run it in a container like this:
 
-- [Running on multiple samples with looper](howto/use_looper.md)
-- [Running the pipeline directly in a container](howto/use_container.md)
-- See other detailed user guide links in the side menu
+```console
+looper run examples/meta/peppro_test.yaml --compute docker
+looper run examples/meta/peppro_test.yaml --compute singularity
+```
+
+There are lots of other cool things you can do with looper, like dry runs, summarize results, check on pipeline run status, clean intermediate files to save disk space, lump multiple samples into one job, and more. For details, consult the [`looper` docs](http://looper.databio.org/).
+
+## 5: Configure your project files
+
+To run your own samples, you'll need to organize them in **PEP format**, which is explained in [how to create a PEP](https://pepkit.github.io/docs/home/) and is universal to all pipelines that read PEPs, including `PEPPRO`. To get you started, there are examples you can adapt in the `examples/` folder (*e.g.* [example test PEP](https://github.com/databio/peppro/tree/master/examples/meta/peppro_test.yaml)). In short, you need two files for your project:
+
+  1. project config file -- describes output locations, pointers to data, etc.
+  2. sample annotation file -- comma-separated value (CSV) list of your samples.
+
+The sample annotation file must specify these columns:
+
+- sample_name
+- library ('PRO' or 'PROSEQ' or 'PRO-seq')
+- organism (e.g. 'human' or 'mouse')
+- read1
+- read2 (if paired)
+- whatever else you want
+
+
+## Next steps
+
+This is just the beginning. For your next step, take a look at one of other detailed user guide links in the side menu.
