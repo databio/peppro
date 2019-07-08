@@ -118,7 +118,7 @@ elif slash > space:
 else:
 	raise Exception("Unknown regex to split reads.")
 
-print("Identified regex split code: '" + args.prefix + "'")
+#print("Identified regex split code: '" + args.prefix + "'")
 if args.outfile == "" or args.outfile is None:
 	outfile = os.path.basename(args.infile).split('.')[0]
 else:
