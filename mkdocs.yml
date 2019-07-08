@@ -1,11 +1,11 @@
 theme: databio
 
-site_name: PEPPRO
+site_name: peppro
 site_author: Jason Smith
-site_url: http://code.databio.org/PEPPRO/
+site_url: http://code.databio.org/peppro/
 site_logo: img/peppro_inline_logo.svg
 repo_url: https://github.com/databio/peppro/
-#google_analytics: ['UA-127092878-1', 'code.databio.org/PEPPRO']
+#google_analytics: ['UA-127092878-1', 'code.databio.org/peppro']
 
 markdown_extensions:
   - fontawesome_markdown  # pip install --user fontawesome-markdown
