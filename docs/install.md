@@ -9,16 +9,7 @@ git clone https://github.com/databio/peppro.git
 
 ## 2: Install required software
 
-`PEPPRO` uses a series of publicly-available, common bioinformatics tools including:
-
-* [samtools](http://www.htslib.org/)
-* [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html)
-* [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
-* [seqkit](https://bioinf.shenwei.me/seqkit/)
-* [fastp](https://github.com/OpenGene/fastp)
-* [seqtk](https://github.com/lh3/seqtk)
-* [preseq](http://smithlabresearch.org/software/preseq/)
-* [wigToBigWig, bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/)
+`PEPPRO` requires a series of publicly-available, common bioinformatics tools including: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/).
 
 ### Python packages
 
@@ -42,14 +33,7 @@ Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming,
 
 `seqOutBias` can be used to take into account the mappability at a given read length to filter the sample signal.
 
-*Optional tools:*
-
-* [fqdedup](https://github.com/guertinlab/fqdedup)
-* [cutadapt](https://cutadapt.readthedocs.io/)
-* [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
-* [seqOutBias](https://github.com/guertinlab/seqOutBias)
-* [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc)
-* [pigz (v2.3.4+)](https://zlib.net/pigz/)
+*Optional tools:* [fqdedup](https://github.com/guertinlab/fqdedup), [cutadapt](https://cutadapt.readthedocs.io/), [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/), [seqOutBias](https://github.com/guertinlab/seqOutBias), [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc), and [pigz (v2.3.4+)](https://zlib.net/pigz/).
 
 ## 3: Download `refgenie` assemblies
 
