@@ -1,4 +1,4 @@
-# <img src="img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:60px; margin-top:10px; margin-bottom:-10px" align="left">  
+# <img src="img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:200px; margin-top:10px; margin-bottom:-10px" align="left">  
 
 <br clear="all">
 

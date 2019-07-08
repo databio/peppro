@@ -3,7 +3,7 @@ theme: databio
 site_name: PEPPRO
 site_author: Jason Smith
 site_url: http://code.databio.org/PEPPRO/
-site_logo: img/peppro_logo_white.svg
+site_logo: img/peppro_inline_logo.svg
 repo_url: https://github.com/databio/peppro/
 #google_analytics: ['UA-127092878-1', 'code.databio.org/PEPPRO']
 
@@ -26,6 +26,7 @@ nav:
     - Usage: 'usage.md'
     - Changelog: 'changelog.md'
     - Support: 'https://github.com/databio/peppro/issues'
+    - Example output file structure: 'browse_output.md'
 
 plugins:
   - search
