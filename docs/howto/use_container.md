@@ -30,26 +30,26 @@ If your containers are set up correctly, then won't need to install any addition
 
 Individual jobs can be run in a container by simply running the `peppro.py` command through `docker run` or `singularity exec`. You can run containers either on your local computer, or in an HPC environment, as long as you have `docker` or `singularity` installed. For example, run it locally in singularity like this:
 ```
-singularity exec --bind $GENOMES $SIMAGES/peppro pipelines/peppro.py --help
+singularity exec --bind $REFGENIE $SIMAGES/peppro pipelines/peppro.py --help
 ```
 
 With `docker`, you can use:
 ```
 docker run --rm -it databio/peppro pipelines/peppro.py --help
 ```
-Be sure to mount the volumes you need with `--volume`. If you're utilizing any environment variables (e.g. `$GENOMES`), don't forget to include those in your docker command with the `-e` option. For a more detailed example, check out our guide to learn [how to run peppro in a container](howto/use-container.md).
+Be sure to mount the volumes you need with `--volume`. If you're utilizing any environment variables (e.g. `$REFGENIE`), don't forget to include those in your docker command with the `-e` option. For a more detailed example, check out our guide to learn [how to run peppro in a container](howto/use-container.md).
 
 ### Container details 
 
 #### Using `docker`
-The pipeline has been successfully run in both a Linux and MacOS environment. With `docker` you need to bind mount your volume that contains the pipeline and your `$GENOMES` location, as well as provide the container the same environment variables your host environment is using.
+The pipeline has been successfully run in both a Linux and MacOS environment. With `docker` you need to bind mount your volume that contains the pipeline and your `$REFGENIE` location, as well as provide the container the same environment variables your host environment is using.
 
-In the first example, we're mounting our home user directory (`/home/jps3ag/`) which contains the parent directories to our `$GENOMES` folder and to the pipeline itself. We'll also provide the pipeline two environment variables, `$GENOMES` and `$HOME`.
+In the first example, we're mounting our home user directory (`/home/jps3ag/`) which contains the parent directories to our `$REFGENIE` folder and to the pipeline itself. We'll also provide the pipeline two environment variables, `$REFGENIE` and `$HOME`.
 
 Here's that example command in a Linux environment to run the test example through the pipeline:
 ```
 docker run --rm -it --volume /home/jps3ag/:/home/jps3ag/ \
-  -e GENOMES='/home/jps3ag/genomes/' \
+  -e REFGENIE='/home/jps3ag/genomes/genome_config.yaml' \
   -e HOME='/home/jps3ag/' \
   databio/peppro \
   /home/jps3ag/src/peppro/pipelines/peppro.py --single-or-paired single \
@@ -71,7 +71,7 @@ Remember to [allocate sufficient memory](https://docs.docker.com/docker-for-mac/
 
 ```
 docker run --rm -it --volume /Users/jps3ag/:/Users/jps3ag/ \
-  -e GENOMES="/Users/jps3ag/genomes" \
+  -e REFGENIE="/Users/jps3ag/genomes/genome_config.yaml" \
   -e HOME="/Users/jps3ag/" \
   databio/peppro \
   /Users/jps3ag/src/peppro/pipelines/peppro.py --single-or-paired single \
@@ -84,7 +84,7 @@ docker run --rm -it --volume /Users/jps3ag/:/Users/jps3ag/ \
 
 #### Using `singularity`
 
-First, build a singularity container from the docker image and create a running instance (be sure to mount your directories containing your `$GENOMES` folder and pipeline.
+First, build a singularity container from the docker image and create a running instance (be sure to mount your directories containing your `$REFGENIE` configuration file, corresponding `refgenie` genomes, and the pipeline.
 ```
 singularity build peppro docker://databio/peppro:latest
 singularity instance.start -B /home/jps3ag/:/home/jps3aq/ peppro peppro_instance
