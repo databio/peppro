@@ -1,4 +1,4 @@
-# Download or create annotation files for <img src="../../img/peppro_logo_black.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> 
+# Download or create annotation files for <img src="../../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> 
 
 
 For each annotation type (TSS, CpA sites, premature mRNA, or general features), we provide [downloadable defaults](http://big.databio.org/peppro/) for common genomes.  You may also recreate these yourself as described below.

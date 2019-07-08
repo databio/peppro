@@ -1,4 +1,4 @@
-# Run <img src="../../img/peppro_logo_black.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> in a container
+# Run <img src="../../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> in a container
 
 We have produced both docker and singularity containers that hold all the necessary software for `PEPPRO`. You can run `PEPPRO` as an individual pipeline on a single sample using these containers by directly calling `docker run` or `singularity exec`. Or, you can rely on `looper`, which is already set up to run any pipeline in existing containers using the `divvy` templating system. Instructions for both follow: 
 

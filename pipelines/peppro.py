@@ -268,12 +268,6 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 pm.run(cmd, [summary_file, out_fastq_r2_gz],
                        container=pm.container)
         else:
-            # if pm.cores > 1 and ngstk.check_command("pigz"):
-            #     compress_cmd = "pigz --keep -f -p {} {}".format(pm.cores, out_fastq_tmp)
-            # else:
-            #     fastqz = out_fastq_tmp + ".gz"
-            #     compress_cmd = "gzip -f -c < {} > {}".format(out_fastq_tmp, fastqz)
-
             if args.keep:
                 pm.run(cmd, mapped_bam)
             else:
@@ -740,8 +734,8 @@ def main():
 
     pm.report_result(
         "File_mb",
-        ngstk.get_file_size(
-            [x for x in [args.input, args.input2] if x is not None]))
+        round(ngstk.get_file_size(
+            [x for x in [args.input, args.input2] if x is not None]), 2))
     pm.report_result("Read_type", args.single_or_paired)
     pm.report_result("Genome", args.genome_assembly)
 
@@ -788,10 +782,14 @@ def main():
     
     adapter_html = os.path.join(
         fastqc_folder, args.sample_name + "_rmAdapter.html")
+    adapter_json = os.path.join(
+        fastqc_folder, args.sample_name + "_rmAdapter.json")
     adapter_report = os.path.join(
         fastqc_folder, args.sample_name + "_rmAdapter.txt")
     umi_report = os.path.join(
         fastqc_folder, args.sample_name + "_rmUmi.html")
+    umi_json = os.path.join(
+        fastqc_folder, args.sample_name + "_rmUmi.json")
 
     # Check quality encoding for use with FastX_Tools
     if args.trimmer == "fastx":
@@ -808,7 +806,8 @@ def main():
                 ("--in2", untrimmed_fastq2),
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_html)
+                ("--html", adapter_html),
+                ("--json", adapter_json)
             ]
         else:
             adapter_cmd_chunks = [
@@ -817,7 +816,8 @@ def main():
                 ("--in1", untrimmed_fastq1),
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_html)
+                ("--html", adapter_html),
+                ("--json", adapter_json)
             ]
 
         if args.complexity:
@@ -876,7 +876,8 @@ def main():
                 ("--in2", untrimmed_fastq2),
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_html)
+                ("--html", adapter_html),
+                ("--json", adapter_json)
             ]
         else:
             adapter_cmd_chunks = [
@@ -885,7 +886,8 @@ def main():
                 ("--in1", untrimmed_fastq1),
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_html)
+                ("--html", adapter_html),
+                ("--json", adapter_json)
             ]
 
         if args.complexity:
@@ -1116,6 +1118,7 @@ def main():
                         ("--umi_loc", "read1"),
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
+                        ("--json", umi_json),
                         "|",
                         (tools.seqtk, "trimfq")
                     ])
@@ -1143,6 +1146,7 @@ def main():
                         ("--umi_loc", "read1"),
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
+                        ("--json", umi_json),
                         "|",
                         (tools.seqtk, "trimfq")
                     ])
@@ -1173,6 +1177,7 @@ def main():
                         ("--umi_loc", "read1"),
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
+                        ("--json", umi_json),
                         "|",
                         (tools.seqtk, "trimfq")
                     ]
@@ -1208,6 +1213,7 @@ def main():
                         ("--umi_loc", "read1"),
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
+                        ("--json", umi_json),
                         "|",
                         (tools.seqtk, "trimfq")
                     ])
@@ -1234,6 +1240,7 @@ def main():
                         ("--umi_loc", "read1"),
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
+                        ("--json", umi_json),
                         "|",
                         (tools.seqtk, "trimfq")
                     ])
@@ -1263,6 +1270,7 @@ def main():
                         ("--umi_loc", "read1"),
                         ("--umi_len", args.umi_len),
                         ("--html", umi_report),
+                        ("--json", umi_json),
                         "|",
                         (tools.seqtk, "trimfq")
                     ]
@@ -1556,6 +1564,8 @@ def main():
                     " -o " + deinterleave_prefix_dups)
             pm.run([cmd1, cmd2], [deinterleave_fq1_dups, deinterleave_fq2_dups])
             pm.clean_add(interleaved_dups)
+            pm.clean_add(unmap_fq1_dups)
+            pm.clean_add(unmap_fq2_dups)
             pm.clean_add(deinterleave_fq1_dups)
             pm.clean_add(deinterleave_fq2_dups)
 
@@ -1640,8 +1650,10 @@ def main():
                     aligndir="prealignments",
                     dups=True)
                 if args.paired_end:
-                    to_compress.append((unmap_fq1_dups, unmap_fq2_dups))
-                    to_compress.append((unmap_fq1, unmap_fq2))
+                    to_compress.append(unmap_fq1_dups)
+                    to_compress.append(unmap_fq2_dups)
+                    to_compress.append(unmap_fq1)
+                    to_compress.append(unmap_fq2)
                 else:
                     to_compress.append(unmap_fq1_dups)
                     to_compress.append(unmap_fq1)
@@ -1663,7 +1675,8 @@ def main():
                     outfolder=param.outfolder,
                     aligndir="prealignments")
                 if args.paired_end:
-                    to_compress.append((unmap_fq1, unmap_fq2))
+                    to_compress.append(unmap_fq1)
+                    to_compress.append(unmap_fq2)
                 else:
                     to_compress.append(unmap_fq1)
 
@@ -1753,20 +1766,22 @@ def main():
     # -q 10: skip alignments with MAPQ less than 10
     cmd2 = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
             " -U " + failQC_genome_bam + " ")
-    if args.paired_end:
+    #if args.paired_end:
         # add a step to accept only reads mapped in proper pair
-        cmd2 += "-f 2 "
+        # ?not appropriate with reverse complemented proseq reads?
+        #cmd2 += "-f 2 "
 
     cmd2 += mapping_genome_bam_temp + " > " + mapping_genome_bam
 
     if args.complexity:
         cmd2_dups = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
             " -U " + failQC_genome_bam_dups + " ")
-        if args.paired_end:
+        #if args.paired_end:
             # add a step to accept only reads mapped in proper pair
-            cmd2_dups += "-f 2 "
+            #cmd2_dups += "-f 2 "
 
         cmd2_dups += mapping_genome_bam_temp_dups + " > " + mapping_genome_bam_dups
+        pm.clean_add(failQC_genome_bam_dups)
 
     def check_alignment_genome(temp_bam, bam):
         mr = ngstk.count_mapped_reads(temp_bam, args.paired_end)
@@ -1948,6 +1963,9 @@ def main():
 
             pm.run([cmd3, cmd4, cmd5],
                    [preseq_mr, preseq_cov, preseq_counts])
+            pm.clean_add(preseq_mr)
+            pm.clean_add(mapping_genome_bam_dups)
+            pm.clean_add(mapping_genome_bam_temp_dups)
 
             cmd = ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " + res.chrom_sizes)
             genome_size = int(pm.checkprint(cmd))
@@ -2089,6 +2107,7 @@ def main():
         cmd += " -z -v -s 4 -o " + Tss_plus
         pm.run(cmd, Tss_plus, nofail=True)
         pm.clean_add(plus_TSS)
+        pm.clean_add(Tss_plus)
 
         with open(Tss_plus) as f:
             floats = list(map(float, f))
@@ -2111,6 +2130,7 @@ def main():
         cmd += " -z -v -s 4 -o " + Tss_minus
         pm.run(cmd, Tss_minus, nofail=True)
         pm.clean_add(minus_TSS)
+        pm.clean_add(Tss_minus)
 
         with open(Tss_minus) as f:
             floats = list(map(float, f))
@@ -2234,12 +2254,12 @@ def main():
         plus_frip = calc_frip(plus_bam, res.pre_mRNA_annotation,
                               frip_func=ngstk.simple_frip,
                               pipeline_manager=pm)
-        pm.report_result("Plus FRiP", plus_frip)
+        pm.report_result("Plus FRiP", round(plus_frip, 2))
         # Minus
         minus_frip = calc_frip(minus_bam, res.pre_mRNA_annotation,
                                frip_func=ngstk.simple_frip,
                                pipeline_manager=pm)
-        pm.report_result("Minus FRiP", minus_frip)
+        pm.report_result("Minus FRiP", round(minus_frip, 2))
 
     # Fragment distribution
     if args.paired_end:
@@ -2264,6 +2284,8 @@ def main():
 
         pm.run([cmd, cmd1, cmd2], fragL_dis1, nofail=True,
                container=pm.container)
+        pm.clean_add(frag_len)
+        pm.clean_add(fragL_count)
 
         fragL_png = os.path.join(QC_folder, args.sample_name +
                                  "_fragLenDistribution.png")
@@ -2455,7 +2477,7 @@ def main():
         mRNApng = os.path.join(QC_folder,
             args.sample_name + "_mRNA_contamination.png")
         mRNAplot = [tools.Rscript, tool_path("PEPPRO.R"), "mrna",
-                    "-i", intron_exon]
+                    "-i", intron_exon, "--raw"]
         cmd = build_command(mRNAplot)
         pm.run(cmd, mRNApdf, nofail=False)
         pm.report_object("mRNA contamination", mRNApdf, anchor_image=mRNApng)

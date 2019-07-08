@@ -1,4 +1,4 @@
-# Run samples through <img src="../../img/peppro_logo_black.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> using `Looper`
+# Run samples through <img src="../../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> using `Looper`
 
 
 This guide walks you through extending `PEPPRO` to run on multiple samples using `looper`. The pipeline can be run directly from the command line for a single sample ([see Install and run](../install.md)). If you need to run it on many samples, you could write your own sample handling code, but we have pre-configured everything to work nicely with `looper`, our sample handling engine.
