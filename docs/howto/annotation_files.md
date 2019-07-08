@@ -12,7 +12,7 @@ zcat hg38_TSS_full.txt.gz | \
   awk  '{if($4=="+"){print $3"\t"$5"\t"$5"\t"$4"\t"$13}else{print $3"\t"$6"\t"$6"\t"$4"\t"$13}}' | \
   LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_TSS.tsv
 ```
-This asset (`tss_annotation`) needs to be [included in your `$REFGENIE` configuration file](#Example_PEPPRO_REFGENIE_configuration_file) for the pipeline to detect it automatically.  Alternatively, you can use the `--TSS-name` pipeline option to provide a path directly to this file.
+This asset (`tss_annotation`) needs to be [included in your `$REFGENIE` configuration file](annotation_files.md#example-peppro-refgenie-configuration-file) for the pipeline to detect it automatically.  Alternatively, you can use the `--TSS-name` pipeline option to provide a path directly to this file.
 
 ### Pause index annotation (PI)
 
@@ -72,7 +72,7 @@ Column four is the **name** column, in our case the name of our feature of inter
 
 After creating your `BED` file, you can point the pipeline to it using the `--anno-name` option followed with the path to your file.  The pipeline will then use that file to determine the fractions of reads that cover those features.
 
-### Example `PEPPRO` `REGENIE` configuration file
+### Example `PEPPRO` `refgenie` configuration file
 
 As mentioned above, you can point the pipeline directly to your annotation files using the matching arguments.
 
