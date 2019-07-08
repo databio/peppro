@@ -3,8 +3,8 @@ name: test
 
 metadata:
   sample_annotation: "peppro_test.csv"
-  output_dir: "$PROCESSED/peppro_test/"
-  pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
+  output_dir: "$HOME/peppro_test/"
+  pipeline_interfaces: "$HOME/peppro/pipeline_interface.yaml" 
   
 derived_columns: [read1]
 
@@ -22,10 +22,10 @@ implied_columns:
       runon: pro      # Default
       umi_len: 8      # Default
       max_len: 30     # Default
-      TSS_name: $GENOMES/hg38/hg38_TSS.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
-      CpA_name: $GENOMES/hg38/hg38_CpA.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
-      pre_name: $GENOMES/hg38/hg38_pre-mRNA.tsv         # Default. Pipeline checks corresponding genome folder without specifying.
-      anno_name: $GENOMES/hg38/hg38_annotations.bed.gz  # Default. Pipeline checks corresponding genome folder without specifying.
+      TSS_name: $HOME/genomes/hg38/hg38_TSS.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
+      CpA_name: $HOME/genomes/hg38/hg38_CpA.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
+      pre_name: $HOME/genomes/hg38/hg38_pre-mRNA.tsv         # Default. Pipeline checks corresponding genome folder without specifying.
+      anno_name: $HOME/genomes/hg38/hg38_annotations.bed.gz  # Default. Pipeline checks corresponding genome folder without specifying.
 
 pipeline_args:
 #  peppro.py:
