@@ -67,13 +67,13 @@ The pipeline at its core is just a python script, and you can run it on the comm
   -O $HOME/peppro_example/
 ```
 
-This test example takes less than 5 minutes to complete. Read more about how to [run the test sample using `Looper`](howto/run-looper.md) with the included [example `peppro_test.yaml` file](https://github.com/databio/peppro/blob/master/examples/meta/peppro_test.yaml).
+This test example takes less than 5 minutes to complete. Read more about how to [run the test sample using `Looper`](howto/use_looper.md) with the included [example `peppro_test.yaml` file](https://github.com/databio/peppro/blob/master/examples/meta/peppro_test.yaml).
 
 # 5. Next steps
 
 This is just the beginning. For your next step, take a look at one of these user guides:
 
 - [Extended tutorial for running a single sample](tutorial.md)
-- [Running on multiple samples with looper](howto/run-looper.md)
-- [Running the pipeline directly in a container](howto/use-container.md)
+- [Running on multiple samples with looper](howto/use_looper.md)
+- [Running the pipeline directly in a container](howto/use_container.md)
 - See other detailed user guide links in the side menu

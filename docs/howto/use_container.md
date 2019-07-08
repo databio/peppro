@@ -37,7 +37,7 @@ With `docker`, you can use:
 ```
 docker run --rm -it databio/peppro pipelines/peppro.py --help
 ```
-Be sure to mount the volumes you need with `--volume`. If you're utilizing any environment variables (e.g. `$REFGENIE`), don't forget to include those in your docker command with the `-e` option. For a more detailed example, check out our guide to learn [how to run peppro in a container](howto/use-container.md).
+Be sure to mount the volumes you need with `--volume`. If you're utilizing any environment variables (e.g. `$REFGENIE`), don't forget to include those in your docker command with the `-e` option.
 
 ### Container details 
 

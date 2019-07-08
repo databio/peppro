@@ -20,7 +20,7 @@ nav:
   - How-to Guides:
     - Annotation files: 'howto/annotation_files/'
     - Configuring prealignments: 'howto/prealignments/'
-    - Detailed install guide: 'howto/detailed-install.md'
+    - Detailed install guide: 'howto/detailed_install.md'
     - Running on a cluster: 'howto/run_cluster/'
     - Running in a container: 'howto/use_container/'
     - Using looper: 'howto/use_looper/'

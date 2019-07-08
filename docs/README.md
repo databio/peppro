@@ -10,9 +10,9 @@
 
 `PEPPRO` produces quality control plots, summary statistics, and several data formats to set the stage for project-specific analysis. 
 
-- PEPPRO produces an easily-navigable HTML report when used with [`Looper`](http://looper.databio.org/en/latest/): View this [HTML Summary report demo](files/examples/K562/summary.html)
+- PEPPRO produces an easily-navigable HTML report when used with [`Looper`](http://looper.databio.org/en/latest/): View this [HTML Summary report demo](files/examples/tutorial/tutorial_summary.html)
 - We have produced an [interactive display of the output folder structure](browse_output/), which includes:
-	- [Easily parsable summary statistics file](files/examples/K562/results_pipeline/K562/stats.tsv)
+	- [Easily parsable summary statistics file](files/examples/tutorial/results_pipeline/tutorial/stats.tsv)
 	- BigWig signal tracks (plus and minus stranded):
 	    - nucleotide-resolution ("exact cut") signal
 	    - smoothed signal

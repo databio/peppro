@@ -122,7 +122,7 @@ Add our `tools/` directory to our `PATH` environment variable.
 ```
 export PATH="$PATH:/path/to/peppro_tutorial/tools/"
 ```
-That should do it!  Now we'll [install some **optional** packages](tutorial.md#install-optional-software).  Of course, these are not required, but for the purposes of this tutorial we're going to be completionists.
+That should do it!  Now we'll [install some **optional** packages](../tutorial.md#install-optional-software).  Of course, these are not required, but for the purposes of this tutorial we're going to be completionists.
 
 ### Optional software
 
@@ -151,7 +151,7 @@ Don't forget to add this to your `PATH` too!
 ```
 export PATH="$PATH:/path/to/peppro_tutorial/tools/pigz-2.4/"
 ```
-That's it! Everything we need to run `PEPPRO` to its full potential should be installed.  If you are interested and have experience using containers, you can check out the [alternate installation methods](install.md#121-use-containers).
+That's it! Everything we need to run `PEPPRO` to its full potential should be installed.  If you are interested and have experience using containers, you can check out the [alternate installation methods](../install.md#121-use-containers).
 
 ### Create environment variables
 
@@ -203,6 +203,6 @@ zcat hg38_TSS_full.txt.gz | \
   LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_TSS.tsv
 ```
 
-We also have [downloadable pre-built genome annotation files](http://big.databio.org/peppro/) for `hg38`, `hg19`, `mm10`, and `mm9` that you can use to annotate the reads and peaks.  These files annotate 3' and 5' UTR, Exonic, Intronic, Intergenic, Promoter, and Promoter Flanking Regions of the corresponding genome as indicated in Ensembl or UCSC.  Simply move the corresponding genome annotation file into the `peppro/anno` folder.  Once present in the `peppro/anno` folder you don't need to do anything else as the pipeline will look there automatically.   Alternatively, you can use the `--anno-name` pipeline option to directly point to this file when running.  You can also [learn how to create a custom annotation file](howto/create-annotation-file.md) to calculate coverage using your own features of interest.
+We also have [downloadable pre-built genome annotation files](http://big.databio.org/peppro/) for `hg38`, `hg19`, `mm10`, and `mm9` that you can use to annotate the reads and peaks.  These files annotate 3' and 5' UTR, Exonic, Intronic, Intergenic, Promoter, and Promoter Flanking Regions of the corresponding genome as indicated in Ensembl or UCSC.  Simply move the corresponding genome annotation file into the `peppro/anno` folder.  Once present in the `peppro/anno` folder you don't need to do anything else as the pipeline will look there automatically.   Alternatively, you can use the `--anno-name` pipeline option to directly point to this file when running.  You can also [learn how to create a custom annotation file](annotation_files.md) to calculate coverage using your own features of interest.
 
 Alright! Time to setup the pipeline configuration files and run our sample.
