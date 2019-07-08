@@ -16,17 +16,20 @@ nav:
     - Introduction: 'README.md'
     - Features: 'features.md'
     - Install and run: 'install.md'
+    - Extended tutorial: 'tutorial.md'
   - How-to Guides:
     - Annotation files: 'howto/annotation_files/'
-    - Using looper: 'howto/use_looper/'
     - Configuring prealignments: 'howto/prealignments/'
+    - Detailed install guide: 'howto/detailed-install.md'
     - Running on a cluster: 'howto/run_cluster/'
     - Running in a container: 'howto/use_container/'
+    - Using looper: 'howto/use_looper/'
   - Reference: 
     - Usage: 'usage.md'
     - Changelog: 'changelog.md'
     - Support: 'https://github.com/databio/peppro/issues'
     - Example output file structure: 'browse_output.md'
+    - "Example summary: tutorial project": 'files/examples/tutorial/tutorial_summary.html'
 
 plugins:
   - search
