@@ -18,7 +18,7 @@ nav:
     - Install and run: 'install.md'
   - How-to Guides:
     - Annotation files: 'howto/annotation_files/'
-    - Using Looper: 'howto/use_looper/'
+    - Using looper: 'howto/use_looper/'
     - Configuring prealignments: 'howto/prealignments/'
     - Running on a cluster: 'howto/run_cluster/'
     - Running in a container: 'howto/use_container/'
