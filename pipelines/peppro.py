@@ -209,6 +209,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             if os.path.exists(out_fastq_tmp):
                 os.remove(out_fastq_tmp)
             pm.run(cmd, out_fastq_tmp)
+            pm.clean_add(cmd, out_fastq_tmp)
 
         else:
             if dups:
@@ -1821,9 +1822,13 @@ def main():
     for unmapped_fq in to_compress:
         # Compress unmapped fastq reads
         if not pypiper.is_gzipped_fastq(unmapped_fq) and not unmapped_fq == '':
-            cmd = (ngstk.ziptool + " " + unmapped_fq)
-            unmapped_fq = unmapped_fq + ".gz"
-            pm.run(cmd, unmapped_fq)
+            if 'unmap_dups' in unmapped_fq:
+                pm.clean_add(unmapped_fq)
+            else:
+                cmd = (ngstk.ziptool + " " + unmapped_fq)
+                unmapped_fq = unmapped_fq + ".gz"
+                pm.run(cmd, unmapped_fq)
+
 
     temp_mapping_index = os.path.join(mapping_genome_bam_temp + ".bai")
     temp_mapping_index_dups = os.path.join(mapping_genome_bam_temp_dups + ".bai")
@@ -2687,6 +2692,8 @@ def main():
         ])
 
         pm.run([table_plus_cmd, table_minus_cmd], minus_table)
+        pm.clean_add(plus_table)
+        pm.clean_add(minus_table)
 
         if args.scale:
             scale_plus_chunks = [
