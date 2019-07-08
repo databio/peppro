@@ -1,4 +1,4 @@
-<img src="docs/img/peppro_logo.svg" alt="pepatac logo" height="200" align="left"/>
+<img src="docs/img/peppro_logo.svg" alt="pepatac logo" height="200" align="left"/>  
 
 <br></br>
 
