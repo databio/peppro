@@ -209,6 +209,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
     if args.adapter == "fastp":
         adapter_cmd_chunks = [
             ("(" + tools.fastp),
+            ("--overrepresentation_analysis"),
             ("--thread", str(pm.cores)),
             ("--in1", fq_file)
         ]
@@ -283,6 +284,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
         # Default to fastp
         adapter_cmd_chunks = [
             ("(" + tools.fastp),
+            ("--overrepresentation_analysis"),
             ("--thread", str(pm.cores)),
             ("--in1", fq_file)
         ]
