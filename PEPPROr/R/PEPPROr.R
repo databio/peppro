@@ -1092,4 +1092,68 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
     invisible(dev.off())
 }
 
+
+#' Plot the distribution of highest covered TSS density/gene body density ratios
+#'
+#' @param pi A single column containing the ratio of TSS densities/gene body
+#'           densities for the highest scoring TSSs
+#' @keywords pause index
+#' @export
+#' @examples
+#' data("pi")
+#' plotPI(pi = "pi")
+#' @export
+plotPI <- function(pi) {
+    if (exists(pi)) {
+        PI <- data.table(get(pi))
+    } else {
+        PI <- fread(pi)
+    }
+    colnames(PI) <- c("pi")
+
+    name           <- basename(tools::file_path_sans_ext(pi))
+    numFields      <- 2
+    for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
+    sample_name <- paste(dirname(pi), name, sep="/")
+
+    q <- ggplot(data = PI, aes(x="", y=pi)) +
+            stat_boxplot(geom ='errorbar', width = 0.25) +
+            geom_boxplot(width = 0.25,
+                         outlier.color='red',
+                         outlier.shape=1) +
+            stat_summary(fun.y = "mean", geom = "point",
+                         shape = 1, size = 2) +
+            labs(x=name, y="each gene's pause index") +
+            scale_y_continuous(breaks = round(seq(min(PI$pi),
+                                              max(PI$pi),
+                                              by = 5), 0),
+                               limits=c(0, max(PI$pi))) +
+            coord_cartesian(ylim=c(0, ceiling(quantile(PI$pi, 0.9)))) +
+            theme_classic(base_size=14) +
+            theme(axis.line = element_line(size = 0.5)) +
+            theme(panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank(),
+                  aspect.ratio = 1,
+                  panel.border = element_rect(colour = "black",
+                                              fill=NA, size=0.5))
+    max_y  <- ceiling(quantile(PI$pi, 0.9))
+    label1 <- c(paste("'median'", ":", round(median(PI$pi), 2)),
+                paste("'mean'", ":", round(mean(PI$pi), 2)))
+    q <- q + annotate("text", x = 0.5, y = c(max_y, 0.95*max_y),
+                      hjust=0, vjust=1, label = label1, parse=TRUE)
+
+    # Save plot to pdf file
+    pdf(file=paste0(sample_name, "_pause_index.pdf"),
+        width= 7, height = 7, useDingbats=F)
+    print(q)
+    invisible(dev.off())
+         
+    # Save plot to png file
+    png(filename = paste0(sample_name, "_pause_index.png"),
+        width = 480, height = 480)
+    print(q)
+    invisible(dev.off())
+}
+
+
 ################################################################################

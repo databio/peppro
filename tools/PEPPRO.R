@@ -47,7 +47,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "\t frif\t plot fraction of reads in features\n",
         "\t tss\t plot TSS enrichment\n",
         "\t frag\t plot fragment length distribution\n",
-        "\t mrna\t plot mRNA contamination distribution\n"
+        "\t mrna\t plot mRNA contamination distribution\n",
+        "\t pi\t plot pause indicies distribution\n"
     )
     message(usage)
 } else if (!is.na(subcmd) && tolower(subcmd) == "preseq") {
@@ -313,6 +314,31 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         suppressWarnings(mRNAcontamination(rpkm=rpkm, raw=raw))
     }
+} else if (!is.na(subcmd) && tolower(subcmd) == "pi") {
+    usage <- paste0(
+        "\n",
+        "Usage:   PEPPRO.R [command] {args}\n",
+        "Version: ", version, "\n\n",
+        "Command: pi \t plot pause indicies distribution\n\n",
+        " -i, --input\t Pause density/gene body density ratios.\n"
+    )
+
+    help <- opt_get(name = c("help", "?", "h"), required=FALSE,
+                    default=FALSE, n=0)
+    if (!help) {
+        help <- suppressWarnings(
+            if(length(opt_get_args()) == 1) {TRUE} else {FALSE}
+        )
+    }
+    if (help) {
+        message(usage)
+        quit()
+    } else {
+        input <- opt_get(name = c("input", "i"), required=TRUE,
+                         description="Pause density/gene body density ratios.")
+
+        suppressWarnings(plotPI(pi=input))
+    }
 } else {
     usage <- paste0(
         "\n",
@@ -322,7 +348,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "\t frif\t plot fraction of reads in features\n",
         "\t tss\t plot TSS enrichment\n",
         "\t frag\t plot fragment length distribution\n",
-        "\t mrna\t plot mRNA contamination distribution\n"
+        "\t mrna\t plot mRNA contamination distribution\n",
+        "\t pi\t plot pause indicies distribution\n"
     )
     message(usage)
     quit()
