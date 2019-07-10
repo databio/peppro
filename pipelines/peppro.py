@@ -2496,11 +2496,11 @@ def main():
                 
                 anno_list_plus.append(anno_cov_plus)
                 anno_list_minus.append(anno_cov_minus)
-                cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
+                cmd4 = (tools.bedtools + " coverage -sorted -counts -s -a " +
                         anno_sort + " -b " + plus_bam +
                         " -g " + chr_order + " > " +
                         anno_cov_plus)
-                cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
+                cmd5 = (tools.bedtools + " coverage -sorted -counts -s -a " +
                         anno_sort + " -b " + minus_bam +
                         " -g " + chr_order + " > " +
                         anno_cov_minus)
