@@ -1671,8 +1671,12 @@ def main():
         r2_repair = os.path.join(
             fastq_folder, args.sample_name + "_R2_trimmed_paired.fastq")
 
-        cmd = (tool_path("fastq_pair.py") + " -r1 " + unmap_fq1 +
-                " -r2 " + unmap_fq2)
+        if float(pm.get_stat("File_mb")) > 2000:
+            cmd = (tool_path("fastq_pair.py") + " -r1 " + unmap_fq1 +
+                   " -r2 " + unmap_fq2 + " --lowmem")
+        else:
+            cmd = (tool_path("fastq_pair.py") + " -r1 " + unmap_fq1 +
+                   " -r2 " + unmap_fq2)
         pm.run(cmd, [r1_repair, r2_repair])
 
         r1_dups_repair = os.path.join(
@@ -2498,11 +2502,11 @@ def main():
                 
                 anno_list_plus.append(anno_cov_plus)
                 anno_list_minus.append(anno_cov_minus)
-                cmd4 = (tools.bedtools + " coverage -sorted -counts -s -a " +
+                cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
                         anno_sort + " -b " + plus_bam +
                         " -g " + chr_order + " > " +
                         anno_cov_plus)
-                cmd5 = (tools.bedtools + " coverage -sorted -counts -s -a " +
+                cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
                         anno_sort + " -b " + minus_bam +
                         " -g " + chr_order + " > " +
                         anno_cov_minus)
