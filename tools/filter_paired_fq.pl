@@ -64,8 +64,10 @@ for ($r = 1; $r < 1000000; $r++) {
 # print "BLAH\n\n";
 while($readname2 = <$fh_fq2>) {
 	$readname1 = <$fh_fq1>;
+	#print STDERR "readname1:\t$readname1";
 	$readname2_copy = $readname2;
 	$readname2 =~ s/[\s\/].*$//;
+	#print STDERR "readname2:\t$readname2";
 	# if ($skipped < 50) { print STDERR ($readname2)};
 	chomp($readname2);
 	# if ("$readname" eq "$readname2") {
