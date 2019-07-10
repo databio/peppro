@@ -1,6 +1,21 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] -- 2019-07-10
+
+### Changed
+- Update pause index calculation and required annotation files
+- Update mRNA contamination required annotation files
+- Move fastq processing to separate function
+- Change handling of PE data
+- Update TSS profiling
+
+### Added
+- Add modified fastq_pair tool to handle PE data properly
+- Add pause index plotting
+- Add mRNA contamination calculation and plotting
+- Add fragment length distribution plotting for PE data
+
 ## [0.7.3] -- 2019-06-13
 
 ### Changed
