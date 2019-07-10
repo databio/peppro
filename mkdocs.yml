@@ -2,7 +2,7 @@ theme: databio
 
 site_name: peppro
 site_author: Jason Smith
-site_url: http://code.databio.org/peppro/
+site_url: http://peppro.databio.org/
 site_logo: img/peppro_inline_logo.svg
 repo_url: https://github.com/databio/peppro/
 #google_analytics: ['UA-127092878-1', 'code.databio.org/peppro']
