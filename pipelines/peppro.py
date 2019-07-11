@@ -1743,6 +1743,7 @@ def main():
                                        untrimmed_fastq1,
                                        outfolder=param.outfolder)
             unmap_fq2 = ""
+            unmap_fq2_dups = ""
 
     pm.clean_add(os.path.join(fastq_folder, "*.fq"), conditional=True)
     pm.clean_add(os.path.join(fastq_folder, "*.fastq"), conditional=True)
@@ -1762,39 +1763,39 @@ def main():
             if args.complexity:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
-                    args, tools, args.paired_end, False, unmap_fq1,
-                    unmap_fq2, reference,
-                    assembly_bt2=os.path.join(
-                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                    outfolder=param.outfolder,
-                    aligndir="prealignments")
+                        args, tools, args.paired_end, False, unmap_fq1,
+                        unmap_fq2, reference,
+                        assembly_bt2=os.path.join(
+                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments")
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
-                    args, tools, args.paired_end, False, unmap_fq1_dups,
-                    unmap_fq2_dups, reference,
-                    assembly_bt2=os.path.join(
-                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                    outfolder=param.outfolder,
-                    aligndir="prealignments",
-                    dups=True)
+                        args, tools, args.paired_end, False, unmap_fq1_dups,
+                        unmap_fq2_dups, reference,
+                        assembly_bt2=os.path.join(
+                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments",
+                        dups=True)
                     
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
-                    args, tools, args.paired_end, True, unmap_fq1,
-                    unmap_fq2, reference,
-                    assembly_bt2=os.path.join(
-                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                    outfolder=param.outfolder,
-                    aligndir="prealignments")
+                        args, tools, args.paired_end, True, unmap_fq1,
+                        unmap_fq2, reference,
+                        assembly_bt2=os.path.join(
+                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments")
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
-                    args, tools, args.paired_end, True, unmap_fq1_dups,
-                    unmap_fq2_dups, reference,
-                    assembly_bt2=os.path.join(
-                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                    outfolder=param.outfolder,
-                    aligndir="prealignments",
-                    dups=True)
+                        args, tools, args.paired_end, True, unmap_fq1_dups,
+                        unmap_fq2_dups, reference,
+                        assembly_bt2=os.path.join(
+                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments",
+                        dups=True)
                 if args.paired_end:
                     to_compress.append(unmap_fq1_dups)
                     to_compress.append(unmap_fq2_dups)
@@ -1806,20 +1807,20 @@ def main():
             else:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
-                    args, tools, args.paired_end, False,
-                    unmap_fq1, unmap_fq2, reference,
-                    assembly_bt2=os.path.join(
-                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                    outfolder=param.outfolder,
-                    aligndir="prealignments")
+                        args, tools, args.paired_end, False,
+                        unmap_fq1, unmap_fq2, reference,
+                        assembly_bt2=os.path.join(
+                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments")
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
-                    args, tools, args.paired_end, True,
-                    unmap_fq1, unmap_fq2, reference,
-                    assembly_bt2=os.path.join(
-                        res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                    outfolder=param.outfolder,
-                    aligndir="prealignments")
+                        args, tools, args.paired_end, True,
+                        unmap_fq1, unmap_fq2, reference,
+                        assembly_bt2=os.path.join(
+                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments")
                 if args.paired_end:
                     to_compress.append(unmap_fq1)
                     to_compress.append(unmap_fq2)
@@ -2042,8 +2043,10 @@ def main():
     mapping_pe2_bam = os.path.join(
         map_genome_folder, args.sample_name + "_PE2.bam")
     cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam +
+            " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
             " > " + mapping_pe1_bam)
     cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam +
+            " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
             " > " + mapping_pe2_bam)
     pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
     mapping_genome_bam = mapping_pe1_bam
@@ -2089,9 +2092,11 @@ def main():
         dups_pe2_bam = os.path.join(
             map_genome_folder, args.sample_name + "_dups_PE2.bam")
         cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam_dups +
-                " > " + dups_pe1_bam)
+            " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
+            " > " + dups_pe1_bam)
         cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam_dups +
-                " > " + dups_pe2_bam)
+            " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
+            " > " + dups_pe2_bam)
         pm.run([cmd1, cmd2], [dups_pe1_bam, dups_pe2_bam])
         mapping_genome_bam_dups = dups_pe1_bam
 
