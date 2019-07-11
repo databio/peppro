@@ -199,6 +199,10 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
         fastqc_folder, args.sample_name + "_R2_rmUmi.html")
     umi_json_R2 = os.path.join(
         fastqc_folder, args.sample_name + "_R2_rmUmi.json")
+    
+    # If single-end, must use cutadapt for plotting purposes
+    if not args.paired_end:
+        args.adapter = "cutadapt"
 
     # Check quality encoding for use with FastX_Tools
     if args.trimmer == "fastx":
@@ -375,12 +379,9 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                 if read2:
                     trim_cmd_chunks_R2 = [
                         tools.seqtk,
-                        "trimfq"
+                        "trimfq",
+                        ("-e", str(args.umi_len))
                     ]
-                    if args.max_len != -1:
-                        trim_cmd_chunks_R2.extend([
-                            ("-L", str(args.max_len))
-                        ]) 
                     trim_cmd_chunks_R2.extend(["-"])
                     if args.runon.lower() == "gro":
                         trim_cmd_chunks_R2.extend([
@@ -454,7 +455,14 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
                     ])
                 if read2:
-                    trim_cmd_chunks_R2 = list(trim_cmd_chunks)
+                    trim_cmd_chunks_R2 = [trim_tool]
+                    if encoding == "Illumina-1.8":
+                        trim_cmd_chunks_R2.extend([
+                            ("-Q", str(33))
+                        ])
+                    trim_cmd_chunks_R2.extend([
+                        ("-t", str(int(float(args.umi_len))))
+                    ])
                     if args.runon.lower() == "gro":
                         trim_cmd_chunks_R2.extend([
                             ("-o", trimmed_fastq_R2)                        
@@ -512,7 +520,8 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                 if read2:
                     trim_cmd_chunks_R2 = [
                         tools.seqtk,
-                        "trimfq"
+                        "trimfq",
+                        ("-e", str(args.umi_len))
                     ]
                     if args.max_len != -1:
                         trim_cmd_chunks_R2.extend([
@@ -537,7 +546,6 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         "trimfq",
                         ("-b", str(args.umi_len))
                     ]
-
                     if args.max_len != -1:
                         trim_cmd_chunks.extend([
                             ("-L", str(args.max_len))
@@ -700,12 +708,9 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
             if read2:
                 trim_cmd_chunks_R2 = [
                     tools.seqtk,
-                    "trimfq"
+                    "trimfq",
+                    ("-e", str(args.umi_len))
                 ]
-                if args.max_len != -1:
-                    trim_cmd_chunks_R2.extend([
-                        ("-L", str(args.max_len))
-                    ])
                 trim_cmd_chunks_R2.extend(["-"])
                 if args.runon.lower() == "gro":
                     trim_cmd_chunks_R2.extend([
@@ -786,7 +791,14 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                 ])
 
             if read2:
-                trim_cmd_chunks_R2 = list(trim_cmd_chunks)
+                trim_cmd_chunks_R2 = [trim_tool]
+                if encoding == "Illumina-1.8":
+                    trim_cmd_chunks_R2.extend([
+                        ("-Q", str(33))
+                    ])
+                trim_cmd_chunks_R2.extend([
+                    ("-t", str(int(float(args.umi_len))))
+                ])
                 if args.runon.lower() == "gro":
                     trim_cmd_chunks_R2.extend([
                         ("-o", trimmed_fastq_R2)
@@ -843,12 +855,9 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
             if read2:
                 trim_cmd_chunks_R2 = [
                     tools.seqtk,
-                    "trimfq"
+                    "trimfq",
+                    ("-e", str(args.umi_len))
                 ]
-                if args.max_len != -1:
-                    trim_cmd_chunks_R2.extend([
-                        ("-L", str(args.max_len))
-                    ])
                 trim_cmd_chunks_R2.extend(["-"])
                 if args.runon.lower() == "gro":
                     trim_cmd_chunks_R2.extend([
@@ -988,7 +997,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
     if read2:
         process_fastq_cmd2 = build_command([
             adapter_cmd, "|", trim_cmd2])
-        print("process_fastq_cmd2: {}".format(process_fastq_cmd2))
+        #print("process_fastq_cmd2: {}".format(process_fastq_cmd2))
         pm.run(process_fastq_cmd2, trimmed_fastq_R2)
         cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
         pm.run(cp_cmd, trimmed_dups_fastq_R2)
@@ -1561,6 +1570,9 @@ def main():
     else:  # otherwise remove it
         if 'fastx' in tool_list: tool_list.remove('fastx')
 
+    if not args.dedup == "fqdedup":  # update tool call
+        if 'fqdedup' in tool_list: tool_list.remove('fqdedup')
+
     if args.sob:
         tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tool_list]
     else:
@@ -1662,36 +1674,64 @@ def main():
             unmap_fq1 = _process_fastq(args, tools, False,
                                        untrimmed_fastq1,
                                        outfolder=param.outfolder)
-        unmap_fq2, unmap_fq2_dups = _process_fastq(args, tools, True, untrimmed_fastq2,
-                                   outfolder=param.outfolder)
+        unmap_fq2, unmap_fq2_dups = _process_fastq(args, tools, True,
+                                                   untrimmed_fastq2,
+                                                   outfolder=param.outfolder)
 
         # Re-pair fastq files
         r1_repair = os.path.join(
-            fastq_folder, args.sample_name + "_R1_processed_paired.fastq")
+            fastq_folder, args.sample_name + "_R1_processed.fastq.paired.fq")
         r2_repair = os.path.join(
-            fastq_folder, args.sample_name + "_R2_trimmed_paired.fastq")
+            fastq_folder, args.sample_name + "_R2_trimmed.fastq.paired.fq")
 
-        if float(pm.get_stat("File_mb")) > 2000:
-            cmd = (tool_path("fastq_pair.py") + " -r1 " + unmap_fq1 +
-                   " -r2 " + unmap_fq2 + " --lowmem")
-        else:
-            cmd = (tool_path("fastq_pair.py") + " -r1 " + unmap_fq1 +
-                   " -r2 " + unmap_fq2)
+        r1_repair_single = os.path.join(
+            fastq_folder, args.sample_name + "_R1_processed.fastq.single.fq")
+        r2_repair_single = os.path.join(
+            fastq_folder, args.sample_name + "_R2_trimmed.fastq.single.fq")
+
+        # if float(pm.get_stat("File_mb")) > 2000:
+        #     cmd = (tool_path("fastq_pair.py") + " -r1 " + unmap_fq1 +
+        #            " -r2 " + unmap_fq2 + " --lowmem")
+        # else:
+        rr = float(pm.get_stat("Raw_reads"))
+        cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + unmap_fq1 +
+               " " + unmap_fq2)
         pm.run(cmd, [r1_repair, r2_repair])
+        pm.clean_add(r1_repair_single)
+        pm.clean_add(r2_repair_single)
+        cmd1 = ("mv " + r1_repair + " " + unmap_fq1)
+        cmd2 = ("mv " + r2_repair + " " + unmap_fq2)
+        repair_target = os.path.join(fastq_folder, "repaired.flag")
+        cmd3 = ("touch repaired.flag")
+        pm.run([cmd1, cmd2, cmd3], repair_target)
+        pm.clean_add(repair_target)
 
         r1_dups_repair = os.path.join(
-            fastq_folder, args.sample_name + "_R1_trimmed_paired.fastq")
+            fastq_folder, args.sample_name + "_R1_trimmed.fastq.paired.fq")
         r2_dups_repair = os.path.join(
-            fastq_folder, args.sample_name + "_R2_trimmed_dups_paired.fastq")
+            fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.paired.fq")
 
-        cmd = (tool_path("fastq_pair.py") + " -r1 " + unmap_fq1_dups +
-                " -r2 " + unmap_fq2_dups)
+        r1_dups_repair_single = os.path.join(
+            fastq_folder, args.sample_name + "_R1_trimmed.fastq.single.fq")
+        r2_dups_repair_single = os.path.join(
+            fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.single.fq")
+
+        cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " +
+               unmap_fq1_dups + " " + unmap_fq2_dups)
         pm.run(cmd, [r1_dups_repair, r2_dups_repair])
+        pm.clean_add(r1_dups_repair_single)
+        pm.clean_add(r2_dups_repair_single)
+        cmd1 = ("mv " + r1_dups_repair + " " + unmap_fq1_dups)
+        cmd2 = ("mv " + r2_dups_repair + " " + unmap_fq2_dups)
+        dups_repair_target = os.path.join(fastq_folder, "dups_repaired.flag")
+        cmd3 = ("touch dups_repaired.flag")
+        pm.run([cmd1, cmd2, cmd3], dups_repair_target)
+        pm.clean_add(dups_repair_target)
 
-        unmap_fq1 = r1_repair
-        unmap_fq2 = r2_repair
-        unmap_fq1_dups = r1_dups_repair
-        unmap_fq2_dups = r2_dups_repair
+        # unmap_fq1 = r1_repair
+        # unmap_fq2 = r2_repair
+        # unmap_fq1_dups = r1_dups_repair
+        # unmap_fq2_dups = r2_dups_repair
     else:
         if args.complexity:
             unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, False,
@@ -1995,6 +2035,19 @@ def main():
     if args.max_len != -1:
         max_len = args.max_len
 
+    # Remove PE2 reads
+    pm.timestamp("### Split BAM file")
+    mapping_pe1_bam = os.path.join(
+        map_genome_folder, args.sample_name + "_PE1.bam")
+    mapping_pe2_bam = os.path.join(
+        map_genome_folder, args.sample_name + "_PE2.bam")
+    cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam +
+            " > " + mapping_pe1_bam)
+    cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam +
+            " > " + mapping_pe2_bam)
+    pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
+    mapping_genome_bam = mapping_pe1_bam
+
     if args.complexity:
         if os.path.exists(mapping_genome_bam_temp_dups):
             if not os.path.exists(temp_mapping_index_dups):
@@ -2029,6 +2082,18 @@ def main():
                 cmd4 = tools.samtools + " index " + mapping_genome_bam_dups
                 pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam_dups)
                 pm.clean_add(mapping_genome_index_dups)
+
+        # Remove PE2 reads
+        dups_pe1_bam = os.path.join(
+            map_genome_folder, args.sample_name + "_dups_PE1.bam")
+        dups_pe2_bam = os.path.join(
+            map_genome_folder, args.sample_name + "_dups_PE2.bam")
+        cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam_dups +
+                " > " + dups_pe1_bam)
+        cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam_dups +
+                " > " + dups_pe2_bam)
+        pm.run([cmd1, cmd2], [dups_pe1_bam, dups_pe2_bam])
+        mapping_genome_bam_dups = dups_pe1_bam
 
         # Calculate library complexity
         pm.timestamp("### Calculate library complexity")
@@ -2092,19 +2157,6 @@ def main():
                              anchor_image=preseq_png)
         else:
             print("Unable to calculate library complexity.")
-
-    # Remove PE2 reads
-    pm.timestamp("### Split BAM file")
-    mapping_pe1_bam = os.path.join(
-        map_genome_folder, args.sample_name + "_PE1.bam")
-    mapping_pe2_bam = os.path.join(
-        map_genome_folder, args.sample_name + "_PE2.bam")
-    cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam +
-            " > " + mapping_pe1_bam)
-    cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam +
-            " > " + mapping_pe2_bam)
-    pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
-    mapping_genome_bam = mapping_pe1_bam
 
     # Calculate quality control metrics for the alignment file
     pm.timestamp("### Calculate NRF, PBC1, and PBC2")
@@ -2429,6 +2481,24 @@ def main():
                                  "_fragLenDistribution.png")
         pm.report_object("Fragment distribution", fragL_dis1,
                          anchor_image=fragL_png)
+    else:
+        pm.timestamp("### Plot adapter insertion distribution")
+        if not args.adapter == "cutadapt":
+            print("Skipping sample degradation plotting...")
+            print("This requires the use of 'cutadapt' for adapter clipping.")
+        elif not os.path.exists(adapter_report):
+            print("Skipping sample degradation plotting...")
+            print("Could not find {}.`".format(adapter_report))
+        else:
+            degradation_pdf = os.path.join(QC_folder,
+                args.sample_name + "_adapter_insertion_distribution.pdf")
+            degradation_png = os.path.join(QC_folder,
+                args.sample_name + "_adapter_insertion_distribution.pdf")
+            cmd2 = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
+                    " cutadapt -i " + adapter_report)
+            pm.run(cmd, degradation_pdf, nofail=True)
+            pm.report_object("Adapter insertion distribution", degradation_pdf,
+                             anchor_image=degradation_png)
 
     # Calculate fraction of reads in features of interest
     pm.timestamp("### Calculate fraction of reads in features (FRiF)")
