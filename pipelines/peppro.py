@@ -1738,12 +1738,12 @@ def main():
                                                        untrimmed_fastq1,
                                                        outfolder=param.outfolder)
             unmap_fq2 = ""
+            unmap_fq2_dups = ""
         else:
             unmap_fq1 = _process_fastq(args, tools, False,
                                        untrimmed_fastq1,
                                        outfolder=param.outfolder)
             unmap_fq2 = ""
-            unmap_fq2_dups = ""
 
     pm.clean_add(os.path.join(fastq_folder, "*.fq"), conditional=True)
     pm.clean_add(os.path.join(fastq_folder, "*.fastq"), conditional=True)
