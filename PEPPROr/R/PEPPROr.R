@@ -41,9 +41,9 @@ NULL
 #' @examples
 #' data("ccurve")
 #' data("counts")
-#' plot_complexity_curves(ccurve, coverage=3099922541, read_length=30,
+#' plotComplexityCurves(ccurve, coverage=3099922541, read_length=30,
 #'                        real_counts_path=counts)
-plot_complexity_curves <- function(ccurves,
+plotComplexityCurves <- function(ccurves,
                                    coverage=0, read_length=0,
                                    real_counts_path=NA, ignore_unique=FALSE,
                                    output_name='complexity_curves',
@@ -668,6 +668,16 @@ plotFRiF <- function(sample_name, num_reads, output_name, bedFile) {
 }
 
 
+#' The function rounds the up to the nearest "nice" number.
+#'
+#' From:
+#' https://stackoverflow.com/questions/6461209/how-to-round-up-to-the-nearest-10-or-100-or-x
+roundUpNice <- function(x, nice=c(1,2,3,4,5,6,7,8,9,10)) {
+    if(length(x) != 1) stop("'x' must be of length 1")
+    10^floor(log10(x)) * nice[[which(x <= 10^floor(log10(x)) * nice)[[1]]]]
+}
+
+
 #' Plot TSS enrichment
 #'
 #' This function plots the global TSS enrichment and produces pdf/png files.
@@ -802,10 +812,11 @@ plotTSS <- function(TSSfile) {
         geom_smooth(method="loess", span=0.02,
                     se=FALSE, colour=lineColor) +
         labs(x = "Distance from TSS (bp)", y = "TSS Enrichment Score")
+    y_max <- max(30, roundUpNice(TSSscore))
     p <- pre + t1 +
          scale_x_continuous(expand=c(0,0)) +
          scale_y_continuous(expand=c(0,0)) +
-         coord_cartesian(xlim=c(-2300,2300), ylim=c(0,32))
+         coord_cartesian(xlim=c(-2300,2300), ylim=c(0, y_max+2))
     if (exists("minus")) {
         val      <- 0.025*nrow(minus)
         # normTSS  <- (minus / mean(minus[c(1:val,
@@ -826,25 +837,25 @@ plotTSS <- function(TSSfile) {
                                  y=score, group=1, colour="black"),
                              method="loess", span=0.02,
                              se=FALSE, colour="blue") +
-                 annotate("rect", xmin=1200, xmax=2300, ymin=25, ymax=32,
-                          fill="gray95", size = 0.5) +
-                 annotate("text", x=1750, y=31, label="TSS Score", fontface = 1,
-                          size=6, hjust=0.5) +
-                 annotate("text", x=1500, y=29, label="+", fontface = 2,
+                 annotate("rect", xmin=1200, xmax=2300, ymin=y_max-6,
+                          ymax=y_max+2, fill="gray95", size = 0.5) +
+                 annotate("text", x=1750, y=y_max, label="TSS Score",
+                          fontface = 1, size=6, hjust=0.5) +
+                 annotate("text", x=1500, y=y_max-2, label="+", fontface = 2,
                           size=8, hjust=0.5, color=lineColor) +
-                 annotate("text", x=1500, y=27, label=TSSscore, fontface = 2,
-                          size=8, hjust=0.5, color=lineColor) +
-                 annotate("text", x=2000, y=29, label="-",
+                 annotate("text", x=1500, y=y_max-4, label=TSSscore,
+                          fontface = 2, size=8, hjust=0.5, color=lineColor) +
+                 annotate("text", x=2000, y=y_max-2, label="-",
                           fontface = 2, size=8, hjust=0.5, color="blue") +
-                 annotate("text", x=2000, y=27, label=minusTSSscore,
+                 annotate("text", x=2000, y=y_max-4, label=minusTSSscore,
                           fontface = 2, size=8, hjust=0.5, color="blue")
     } else {
-        p <- p + annotate("rect", xmin=1200, xmax=2300, ymin=27, ymax=32,
-                          fill="gray95", size = 0.5) +
-                 annotate("text", x=1750, y=31, label="TSS Score",
+        p <- p + annotate("rect", xmin=1200, xmax=2300, ymin=y_max-3,
+                          ymax=y_max+2, fill="gray95", size = 0.5) +
+                 annotate("text", x=1750, y=y_max+1, label="TSS Score",
                           fontface = 1, size=6, hjust=0.5) +
-                 annotate("text", x=1750, y=29, label=TSSscore, fontface = 2,
-                          size=10, hjust=0.5)
+                 annotate("text", x=1750, y=y_max-1, label=TSSscore,
+                          fontface = 2, size=10, hjust=0.5)
     }
 
     png(filename = paste0(sample_name, "_TSSenrichment.png"),
@@ -1150,6 +1161,61 @@ plotPI <- function(pi) {
          
     # Save plot to png file
     png(filename = paste0(sample_name, "_pause_index.png"),
+        width = 480, height = 480)
+    print(q)
+    invisible(dev.off())
+}
+
+
+#' Plot the distribution of adapter insertions
+#'
+#' @param input A cutadapt report
+#'
+#' @keywords cutadapt
+#' @export
+#' @examples
+#' data("cutadapt")
+#' plotCutadapt(input = "cutadapt")
+#' @export
+plotCutadapt <- function(input) {
+    if (exists(input)) {
+        report <- data.table(get(input))
+    } else {
+        report <- fread(input)
+    }
+
+    name      <- basename(tools::file_path_sans_ext(input))
+    numFields <- 2
+    for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
+    sample_name <- paste(dirname(input), name, sep="/")
+    
+    # only keep sizes where the expected count represents less than 1% of 
+    # the actual count
+    report <- report[which(report$expect/report$count < 0.01),]
+    
+    # don't include size 0 insertions
+    report <- report[-nrow(report),]
+
+    q <- ggplot(report, aes(x=100-length, y=count)) +
+            geom_point() +
+            labs(title=name, x="Size of insertion", y="Number of reads") +
+            theme_classic(base_size=14) +
+            theme(axis.line = element_line(size = 0.5),
+                  plot.title = element_text(hjust = 0.5),
+                  panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank(),
+                  aspect.ratio = 1,
+                  panel.border = element_rect(colour = "black",
+                                              fill=NA, size=0.5))
+
+    # Save plot to pdf file
+    pdf(file=paste0(sample_name, "_adapter_insertion_distribution.pdf"),
+        width= 7, height = 7, useDingbats=F)
+    print(q)
+    invisible(dev.off())
+         
+    # Save plot to png file
+    png(filename = paste0(sample_name, "_adapter_insertion_distribution.png"),
         width = 480, height = 480)
     print(q)
     invisible(dev.off())
