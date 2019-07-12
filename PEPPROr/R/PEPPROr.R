@@ -1196,7 +1196,7 @@ plotCutadapt <- function(input) {
     # don't include size 0 insertions
     report <- report[-nrow(report),]
 
-    q <- ggplot(report, aes(x=100-length, y=count)) +
+    q <- ggplot(report, aes(x=max(length)-length, y=count)) +
             geom_point() +
             labs(title=name, x="Size of insertion", y="Number of reads") +
             theme_classic(base_size=14) +
