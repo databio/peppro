@@ -30,7 +30,7 @@ Pull requests welcome. Active development should occur in a development or featu
 ## Contributors
 
 * Jason Smith, jasonsmith@virginia.edu
-* Mike Guertin, mjg7y@virginia.edu
+* Michael Guertin, mjg7y@virginia.edu
 * Nathan Sheffield, nathan@code.databio.org
 * Others... (add your name)
 
