@@ -14,7 +14,7 @@
 - We have produced an [interactive display of the output folder structure](browse_output/), which includes:
 	- [Easily parsable summary statistics file](files/examples/tutorial/results_pipeline/tutorial/stats.tsv)
 	- BigWig signal tracks (plus and minus stranded):
-	    - nucleotide-resolution ("exact cut") signal
+	    - nucleotide-resolution exact RNA polymerase position signal
 	    - smoothed signal
 
 ## User interface
