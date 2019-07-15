@@ -83,7 +83,7 @@ export PATH="$PATH:/path/to/peppro_tutorial/tools/bedtools2/bin/"
 ```
 
 #### `bowtie2`
-Next, let's install `bowtie2`.  For more more specific instruction, [read the author's installation guide]().
+Next, let's install `bowtie2`.  For more more specific instruction, [read the author's installation guide](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#building-from-source).
 ```console
 cd ../
 wget https://downloads.sourceforge.net/project/bowtie-bio/bowtie2/2.3.4.1/bowtie2-2.3.4.1-source.zip
