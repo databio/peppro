@@ -1,6 +1,17 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.8.1] -- 2019-07-15
+
+### Changed
+- Fix fraction in feature calculation
+- Fix library complexity calculation for PE data
+- Require fastq_pair tool
+- Require cutadapt for SE processing
+
+### Added
+- Add QC plot for adapter insertion distribution
+
 ## [0.8.0] -- 2019-07-10
 
 ### Changed
