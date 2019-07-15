@@ -2037,19 +2037,20 @@ def main():
         max_len = args.max_len
 
     # Remove PE2 reads
-    pm.timestamp("### Split BAM file")
-    mapping_pe1_bam = os.path.join(
-        map_genome_folder, args.sample_name + "_PE1.bam")
-    mapping_pe2_bam = os.path.join(
-        map_genome_folder, args.sample_name + "_PE2.bam")
-    cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam +
-            " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
-            " > " + mapping_pe1_bam)
-    cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam +
-            " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
-            " > " + mapping_pe2_bam)
-    pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
-    mapping_genome_bam = mapping_pe1_bam
+    if args.paired_end:
+        pm.timestamp("### Split BAM file")
+        mapping_pe1_bam = os.path.join(
+            map_genome_folder, args.sample_name + "_PE1.bam")
+        mapping_pe2_bam = os.path.join(
+            map_genome_folder, args.sample_name + "_PE2.bam")
+        cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam +
+                " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
+                " > " + mapping_pe1_bam)
+        cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam +
+                " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
+                " > " + mapping_pe2_bam)
+        pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
+        mapping_genome_bam = mapping_pe1_bam
 
     if args.complexity:
         if os.path.exists(mapping_genome_bam_temp_dups):
@@ -2087,18 +2088,19 @@ def main():
                 pm.clean_add(mapping_genome_index_dups)
 
         # Remove PE2 reads
-        dups_pe1_bam = os.path.join(
-            map_genome_folder, args.sample_name + "_dups_PE1.bam")
-        dups_pe2_bam = os.path.join(
-            map_genome_folder, args.sample_name + "_dups_PE2.bam")
-        cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam_dups +
-            " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
-            " > " + dups_pe1_bam)
-        cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam_dups +
-            " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
-            " > " + dups_pe2_bam)
-        pm.run([cmd1, cmd2], [dups_pe1_bam, dups_pe2_bam])
-        mapping_genome_bam_dups = dups_pe1_bam
+        if args.paired_end:
+            dups_pe1_bam = os.path.join(
+                map_genome_folder, args.sample_name + "_dups_PE1.bam")
+            dups_pe2_bam = os.path.join(
+                map_genome_folder, args.sample_name + "_dups_PE2.bam")
+            cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam_dups +
+                " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
+                " > " + dups_pe1_bam)
+            cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam_dups +
+                " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
+                " > " + dups_pe2_bam)
+            pm.run([cmd1, cmd2], [dups_pe1_bam, dups_pe2_bam])
+            mapping_genome_bam_dups = dups_pe1_bam
 
         # Calculate library complexity
         pm.timestamp("### Calculate library complexity")
