@@ -4,3 +4,4 @@ pararead
 pandas
 piper
 refgenie
+cutadapt

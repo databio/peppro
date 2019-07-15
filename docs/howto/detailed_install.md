@@ -1,6 +1,6 @@
 # Detailed installation instructions
 
-This guide walks you through the minutiae of how to install each prerequisite component.
+This guide walks you through the minutiae of how to install each prerequisite component.  We'll presume you're installing this in a Linux environment.  If not the case, you'll need to go to each tool's respective site to find alternative installation approaches and options.
 
 ## 1: Clone the `PEPPRO` pipeline
 
@@ -16,12 +16,12 @@ git clone https://github.com/databio/peppro.git
 ```
 
 We'll use HTTPS in this example.  From an open terminal, let's first create a directory we'll use to run through this guide:
-```
+```console
 mkdir peppro_tutorial
 ```
 
 Let's move into our newly created directory and create a few more folders that we'll use later.
-```
+```console
 cd peppro_tutorial/
 mkdir data
 mkdir genomes
@@ -39,13 +39,18 @@ Success! If you had any issues, feel free to [reach out to us with questions](ht
 
 ## 2: Install required software
 
-You have two options for installing the software prerequisites: 1) use a container, in which case you need only either `docker` or `singularity`; or 2) install all prerequisites natively. 
+You have two options for installing the software prerequisites: 1) use a container, in which case you need only either `docker` or `singularity`; or 2) install all prerequisites natively. We'll install everything natively in this guide.
 
 To use `PEPPRO`, we need the following software:
-**Python packages**. The pipeline uses [`pypiper`](http://pypiper.readthedocs.io/en/latest/) to run a single sample, [`looper`](http://looper.readthedocs.io/en/latest/) to handle multi-sample projects (for either local or cluster computation), [`pararead`](https://github.com/databio/pararead) for parallel processing sequence reads, [`refgenie`](http://refgenie.databio.org/en/latest/) to organize and build reference assemblies, and the common `python` libraries [`numpy`](https://www.numpy.org/) and [`pandas`](https://pandas.pydata.org/). You can do a user-specific install using the included requirements.txt file in the pipeline directory:  
-```
+**Python packages**. The pipeline uses [`pypiper`](http://pypiper.readthedocs.io/en/latest/) to run a single sample, [`looper`](http://looper.readthedocs.io/en/latest/) to handle multi-sample projects (for either local or cluster computation), [`pararead`](https://github.com/databio/pararead) for parallel processing sequence reads, [`refgenie`](http://refgenie.databio.org/en/latest/) to organize and build reference assemblies, [`cutadapt`](https://cutadapt.readthedocs.io/) to remove adapters for single-end data or optionally for paired-end, and the common `python` libraries [`numpy`](https://www.numpy.org/) and [`pandas`](https://pandas.pydata.org/). You can do a user-specific install using the included requirements.txt file in the pipeline directory:  
+```console
 pip install --user -r requirements.txt
 ```
+Remember to add your user specific install location to your `PATH`.
+```console
+export PATH="$PATH:$HOME/.local/bin/"
+```
+
 **Required executables**. We will need some common bioinformatics tools installed. The complete list (including optional tools) is specified in the pipeline configuration file (pipelines/peppro.yaml) tools section.
 The following tools are used by the pipeline:  
 
@@ -56,12 +61,14 @@ The following tools are used by the pipeline:
 * [fastp](https://github.com/OpenGene/fastp)
 * [seqtk](https://github.com/lh3/seqtk)
 * [preseq](http://smithlabresearch.org/software/preseq/)
+* [fastq_pair](https://github.com/jvivian/fastq_pair)
 * UCSC tools (v3.5.1)
     * [wigToBigWig (v4)](https://www.encodeproject.org/software/wigtobigwig/)
     * [bigWigCat (v4)](http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/)
 
+#### `bedtools`
 We'll install each of these pieces of software before moving forward.  Let's start right at the beginning and install `bedtools`.  We're going to install from source, but if you would prefer to install from a package manager, you can follow the instructions in the [bedtools' installation guide](http://bedtools.readthedocs.io/en/latest/content/installation.html).
-```
+```console
 cd tools/
 wget https://github.com/arq5x/bedtools2/releases/download/v2.25.0/bedtools-2.25.0.tar.gz
 tar -zxvf bedtools-2.25.0.tar.gz
@@ -71,11 +78,13 @@ make
 ```
 
 Now, let's add `bedtools` to our `PATH` environment variable.  Look here to [learn more about the concept of environment variables](https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environmental-and-shell-variables-on-a-linux-vps) if you are unfamiliar.
-```
+```console
 export PATH="$PATH:/path/to/peppro_tutorial/tools/bedtools2/bin/"
 ```
-Next, let's install `bowtie2`.
-```
+
+#### `bowtie2`
+Next, let's install `bowtie2`.  For more more specific instruction, [read the author's installation guide]().
+```console
 cd ../
 wget https://downloads.sourceforge.net/project/bowtie-bio/bowtie2/2.3.4.1/bowtie2-2.3.4.1-source.zip
 unzip bowtie2-2.3.4.1-source.zip
@@ -89,20 +98,17 @@ export PATH="$PATH:/path/to/peppro_tutorial/tools/bowtie2-2.3.4.1/"
 ```
 Great! On to the next one. 
 
-* [TODO] seqkit
-* [TODO] fastp
-* [TODO] preseq
-
+#### `samtools`
 Next up, `samtools`.
-```
+```console
 wget https://sourceforge.net/projects/samtools../files/samtools/1.9/samtools-1.9.tar.bz2
 tar xvfj samtools-1.9.tar.bz2
 rm samtools-1.9.tar.bz2
 cd samtools-1.9
-/configure
+./configure
 ```
 Alternatively, if you do not have the ability to install `samtools` to the default location, you can specify using the `--prefix=/install/destination/dir/` option.  [Learn more about the `--prefix` option here](http://samtools.github.io/bcftools/howtos/install.html).
-```
+```console
 make
 make install
 ```
@@ -111,6 +117,56 @@ As for our other tools, add `samtools` to our `PATH` environment variable:
 export PATH="$PATH:/path/to/peppro_tutorial/tools/samtools-1.9/"
 ```
 
+#### `seqkit`
+Let's grab `seqkit` now.  Check out [the author's installation guide](https://github.com/shenwei356/seqkit#installation) for more instruction if necessary. 
+```console
+cd ../
+wget https://github.com/shenwei356/seqkit/releases/download/v0.10.1/seqkit_linux_amd64.tar.gz
+tar -zxvf seqkit_linux_amd64.tar.gz
+```
+And then make sure that executable is in our `PATH`.
+```console
+export PATH="$PATH:/path/to/peppro_tutorial/tools/"
+```
+
+#### `fastp`
+Next on our list is `fastp`. Check out their [install instructions](https://github.com/OpenGene/fastp#get-fastp) if necessary.
+```console
+git clone https://github.com/OpenGene/fastp.git
+cd fastp/
+make
+make install
+```
+Add to `PATH`!
+```console
+export PATH="$PATH:/path/to/peppro_tutorial/tools/fastp/"
+```
+
+#### `preseq`
+The pipeline uses `preseq` to calculate library complexity. Check out the author's [page for more instruction](https://github.com/smithlabcode/preseq).
+```console
+cd ../
+wget http://smithlabresearch.org/downloads/preseq_linux_v2.0.tar.bz2
+tar xvfj preseq_linux_v2.0.tar.bz2
+```
+Add to `PATH`!
+```console
+export PATH="$PATH:/path/to/peppro_tutorial/tools/preseq_v2.0/"
+```
+
+#### `fastq_pair`
+Finally, because PRO-seq treats read1 differently than read2 in paired-end data, we need to resync paired-end files after processing.  We [use `fastq_pair`](https://github.com/linsalrob/fastq-pair/blob/master/INSTALLATION.md) to do so efficiently.
+```console
+git clone https://github.com/linsalrob/fastq-pair.git
+cd fastq-pair/
+mkdir build
+cd build/
+cmake3 ..
+make
+make install
+```
+
+#### UCSC utilities
 Finally, we need a few of the UCSC utilities.  You can install the [entire set of tools](https://github.com/ENCODE-DCC/kentUtils) should you choose, but here we'll just grab the subset that we need.
 ```
 wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/wigToBigWig
