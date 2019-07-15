@@ -2433,9 +2433,9 @@ def main():
 
         # Plot pause index distribution
         pi_pdf = os.path.join(QC_folder, args.sample_name +
-                              "pause_index.pdf")
+                              "_pause_index.pdf")
         pi_png = os.path.join(QC_folder, args.sample_name +
-                              "pause_index.png")
+                              "_pause_index.png")
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                " pi -i " + pause_index)
         pm.run(cmd, pi_pdf, nofail=True)
