@@ -848,20 +848,20 @@ plotTSS <- function(TSSfile) {
                                  y=score, group=1, colour="black"),
                              method="loess", span=0.02,
                              se=FALSE, colour="blue") +
-                 annotate("rect", xmin=1200, xmax=2300, ymin=y_max-6,
+                 annotate("rect", xmin=1200, xmax=2300, ymin=y_max-8,
                           ymax=y_max+2, fill="gray95", size = 0.5) +
                  annotate("text", x=1750, y=y_max, label="TSS Score",
                           fontface = 1, size=6, hjust=0.5) +
                  annotate("text", x=1500, y=y_max-2, label="+", fontface = 2,
                           size=8, hjust=0.5, color=lineColor) +
-                 annotate("text", x=1500, y=y_max-4, label=TSSscore,
+                 annotate("text", x=1500, y=y_max-5, label=TSSscore,
                           fontface = 2, size=8, hjust=0.5, color=lineColor) +
                  annotate("text", x=2000, y=y_max-2, label="-",
                           fontface = 2, size=8, hjust=0.5, color="blue") +
-                 annotate("text", x=2000, y=y_max-4, label=minusTSSscore,
+                 annotate("text", x=2000, y=y_max-5, label=minusTSSscore,
                           fontface = 2, size=8, hjust=0.5, color="blue")
     } else {
-        p <- p + annotate("rect", xmin=1200, xmax=2300, ymin=y_max-3,
+        p <- p + annotate("rect", xmin=1200, xmax=2300, ymin=y_max-4,
                           ymax=y_max+2, fill="gray95", size = 0.5) +
                  annotate("text", x=1750, y=y_max+1, label="TSS Score",
                           fontface = 1, size=6, hjust=0.5) +
@@ -1168,12 +1168,25 @@ plotPI <- function(pi) {
                          outlier.shape=1) +
             stat_summary(fun.y = "mean", geom = "point",
                          shape = 1, size = 2) +
-            labs(x=name, y="each gene's pause index") +
-            scale_y_continuous(breaks = round(seq(min(PI$pi),
+            labs(x=name, y="each gene's pause index")
+
+    if (max(PI$pi) > 500) {
+        q <- q + scale_y_continuous(breaks = round(seq(min(PI$pi),
+                                              max(PI$pi),
+                                              by = 50), 0),
+                                    limits=c(0, max(PI$pi)))
+    } else if (max(PI$pi) > 100 & max(PI$pi) < 500) {
+        q <- q + scale_y_continuous(breaks = round(seq(min(PI$pi),
+                                              max(PI$pi),
+                                              by = 10), 0),
+                                    limits=c(0, max(PI$pi)))
+    } else {
+        q <- q + scale_y_continuous(breaks = round(seq(min(PI$pi),
                                               max(PI$pi),
                                               by = 5), 0),
-                               limits=c(0, max(PI$pi))) +
-            coord_cartesian(ylim=c(0, ceiling(boxplot(PI$pi)$stats[5]))) +
+                                    limits=c(0, max(PI$pi)))
+    }
+    q <- q + coord_cartesian(ylim=c(0, ceiling(boxplot(PI$pi)$stats[5]))) +
             theme_classic(base_size=14) +
             theme(axis.line = element_line(size = 0.5)) +
             theme(panel.grid.major = element_blank(),
