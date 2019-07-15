@@ -1,7 +1,8 @@
+cutadapt
+loopercli
 numpy
-https://github.com/pepkit/looper/zipball/master 
 pararead
 pandas
 piper
+refgenconf
 refgenie
-cutadapt
