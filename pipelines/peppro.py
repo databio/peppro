@@ -1933,6 +1933,8 @@ def main():
     def check_alignment_genome(temp_bam, bam):
         mr = ngstk.count_mapped_reads(temp_bam, args.paired_end)
         ar = ngstk.count_mapped_reads(bam, args.paired_end)
+        if args.paired_end:
+            ar = float(ar)/2
         rr = float(pm.get_stat("Raw_reads"))
         tr = float(pm.get_stat("Trimmed_reads"))
         if os.path.exists(res.pre_mRNA_annotation):
