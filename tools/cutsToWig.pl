@@ -32,6 +32,7 @@ $countIndex = 1;
 $currentCount = 1;
 $header =  <>;  # Grab the first line (e.g. the header)
 print $header;
+
 $cutSite = <>;  # Grab the first cut
 chomp($cutSite);
 
