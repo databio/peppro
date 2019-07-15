@@ -41,25 +41,25 @@ NULL
 #' @examples
 #' data("ccurve")
 #' data("counts")
-#' plotComplexityCurves(ccurve, coverage=3099922541, read_length=30,
-#'                        real_counts_path=counts)
+#' plotComplexityCurves(ccurves = "ccurve", coverage=3099922541, read_length=30,
+#'                      real_counts_path="counts")
 plotComplexityCurves <- function(ccurves,
-                                   coverage=0, read_length=0,
-                                   real_counts_path=NA, ignore_unique=FALSE,
-                                   output_name='complexity_curves',
-                                   x_min=0, x_max=500000000) {
+                                 coverage=0, read_length=0,
+                                 real_counts_path=NA, ignore_unique=FALSE,
+                                 output_name='complexity_curves',
+                                 x_min=0, x_max=500000000) {
 
     if (x_min < 0 || x_max <= x_min) {
         message(paste0("problem with x-min or x-max (", x_min, " ", x_max,
                        "). x-min must be >= 0 and < x-max"))
-        quit()
+        quit(save = "no", status = 1, runLast = FALSE)
     }
 
     # Convert limit counts to coverage
     if (coverage > 0) {
         if (read_length == 0) {
             message("Error: --coverage specified but not --read_length")
-            quit()
+            quit(save = "no", status = 1, runLast = FALSE)
         } else {
             coverage <- as.numeric(coverage) / as.numeric(read_length)
         }
@@ -71,8 +71,9 @@ plotComplexityCurves <- function(ccurves,
     rcDT <- data.table(name = character(length(real_counts_path)),
                        total = integer(length(real_counts_path)),
                        unique = integer(length(real_counts_path)))
-    if ("data.frame" %in% class(real_counts_path[1])) {
-        rc_file    <- real_counts_path[1]
+
+    if (exists(real_counts_path[1])) {
+        rc_file    <- data.table(get(real_counts_path[1]))
         rcDT$name  <- basename(rc_file$V1)
         rcDT$total <- as.integer(rc_file$V2)
         if (ncol(rc_file) == 3 && !ignore_unique) {
@@ -113,7 +114,7 @@ plotComplexityCurves <- function(ccurves,
                 } else if (info$size == 0) {
                     message("File is empty.")
                 }
-                quit()
+                quit(save = "no", status = 1, runLast = FALSE)
             }
         }
     }
@@ -144,7 +145,17 @@ plotComplexityCurves <- function(ccurves,
         for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
         sample_name <- name
         message(paste0("Processing ", sample_name))
-        ctable <- fread(ccurves[[c]])
+
+        if (exists(ccurves[[c]])) {
+            ctable <- data.table(get(ccurves[[c]]))
+        } else if (file.exists(ccurves[[c]])) {
+            ctable <- fread(ccurves[[c]])
+        } else {
+            stop(paste0("FileExistsError: ", ccurves[[c]],
+                        " could not be found."))
+            quit(save = "no", status = 1, runLast = FALSE)
+        }
+
         if (coverage > 0) {
             if ("TOTAL_READS" %in% colnames(ctable)) {
                 ccurve_TOTAL_READS <- as.numeric(ctable$TOTAL_READS) / coverage
@@ -160,7 +171,7 @@ plotComplexityCurves <- function(ccurves,
             } else {
                 messsage(paste0("Error, table ", c, " is not in the expected "))
                 message("format... has it been generated with preseq?")
-                quit()
+                quit(save = "no", status = 1, runLast = FALSE)
             }
         } else {
             if ("TOTAL_READS" %in% colnames(ctable)) {
@@ -175,7 +186,7 @@ plotComplexityCurves <- function(ccurves,
             } else {
                 messsage(paste0("Error, table ", c, " is not in the expected "))
                 message("format... has it been generated with preseq?")
-                quit()
+                quit(save = "no", status = 1, runLast = FALSE)
             }
         }
         if (c == 1) {
@@ -596,7 +607,7 @@ plotFRiF <- function(sample_name, num_reads, output_name, bedFile) {
             } else {
                 outFile <- file.path(output_name)
                 system2(paste("touch"), outFile)
-                quit()
+                quit(save = "no", status = 1, runLast = FALSE)
             }
 
             if (max(bed[,4] > 0)) {
@@ -687,7 +698,7 @@ roundUpNice <- function(x, nice=c(1,2,3,4,5,6,7,8,9,10)) {
 #' @export
 #' @examples
 #' data("tss")
-#' plotTSS(TSSfile = "TSSfile")
+#' plotTSS(TSSfile = "tss")
 #' @export
 plotTSS <- function(TSSfile) {
     if (length(TSSfile) == 1) {
@@ -702,7 +713,7 @@ plotTSS <- function(TSSfile) {
                          paste(TSSfile, collapse=", ")),
                   stdout())
             write(paste0("Did you mean to pass more than 2 files?"), stdout())
-            quit()
+            quit(save = "no", status = 1, runLast = FALSE)
         }
     }
 
@@ -729,7 +740,7 @@ plotTSS <- function(TSSfile) {
 
     iMat <- data.table(V1 = numeric())
     if (length(TSSfile) == 1) {
-        if (exists(TSSfile[i])) {
+        if (exists(TSSfile)) {
             iMat <- data.table(get(TSSfile))
         } else {
             iMat <- fread(TSSfile)
@@ -755,7 +766,7 @@ plotTSS <- function(TSSfile) {
                      paste(TSSfile, collapse=", ")),
               stdout())
         write(paste0("Did you mean to pass more than 2 files?"), stdout())
-        quit()
+        quit(save = "no", status = 1, runLast = FALSE)
     }
 
     if (length(TSSfile) == 1) {
@@ -776,7 +787,7 @@ plotTSS <- function(TSSfile) {
                                        peakPos+50)), score]),1)
         if (is.nan(TSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile, "\n"))
-            quit()
+            quit(save = "no", status = 1, runLast = FALSE)
         }
     } else {
         val      <- 0.05*nrow(plus)
@@ -789,7 +800,7 @@ plotTSS <- function(TSSfile) {
                                        peakPos+50)), score]),1)
         if (is.nan(TSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile[1], "\n"))
-            quit()
+            quit(save = "no", status = 1, runLast = FALSE)
         }
     }
     
@@ -816,7 +827,7 @@ plotTSS <- function(TSSfile) {
     p <- pre + t1 +
          scale_x_continuous(expand=c(0,0)) +
          scale_y_continuous(expand=c(0,0)) +
-         coord_cartesian(xlim=c(-2300,2300), ylim=c(0, y_max+2))
+         coord_cartesian(xlim=c(-2300, 2300), ylim=c(0, y_max+2))
     if (exists("minus")) {
         val      <- 0.025*nrow(minus)
         # normTSS  <- (minus / mean(minus[c(1:val,
@@ -829,7 +840,7 @@ plotTSS <- function(TSSfile) {
                                peakPos+50)), score]),1)
         if (is.nan(minusTSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile[2], "\n"))
-            quit()
+            quit(save = "no", status = 1, runLast = FALSE)
         }
         p <- p + geom_smooth(data=minusNormTSS,
                              aes(x=(as.numeric(rownames(minusNormTSS))-
@@ -884,9 +895,9 @@ plotTSS <- function(TSSfile) {
 #' @keywords fragment distribution
 #' @export
 #' @examples
-#' data("fragL")
-#' data("fragL_count")
-#' plotFLD(fragL = "fragL", fragL_count = "fragL_count",
+#' data("frag_len")
+#' data("frag_len_count")
+#' plotFLD(fragL = "frag_len", fragL_count = "frag_len_count",
 #'         fragL_dis1 = "fragLenDistribution_example.pdf",
 #'         fragL_dis2 = "fragLenDistribution_example.txt")
 #' @export
@@ -894,23 +905,37 @@ plotFLD <- function(fragL, fragL_count,
                     fragL_dis1="fragLenDistribution.pdf",
                     fragL_dis2="fragLenDistribution.txt") {
 
-    outfile_png <- gsub('pdf', 'png', fragL_dis1)
+    if (exists(fragL_count)) {
+        dat <- data.table(get(fragL_count))
+    } else if (file.exists(fragL_count)) {
+        dat <- fread(fragL_count)
+    } else {
+        stop(paste0("FileExistsError: ", fragL_count, " could not be found."))
+        quit(save = "no", status = 1, runLast = FALSE)
+    }
 
-    dat  <- fread(fragL_count)
+    if (exists(fragL)) {
+        summary_table <- data.table(get(fragL))
+    } else if (file.exists(fragL)) {
+        summary_table <- fread(fragL)
+    } else {
+        stop(paste0("FileExistsError: ", fragL, " could not be found."))
+        quit(save = "no", status = 1, runLast = FALSE)
+    }
+
     dat1 <- dat[dat$V2<=600,]
     tmp  <- seq(1:as.numeric(dat1[1,2]-1))
     dat0 <- data.table(V1=rep(0,length(tmp)),V2=tmp)
     dat2 <- rbind(dat0, dat1)
 
     t1 = theme_classic(base_size=14) +
-         theme(axis.line = element_line(size = 0.5)) +
-         theme(panel.grid.major = element_blank(),
+         theme(axis.line = element_line(size = 0.5), 
+               panel.grid.major = element_blank(),
                panel.grid.minor = element_blank(),
                legend.position = "none",
                aspect.ratio = 1,
-               panel.border = element_rect(colour = "black",
-                                          fill=NA, size=0.5)) +
-         theme(plot.title = element_text(hjust = 0.5))
+               panel.border = element_rect(colour = "black", fill=NA, size=0.5),
+               plot.title = element_text(hjust = 0.5))
 
     p <- ggplot(dat1, aes(x=V2, y=V1)) +
              geom_line(aes(color='red')) +
@@ -923,15 +948,18 @@ plotFLD <- function(fragL, fragL_count,
     pdf(file=fragL_dis1, width= 7, height = 7, useDingbats=F)
     print(p)
     invisible(dev.off())
-         
+
     # Save plot to png file
+    outfile_png <- gsub('pdf', 'png', fragL_dis1)
     png(filename=outfile_png, width = 480, height = 480)
     print(p)
     invisible(dev.off())
 
-    dat  <- fread(fragL)
-    summ <- data.table(Min=min(dat$V1), Max=max(dat$V1), Median=median(dat$V1),
-                       Mean=mean(dat$V1), Stdev=sd(dat$V1))
+    summ <- data.table(Min=min(summary_table$V1),
+                       Max=max(summary_table$V1),
+                       Median=median(summary_table$V1),
+                       Mean=mean(summary_table$V1),
+                       Stdev=sd(summary_table$V1))
     # Write summary table to stats file
     fwrite(summ, file=fragL_dis2, row.names=F, quote=F, sep="\t")
 }
@@ -1012,14 +1040,17 @@ fancyNumbers <- function(n){
 #' @keywords mRNA contamination
 #' @export
 #' @examples
-#' data("rpkm")
-#' mRNAcontamination(rpkm = "rpkm")
+#' data("rpkm_ratios")
+#' mRNAcontamination(rpkm = "rpkm_ratios")
 #' @export
 mRNAcontamination <- function(rpkm, raw=FALSE) {
     if (exists(rpkm)) {
         RPKM <- data.table(get(rpkm))
-    } else {
+    } else if (file.exists(rpkm)) {
         RPKM <- fread(rpkm)
+    } else {
+        stop(paste0("FileExistsError: ", rpkm, " could not be found."))
+        quit(save = "no", status = 1, runLast = FALSE)
     }
     colnames(RPKM) <- c("gene","intron","exon")
 
@@ -1111,14 +1142,17 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
 #' @keywords pause index
 #' @export
 #' @examples
-#' data("pi")
-#' plotPI(pi = "pi")
+#' data("pidx")
+#' plotPI(pi = "pidx")
 #' @export
 plotPI <- function(pi) {
     if (exists(pi)) {
         PI <- data.table(get(pi))
-    } else {
+    } else if (file.exists(pi)) {
         PI <- fread(pi)
+    } else {
+        stop(paste0("FileExistsError: ", pi, " could not be found."))
+        quit(save = "no", status = 1, runLast = FALSE)
     }
     colnames(PI) <- c("pi")
 
@@ -1139,7 +1173,7 @@ plotPI <- function(pi) {
                                               max(PI$pi),
                                               by = 5), 0),
                                limits=c(0, max(PI$pi))) +
-            coord_cartesian(ylim=c(0, ceiling(quantile(PI$pi, 0.9)))) +
+            coord_cartesian(ylim=c(0, ceiling(boxplot(PI$pi)$stats[5]))) +
             theme_classic(base_size=14) +
             theme(axis.line = element_line(size = 0.5)) +
             theme(panel.grid.major = element_blank(),
@@ -1147,7 +1181,7 @@ plotPI <- function(pi) {
                   aspect.ratio = 1,
                   panel.border = element_rect(colour = "black",
                                               fill=NA, size=0.5))
-    max_y  <- ceiling(quantile(PI$pi, 0.9))
+    max_y  <- ceiling(boxplot(PI$pi)$stats[5])
     label1 <- c(paste("'median'", ":", round(median(PI$pi), 2)),
                 paste("'mean'", ":", round(mean(PI$pi), 2)))
     q <- q + annotate("text", x = 0.5, y = c(max_y, 0.95*max_y),
@@ -1180,8 +1214,11 @@ plotPI <- function(pi) {
 plotCutadapt <- function(input) {
     if (exists(input)) {
         report <- data.table(get(input))
-    } else {
+    } else if (file.exists(input)) {
         report <- fread(input)
+    } else {
+        stop(paste0("FileExistsError: ", input, " could not be found."))
+        quit(save = "no", status = 1, runLast = FALSE)
     }
 
     name      <- basename(tools::file_path_sans_ext(input))
