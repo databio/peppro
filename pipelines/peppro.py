@@ -2113,10 +2113,10 @@ def main():
             QC_folder, args.sample_name + "_preseq_out.txt")
         preseq_yield = os.path.join(
             QC_folder, args.sample_name + "_preseq_yield.txt")
-        preseq_mr = os.path.join(
-            QC_folder, args.sample_name + "_preseq.mr")
-        preseq_cov = os.path.join(
-            QC_folder, args.sample_name + "_preseq_coverage.txt")
+        # preseq_mr = os.path.join(
+        #     QC_folder, args.sample_name + "_preseq.mr")
+        # preseq_cov = os.path.join(
+        #     QC_folder, args.sample_name + "_preseq_coverage.txt")
         preseq_counts = os.path.join(
             QC_folder, args.sample_name + "_preseq_counts.txt")
         preseq_plot = os.path.join(
@@ -2135,19 +2135,20 @@ def main():
         pm.run(cmd2, preseq_yield, nofail=True)
 
         if os.path.exists(preseq_yield):
-            cmd3 = ("bam2mr " + mapping_genome_bam_dups +
-                    " > " + preseq_mr)
-            cmd4 = (tools.preseq + " gc_extrap -v -o " + preseq_cov +
-                    " " + preseq_mr)
+            # cmd3 = ("bam2mr " + mapping_genome_bam_dups +
+            #         " > " + preseq_mr)
+            # cmd4 = (tools.preseq + " gc_extrap -v -o " + preseq_cov +
+            #         " " + preseq_mr)
             cmd5 = ("echo '" + preseq_yield +
                     " '$(" + tools.samtools + " view -c -F 4 " + 
                     mapping_genome_bam_dups + ")" + "' '" +
                     "$(" + tools.samtools + " view -c -F 4 " +
                     mapping_genome_bam + ") > " + preseq_counts)
 
-            pm.run([cmd3, cmd4, cmd5],
-                   [preseq_mr, preseq_cov, preseq_counts])
-            pm.clean_add(preseq_mr)
+            # pm.run([cmd3, cmd4, cmd5],
+            #        [preseq_mr, preseq_cov, preseq_counts])
+            pm.run(cmd5, preseq_counts)
+            #pm.clean_add(preseq_mr)
             pm.clean_add(mapping_genome_bam_dups)
             pm.clean_add(mapping_genome_bam_temp_dups)
 
