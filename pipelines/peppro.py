@@ -23,7 +23,7 @@ RUNON_SOURCE = ["pro", "gro"]
 ADAPTER_REMOVAL = ["fastp", "cutadapt"]
 DEDUPLICATORS = ["seqkit", "fqdedup"]
 TRIMMERS = ["seqtk", "fastx"]
-BT2_IDX_KEY = "bowtie2"
+BT2_IDX_KEY = "bowtie2_index"
 
 
 def parse_arguments():
@@ -1661,10 +1661,14 @@ def main():
     untrimmed_fastq1 = out_fastq_pre + "_R1.fastq"
     untrimmed_fastq2 = out_fastq_pre + "_R2.fastq" if args.paired_end else None
 
-    ###########################################################################
-    # Begin fastq trimming
-    ###########################################################################
+    ############################################################################
+    #                          Process read files                              #
+    ############################################################################
     pm.timestamp("### FASTQ processing: ")
+
+    adapter_report = os.path.join(
+        fastqc_folder, args.sample_name + "_R1_rmAdapter.txt")
+
     if args.paired_end:
         if args.complexity:
             unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, False,
@@ -1689,10 +1693,6 @@ def main():
         r2_repair_single = os.path.join(
             fastq_folder, args.sample_name + "_R2_trimmed.fastq.single.fq")
 
-        # if float(pm.get_stat("File_mb")) > 2000:
-        #     cmd = (tool_path("fastq_pair.py") + " -r1 " + unmap_fq1 +
-        #            " -r2 " + unmap_fq2 + " --lowmem")
-        # else:
         rr = float(pm.get_stat("Raw_reads"))
         cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + unmap_fq1 +
                " " + unmap_fq2)
@@ -1727,11 +1727,6 @@ def main():
         cmd3 = ("touch dups_repaired.flag")
         pm.run([cmd1, cmd2, cmd3], dups_repair_target)
         pm.clean_add(dups_repair_target)
-
-        # unmap_fq1 = r1_repair
-        # unmap_fq2 = r2_repair
-        # unmap_fq1_dups = r1_dups_repair
-        # unmap_fq2_dups = r2_dups_repair
     else:
         if args.complexity:
             unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, False,
@@ -1749,8 +1744,10 @@ def main():
     pm.clean_add(os.path.join(fastq_folder, "*.fastq"), conditional=True)
     pm.clean_add(os.path.join(fastq_folder, "*.log"), conditional=True)
 
-    # Map to any requested prealignments
-    # We recommend mapping to chrM first for PRO-seq data
+    ############################################################################
+    #                  Map to any requested prealignments                      #
+    ############################################################################
+    # We recommend mapping to human_rDNA first for PRO-seq data
     pm.timestamp("### Prealignments")
     to_compress = []
     if len(args.prealignments) == 0:
@@ -1827,6 +1824,9 @@ def main():
                 else:
                     to_compress.append(unmap_fq1)
 
+    ############################################################################
+    #                           Map to primary genome                          #
+    ############################################################################
     pm.timestamp("### Map to genome")
     map_genome_folder = os.path.join(
         param.outfolder, "aligned_" + args.genome_assembly)
@@ -2054,6 +2054,9 @@ def main():
         pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
         mapping_genome_bam = mapping_pe1_bam
 
+    ############################################################################
+    #                     Calculate library complexity                         #
+    ############################################################################
     if args.complexity:
         if os.path.exists(mapping_genome_bam_temp_dups):
             if not os.path.exists(temp_mapping_index_dups):
@@ -2104,7 +2107,6 @@ def main():
             pm.run([cmd1, cmd2], [dups_pe1_bam, dups_pe2_bam])
             mapping_genome_bam_dups = dups_pe1_bam
 
-        # Calculate library complexity
         pm.timestamp("### Calculate library complexity")
         QC_folder = os.path.join(param.outfolder, "QC_" + args.genome_assembly)
         ngstk.make_dir(QC_folder)
@@ -2168,7 +2170,9 @@ def main():
         else:
             print("Unable to calculate library complexity.")
 
-    # Calculate quality control metrics for the alignment file
+    ############################################################################
+    #         Calculate quality control metrics for the alignment file         #
+    ############################################################################
     pm.timestamp("### Calculate NRF, PBC1, and PBC2")
 
     # Need index for mapping_genome_bam before calculating bamQC metrics
@@ -2210,7 +2214,9 @@ def main():
     pm.run(cmd, bamQC, follow=lambda: report_bam_qc(bamQC),
            container=pm.container)
 
-    # Now produce the unmapped file
+    ############################################################################
+    #                     Produce unmapped reads file                          #
+    ############################################################################
     def count_unmapped_reads():
         # Report total number of unmapped reads (-f 4)
         cmd = (tools.samtools + " view -c -f 4 -@ " + str(pm.cores) +
@@ -2233,7 +2239,9 @@ def main():
     # Remove temporary bam file from unmapped file production
     pm.clean_add(mapping_genome_bam_temp)
 
-    # Separate by strand
+    ############################################################################
+    #                          Separate BAM by strand                          #
+    ############################################################################
     pm.timestamp("### Split BAM by strand")
     plus_bam = os.path.join(
         map_genome_folder, args.sample_name + "_plus.bam")
@@ -2259,7 +2267,9 @@ def main():
     
     pm.run([cmd1,cmd2], minus_bam)
 
-    # TSS enrichment
+    ############################################################################
+    #                             TSS enrichment                               #
+    ############################################################################
     if not os.path.exists(res.tss_annotation):
         print("Skipping TSS -- TSS enrichment requires TSS annotation file: {}"
               .format(res.tss_annotation))
@@ -2269,8 +2279,8 @@ def main():
         # Split TSS file
         plus_TSS  = os.path.join(QC_folder, "plus_TSS.tsv")
         minus_TSS = os.path.join(QC_folder, "minus_TSS.tsv")
-        cmd = ("sed -n -e '/[[:space:]]+[[:space:]]/w " +
-               plus_TSS + "' -e '/[[:space:]]-[[:space:]]/w " +
+        cmd = ("sed -n -e '/[[:space:]]+/w " +
+               plus_TSS + "' -e '/[[:space:]]-/w " +
                minus_TSS + "' " + res.tss_annotation)
         pm.run(cmd, [plus_TSS, minus_TSS])
 
@@ -2340,7 +2350,9 @@ def main():
                                "_TSSenrichment.png")
         pm.report_object("TSS enrichment", TSS_pdf, anchor_image=TSS_png)
 
-    # Pause index
+    ############################################################################
+    #                Pause index calculation and plotting                      #
+    ############################################################################
     chr_order = os.path.join(QC_folder, "chr_order.txt")
     chr_keep = os.path.join(QC_folder, "chr_keep.txt")
 
@@ -2444,7 +2456,9 @@ def main():
         pm.run(cmd, pi_pdf, nofail=True)
         pm.report_object("Pause index", pi_pdf, anchor_image=pi_png)
 
-    # Fraction of reads in Pre-mRNA (FRiP)
+    ############################################################################
+    #           Calculate Fraction of Reads in Pre-mRNA (FRiP)                 #
+    ############################################################################
     if not os.path.exists(res.pre_mRNA_annotation):
         print("Skipping FRiP -- Fraction of reads in pre-mRNA requires "
               "pre-mRNA annotation file: {}"
@@ -2462,7 +2476,9 @@ def main():
                                pipeline_manager=pm)
         pm.report_result("Minus FRiP", round(minus_frip, 2))
 
-    # Fragment distribution
+    ############################################################################
+    #             Plot fragment distribution (for SE data)                     #
+    ############################################################################
     if args.paired_end:
         pm.timestamp("### Plot fragment distribution")
         frag_len = os.path.join(QC_folder, args.sample_name + "_fragLen.txt")
@@ -2510,96 +2526,156 @@ def main():
             pm.report_object("Adapter insertion distribution", degradation_pdf,
                              anchor_image=degradation_png)
 
-    # Calculate fraction of reads in features of interest
-    pm.timestamp("### Calculate fraction of reads in features (FRiF)")
+    ############################################################################
+    #                        Extract genomic features                          #
+    ############################################################################
+    # Generate local unzipped annotation file
+    anno_local = os.path.join(raw_folder,
+                              args.genome_assembly + "_annotations.bed")
+    anno_zip = os.path.join(raw_folder,
+                            args.genome_assembly + "_annotations.bed.gz")
 
-    # Custom annotation file or direct path to annotation file is specified
-    anno_local = ''
+    if (not os.path.exists(anno_local) and
+        not os.path.exists(anno_zip) and
+        os.path.exists(res.feat_annotation) or
+        args.new_start):
 
-    if os.path.exists(res.feat_annotation):
         if res.feat_annotation.endswith(".gz"):
-            anno_local = os.path.join(raw_folder,
-                                      args.genome_assembly +
-                                      "_annotations.bed.gz")
-            cmd = ("ln -sf " + res.feat_annotation + " " + anno_local)
-            pm.run(cmd, anno_local)
+            cmd1 = ("ln -sf " + res.feat_annotation + " " + anno_zip)
+            cmd2 = (ngstk.ziptool + " -d -c " + anno_zip +
+                    " > " + anno_local)
+            pm.run([cmd1, cmd2], anno_local)
+            pm.clean_add(anno_local)
         elif res.feat_annotation.endswith(".bed"):
-            anno_local = os.path.join(raw_folder,
-                                      args.genome_assembly +
-                                      "_annotations.bed")
             cmd = ("ln -sf " + res.feat_annotation + " " + anno_local)
             pm.run(cmd, anno_local)
+            pm.clean_add(anno_local)
         else:
-            print("Skipping read annotation...")
+            print("Skipping read and peak annotation...")
             print("This requires a {} annotation file."
                   .format(args.genome_assembly))
             print("Could not find {}.`"
                   .format(str(os.path.dirname(res.feat_annotation))))
 
-    anno_list_plus = list()
-    anno_list_minus = list()
+    ############################################################################ 
+    #                  Determine genomic feature coverage                      #
+    ############################################################################
+    pm.timestamp("### Calculate fraction of reads in features (FRiF)")
 
-    if os.path.isfile(anno_local):
-        # Get list of features
-        cmd1 = (ngstk.ziptool + " -d -c " + anno_local +
-                " | cut -f 4 | sort -u")
-        ft_list = pm.checkprint(cmd1, shell=True)
-        ft_list = ft_list.splitlines()
+    frif_plus_PDF = os.path.join(QC_folder, args.sample_name + "_plus_frif.pdf")
+    frif_plus_PNG = os.path.join(QC_folder, args.sample_name + "_plus_frif.png")
+    frif_minus_PDF = os.path.join(QC_folder,
+                                  args.sample_name + "_minus_frif.pdf")
+    frif_minus_PNG = os.path.join(QC_folder,
+                                  args.sample_name + "_minus_frif.png")
 
-        # Split annotation file on features
-        cmd2 = (ngstk.ziptool + " -d -c " + anno_local +
-                " | awk -F'\t' '{print>\"" + QC_folder + "/\"$4}'")
-        if len(ft_list) >= 1:
-            for pos, anno in enumerate(ft_list):
-                # working files
-                anno_file = os.path.join(QC_folder, anno)
-                valid_name = re.sub('[^\w_.)( -]', '', anno).strip().replace(' ', '_')
-                file_name = os.path.join(QC_folder, valid_name)
-                anno_sort = os.path.join(QC_folder, valid_name + "_sort.bed")
-                anno_cov_plus = os.path.join(QC_folder,
-                                             args.sample_name + "_" +
-                                             valid_name + "_plus_coverage.bed")
-                anno_cov_minus = os.path.join(QC_folder,
-                                              args.sample_name + "_" +
-                                              valid_name +
-                                              "_minus_coverage.bed")
+    if not os.path.exists(frif_plus_PDF) or args.new_start:
+        anno_list_plus = list()
+        anno_list_minus = list()
 
-                # Extract feature files
-                pm.run(cmd2, anno_file)
+        if os.path.isfile(anno_local):
+            # Get list of features
+            cmd1 = ("cut -f 4 " + anno_local + " | sort -u")
+            ft_list = pm.checkprint(cmd1, shell=True)
+            ft_list = ft_list.splitlines()
 
-                # Rename files to valid file_names
-                # Avoid 'mv' "are the same file" error
-                if not os.path.exists(file_name):
-                    cmd = 'mv "{old}" "{new}"'.format(old=anno_file,
-                                                      new=file_name)
-                    pm.run(cmd, file_name)
+            # Split annotation file on features
+            cmd2 = ("awk -F'\t' '{print>\"" + QC_folder + "/\"$4}' " +
+                    anno_local)
+            if len(ft_list) >= 1:
+                for pos, anno in enumerate(ft_list):
+                    # working files
+                    anno_file = os.path.join(QC_folder, str(anno))
+                    valid_name = str(re.sub('[^\w_.)( -]', '', anno).strip().replace(' ', '_'))
+                    file_name = os.path.join(QC_folder, valid_name)
+                    anno_sort = os.path.join(QC_folder,
+                                             valid_name + "_sort.bed")
+                    anno_cov_plus = os.path.join(QC_folder,
+                                                 args.sample_name + "_" +
+                                                 valid_name + "_plus_coverage.bed")
+                    anno_cov_minus = os.path.join(QC_folder,
+                                                  args.sample_name + "_" +
+                                                  valid_name +
+                                                  "_minus_coverage.bed")
 
-                # Sort files
-                cmd3 = ("cut -f 1-3 " + file_name +
-                        " | bedtools sort -i stdin -faidx " +
-                        chr_order + " > " + anno_sort)
-                pm.run(cmd3, anno_sort)
-                
-                anno_list_plus.append(anno_cov_plus)
-                anno_list_minus.append(anno_cov_minus)
-                cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        anno_sort + " -b " + plus_bam +
-                        " -g " + chr_order + " > " +
-                        anno_cov_plus)
-                cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
-                        anno_sort + " -b " + minus_bam +
-                        " -g " + chr_order + " > " +
-                        anno_cov_minus)
-                pm.run(cmd4, anno_cov_plus, 
-                       container=pm.container)
-                pm.run(cmd5, anno_cov_minus,
-                       container=pm.container)
-                pm.clean_add(file_name)
-                pm.clean_add(anno_sort)
-                pm.clean_add(anno_cov_plus)
-                pm.clean_add(anno_cov_minus)
+                    # Extract feature files
+                    pm.run(cmd2, anno_file)
 
-    # Report mRNA contamination
+                    # Rename files to valid file_names
+                    # Avoid 'mv' "are the same file" error
+                    if not os.path.exists(file_name):
+                        cmd = 'mv "{old}" "{new}"'.format(old=anno_file,
+                                                          new=file_name)
+                        pm.run(cmd, file_name)
+
+                    # Sort files (ensure only aligned chromosomes are kept)
+                    cmd3 = ("cut -f 1 " + chr_order + " | grep -wf - " +
+                            file_name + " | cut -f 1-3 | " +
+                            "bedtools sort -i stdin -faidx " +
+                            chr_order + " > " + anno_sort)
+                    pm.run(cmd3, anno_sort)
+                    
+                    anno_list_plus.append(anno_cov_plus)
+                    anno_list_minus.append(anno_cov_minus)
+                    cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
+                            anno_sort + " -b " + plus_bam +
+                            " -g " + chr_order + " > " +
+                            anno_cov_plus)
+                    cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
+                            anno_sort + " -b " + minus_bam +
+                            " -g " + chr_order + " > " +
+                            anno_cov_minus)
+                    pm.run(cmd4, anno_cov_plus)
+                    pm.run(cmd5, anno_cov_minus)
+
+                    pm.clean_add(file_name)
+                    pm.clean_add(anno_sort)
+                    pm.clean_add(anno_cov_plus)
+                    pm.clean_add(anno_cov_minus)
+
+    ############################################################################
+    #                                 Plot FRiF                                #
+    ############################################################################
+    pm.timestamp("### Plot FRiF")
+    # Plus
+    if not os.path.exists(frif_plus_PDF) or args.new_start:
+        count_cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
+                     param.samtools.params + " -c -F4 " + plus_bam)
+        plus_read_count = pm.checkprint(count_cmd)
+        plus_read_count = str(plus_read_count).rstrip()
+
+        frif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+                   "-n", args.sample_name, "-r", plus_read_count,
+                   "-o", frif_plus_PDF, "--bed"]
+        if anno_list_plus:
+            for cov in anno_list_plus:
+                frif_cmd.append(cov)
+            cmd = build_command(frif_cmd)
+            pm.run(cmd, frif_plus_PDF, nofail=False)
+            pm.report_object("Plus FRiF", frif_plus_PDF,
+                             anchor_image=frif_plus_PNG)
+
+    # Minus
+    if not os.path.exists(frif_minus_PDF) or args.new_start:
+        count_cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
+                     param.samtools.params + " -c -F4 " + minus_bam)
+        minus_read_count = pm.checkprint(count_cmd)
+        minus_read_count = str(minus_read_count).rstrip()
+
+        frif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+                   "-n", args.sample_name, "-r", minus_read_count,
+                   "-o", frif_minus_PDF, "--bed"]
+        if anno_list_minus:
+            for cov in anno_list_minus:
+                frif_cmd.append(cov)
+            cmd = build_command(frif_cmd)
+            pm.run(cmd, frif_minus_PDF, nofail=False)
+            pm.report_object("Minus FRiF", frif_minus_PDF,
+                             anchor_image=frif_minus_PNG)
+
+    ############################################################################
+    #                         Report mRNA contamination                        #
+    ############################################################################
     if (os.path.exists(res.exon_annotation) and
         os.path.exists(res.intron_annotation)):
 
@@ -2700,43 +2776,9 @@ def main():
         pm.run(cmd, mRNApdf, nofail=False)
         pm.report_object("mRNA contamination", mRNApdf, anchor_image=mRNApng)
 
-    # Plot FRiF
-    pm.timestamp("### Plot FRiF")
-    # Plus
-    cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
-           param.samtools.params + " -c -F4 " + plus_bam)
-    totalReads = pm.checkprint(cmd)
-    totalReads = str(totalReads).rstrip()
-
-    frifPDF = os.path.join(QC_folder, args.sample_name + "_plus_frif.pdf")
-    frifPNG = os.path.join(QC_folder, args.sample_name + "_plus_frif.png")
-    frifCmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-               "-n", args.sample_name, "-r", totalReads,
-               "-o", frifPDF, "--bed"]
-    for cov in anno_list_plus:
-        frifCmd.append(cov)
-    cmd = build_command(frifCmd)
-    pm.run(cmd, frifPDF, nofail=False)
-    pm.report_object("Plus FRiF", frifPDF, anchor_image=frifPNG)
-
-    # Minus
-    cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
-           param.samtools.params + " -c -F4 " + minus_bam)
-    totalReads = pm.checkprint(cmd)
-    totalReads = str(totalReads).rstrip()
-
-    frifPDF = os.path.join(QC_folder, args.sample_name + "_minus_frif.pdf")
-    frifPNG = os.path.join(QC_folder, args.sample_name + "_minus_frif.png")
-    frifCmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-               "-n", args.sample_name, "-r", totalReads,
-               "-o", frifPDF, "--bed"]
-    for cov in anno_list_minus:
-        frifCmd.append(cov)
-    cmd = build_command(frifCmd)
-    pm.run(cmd, frifPDF, nofail=False)
-    pm.report_object("Minus FRiF", frifPDF, anchor_image=frifPNG)
-
-    # Shift and produce BigWig's
+    ############################################################################
+    #                        Shift and produce BigWig's                        #
+    ############################################################################
     genome_fq = os.path.join(res.rgc.genome_folder,
                              args.genome_assembly,
                              (args.genome_assembly + ".fa"))
@@ -2957,7 +2999,9 @@ def main():
 
         pm.run([scale_plus_cmd, scale_minus_cmd], minus_bw)
 
-    # COMPLETE!
+    ############################################################################
+    #                            PIPELINE COMPLETE!                            #
+    ############################################################################
     pm.stop_pipeline()
 
 
