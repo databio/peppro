@@ -9,8 +9,8 @@ To calculate [TSS enrichments](../glossary.md), you will need a [TSS annotation 
 ```console
 wget -O hg38_TSS_full.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz \
 zcat hg38_TSS_full.txt.gz | \
-  awk  '{if($4=="+"){print $3"\t"$5"\t"$5"\t"$4"\t"$13}else{print $3"\t"$6"\t"$6"\t"$4"\t"$13}}' | \
-  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_TSS.tsv
+  awk  '{if($4=="+"){print $3"\t"$5"\t"$5"\t"$13"\t.\t"$4}else{print $3"\t"$6"\t"$6"\t"$13"\t.\t"$4}}' | \
+  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_TSS.bed
 ```
 This asset (`tss_annotation`) needs to be [included in your `$REFGENIE` configuration file](annotation_files.md#example-peppro-refgenie-configuration-file) for the pipeline to detect it automatically.  Alternatively, you can use the `--TSS-name` pipeline option to provide a path directly to this file.
 
@@ -18,8 +18,8 @@ This asset (`tss_annotation`) needs to be [included in your `$REFGENIE` configur
 
 To calculate [pause indicies](../glossary.md), you will need two files in your reference genome directory: a [PI TSS annotation file](http://big.databio.org/refgenomes/) and a [PI gene body annotation file](http://big.databio.org/refgenomes/).  If a pre-built version for your genome of interest isn't present, you can quickly create that file yourself. In the reference genome directory, you can perform the following commands for in this example, `hg38`:
 ```console
-wget ftp://ftp.ensembl.org/pub/release-87/gtf/homo_sapiens/Homo_sapiens.GRCh38.87.gtf.gz \
-zcat Homo_sapiens.GRCh38.87.gtf.gz | \
+wget ftp://ftp.ensembl.org/pub/release-97/gtf/homo_sapiens/Homo_sapiens.GRCh38.97.gtf.gz \
+zcat Homo_sapiens.GRCh38.97.gtf.gz | \
   grep 'exon_number "1"' | \
   sed 's/^/chr/' | \
   awk '{OFS="\t";} {print $1,$4,$5,$20,$14,$7}' | \
@@ -28,7 +28,7 @@ zcat Homo_sapiens.GRCh38.87.gtf.gz | \
   awk '{if($6=="+"){print $1"\t"$2+20"\t"$3+120"\t"$4"\t"$5"\t"$6}else{print $1"\t"$3-120"\t"$3-20"\t"$4"\t"$5"\t"$6}}' | \
   LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_PI_TSS.bed
 
-zcat Homo_sapiens.GRCh38.87.gtf.gz | \
+zcat Homo_sapiens.GRCh38.97.gtf.gz | \
   awk '$3 == "gene"' | \
   sed 's/^/chr/' | \
   awk '{OFS="\t";} {print $1,$4,$5,$14,$6,$7}' | \
@@ -68,8 +68,8 @@ To determine the [*F*raction of *R*eads *i*n *P*re-mature mRNA (*FRiP*)](../glos
 ```console
 wget -O hg38_refGene.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz
 zcat hg38_refGene.txt.gz | grep 'cmpl' | \
-  awk  '{print $3"\t"$5"\t"$6"\t"$4"\t"$13}' | \
-  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_pre-mRNA.tsv
+  awk  '{print $3"\t"$5"\t"$6"\t"$13"\t.\t"$4}' | \
+  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_pre-mRNA.bed
 ```
 This asset (`pre_mRNA_annotation`) needs to be [included in your `$REFGENIE` configuration file](#Example_PEPPRO_REFGENIE_configuration_file) for the pipeline to detect it automatically.  Alternatively, you can use the `--pre-name` pipeline option to provide a path directly to this file.
 

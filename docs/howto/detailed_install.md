@@ -66,7 +66,7 @@ The following tools are used by the pipeline:
     * [wigToBigWig (v4)](https://www.encodeproject.org/software/wigtobigwig/)
     * [bigWigCat (v4)](http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/)
 
-#### `bedtools`
+#### bedtools
 We'll install each of these pieces of software before moving forward.  Let's start right at the beginning and install `bedtools`.  We're going to install from source, but if you would prefer to install from a package manager, you can follow the instructions in the [bedtools' installation guide](http://bedtools.readthedocs.io/en/latest/content/installation.html).
 ```console
 cd tools/
@@ -82,7 +82,7 @@ Now, let's add `bedtools` to our `PATH` environment variable.  Look here to [lea
 export PATH="$PATH:/path/to/peppro_tutorial/tools/bedtools2/bin/"
 ```
 
-#### `bowtie2`
+#### bowtie2
 Next, let's install `bowtie2`.  For more more specific instruction, [read the author's installation guide](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#building-from-source).
 ```console
 cd ../
@@ -98,7 +98,7 @@ export PATH="$PATH:/path/to/peppro_tutorial/tools/bowtie2-2.3.4.1/"
 ```
 Great! On to the next one. 
 
-#### `samtools`
+#### samtools
 Next up, `samtools`.
 ```console
 wget https://sourceforge.net/projects/samtools../files/samtools/1.9/samtools-1.9.tar.bz2
@@ -117,7 +117,7 @@ As for our other tools, add `samtools` to our `PATH` environment variable:
 export PATH="$PATH:/path/to/peppro_tutorial/tools/samtools-1.9/"
 ```
 
-#### `seqkit`
+#### seqkit
 Let's grab `seqkit` now.  Check out [the author's installation guide](https://github.com/shenwei356/seqkit#installation) for more instruction if necessary. 
 ```console
 cd ../
@@ -129,7 +129,7 @@ And then make sure that executable is in our `PATH`.
 export PATH="$PATH:/path/to/peppro_tutorial/tools/"
 ```
 
-#### `fastp`
+#### fastp
 Next on our list is `fastp`. Check out their [install instructions](https://github.com/OpenGene/fastp#get-fastp) if necessary.
 ```console
 git clone https://github.com/OpenGene/fastp.git
@@ -142,7 +142,7 @@ Add to `PATH`!
 export PATH="$PATH:/path/to/peppro_tutorial/tools/fastp/"
 ```
 
-#### `preseq`
+#### preseq
 The pipeline uses `preseq` to calculate library complexity. Check out the author's [page for more instruction](https://github.com/smithlabcode/preseq).
 ```console
 cd ../
@@ -154,7 +154,7 @@ Add to `PATH`!
 export PATH="$PATH:/path/to/peppro_tutorial/tools/preseq_v2.0/"
 ```
 
-#### `fastq_pair`
+#### fastq_pair
 Finally, because PRO-seq treats read1 differently than read2 in paired-end data, we need to resync paired-end files after processing.  We [use `fastq_pair`](https://github.com/linsalrob/fastq-pair/blob/master/INSTALLATION.md) to do so efficiently.
 ```console
 git clone https://github.com/linsalrob/fastq-pair.git
