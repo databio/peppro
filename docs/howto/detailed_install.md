@@ -61,7 +61,7 @@ The following tools are used by the pipeline:
 * [fastp](https://github.com/OpenGene/fastp)
 * [seqtk](https://github.com/lh3/seqtk)
 * [preseq](http://smithlabresearch.org/software/preseq/)
-* [fastq_pair](https://github.com/jvivian/fastq_pair)
+* [fastq-pair](https://github.com/linsalrob/fastq-pair.git)
 * UCSC tools (v3.5.1)
     * [wigToBigWig (v4)](https://www.encodeproject.org/software/wigtobigwig/)
     * [bigWigCat (v4)](http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/)
