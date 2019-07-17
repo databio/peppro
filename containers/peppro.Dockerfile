@@ -5,7 +5,7 @@ FROM phusion/baseimage:0.11
 LABEL maintainer Jason Smith "jasonsmith@virginia.edu"
 
 # Version info
-LABEL version 0.7.3
+LABEL version 0.7.4
 
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
@@ -16,6 +16,7 @@ RUN apt-get update && \
     autoconf \
     automake \
     autotools-dev \
+    cmake \
     curl \
     default-jre \
     default-jdk \
@@ -35,6 +36,7 @@ RUN apt-get update && \
     libtbb2 \
     libtbb-dev \
     libtool \
+    libxml2-dev \
     openssl \
     pigz \
     build-essential \
@@ -51,11 +53,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes mysql-server \
 # Install Python tools
 RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade cutadapt && \
+    pip3 install --upgrade loopercli && \
     pip3 install --upgrade numpy && \
-    pip3 install --upgrade https://github.com/pepkit/looper/zipball/master && \
     pip3 install --upgrade pararead && \
     pip3 install --upgrade pandas && \
     pip3 install --upgrade piper && \
+    pip3 install --upgrade refgenconf && \
     pip3 install --upgrade refgenie
 
 # Install R
@@ -138,6 +141,17 @@ RUN wget http://smithlabresearch.org/downloads/preseq_linux_v2.0.tar.bz2 && \
     ln -s /home/src/preseq_v2.0/preseq /usr/bin/ && \
     ln -s /home/src/preseq_v2.0/bam2mr /usr/bin/
 
+# Install fastq-pair
+WORKDIR /home/src/
+RUN git clone https://github.com/linsalrob/fastq-pair.git && \
+    cd fastq-pair/ && \
+    mkdir build && \
+    cd build/ && \
+    cmake .. && \
+    make && \
+    make install
+    
+
 # Install UCSC tools
 WORKDIR /home/tools/
 RUN wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/wigToBigWig && \
@@ -157,10 +171,12 @@ RUN wget https://github.com/s-andrews/FastQC/archive/v0.11.8.zip && \
     chmod 755 fastqc && \ 
     ln -s /home/tools/FastQC-0.11.8/fastqc /usr/bin/
 
+
 # Install cargo
 WORKDIR /home/tools/
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+
 
 # Install fqdedup
 WORKDIR /home/tools/
@@ -168,6 +184,7 @@ RUN git clone https://github.com/guertinlab/fqdedup.git && \
     cd fqdedup && \
     bash -c 'source $HOME/.cargo/env; cargo build --release' && \
     ln -s /home/tools/fqdedup/target/release/fqdedup /usr/bin/
+
 
 # Install fastx_toolkit
 WORKDIR /home/tools/
@@ -185,6 +202,7 @@ RUN git clone https://github.com/agordon/fastx_toolkit && \
     find . -type f -exec sed -ie 's/-Werror//g' {} \; && \
     make && \
     make install
+
 
 # Install seqOutBias
 WORKDIR /home/tools/
@@ -204,9 +222,11 @@ ENV PATH=/home/tools/bin:/home/tools/:/home/src/bowtie2-2.3.5.1:/home/src/samtoo
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/:/usr/local/lib/ \
     PYTHONPATH=/usr/local/lib/python3.6/dist-packages:$PYTHONPATH
 
+
 # Define default command
 WORKDIR /home/
 CMD ["/bin/bash"]
+
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
