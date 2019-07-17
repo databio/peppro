@@ -474,9 +474,11 @@ computeLimit <- function(value, ccurve_TOTAL_READS) {
     last_point   <- length(ccurve_TOTAL_READS)
     iterations   <- 0
     while (first_point != last_point) {
-        middle_point <- (first_point + last_point)/2
-        middle_value <- ccurve_TOTAL_READS[middle_point]
-        if (middle_value == value || iterations >= 10000) {
+        middle_point <- as.numeric((first_point + last_point)/2)
+        middle_value <- as.numeric(ccurve_TOTAL_READS[middle_point])
+        if (length(middle_value)==0) {
+            return(middle_point)
+        } else if (middle_value == value || iterations >= 10000) {
             return(middle_point)
         } else if (middle_value >= value) {
             last_point  <- middle_point - 1
