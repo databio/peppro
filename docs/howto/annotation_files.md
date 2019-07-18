@@ -120,13 +120,13 @@ genomes:
     chrom_sizes:
       path: hg38.chrom.sizes
     tss_annotation:
-      path: hg38_TSS.tsv
+      path: hg38_TSS.bed
     pi_tss:
       path: hg38_PI_TSS.bed
     pi_body:
       path: hg38_PI_gene_body.bed
     pre_mRNA_annotation:
-      path: hg38_pre-mRNA.tsv
+      path: hg38_pre-mRNA.bed
     feat_annotation:
       path: hg38_annotations.bed.gz
     exon_annotation:
