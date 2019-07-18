@@ -1,13 +1,13 @@
 protocol_mapping:
-  PRO: peppro.py
-  pro: peppro.py
-  PRO-SEQ: peppro.py
-  PRO-seq: peppro.py
-  PROSEQ: peppro.py
-  proseq: peppro.py
+  PRO: peppro
+  pro: peppro
+  PRO-SEQ: peppro
+  PRO-seq: peppro
+  PROSEQ: peppro
+  proseq: peppro
 
 pipelines:
-  peppro.py:
+  peppro:
     name: PEPPRO
     path: pipelines/peppro.py
     looper_args: True
