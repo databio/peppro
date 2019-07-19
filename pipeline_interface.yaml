@@ -1,6 +1,8 @@
 protocol_mapping:
   PRO: peppro
   pro: peppro
+  GRO: peppro
+  gro: peppro
   PRO-SEQ: peppro
   PRO-seq: peppro
   PROSEQ: peppro
