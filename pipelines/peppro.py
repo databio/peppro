@@ -23,7 +23,7 @@ RUNON_SOURCE = ["pro", "gro"]
 ADAPTER_REMOVAL = ["fastp", "cutadapt"]
 DEDUPLICATORS = ["seqkit", "fqdedup"]
 TRIMMERS = ["seqtk", "fastx"]
-BT2_IDX_KEY = "bowtie2"
+BT2_IDX_KEY = "bowtie2_index"
 
 
 def parse_arguments():
