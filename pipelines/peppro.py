@@ -1556,22 +1556,21 @@ def main():
 
     # Check that the required tools are callable by the pipeline
     tool_list = [v for k,v in tools.items()]    # extract tool list
+    tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tool_list]
+    tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tool_list]
+    opt_tools = ["fqdedup", "fastx_trimmer", "seqOutBias"]
     if args.trimmer == "fastx":  # update tool call
-        tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tool_list]
-    else:  # otherwise remove it
-        if 'fastx' in tool_list: tool_list.remove('fastx')
+        if 'fastx' in opt_tools: opt_tools.remove('fastx_trimmer')
 
-    if not args.dedup == "fqdedup":  # update tool call
-        if 'fqdedup' in tool_list: tool_list.remove('fqdedup')
+    if args.dedup == "fqdedup":  # update tool call
+        if 'fqdedup' in opt_tools: opt_tools.remove('fqdedup')
 
     if args.sob:
-        tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tool_list]
-    else:
-        if 'seqoutbias' in tool_list: tool_list.remove('seqoutbias')
+        if 'seqOutBias' in opt_tools: opt_tools.remove('seqOutBias')
 
     tool_list = dict((t,t) for t in tool_list)  # convert back to dict
 
-    if not check_commands(tool_list):
+    if not check_commands(tool_list, opt_tools):
         err_msg = "Missing required tools. See message above."
         pm.fail_pipeline(RuntimeError(err_msg))
 
