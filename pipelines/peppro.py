@@ -206,7 +206,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
 
     # Check quality encoding for use with FastX_Tools
     if args.trimmer == "fastx":
-        encoding = guess_encoding(fq_file)
+        encoding = _guess_encoding(fq_file)
         #print("Encoding: {}".format(str(encoding)))  # DEBUG
         
     # Create adapter trimming command(s).
@@ -1197,69 +1197,6 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         return unmap_fq1, unmap_fq2
 
 
-def _check_bowtie2_index(rgc, genome_assembly):
-    """
-    Confirm bowtie2 index is present.
-
-    Checks by simple file count whether the bowtie2 index for a genome
-    assembly (as produced by the RefGenie reference builder) contains the
-    correct number of non-empty files.
-
-    :param str genomes_folder: refgenconf.RefGenConf rgc: a genome configuration
-        instance, which provides relevant genome asset pointers
-    :param str genome_assembly: name of the specific assembly of interest,
-        e.g. 'mm10'
-    """
-    try:
-        bt2_path = rgc.get_asset(
-            genome_assembly, BT2_IDX_KEY, check_exist=os.path.isdir)
-    except IOError as e:
-        pm.fail_pipeline(e)
-    
-    if not os.listdir(bt2_path):
-        err_msg = "'{}' does not contain any files.\n{}\n{}"
-        loc_msg = ("Try updating/confirming the 'genomes' variable in "
-                   "'pipelines/pepatac.yaml'.")
-        typ_msg = ("Confirm that '{}' "
-                   "is the correct genome, and that you have successfully "
-                   "built a refgenie genome "
-                   "by that name.".format(genome_assembly))
-        pm.fail_pipeline(IOError(err_msg.format(bt2_path, loc_msg, typ_msg)))
-    else:
-        path, dirs, files = next(os.walk(bt2_path))
-
-    # check for bowtie small index
-    if [bt for bt in files if bt.endswith('bt2')]:
-        bt = ['.1.bt2', '.2.bt2', '.3.bt2', '.4.bt2',
-              '.rev.1.bt2', '.rev.2.bt2']
-    # check for bowtie large index
-    elif [bt for bt in files if bt.endswith('bt2l')]:
-        bt = ['.1.bt2l', '.2.bt2l', '.3.bt2l', '.4.bt2l',
-              '.rev.1.bt2l', '.rev.2.bt2l']
-    # if neither file type present, fail
-    else:
-        err_msg = "{} does not contain any bowtie2 index files."
-        pm.fail_pipeline(IOError(err_msg.format(bt2_path)))
-
-    bt_expected = [genome_assembly + s for s in bt]
-    bt_present  = [bt for bt in files if any(s in bt for s in bt_expected)]
-    bt_missing  = list(set(bt_expected) - set(bt_present))
-    # if there are any missing files (bowtie2 file naming is constant), fail
-    if bt_missing:
-        err_msg = "The {} bowtie2 index is missing the following file(s): {}"
-        pm.fail_pipeline(IOError(
-            err_msg.format(genome_assembly,
-                           ', '.join(str(s) for s in bt_missing))))
-    else:
-        for f in bt_present:
-            # If any bowtie2 files are empty, fail
-            if os.stat(os.path.join(bt2_path, f)).st_size == 0:
-                err_msg = "The bowtie2 index file, {}, is empty."
-                pm.fail_pipeline(IOError(err_msg.format(f)))
-
-    genome_file = genome_assembly + ".fa"
-
-
 def tool_path(tool_name):
     """
     Return the path to a tool used by this pipeline.
@@ -1272,9 +1209,9 @@ def tool_path(tool_name):
                         TOOLS_FOLDER, tool_name)
 
 
-def guess_encoding(fq):
+def _guess_encoding(fq):
     """
-    Adapted from Brent Pedersen's "guess_encoding.py"
+    Adapted from Brent Pedersen's "_guess_encoding.py"
     https://github.com/brentp/bio-playground/blob/master/reads-utils/guess-encoding.py
     
     Copyright (c) 2018 Brent Pedersen
@@ -1350,7 +1287,7 @@ def guess_encoding(fq):
         return(str(valid[-1]))
 
 
-def check_commands(commands, ignore=''):
+def _check_commands(commands, ignore=''):
     """
     Check if command(s) can be called
 
@@ -1363,13 +1300,17 @@ def check_commands(commands, ignore=''):
     uncallable = []
     for name, command in commands.items():
         if command not in ignore:
+            # if an environment variable is not expanded it means it points to
+            # an uncallable command
+            if '$' in command:
+                # try to expand
+                command = os.path.expandvars(os.path.expanduser(command))
+                if not os.path.exists(command):
+                    uncallable.append(command)
+
             # if a command is a java file, modify the command
             if '.jar' in command:
                 command = "java -jar " + command
-            # if an environment variable is not expanded it means it points to
-            # an uncallable command
-            if '$' in command: 
-                uncallable.append(command)
 
             code = os.system("command -v {0} >/dev/null 2>&1 || {{ exit 1; }}".format(command))
             # If exit code is not 0, track which command failed
@@ -1422,6 +1363,10 @@ def _add_resources(args, res):
     # REQ
     for asset in ["chrom_sizes", BT2_IDX_KEY]:
         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+
+    for reference in args.prealignments:
+        for asset in [BT2_IDX_KEY]:
+            res[asset] = rgc.get_asset(reference, asset)
 
     # OPT
     msg = "The '{}' asset is not present in your REFGENIE config file."
@@ -1570,7 +1515,7 @@ def main():
 
     tool_list = dict((t,t) for t in tool_list)  # convert back to dict
 
-    if not check_commands(tool_list, opt_tools):
+    if not _check_commands(tool_list, opt_tools):
         err_msg = "Missing required tools. See message above."
         pm.fail_pipeline(RuntimeError(err_msg))
 
@@ -1580,11 +1525,6 @@ def main():
 
     # Set up reference resource according to genome prefix.
     res = _add_resources(args, res)
-
-    # Get bowtie2 indexes
-    _check_bowtie2_index(res.rgc, args.genome_assembly)
-    for reference in args.prealignments:
-        _check_bowtie2_index(res.rgc, reference)
 
     # Adapter file can be set in the config; if left null, we use a default.
     # TODO: use this option or just specify directly the adapter sequence as I do now
