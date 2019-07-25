@@ -1226,7 +1226,7 @@ plotPI <- function(pi) {
 #' data("cutadapt")
 #' plotCutadapt(input = "cutadapt")
 #' @export
-plotCutadapt <- function(input) {
+plotCutadapt <- function(input, output_dir=".") {
     if (exists(input)) {
         report <- data.table(get(input))
     } else if (file.exists(input)) {
@@ -1236,10 +1236,8 @@ plotCutadapt <- function(input) {
         quit(save = "no", status = 1, runLast = FALSE)
     }
 
-    name      <- basename(tools::file_path_sans_ext(input))
-    numFields <- 2
-    for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
-    sample_name <- paste(dirname(input), name, sep="/")
+    name        <- basename(tools::file_path_sans_ext(input))
+    sample_name <- paste(dirname(output_dir), name, sep="/")
     
     # only keep sizes where the expected count represents less than 1% of 
     # the actual count

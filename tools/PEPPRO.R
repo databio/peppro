@@ -346,7 +346,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Usage:   PEPPRO.R [command] {args}\n",
         "Version: ", version, "\n\n",
         "Command: cutadapt \t plot adapter insertion distribution\n\n",
-        " -i, --input\t cutadapt report.\n"
+        " -i, --input\t cutadapt report.\n",
+        " -o, --output\t output directory.\n"
     )
 
     help <- opt_get(name = c("help", "?", "h"), required=FALSE,
@@ -360,10 +361,12 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         message(usage)
         quit()
     } else {
-        input <- opt_get(name = c("input", "i"), required=TRUE,
-                         description="cutadapt report.")
+        input  <- opt_get(name = c("input", "i"), required=TRUE,
+                          description="cutadapt report.")
+        output <- opt_get(name = c("output", "o"), required=TRUE,
+                          description="output destination directory.")
 
-        suppressWarnings(plotPI(pi=input))
+        suppressWarnings(plotCutadapt(input=input, output_dir=output))
     }
 } else {
     usage <- paste0(
