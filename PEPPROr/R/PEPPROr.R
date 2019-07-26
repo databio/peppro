@@ -941,6 +941,7 @@ plotFLD <- function(fragL, fragL_count,
 
     p <- ggplot(dat1, aes(x=V2, y=V1)) +
              geom_line(aes(color='red')) +
+             geom_vline(xintercept = 30, linetype = "longdash") +
              xlab("Read length") + 
              ylab("Read counts") +
              ggtitle("Insert size distribution") +
