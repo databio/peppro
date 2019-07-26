@@ -321,7 +321,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
         adapter_cmd = build_command(adapter_cmd_chunks)
 
     # Create deduplication command(s).
-    if not read2:
+    if not read2 and not args.umi_len <=0:
         if args.dedup == "seqkit":
             dedup_cmd_chunks = [
                 (tools.seqkit, "rmdup"),
