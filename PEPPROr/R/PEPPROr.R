@@ -1237,7 +1237,7 @@ plotCutadapt <- function(input, output_dir=".") {
     }
 
     name        <- basename(tools::file_path_sans_ext(input))
-    sample_name <- paste(dirname(output_dir), name, sep="/")
+    sample_name <- paste(output_dir, name, sep="/")
     
     # only keep sizes where the expected count represents less than 1% of 
     # the actual count
