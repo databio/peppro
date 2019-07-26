@@ -259,7 +259,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     fq_file
             ])
         else:
-            if args.complexity:
+            if args.complexity and args.umi_len > 0:
                 adapter_cmd_chunks = ["(" + tools.cutadapt]
                 # old versions of cutadapt can not use multiple cores
                 if cut_version >= 1.15:
@@ -330,7 +330,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                 "--ignore-case",
                 "-o"           
             ]
-            if args.complexity:
+            if args.complexity and args.umi_len > 0:
                 dedup_cmd_chunks.extend([
                     (dedup_fastq, noadap_fastq)
                 ])
@@ -341,7 +341,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
 
         elif args.dedup == "fqdedup":
             dedup_cmd_chunks = [tools.fqdedup]
-            if args.complexity:
+            if args.complexity and args.umi_len > 0:
                 dedup_cmd_chunks.extend([("-i", noadap_fastq)])
                 dedup_cmd_chunks.extend([("-o", dedup_fastq)])
             else:
@@ -359,7 +359,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                 "--ignore-case",
                 "-o"           
             ]
-            if args.complexity:
+            if args.complexity and args.umi_len > 0:
                 dedup_cmd_chunks.extend([
                     (dedup_fastq, noadap_fastq)
                 ])
@@ -406,7 +406,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         trim_cmd_chunks.extend([
                             ("-L", str(args.max_len))
                         ])
-                    if args.complexity:
+                    if args.complexity and args.umi_len > 0:
                         # Need undeduplicated results for complexity calculation
                         #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  # python3
                         trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
@@ -479,7 +479,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                             ("-o", trimmed_fastq_R2)
                         ])
                 else:
-                    if args.complexity:
+                    if args.complexity and args.umi_len > 0:
                         # Need undeduplicated results for complexity calculation
                         #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
                         trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
@@ -550,7 +550,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         trim_cmd_chunks.extend([
                             ("-L", str(args.max_len))
                         ])
-                    if args.complexity:
+                    if args.complexity and args.umi_len > 0:
                         # Need undeduplicated results for complexity calculation
                         #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  # python3
                         trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
@@ -612,7 +612,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         (">", trimmed_fastq_R2)
                     ])
             else:
-                if args.complexity:
+                if args.complexity and args.umi_len > 0:
                     trim_cmd_chunks = [
                         tools.fastp,
                         ("--thread", str(pm.cores))
@@ -733,7 +733,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     trim_cmd_chunks.extend([
                         ("-L", str(args.max_len))
                     ])
-                if args.complexity:
+                if args.complexity and args.umi_len > 0:
                     #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
                     trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
                     trim_cmd_chunks_nodedup.extend([noadap_fastq])
@@ -815,7 +815,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         ("-o", trimmed_fastq_R2)
                     ])
             else:
-                if args.complexity:
+                if args.complexity and args.umi_len > 0:
                     # Need undeduplicated results for complexity calculation
                     #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
                     trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
@@ -880,7 +880,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     trim_cmd_chunks.extend([
                         ("-L", str(args.max_len))
                     ])
-                if args.complexity:
+                if args.complexity and args.umi_len > 0:
                     #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
                     trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
                     trim_cmd_chunks_nodedup.extend([noadap_fastq])
@@ -925,7 +925,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
         trim_cmd2 = build_command(trim_cmd_chunks_R2)
     else:
         trim_cmd1 = build_command(trim_cmd_chunks)
-        if args.complexity:
+        if args.complexity and args.umi_len > 0:
             trim_cmd_nodedup = build_command(trim_cmd_chunks_nodedup)
 
     def report_fastq():
@@ -1003,7 +1003,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
         pm.run(cp_cmd, trimmed_dups_fastq_R2)
         return trimmed_fastq_R2, trimmed_dups_fastq_R2
     else:
-        if args.complexity:
+        if args.complexity and args.umi_len > 0:
             pm.run([adapter_cmd, dedup_cmd, trim_cmd_nodedup],
                    trimmed_fastq, follow=report_fastq)
             pm.run(trim_cmd1, processed_fastq,
@@ -1600,7 +1600,7 @@ def main():
         fastqc_folder, args.sample_name + "_R1_rmAdapter.txt")
 
     if args.paired_end:
-        if args.complexity:
+        if args.complexity and args.umi_len > 0:
             unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, False,
                                                        untrimmed_fastq1,
                                                        outfolder=param.outfolder)
@@ -1658,7 +1658,7 @@ def main():
         pm.run([cmd1, cmd2, cmd3], dups_repair_target)
         pm.clean_add(dups_repair_target)
     else:
-        if args.complexity:
+        if args.complexity and args.umi_len > 0:
             unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, False,
                                                        untrimmed_fastq1,
                                                        outfolder=param.outfolder)
@@ -1687,7 +1687,7 @@ def main():
         print("Prealignment assemblies: " + str(args.prealignments))
         # Loop through any prealignment references and map to them sequentially
         for reference in args.prealignments:
-            if args.complexity:
+            if args.complexity and args.umi_len > 0:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1,
@@ -1771,7 +1771,7 @@ def main():
     unmap_genome_bam = os.path.join(
         map_genome_folder, args.sample_name + "_unmap.bam")
 
-    if args.complexity:
+    if args.complexity and args.umi_len > 0:
         mapping_genome_bam_dups = os.path.join(
             map_genome_folder, args.sample_name + "_sort_dups.bam")
         mapping_genome_bam_temp_dups = os.path.join(
@@ -1812,7 +1812,7 @@ def main():
     cmd += " -T " + tempdir
     cmd += " -o " + mapping_genome_bam_temp
 
-    if args.complexity:
+    if args.complexity and args.umi_len > 0:
         # check input for zipped or not
         if pypiper.is_gzipped_fastq(unmap_fq1_dups):
             cmd = (ngstk.ziptool + " -d " + (unmap_fq1_dups + ".gz"))
@@ -1850,7 +1850,7 @@ def main():
 
     cmd2 += mapping_genome_bam_temp + " > " + mapping_genome_bam
 
-    if args.complexity:
+    if args.complexity and args.umi_len > 0:
         cmd2_dups = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
             " -U " + failQC_genome_bam_dups + " ")
         #if args.paired_end:
@@ -1892,7 +1892,7 @@ def main():
                                                  mapping_genome_bam),
            container=pm.container)
 
-    if args.complexity:
+    if args.complexity and args.umi_len > 0:
         pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups,
                container=pm.container)
 
@@ -1917,7 +1917,7 @@ def main():
         pm.run(cmd, temp_mapping_index)
         pm.clean_add(temp_mapping_index)
 
-        if args.complexity:
+        if args.complexity and args.umi_len > 0:
             cmd_dups = tools.samtools + " index " + mapping_genome_bam_temp_dups
             pm.run(cmd_dups, temp_mapping_index_dups)
             pm.clean_add(temp_mapping_index_dups)
@@ -1987,7 +1987,7 @@ def main():
     ############################################################################
     #                     Calculate library complexity                         #
     ############################################################################
-    if args.complexity:
+    if args.complexity and args.umi_len > 0:
         if os.path.exists(mapping_genome_bam_temp_dups):
             if not os.path.exists(temp_mapping_index_dups):
                 cmd = tools.samtools + " index " + mapping_genome_bam_temp_dups
