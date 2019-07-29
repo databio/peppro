@@ -158,14 +158,28 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                required=FALSE, default=500000000,
                                description="Upper x-limit (default 500 million)")
 
-        plotComplexityCurves(ccurves = input,
-                             coverage = coverage,
-                             read_length = read_length,
-                             real_counts_path = real_counts,
-                             ignore_unique = ign_unique,
-                             output_name = output_name,
-                             x_min = x_min,
-                             x_max = x_max)
+        p <- plotComplexityCurves(ccurves = input,
+                                  coverage = coverage,
+                                  read_length = read_length,
+                                  real_counts_path = real_counts,
+                                  ignore_unique = ign_unique,
+                                  x_min = x_min,
+                                  x_max = x_max)
+        # now save the plot
+        pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+            width= 10, height = 7, useDingbats=F)
+        print(fig)
+        invisible(dev.off())
+        png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+            width = 686, height = 480)
+        print(fig)
+        invisible(dev.off())
+
+        if (exists("p")) {
+            write("Library complexity plot completed!\n", stdout())
+        } else {
+            write("Unable to produce library complexity plot!\n", stdout())
+        }
     }
 } else if (!is.na(subcmd) && tolower(subcmd) == "frif") {
     usage <- paste0(
@@ -201,10 +215,25 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                n=(numArgs - 8),
                                description="Coverage file(s).")
 
-        plotFRiF(sample_name = sample_name,
-                 num_reads = reads,
-                 output_name = output_name,
-                 bedFile = bed)
+        p <- plotFRiF(sample_name = sample_name,
+                      num_reads = reads,
+                      output_name = output_name,
+                      bedFile = bed)
+
+        pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+        width= 7, height = 7, useDingbats=F)
+        print(p)
+        invisible(dev.off())
+        png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+            width = 480, height = 480)
+        print(p)
+        invisible(dev.off())
+
+        if (exists("p")) {
+            write("Cumulative FRiF plot completed!\n", stdout())
+        } else {
+            write("Unable to produce FRiF plot!\n", stdout())
+        }
     }
 } else if (!is.na(subcmd) && tolower(subcmd) == "tss") {
     usage <- paste0(
@@ -245,10 +274,28 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
             }
         }
 
-        TSSfile    <- opt_get(name = c("input", "i"), required=TRUE, n=inArgs,
-                              description="TSS enrichment file.")
+        TSSfile     <- opt_get(name = c("input", "i"), required=TRUE, n=inArgs,
+                               description="TSS enrichment file.")
 
-        plotTSS(TSSfile = TSSfile)
+        p           <- plotTSS(TSSfile = TSSfile)
+
+        sample_name <- sampleName(TSS_file[1])
+
+        png(filename = paste0(sample_name, "_TSSenrichment.png"),
+        width = 480, height = 480)
+        print(p)
+        invisible(dev.off())
+
+        pdf(file = paste0(sample_name, "_TSSenrichment.pdf"),
+            width= 7, height = 7, useDingbats=F)
+        print(p)
+        invisible(dev.off())
+
+        if (exists("p")) {
+            write("TSS enrichment plot completed!\n", stdout())
+        } else {
+            write("Unable to produce TSS enrichment plot!\n", stdout())
+        }
     }
 } else if (!is.na(subcmd) && tolower(subcmd) == "frag") {
     usage <- paste0(
@@ -277,15 +324,31 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                description="Column of fragment lengths.")
         fragL_count <- opt_get(name = c("frag_count", "c"), required=TRUE,
                                description="Counts of each fragment length.")
-        fragL_dis1  <- opt_get(name = c("pdf", "p"), required=TRUE,
+        fragL_name  <- opt_get(name = c("pdf", "p"), required=TRUE,
                                description="PDF output file name.")
-        fragL_dis2  <- opt_get(name = c("text", "t"), required=TRUE,
+        fragL_txt   <- opt_get(name = c("text", "t"), required=TRUE,
                                description="Fragment length distribution stats file.")
 
-        plotFLD(fragL = fragL,
-                fragL_count = fragL_count,
-                fragL_dis1 = fragL_dis1,
-                fragL_dis2 = fragL_dis2)
+        p <- plotFLD(fragL = fragL,
+                     fragL_count = fragL_count,
+                     fragL_dis2 = fragL_txt)
+
+        # Save plot to pdf file
+        pdf(file=fragL_name, width= 7, height = 7, useDingbats=F)
+        print(p)
+        invisible(dev.off())
+
+        # Save plot to png file
+        outfile_png <- gsub('pdf', 'png', fragL_name)
+        png(filename=outfile_png, width = 480, height = 480)
+        print(p)
+        invisible(dev.off())
+
+        if (exists("p")) {
+            write("Fragment distribution plot completed!\n", stdout())
+        } else {
+            write("Unable to produce fragment distribution plot!\n", stdout())
+        }
     }
 } else if (!is.na(subcmd) && tolower(subcmd) == "mrna") {
     usage <- paste0(
@@ -313,7 +376,27 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         raw  <- opt_get(name = c("raw", "w"), required=FALSE, default=FALSE,
                         description="Plot raw ratios (Default = FALSE).")
 
-        suppressWarnings(mRNAcontamination(rpkm=rpkm, raw=raw))
+        suppressWarnings(p <- mRNAcontamination(rpkm=rpkm, raw=raw))
+
+        sample_name <- sampleName(rpkm)
+
+        # Save plot to pdf file
+        pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
+            width= 7, height = 7, useDingbats=F)
+        print(q)
+        invisible(dev.off())
+             
+        # Save plot to png file
+        png(filename = paste0(sample_name, "_mRNA_contamination.png"),
+            width = 480, height = 480)
+        print(q)
+        invisible(dev.off())
+
+        if (exists("p")) {
+            write("mRNA contamination plot completed!\n", stdout())
+        } else {
+            write("Unable to produce mRNA contamination plot!\n", stdout())
+        }
     }
 } else if (!is.na(subcmd) && tolower(subcmd) == "pi") {
     usage <- paste0(
@@ -338,7 +421,27 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         input <- opt_get(name = c("input", "i"), required=TRUE,
                          description="Pause density/gene body density ratios.")
 
-        suppressWarnings(plotPI(pi=input))
+        suppressWarnings(p <- plotPI(pi=input))
+
+        sample_name <- sampleName(input)
+
+        # Save plot to pdf file
+        pdf(file=paste0(sample_name, "_pause_index.pdf"),
+            width= 7, height = 7, useDingbats=F)
+        print(p)
+        invisible(dev.off())
+             
+        # Save plot to png file
+        png(filename = paste0(sample_name, "_pause_index.png"),
+            width = 480, height = 480)
+        print(p)
+        invisible(dev.off())
+
+        if (exists("p")) {
+            write("Pause index plot completed!\n", stdout())
+        } else {
+            write("Unable to produce pause index plot!\n", stdout())
+        }
     }
 } else if (!is.na(subcmd) && tolower(subcmd) == "cutadapt") {
     usage <- paste0(
@@ -366,7 +469,30 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         output <- opt_get(name = c("output", "o"), required=TRUE,
                           description="output destination directory.")
 
-        suppressWarnings(plotCutadapt(input=input, output_dir=output))
+        suppressWarnings(p <- plotCutadapt(input=input))
+
+        name        <- basename(tools::file_path_sans_ext(input))
+        sample_name <- paste(output, name, sep="/")
+
+        # Save plot to pdf file
+        pdf(file=paste0(sample_name, "_adapter_insertion_distribution.pdf"),
+            width= 7, height = 7, useDingbats=F)
+        print(p)
+        invisible(dev.off())
+             
+        # Save plot to png file
+        png(filename = paste0(sample_name,
+                              "_adapter_insertion_distribution.png"),
+            width = 480, height = 480)
+        print(p)
+        invisible(dev.off())
+
+        if (exists("p")) {
+            write("Adapter insertion distribution plot completed!\n", stdout())
+        } else {
+            write("Unable to produce adapter insertion distribution plot!\n",
+                  stdout())
+        }
     }
 } else {
     usage <- paste0(

@@ -33,7 +33,6 @@ NULL
 #'                         (unique is optional, file is whitespace delimited)
 #' @param ignore_unique If FALSE, ignore information about unique read counts
 #'                   found in real_counts_path file.
-#' @param output_name Desired output name (produces both .pdf and .png files).
 #' @param x_min Lower x-limit (default 0)
 #' @param x_max Upper x-limit (default 500 million)
 #' @keywords preseq library complexity
@@ -46,7 +45,6 @@ NULL
 plotComplexityCurves <- function(ccurves,
                                  coverage=0, read_length=0,
                                  real_counts_path=NA, ignore_unique=FALSE,
-                                 output_name='complexity_curves',
                                  x_min=0, x_max=500000000) {
 
     if (x_min < 0 || x_max <= x_min) {
@@ -440,15 +438,7 @@ plotComplexityCurves <- function(ccurves,
                               ymax = max(preseq_ymax, max_unique)/2)
     }
 
-    # now save the plot
-    pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-        width= 10, height = 7, useDingbats=F)
-    print(fig)
-    invisible(dev.off())
-    png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-        width = 686, height = 480)
-    print(fig)
-    invisible(dev.off())
+    return(p)
 }
 
 #' Compute the axis value limit
@@ -664,20 +654,7 @@ plotFRiF <- function(sample_name, num_reads, output_name, bedFile) {
         p <- ggplot()
     }
 
-    pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-        width= 7, height = 7, useDingbats=F)
-    print(p)
-    invisible(dev.off())
-    png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-        width = 480, height = 480)
-    print(p)
-    invisible(dev.off())
-
-    if (exists("p")) {
-        write("Cumulative FRiF plot completed!\n", stdout())
-    } else {
-        write("Unable to produce FRiF plot!\n", stdout())
-    }
+    return(p)
 }
 
 
@@ -838,7 +815,7 @@ plotTSS <- function(TSSfile) {
         colnames(minusNormTSS) <- c("score")
         peakPos       <- which.max(minusNormTSS$score)
         minusTSSscore <- round(
-            mean(minusNormTSS[(max(0, peakPos-50)):(min(nrow(normTSS),
+            mean(minusNormTSS[(max(0, peakPos-50)):(min(nrow(minusNormTSS),
                                peakPos+50)), score]),1)
         if (is.nan(minusTSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile[2], "\n"))
@@ -846,7 +823,7 @@ plotTSS <- function(TSSfile) {
         }
         p <- p + geom_smooth(data=minusNormTSS,
                              aes(x=(as.numeric(rownames(minusNormTSS))-
-                                   (nrow(normTSS)/2)),
+                                   (nrow(minusNormTSS)/2)),
                                  y=score, group=1, colour="black"),
                              method="loess", span=0.02,
                              se=FALSE, colour="blue") +
@@ -871,17 +848,19 @@ plotTSS <- function(TSSfile) {
                           fontface = 2, size=10, hjust=0.5)
     }
 
-    png(filename = paste0(sample_name, "_TSSenrichment.png"),
-        width = 480, height = 480)
-    print(p)
-    invisible(dev.off())
+    return(p)
+}
 
-    pdf(file = paste0(sample_name, "_TSSenrichment.pdf"),
-        width= 7, height = 7, useDingbats=F)
-    print(p)
-    invisible(dev.off())
 
-    write("Completed TSS enrichment plot!\n", stdout())
+#' Derive the sample name from input file and return with full path
+#'
+#' @param path A path to a file for which you wish to extract the sample name
+#' @param num_fields An integer representing the number of fields to strip
+#' @param delim A delimiter for the fields splitting a path or string
+sampleName <- function(path, num_fields=2, delim='_') {
+    name <- basename(tools::file_path_sans_ext(path))
+    for(n in 1:num_fields) name <- gsub(paste0(delim, "[^", delim, "]*$"), "", name)
+    return(paste(dirname(path), name, sep="/"))
 }
 
 
@@ -900,12 +879,11 @@ plotTSS <- function(TSSfile) {
 #' data("frag_len")
 #' data("frag_len_count")
 #' plotFLD(fragL = "frag_len", fragL_count = "frag_len_count",
-#'         fragL_dis1 = "fragLenDistribution_example.pdf",
-#'         fragL_dis2 = "fragLenDistribution_example.txt")
+#'         fragL_txt = "fragLenDistribution_example.txt")
 #' @export
-plotFLD <- function(fragL, fragL_count,
-                    fragL_dis1="fragLenDistribution.pdf",
-                    fragL_dis2="fragLenDistribution.txt") {
+plotFLD <- function(fragL,
+                    fragL_count,
+                    fragL_txt="fragLenDistribution.txt") {
 
     if (exists(fragL_count)) {
         dat <- data.table(get(fragL_count))
@@ -947,24 +925,15 @@ plotFLD <- function(fragL, fragL_count,
              ggtitle("Insert size distribution") +
              t1
 
-    # Save plot to pdf file
-    pdf(file=fragL_dis1, width= 7, height = 7, useDingbats=F)
-    print(p)
-    invisible(dev.off())
-
-    # Save plot to png file
-    outfile_png <- gsub('pdf', 'png', fragL_dis1)
-    png(filename=outfile_png, width = 480, height = 480)
-    print(p)
-    invisible(dev.off())
-
     summ <- data.table(Min=min(summary_table$V1),
                        Max=max(summary_table$V1),
                        Median=median(summary_table$V1),
                        Mean=mean(summary_table$V1),
                        Stdev=sd(summary_table$V1))
     # Write summary table to stats file
-    fwrite(summ, file=fragL_dis2, row.names=F, quote=F, sep="\t")
+    fwrite(summ, file=fragL_txt, row.names=F, quote=F, sep="\t")
+
+    return(p)
 }
 
 #' Return the count of the plot at 95% of the upper limit.
@@ -1057,11 +1026,6 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
     }
     colnames(RPKM) <- c("gene","intron","exon")
 
-    name           <- basename(tools::file_path_sans_ext(rpkm))
-    numFields      <- 2
-    for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
-    sample_name <- paste(dirname(rpkm), name, sep="/")
-
     finite_rpkm <- RPKM[is.finite(RPKM$exon/RPKM$intron),]
 
     if (raw) {
@@ -1124,17 +1088,7 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
                       hjust=0, vjust=1, label = label1, parse=TRUE)
     }
 
-    # Save plot to pdf file
-    pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
-        width= 7, height = 7, useDingbats=F)
-    print(q)
-    invisible(dev.off())
-         
-    # Save plot to png file
-    png(filename = paste0(sample_name, "_mRNA_contamination.png"),
-        width = 480, height = 480)
-    print(q)
-    invisible(dev.off())
+    return(p)
 }
 
 
@@ -1158,11 +1112,6 @@ plotPI <- function(pi) {
         quit(save = "no", status = 1, runLast = FALSE)
     }
     colnames(PI) <- c("pi")
-
-    name           <- basename(tools::file_path_sans_ext(pi))
-    numFields      <- 2
-    for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
-    sample_name <- paste(dirname(pi), name, sep="/")
 
     q <- ggplot(data = PI, aes(x="", y=pi)) +
             stat_boxplot(geom ='errorbar', width = 0.25) +
@@ -1203,17 +1152,7 @@ plotPI <- function(pi) {
     q <- q + annotate("text", x = 0.5, y = c(max_y, 0.95*max_y),
                       hjust=0, vjust=1, label = label1, parse=TRUE)
 
-    # Save plot to pdf file
-    pdf(file=paste0(sample_name, "_pause_index.pdf"),
-        width= 7, height = 7, useDingbats=F)
-    print(q)
-    invisible(dev.off())
-         
-    # Save plot to png file
-    png(filename = paste0(sample_name, "_pause_index.png"),
-        width = 480, height = 480)
-    print(q)
-    invisible(dev.off())
+    return(q)
 }
 
 
@@ -1227,7 +1166,7 @@ plotPI <- function(pi) {
 #' data("cutadapt")
 #' plotCutadapt(input = "cutadapt")
 #' @export
-plotCutadapt <- function(input, output_dir=".") {
+plotCutadapt <- function(input) {
     if (exists(input)) {
         report <- data.table(get(input))
     } else if (file.exists(input)) {
@@ -1236,9 +1175,6 @@ plotCutadapt <- function(input, output_dir=".") {
         stop(paste0("FileExistsError: ", input, " could not be found."))
         quit(save = "no", status = 1, runLast = FALSE)
     }
-
-    name        <- basename(tools::file_path_sans_ext(input))
-    sample_name <- paste(output_dir, name, sep="/")
     
     # only keep sizes where the expected count represents less than 1% of 
     # the actual count
@@ -1259,17 +1195,7 @@ plotCutadapt <- function(input, output_dir=".") {
                   panel.border = element_rect(colour = "black",
                                               fill=NA, size=0.5))
 
-    # Save plot to pdf file
-    pdf(file=paste0(sample_name, "_adapter_insertion_distribution.pdf"),
-        width= 7, height = 7, useDingbats=F)
-    print(q)
-    invisible(dev.off())
-         
-    # Save plot to png file
-    png(filename = paste0(sample_name, "_adapter_insertion_distribution.png"),
-        width = 480, height = 480)
-    print(q)
-    invisible(dev.off())
+    return(q)
 }
 
 
