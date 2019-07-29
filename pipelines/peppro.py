@@ -2450,9 +2450,8 @@ def main():
                 args.sample_name + "_adapter_insertion_distribution.pdf")
             degradation_png = os.path.join(QC_folder,
                 args.sample_name + "_adapter_insertion_distribution.pdf")
-            cmd2 = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
-                    " cutadapt -i " + adapter_report + " -o " +
-                    QC_folder)
+            cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
+                   " cutadapt -i " + adapter_report + " -o " + QC_folder)
             pm.run(cmd, degradation_pdf, nofail=True)
             pm.report_object("Adapter insertion distribution", degradation_pdf,
                              anchor_image=degradation_png)

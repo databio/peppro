@@ -1159,6 +1159,7 @@ plotPI <- function(pi) {
 #' Plot the distribution of adapter insertions
 #'
 #' @param input A cutadapt report
+#' @param name A sample name or identifier for the plot title
 #'
 #' @keywords cutadapt
 #' @export
@@ -1166,7 +1167,7 @@ plotPI <- function(pi) {
 #' data("cutadapt")
 #' plotCutadapt(input = "cutadapt")
 #' @export
-plotCutadapt <- function(input) {
+plotCutadapt <- function(input, name='cutadapt') {
     if (exists(input)) {
         report <- data.table(get(input))
     } else if (file.exists(input)) {
