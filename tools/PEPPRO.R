@@ -279,7 +279,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         p           <- plotTSS(TSSfile = TSSfile)
 
-        sample_name <- sampleName(TSS_file[1])
+        sample_name <- sampleName(TSSfile[1])
 
         png(filename = paste0(sample_name, "_TSSenrichment.png"),
         width = 480, height = 480)
@@ -331,7 +331,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         p <- plotFLD(fragL = fragL,
                      fragL_count = fragL_count,
-                     fragL_dis2 = fragL_txt)
+                     fragL_txt = fragL_txt)
 
         # Save plot to pdf file
         pdf(file=fragL_name, width= 7, height = 7, useDingbats=F)

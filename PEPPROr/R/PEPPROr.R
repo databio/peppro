@@ -762,6 +762,12 @@ plotTSS <- function(TSSfile) {
         normTSS           <- plusMinus / mean(plusMinus[c(1:val), V1])
         colnames(normTSS) <- c("score")
         peakPos  <- which.max(normTSS$score)
+        # check for true peak
+        if ((normTSS$score[peakPos]/normTSS$score[peakPos-1]) > 1.5 &
+            (normTSS$score[peakPos]/normTSS$score[peakPos+1]) > 1.5) {
+            tmpTSS  <- normTSS$score[-peakPos]
+            peakPos <- which.max(tmpTSS) + 1
+        }
         TSSscore <- round(mean(normTSS[(max(0, peakPos-50)):(min(nrow(normTSS),
                                        peakPos+50)), score]),1)
         if (is.nan(TSSscore)) {
@@ -775,6 +781,12 @@ plotTSS <- function(TSSfile) {
         normTSS           <- plus / mean(plus[c(1:val), V1])
         colnames(normTSS) <- c("score")
         peakPos  <- which.max(normTSS$score)
+        # check for true peak
+        if ((normTSS$score[peakPos]/normTSS$score[peakPos-1]) > 1.5 &
+            (normTSS$score[peakPos]/normTSS$score[peakPos+1]) > 1.5) {
+            tmpTSS  <- normTSS$score[-peakPos]
+            peakPos <- which.max(tmpTSS) + 1
+        }
         TSSscore <- round(mean(normTSS[(max(0, peakPos-50)):(min(nrow(normTSS),
                                        peakPos+50)), score]),1)
         if (is.nan(TSSscore)) {
@@ -814,6 +826,13 @@ plotTSS <- function(TSSfile) {
         minusNormTSS           <- minus / mean(minus[c(1:val), V1])
         colnames(minusNormTSS) <- c("score")
         peakPos       <- which.max(minusNormTSS$score)
+        # check for true peak
+        if ((minusNormTSS$score[peakPos]/minusNormTSS$score[peakPos-1]) > 1.5 &
+            (minusNormTSS$score[peakPos]/minusNormTSS$score[peakPos+1]) > 1.5) {
+            tmpTSS  <- minusNormTSS$score[-peakPos]
+            peakPos <- which.max(tmpTSS) + 1
+        }
+
         minusTSSscore <- round(
             mean(minusNormTSS[(max(0, peakPos-50)):(min(nrow(minusNormTSS),
                                peakPos+50)), score]),1)
@@ -918,12 +937,13 @@ plotFLD <- function(fragL,
                plot.title = element_text(hjust = 0.5))
 
     p <- ggplot(dat1, aes(x=V2, y=V1)) +
-             geom_line(aes(color='red')) +
-             geom_vline(xintercept = 30, linetype = "longdash") +
-             xlab("Read length") + 
-             ylab("Read counts") +
-             ggtitle("Insert size distribution") +
-             t1
+            geom_point(size=1, alpha=0.25) +
+            geom_line(alpha=0.5) +
+            geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
+            xlab("Fragment length") + 
+            ylab("Number of reads") +
+            ggtitle("Insert size distribution") +
+            t1
 
     summ <- data.table(Min=min(summary_table$V1),
                        Max=max(summary_table$V1),
