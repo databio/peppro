@@ -1186,6 +1186,8 @@ plotCutadapt <- function(input, name='cutadapt') {
 
     q <- ggplot(report, aes(x=max(length)-length, y=count)) +
             geom_point() +
+            geom_vline(xintercept = 20, linetype = "dotted", alpha=0.25) +
+            geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
             labs(title=name, x="Size of insertion", y="Number of reads") +
             theme_classic(base_size=14) +
             theme(axis.line = element_line(size = 0.5),
