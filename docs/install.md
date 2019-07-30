@@ -23,9 +23,17 @@ refgenie pull -g human_rDNA -a bowtie2_index
 refgenie pull -g rCRSd -a bowtie2_index
 ```
 
+PEPPRO also uses [refgenie](https://refgenie.databio.org) to manage a variety of annotation files for quality control plots. Downloading them is very easy:
+
+```
+refgenie pull -g hg38 -a ensembl_gtf tss_annotation feat_annotation pi_tss pi_body
+```
+Replace `hg38` if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md).
+
+
 ## 3: Install required software
 
-If you don't want to install the prerequisite software used by PEPPRO, you can follow our tutorial on [running PEPPRO directly in a container](howto/use_container.md) and then skip this step. If you want to run it natively, you'll need to install the following: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/).
+If you don't want to install the prerequisite software used by PEPPRO, you can follow our tutorial on [running PEPPRO directly in a container](use_container.md) and then skip this step. If you want to run it natively, you'll need to install the following: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/).
 
 
 ### Python packages

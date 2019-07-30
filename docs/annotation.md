@@ -1,22 +1,45 @@
-# Download or create annotation files for <img src="../../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> 
+# Annotation reference
+
+This document outlines how we created the reference data, so you can recreate it if you need to. The easiest way to do this is use `refgenie build`. All you need to do is:
 
 
-For each annotation type (TSS, CpA sites, premature mRNA, or general features), we provide [downloadable defaults](http://big.databio.org/peppro/) for common genomes.  You may also recreate these yourself as described below.
+## Fasta file
+You need a FASTA file for your genome. You can insert this file into refgenie like this:
+```
+refgenie build -g GENOME -a fasta --fasta path/to/file.fa
+```
+
+## GTF file
+
+You also need an Ensembl GTF file (or equivalent) for your genome. You can insert this file into refgenie like this:
+
+```
+refgenie build -g GENOME -a ensembl_gtf --GTF path/to/file.gtf
+```
+
+## Other assets
+Once you have those two assets installed, `refgenie` can automatically build all the remaining assets from them. Build the assets that are required like this:
+
+```
+refgenie build -g GENOME -a ensembl_gtf tss_annotation feat_annotation pi_tss pi_body
+```
+
+That's it! These assets will be automatically detected by PEPPRO if you build them like this with refgenie. If you want to know what we're doing, or customize these, more details follow:
 
 ### TSS
 
-To calculate [TSS enrichments](../glossary.md), you will need a [TSS annotation file](http://big.databio.org/refgenomes/) in your reference genome directory.  If a pre-built version for your genome of interest isn't present, you can quickly create that file yourself. In the reference genome directory, you can perform the following commands for in this example, `hg38`:
+To calculate [TSS enrichments](../glossary.md), you will need a [TSS annotation file](http://big.databio.org/refgenomes/).  We build these using these commands, in this example for `hg38`:
 ```console
 wget -O hg38_TSS_full.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz \
 zcat hg38_TSS_full.txt.gz | \
   awk  '{if($4=="+"){print $3"\t"$5"\t"$5"\t"$13"\t.\t"$4}else{print $3"\t"$6"\t"$6"\t"$13"\t.\t"$4}}' | \
   LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_TSS.bed
 ```
-This asset (`tss_annotation`) needs to be [included in your `$REFGENIE` configuration file](annotation_files.md#example-peppro-refgenie-configuration-file) for the pipeline to detect it automatically.  Alternatively, you can use the `--TSS-name` pipeline option to provide a path directly to this file.
+You can pass the `--TSS-name` pipeline option to provide a path directly to this file.
 
 ### Pause index annotation (PI)
 
-To calculate [pause indicies](../glossary.md), you will need two files in your reference genome directory: a [PI TSS annotation file](http://big.databio.org/refgenomes/) and a [PI gene body annotation file](http://big.databio.org/refgenomes/).  If a pre-built version for your genome of interest isn't present, you can quickly create that file yourself. In the reference genome directory, you can perform the following commands for in this example, `hg38`:
+To calculate [pause indicies](../glossary.md), you will need two files in your reference genome directory: a PI TSS annotation file and a PI gene body annotation file. Here are example commands for `hg38`:
 ```console
 wget ftp://ftp.ensembl.org/pub/release-97/gtf/homo_sapiens/Homo_sapiens.GRCh38.97.gtf.gz \
 zcat Homo_sapiens.GRCh38.97.gtf.gz | \
@@ -42,11 +65,12 @@ zcat Homo_sapiens.GRCh38.97.gtf.gz | \
   awk '$3>$2' | \
   LC_COLLATE=C sort -k4 -u > hg38_PI_gene_body.bed
 ```
-These assets (`pi_tss` and `pi_body`) need to be [included in your `$REFGENIE` configuration file](annotation_files.md#example-peppro-refgenie-configuration-file) for the pipeline to detect it automatically.  Alternatively, you can use the `--pi-tss` and `--pi-body` pipeline options to provide paths directly to each file.
+You can use the `--pi-tss` and `--pi-body` pipeline options to provide paths directly to each file.
 
 ### mRNA contamination
 
-To determine the amount of [mRNA contamination](../glossary.md), you will need two files in your reference genome directory: an [exon annotation file](http://big.databio.org/refgenomes/) and an [intron annotation file](http://big.databio.org/refgenomes/).  If a pre-built version for your genome of interest isn't present, you can quickly create that file yourself. In the reference genome directory, you can perform the following commands for in this example, `hg38`:
+To determine the amount of [mRNA contamination](../glossary.md), you will need two files in your reference genome directory: an [exon annotation file](http://big.databio.org/refgenomes/) and an [intron annotation file](http://big.databio.org/refgenomes/). Here are example commands for `hg38`:
+
 ```console
 wget -O hg38_TSS_full.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz \
 zcat hg38_TSS_full.txt.gz | \
@@ -60,7 +84,7 @@ zcat hg38_TSS_full.txt.gz | \
   awk -F"\t" '{ exonCount=int($9);split($10,exonStarts,"[,]"); split($11,exonEnds,"[,]"); for(i=1;i<exonCount;i++) {printf("%s\t%s\t%s\t%s\t%d\t%s\n",$3,exonEnds[i],exonStarts[i+1],$13,($3=="+"?i:exonCount-i),$4);}}' | \
   LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_introns.bed
 ```
-These assets (`exon_annotation` and `intron_annotation`) need to be [included in your `$REFGENIE` configuration file](annotation_files.md#example-peppro-refgenie-configuration-file) for the pipeline to detect it automatically.  Alternatively, you can use the `--exon-name` and `--intron-name` pipeline options to provide paths directly to each file.
+You can use the `--exon-name` and `--intron-name` pipeline options to provide paths directly to each file.
 
 ### Premature mRNA
 
@@ -71,11 +95,11 @@ zcat hg38_refGene.txt.gz | grep 'cmpl' | \
   awk  '{print $3"\t"$5"\t"$6"\t"$13"\t.\t"$4}' | \
   LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_pre-mRNA.bed
 ```
-This asset (`pre_mRNA_annotation`) needs to be [included in your `$REFGENIE` configuration file](#Example_PEPPRO_REFGENIE_configuration_file) for the pipeline to detect it automatically.  Alternatively, you can use the `--pre-name` pipeline option to provide a path directly to this file.
+You can use the `--pre-name` pipeline option to provide a path directly to this file.
 
 ### Features
 
-We also have [downloadable genome feature annotation files](http://big.databio.org/peppro/) for both `hg38` and `hg19` that you can use.  These files annotate 3' and 5' UTR, Exons, Introns, Promoters, and Promoter Flanking Regions.  If present in the corresponding reference genome folder and included as an asset (named `feat_annotation`) in your `$REFGENIE` configuration file you don't need to do anything else as the pipeline will look there automatically.   Alternatively, you can use the `--anno-name` pipeline option to just directly point to this file.
+We also have [downloadable genome feature annotation files](http://big.databio.org/peppro/) for both `hg38` and `hg19` that you can use.  These files annotate 3' and 5' UTR, Exons, Introns, Promoters, and Promoter Flanking Regions.  You can use the `--anno-name` pipeline option to directly point to this file.
 
 #### Create a custom feature annotation file
 
@@ -104,33 +128,3 @@ Just like a standard `BED` file, the first three fields are:
 Column four is the **name** column, in our case the name of our feature of interest. The fifth column is the **score**, which would determine how darkly an item would be displayed in a genome browser if you chose to set that or if the information in your file of interest has ascribed a score to the features. The final, sixth, column is the **strand** column.
 
 After creating your `BED` file, you can point the pipeline to it using the `--anno-name` option followed with the path to your file.  The pipeline will then use that file to determine the fractions of reads that cover those features.
-
-### Example `PEPPRO` `refgenie` configuration file
-
-As mentioned above, you can point the pipeline directly to your annotation files using the matching arguments.
-
-Alternatively, if they are all present in the corresponding reference genome folders, you can direct `refgenie` to detect them automatically. Here's an example of what a `refgenie` configuration file would look like:
-```yaml
-genome_folder: $GENOMES
-genome_server: http://refgenomes.databio.org
-genomes:
-  hg38:
-    bowtie2:
-      path: indexed_bowtie2
-    chrom_sizes:
-      path: hg38.chrom.sizes
-    tss_annotation:
-      path: hg38_TSS.bed
-    pi_tss:
-      path: hg38_PI_TSS.bed
-    pi_body:
-      path: hg38_PI_gene_body.bed
-    pre_mRNA_annotation:
-      path: hg38_pre-mRNA.bed
-    feat_annotation:
-      path: hg38_annotations.bed.gz
-    exon_annotation:
-      path: hg38_exons.bed
-    intron_annotation:
-      path: hg38_introns.bed
-```
