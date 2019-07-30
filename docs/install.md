@@ -116,4 +116,3 @@ The sample annotation file must specify these columns:
 ## Next steps
 
 This is just the beginning. For your next step, take a look at one of other detailed user guide links in the side menu.
-
