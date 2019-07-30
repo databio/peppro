@@ -1,4 +1,4 @@
-# Use prealignments with <img src="../../img/peppro_logo_black.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px">
+# Use prealignments with <img src="../../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px">
 
 One feature of the pipeline is *prealignments*, which siphons off reads by aligning to small genomes before the main alignment to the primary reference genome.
 

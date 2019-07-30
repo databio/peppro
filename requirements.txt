@@ -1,6 +1,15 @@
+cutadapt
+loopercli
 numpy
+<<<<<<< HEAD
 loopercli
 pararead
 pandas
 piper
+=======
+pararead
+pandas
+piper
+refgenconf
+>>>>>>> master
 refgenie

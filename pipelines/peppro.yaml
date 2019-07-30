@@ -9,13 +9,15 @@ tools:  # absolute paths to required tools
   bowtie2: bowtie2
   seqkit: seqkit
   fastp: fastp
+  cutadapt: cutadapt
   seqtk: seqtk
+  fastqpair: fastq_pair
+  picard: /apps/software/standard/core/picard/2.18.5/picard.jar
   # UCSC tools
   bigWigCat: bigWigCat
   wigToBigWig: wigToBigWig
   # optional tools
   fqdedup: fqdedup
-  cutadapt: cutadapt
   fastx: fastx
   seqoutbias: seqOutBias
 

@@ -1,7 +1,8 @@
-<img src="docs/img/peppro_logo_white.svg" alt="pepatac logo" height="70" align="left"/>
+<img src="docs/img/peppro_logo.svg" alt="pepatac logo" height="200" align="left"/>  
 
 <br></br>
-
+<br></br>
+<br></br>
 ---
 
 [![PEP compatible](http://pepkit.github.io/img/PEP-compatible-green.svg)](http://pepkit.github.io)
@@ -29,7 +30,7 @@ Pull requests welcome. Active development should occur in a development or featu
 ## Contributors
 
 * Jason Smith, jasonsmith@virginia.edu
-* Mike Guertin, mjg7y@virginia.edu
+* Michael Guertin, mjg7y@virginia.edu
 * Nathan Sheffield, nathan@code.databio.org
 * Others... (add your name)
 

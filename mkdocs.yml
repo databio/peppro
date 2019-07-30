@@ -1,11 +1,11 @@
 theme: databio
 
-site_name: PEPPRO
+site_name: peppro
 site_author: Jason Smith
-site_url: http://code.databio.org/PEPPRO/
-site_logo: img/peppro_logo_white.svg
+site_url: http://peppro.databio.org/
+site_logo: img/peppro_inline_logo.svg
 repo_url: https://github.com/databio/peppro/
-#google_analytics: ['UA-127092878-1', 'code.databio.org/PEPPRO']
+#google_analytics: ['UA-127092878-1', 'code.databio.org/peppro']
 
 markdown_extensions:
   - fontawesome_markdown  # pip install --user fontawesome-markdown
@@ -16,18 +16,30 @@ nav:
     - Introduction: 'README.md'
     - Features: 'features.md'
     - Install and run: 'install.md'
+    - Extended tutorial: 'tutorial.md'
   - How-to Guides:
+<<<<<<< HEAD
     - Annotation files: 'howto/annotation_files.md'
     - Run PEPPRO directly: 'howto/run_direct.md'
     - PEPPRO in containers: 'howto/use_container.md'
     - Configuring prealignments: 'howto/prealignments.md'
     - Configuring computing: 'howto/configure_compute.md'
+=======
+    - Annotation files: 'howto/annotation_files/'
+    - Configuring prealignments: 'howto/prealignments/'
+    - Detailed install guide: 'howto/detailed_install.md'
+    - Running on a cluster: 'howto/run_cluster/'
+    - Running in a container: 'howto/use_container/'
+    - Using looper: 'howto/use_looper/'
+>>>>>>> master
   - Reference: 
     - FAQ: 'faq.md'
     - Usage: 'usage.md'
     - Advanced container reference: 'howto/container_reference.md'
     - Changelog: 'changelog.md'
     - Support: 'https://github.com/databio/peppro/issues'
+    - Example output file structure: 'browse_output.md'
+    - "Example summary: tutorial project": 'files/examples/tutorial/tutorial_summary.html'
 
 plugins:
   - search

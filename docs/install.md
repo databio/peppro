@@ -9,6 +9,7 @@ git clone https://github.com/databio/peppro.git
 
 PEPPRO uses [`refgenie`](http://refgenie.databio.org/) assets. If you haven't already set it up, initialize your refgenie config file like this:
 
+<<<<<<< HEAD
 ```console
 pip install --user refgenie
 export REFGENIE=your_genome_folder/genome_config.yaml
@@ -35,6 +36,9 @@ If you don't want to install the prerequisite software used by PEPPRO, you can f
 * [seqtk](https://github.com/lh3/seqtk)
 * [preseq](http://smithlabresearch.org/software/preseq/)
 * [wigToBigWig, bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/)
+=======
+`PEPPRO` requires a series of publicly-available, common bioinformatics tools including: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/).
+>>>>>>> master
 
 ### Python packages
 
@@ -58,14 +62,7 @@ Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming,
 
 `seqOutBias` can be used to take into account the mappability at a given read length to filter the sample signal.
 
-*Optional tools:*
-
-* [fqdedup](https://github.com/guertinlab/fqdedup)
-* [cutadapt](https://cutadapt.readthedocs.io/)
-* [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
-* [seqOutBias](https://github.com/guertinlab/seqOutBias)
-* [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc)
-* [pigz (v2.3.4+)](https://zlib.net/pigz/)
+*Optional tools:* [fqdedup](https://github.com/guertinlab/fqdedup), [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/), [seqOutBias](https://github.com/guertinlab/seqOutBias), [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc), and [pigz (v2.3.4+)](https://zlib.net/pigz/).
 
 ## 4: Run an example project through PEPPRO
 
@@ -104,14 +101,25 @@ To run your own samples, you'll need to organize them in **PEP format**, which i
 
 The sample annotation file must specify these columns:
 
+<<<<<<< HEAD
 - sample_name
 - library ('PRO' or 'PROSEQ' or 'PRO-seq')
 - organism (e.g. 'human' or 'mouse')
 - read1
 - read2 (if paired)
 - whatever else you want
+=======
+This test example takes less than 5 minutes to complete. Read more about how to [run the test sample using `Looper`](howto/use_looper.md) with the included [example `peppro_test.yaml` file](https://github.com/databio/peppro/blob/master/examples/meta/peppro_test.yaml).
+>>>>>>> master
 
 
 ## Next steps
 
+<<<<<<< HEAD
 This is just the beginning. For your next step, take a look at one of other detailed user guide links in the side menu.
+=======
+- [Extended tutorial for running a single sample](tutorial.md)
+- [Running on multiple samples with looper](howto/use_looper.md)
+- [Running the pipeline directly in a container](howto/use_container.md)
+- See other detailed user guide links in the side menu
+>>>>>>> master

@@ -199,7 +199,7 @@ class CutTracer(pararead.ParaReadProcessor):
 
         if self.exactbw:
             if self.variable_step:
-                header_line = "variableStep chrom=" + chrom + "\n";
+                header_line = ("variableStep chrom=" + chrom + "\n")
             else: 
                 header_line = ("fixedStep chrom=" + chrom + " start=" +
                                str(begin) + " step=1\n")
@@ -208,7 +208,7 @@ class CutTracer(pararead.ParaReadProcessor):
 
         if self.smoothbw:
             if self.variable_step:
-                header_line = "variableStep chrom=" + chrom + "\n";
+                header_line = ("variableStep chrom=" + chrom + "\n")
             else:
                 header_line = ("fixedStep chrom=" + chrom + " start=" +
                                str(begin) + " step=" + str(self.step_size) +
@@ -220,13 +220,13 @@ class CutTracer(pararead.ParaReadProcessor):
             for read in reads:
                 shifted_pos = get_shifted_pos(read, shift_factor)
 
-                if self.exactbw:
+                if self.exactbw and shifted_pos:
                     cutsToWigProcess.stdin.write((str(shifted_pos) + "\n").encode('utf-8'))
 
-                if self.smoothbw:
+                if self.smoothbw and shifted_pos:
                     cutsToWigProcessSm.stdin.write((str(shifted_pos) + "\n").encode('utf-8'))
 
-                if self.bedout:
+                if self.bedout and shifted_pos:
                     strand = "-" if read.is_reverse else "+"
                     # The bed file needs 6 columns (even though some are dummy) 
                     # because MACS says so.

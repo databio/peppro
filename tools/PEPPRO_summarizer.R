@@ -66,7 +66,7 @@ rc <- paste(config(prj)$metadata$output_dir,
             paste0("QC_", samples(prj)$genome),
             paste0(samples(prj)$sample_name, "_preseq_counts.txt"),
             sep="/")
-plot_complexity_curves(ccurves = cc,
+plotComplexityCurves(ccurves = cc,
     coverage = 0, read_length = 0,
     real_counts_path = rc, ignore_unique = FALSE,
     output_name = paste(config(prj)$metadata$output_dir,

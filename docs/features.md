@@ -1,4 +1,4 @@
-# <img src="../img/peppro_logo_black.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> features at-a-glance
+# <img src="../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> features at-a-glance
 
 Here are a few of the highlights that make `PEPPRO` valuable.
 

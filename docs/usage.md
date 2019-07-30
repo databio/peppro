@@ -1,4 +1,4 @@
-# <img src="../img/peppro_logo_black.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px">  usage reference
+# <img src="../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px">  usage reference
 
 `PEPPRO` command-line usage instructions:
 
@@ -15,11 +15,12 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-C CONFIG_FILE] -O
                  [--trimmer {seqtk,fastx}] [--umi] [--umi_len UMI_LEN]
                  [--max_len MAX_LEN] [--sob] [--scale] [--parts PARTS]
                  [--prealignments PREALIGNMENTS [PREALIGNMENTS ...]]
-                 [--TSS-name TSS_NAME] [--pre-name PRE_NAME]
-                 [--anno-name ANNO_NAME] [--keep] [--noFIFO] [--complexity]
-                 [-V]
+                 [--TSS-name TSS_NAME] [--pi-tss PI_TSS] [--pi-body PI_BODY]
+                 [--pre-name PRE_NAME] [--anno-name ANNO_NAME]
+                 [--exon-name EXON_NAME] [--intron-name INTRON_NAME]
+                 [--coverage] [--keep] [--noFIFO] [--complexity] [-V]
 
-PEPPRO version 0.7.3
+PEPPRO version 0.8.0
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -61,10 +62,18 @@ optional arguments:
   --prealignments PREALIGNMENTS [PREALIGNMENTS ...]
                         Space-delimited list of reference genomes to align to
                         before primary alignment.
-  --TSS-name TSS_NAME   Filename of TSS annotation file.
-  --pre-name PRE_NAME   Filename of pre-mRNA annotation file.
+  --TSS-name TSS_NAME   file_name of TSS annotation file.
+  --pi-tss PI_TSS       file_name of pause index TSS annotation file.
+  --pi-body PI_BODY     file_name of pause index gene body annotation file.
+  --pre-name PRE_NAME   file_name of pre-mRNA annotation file.
   --anno-name ANNO_NAME
-                        Filename of genomic annotation file.
+                        file_name of genomic annotation file.
+  --exon-name EXON_NAME
+                        file_name of exon annotation file.
+  --intron-name INTRON_NAME
+                        file_name of intron annotation file.
+  --coverage            Report library complexity using coverage: reads /
+                        (bases in genome / read length)
   --keep                Keep prealignment BAM files
   --noFIFO              Do NOT use named pipes during prealignments.
   --complexity          Disable library complexity calculation (faster).

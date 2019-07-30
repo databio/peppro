@@ -3,7 +3,7 @@
 # PEPPRO R parser
 
 ###############################################################################
-version <- 0.4
+version <- 0.5
 ##### Load dependencies #####
 
 required_libraries <- c("PEPPROr")
@@ -43,11 +43,13 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "\n",
         "Usage:   PEPPRO.R [command] {args}\n",
         "Version: ", version, "\n\n",
-        "Command: preseq\t plot preseq complexity curves\n",
-        "\t frif\t plot fraction of reads in features\n",
-        "\t tss\t plot TSS enrichment\n",
-        "\t frag\t plot fragment length distribution\n",
-        "\t mrna\t plot mRNA contamination distribution\n"
+        "Command: preseq\t\t plot preseq complexity curves\n",
+        "\t frif\t\t plot fraction of reads in features\n",
+        "\t tss\t\t plot TSS enrichment\n",
+        "\t frag\t\t plot fragment length distribution\n",
+        "\t mrna\t\t plot mRNA contamination distribution\n",
+        "\t pi\t\t plot pause indicies distribution\n",
+        "\t cutadapt\t plot adapter insertion distribution\n"
     )
     message(usage)
 } else if (!is.na(subcmd) && tolower(subcmd) == "preseq") {
@@ -156,14 +158,14 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                required=FALSE, default=500000000,
                                description="Upper x-limit (default 500 million)")
 
-        plot_complexity_curves(ccurves = input,
-                               coverage = coverage,
-                               read_length = read_length,
-                               real_counts_path = real_counts,
-                               ignore_unique = ign_unique,
-                               output_name = output_name,
-                               x_min = x_min,
-                               x_max = x_max)
+        plotComplexityCurves(ccurves = input,
+                             coverage = coverage,
+                             read_length = read_length,
+                             real_counts_path = real_counts,
+                             ignore_unique = ign_unique,
+                             output_name = output_name,
+                             x_min = x_min,
+                             x_max = x_max)
     }
 } else if (!is.na(subcmd) && tolower(subcmd) == "frif") {
     usage <- paste0(
@@ -313,16 +315,68 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         suppressWarnings(mRNAcontamination(rpkm=rpkm, raw=raw))
     }
+} else if (!is.na(subcmd) && tolower(subcmd) == "pi") {
+    usage <- paste0(
+        "\n",
+        "Usage:   PEPPRO.R [command] {args}\n",
+        "Version: ", version, "\n\n",
+        "Command: pi \t plot pause indicies distribution\n\n",
+        " -i, --input\t Pause density/gene body density ratios.\n"
+    )
+
+    help <- opt_get(name = c("help", "?", "h"), required=FALSE,
+                    default=FALSE, n=0)
+    if (!help) {
+        help <- suppressWarnings(
+            if(length(opt_get_args()) == 1) {TRUE} else {FALSE}
+        )
+    }
+    if (help) {
+        message(usage)
+        quit()
+    } else {
+        input <- opt_get(name = c("input", "i"), required=TRUE,
+                         description="Pause density/gene body density ratios.")
+
+        suppressWarnings(plotPI(pi=input))
+    }
+} else if (!is.na(subcmd) && tolower(subcmd) == "cutadapt") {
+    usage <- paste0(
+        "\n",
+        "Usage:   PEPPRO.R [command] {args}\n",
+        "Version: ", version, "\n\n",
+        "Command: cutadapt \t plot adapter insertion distribution\n\n",
+        " -i, --input\t cutadapt report.\n"
+    )
+
+    help <- opt_get(name = c("help", "?", "h"), required=FALSE,
+                    default=FALSE, n=0)
+    if (!help) {
+        help <- suppressWarnings(
+            if(length(opt_get_args()) == 1) {TRUE} else {FALSE}
+        )
+    }
+    if (help) {
+        message(usage)
+        quit()
+    } else {
+        input <- opt_get(name = c("input", "i"), required=TRUE,
+                         description="cutadapt report.")
+
+        suppressWarnings(plotPI(pi=input))
+    }
 } else {
     usage <- paste0(
         "\n",
         "Usage:   PEPPRO.R [command] {args}\n",
         "Version: ", version, "\n\n",
-        "Command: preseq\t plot preseq complexity curves\n",
-        "\t frif\t plot fraction of reads in features\n",
-        "\t tss\t plot TSS enrichment\n",
-        "\t frag\t plot fragment length distribution\n",
-        "\t mrna\t plot mRNA contamination distribution\n"
+        "Command: preseq\t\t plot preseq complexity curves\n",
+        "\t frif\t\t plot fraction of reads in features\n",
+        "\t tss\t\t plot TSS enrichment\n",
+        "\t frag\t\t plot fragment length distribution\n",
+        "\t mrna\t\t plot mRNA contamination distribution\n",
+        "\t pi\t\t plot pause indicies distribution\n",
+        "\t cutadapt\t plot adapter insertion distribution\n"
     )
     message(usage)
     quit()
