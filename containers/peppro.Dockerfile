@@ -5,7 +5,7 @@ FROM phusion/baseimage:0.11
 LABEL maintainer Jason Smith "jasonsmith@virginia.edu"
 
 # Version info
-LABEL version 0.7.4
+LABEL version 0.7.5
 
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
@@ -150,7 +150,11 @@ RUN git clone https://github.com/linsalrob/fastq-pair.git && \
     cmake .. && \
     make && \
     make install
-    
+
+# Install picard
+WORKDIR /home/tools/bin
+RUN wget https://github.com/broadinstitute/picard/releases/download/2.20.3/picard.jar && \
+    chmod +x picard.jar
 
 # Install UCSC tools
 WORKDIR /home/tools/
@@ -161,7 +165,6 @@ RUN wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/wigToBigWig && \
     ln -s /home/tools/wigToBigWig /usr/bin/ && \
     ln -s /home/tools/bigWigCat /usr/bin/
 
-
 # OPTIONAL REQUIREMENTS
 # Install fastqc
 WORKDIR /home/tools/
@@ -171,12 +174,10 @@ RUN wget https://github.com/s-andrews/FastQC/archive/v0.11.8.zip && \
     chmod 755 fastqc && \ 
     ln -s /home/tools/FastQC-0.11.8/fastqc /usr/bin/
 
-
 # Install cargo
 WORKDIR /home/tools/
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
-
 
 # Install fqdedup
 WORKDIR /home/tools/
@@ -184,7 +185,6 @@ RUN git clone https://github.com/guertinlab/fqdedup.git && \
     cd fqdedup && \
     bash -c 'source $HOME/.cargo/env; cargo build --release' && \
     ln -s /home/tools/fqdedup/target/release/fqdedup /usr/bin/
-
 
 # Install fastx_toolkit
 WORKDIR /home/tools/
@@ -203,14 +203,12 @@ RUN git clone https://github.com/agordon/fastx_toolkit && \
     make && \
     make install
 
-
 # Install seqOutBias
 WORKDIR /home/tools/
 RUN git clone https://github.com/guertinlab/seqOutBias.git && \
     cd seqOutBias && \
     bash -c 'source $HOME/.cargo/env; cargo build --release' && \
     ln -s /home/tools/seqOutBias/target/release/seqOutBias /usr/bin/
-
 
 # Set environment variables and make python3 default
 RUN rm -f /usr/bin/python && \
@@ -222,11 +220,9 @@ ENV PATH=/home/tools/bin:/home/tools/:/home/src/bowtie2-2.3.5.1:/home/src/samtoo
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/:/usr/local/lib/ \
     PYTHONPATH=/usr/local/lib/python3.6/dist-packages:$PYTHONPATH
 
-
 # Define default command
 WORKDIR /home/
 CMD ["/bin/bash"]
-
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

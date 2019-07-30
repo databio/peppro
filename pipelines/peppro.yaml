@@ -1,7 +1,5 @@
 # PEPPRO configuration file for an PRO-seq pipeline based on pypiper
 
-# basic tools 
-# public tools
 tools:  # absolute paths to required tools
   python: python
   samtools: samtools
@@ -16,6 +14,8 @@ tools:  # absolute paths to required tools
   # UCSC tools
   bigWigCat: bigWigCat
   wigToBigWig: wigToBigWig
+  # for PyPiper NGTSK
+  picard: ${PICARD}
   # optional tools
   fqdedup: fqdedup
   fastx: fastx

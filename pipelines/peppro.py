@@ -206,7 +206,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
 
     # Check quality encoding for use with FastX_Tools
     if args.trimmer == "fastx":
-        encoding = guess_encoding(fq_file)
+        encoding = _guess_encoding(fq_file)
         #print("Encoding: {}".format(str(encoding)))  # DEBUG
         
     # Create adapter trimming command(s).
@@ -259,7 +259,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     fq_file
             ])
         else:
-            if args.complexity:
+            if args.complexity and args.umi_len > 0:
                 adapter_cmd_chunks = ["(" + tools.cutadapt]
                 # old versions of cutadapt can not use multiple cores
                 if cut_version >= 1.15:
@@ -321,7 +321,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
         adapter_cmd = build_command(adapter_cmd_chunks)
 
     # Create deduplication command(s).
-    if not read2:
+    if not read2 and not args.umi_len <=0:
         if args.dedup == "seqkit":
             dedup_cmd_chunks = [
                 (tools.seqkit, "rmdup"),
@@ -330,7 +330,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                 "--ignore-case",
                 "-o"           
             ]
-            if args.complexity:
+            if args.complexity and args.umi_len > 0:
                 dedup_cmd_chunks.extend([
                     (dedup_fastq, noadap_fastq)
                 ])
@@ -341,7 +341,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
 
         elif args.dedup == "fqdedup":
             dedup_cmd_chunks = [tools.fqdedup]
-            if args.complexity:
+            if args.complexity and args.umi_len > 0:
                 dedup_cmd_chunks.extend([("-i", noadap_fastq)])
                 dedup_cmd_chunks.extend([("-o", dedup_fastq)])
             else:
@@ -359,7 +359,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                 "--ignore-case",
                 "-o"           
             ]
-            if args.complexity:
+            if args.complexity and args.umi_len > 0:
                 dedup_cmd_chunks.extend([
                     (dedup_fastq, noadap_fastq)
                 ])
@@ -406,7 +406,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         trim_cmd_chunks.extend([
                             ("-L", str(args.max_len))
                         ])
-                    if args.complexity:
+                    if args.complexity and args.umi_len > 0:
                         # Need undeduplicated results for complexity calculation
                         #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  # python3
                         trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
@@ -479,7 +479,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                             ("-o", trimmed_fastq_R2)
                         ])
                 else:
-                    if args.complexity:
+                    if args.complexity and args.umi_len > 0:
                         # Need undeduplicated results for complexity calculation
                         #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
                         trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
@@ -550,7 +550,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         trim_cmd_chunks.extend([
                             ("-L", str(args.max_len))
                         ])
-                    if args.complexity:
+                    if args.complexity and args.umi_len > 0:
                         # Need undeduplicated results for complexity calculation
                         #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  # python3
                         trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
@@ -612,7 +612,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         (">", trimmed_fastq_R2)
                     ])
             else:
-                if args.complexity:
+                if args.complexity and args.umi_len > 0:
                     trim_cmd_chunks = [
                         tools.fastp,
                         ("--thread", str(pm.cores))
@@ -733,7 +733,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     trim_cmd_chunks.extend([
                         ("-L", str(args.max_len))
                     ])
-                if args.complexity:
+                if args.complexity and args.umi_len > 0:
                     #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
                     trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
                     trim_cmd_chunks_nodedup.extend([noadap_fastq])
@@ -815,7 +815,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         ("-o", trimmed_fastq_R2)
                     ])
             else:
-                if args.complexity:
+                if args.complexity and args.umi_len > 0:
                     # Need undeduplicated results for complexity calculation
                     #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
                     trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
@@ -880,7 +880,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     trim_cmd_chunks.extend([
                         ("-L", str(args.max_len))
                     ])
-                if args.complexity:
+                if args.complexity and args.umi_len > 0:
                     #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
                     trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
                     trim_cmd_chunks_nodedup.extend([noadap_fastq])
@@ -925,7 +925,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
         trim_cmd2 = build_command(trim_cmd_chunks_R2)
     else:
         trim_cmd1 = build_command(trim_cmd_chunks)
-        if args.complexity:
+        if args.complexity and args.umi_len > 0:
             trim_cmd_nodedup = build_command(trim_cmd_chunks_nodedup)
 
     def report_fastq():
@@ -1003,7 +1003,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
         pm.run(cp_cmd, trimmed_dups_fastq_R2)
         return trimmed_fastq_R2, trimmed_dups_fastq_R2
     else:
-        if args.complexity:
+        if args.complexity and args.umi_len > 0:
             pm.run([adapter_cmd, dedup_cmd, trim_cmd_nodedup],
                    trimmed_fastq, follow=report_fastq)
             pm.run(trim_cmd1, processed_fastq,
@@ -1115,6 +1115,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
 
         # samtools sort needs a temporary directory
         tempdir = tempfile.mkdtemp(dir=sub_outdir)
+        os.chmod(tempdir, 0o771)
         pm.clean_add(tempdir)
 
         # Build bowtie2 command
@@ -1197,69 +1198,6 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         return unmap_fq1, unmap_fq2
 
 
-def _check_bowtie2_index(rgc, genome_assembly):
-    """
-    Confirm bowtie2 index is present.
-
-    Checks by simple file count whether the bowtie2 index for a genome
-    assembly (as produced by the RefGenie reference builder) contains the
-    correct number of non-empty files.
-
-    :param str genomes_folder: refgenconf.RefGenConf rgc: a genome configuration
-        instance, which provides relevant genome asset pointers
-    :param str genome_assembly: name of the specific assembly of interest,
-        e.g. 'mm10'
-    """
-    try:
-        bt2_path = rgc.get_asset(
-            genome_assembly, BT2_IDX_KEY, check_exist=os.path.isdir)
-    except IOError as e:
-        pm.fail_pipeline(e)
-    
-    if not os.listdir(bt2_path):
-        err_msg = "'{}' does not contain any files.\n{}\n{}"
-        loc_msg = ("Try updating/confirming the 'genomes' variable in "
-                   "'pipelines/pepatac.yaml'.")
-        typ_msg = ("Confirm that '{}' "
-                   "is the correct genome, and that you have successfully "
-                   "built a refgenie genome "
-                   "by that name.".format(genome_assembly))
-        pm.fail_pipeline(IOError(err_msg.format(bt2_path, loc_msg, typ_msg)))
-    else:
-        path, dirs, files = next(os.walk(bt2_path))
-
-    # check for bowtie small index
-    if [bt for bt in files if bt.endswith('bt2')]:
-        bt = ['.1.bt2', '.2.bt2', '.3.bt2', '.4.bt2',
-              '.rev.1.bt2', '.rev.2.bt2']
-    # check for bowtie large index
-    elif [bt for bt in files if bt.endswith('bt2l')]:
-        bt = ['.1.bt2l', '.2.bt2l', '.3.bt2l', '.4.bt2l',
-              '.rev.1.bt2l', '.rev.2.bt2l']
-    # if neither file type present, fail
-    else:
-        err_msg = "{} does not contain any bowtie2 index files."
-        pm.fail_pipeline(IOError(err_msg.format(bt2_path)))
-
-    bt_expected = [genome_assembly + s for s in bt]
-    bt_present  = [bt for bt in files if any(s in bt for s in bt_expected)]
-    bt_missing  = list(set(bt_expected) - set(bt_present))
-    # if there are any missing files (bowtie2 file naming is constant), fail
-    if bt_missing:
-        err_msg = "The {} bowtie2 index is missing the following file(s): {}"
-        pm.fail_pipeline(IOError(
-            err_msg.format(genome_assembly,
-                           ', '.join(str(s) for s in bt_missing))))
-    else:
-        for f in bt_present:
-            # If any bowtie2 files are empty, fail
-            if os.stat(os.path.join(bt2_path, f)).st_size == 0:
-                err_msg = "The bowtie2 index file, {}, is empty."
-                pm.fail_pipeline(IOError(err_msg.format(f)))
-
-    genome_file = genome_assembly + ".fa"
-
-
 def tool_path(tool_name):
     """
     Return the path to a tool used by this pipeline.
@@ -1272,9 +1210,9 @@ def tool_path(tool_name):
                         TOOLS_FOLDER, tool_name)
 
 
-def guess_encoding(fq):
+def _guess_encoding(fq):
     """
-    Adapted from Brent Pedersen's "guess_encoding.py"
+    Adapted from Brent Pedersen's "_guess_encoding.py"
     https://github.com/brentp/bio-playground/blob/master/reads-utils/guess-encoding.py
     
     Copyright (c) 2018 Brent Pedersen
@@ -1350,7 +1288,7 @@ def guess_encoding(fq):
         return(str(valid[-1]))
 
 
-def check_commands(commands, ignore=''):
+def _check_commands(commands, ignore=''):
     """
     Check if command(s) can be called
 
@@ -1363,13 +1301,17 @@ def check_commands(commands, ignore=''):
     uncallable = []
     for name, command in commands.items():
         if command not in ignore:
+            # if an environment variable is not expanded it means it points to
+            # an uncallable command
+            if '$' in command:
+                # try to expand
+                command = os.path.expandvars(os.path.expanduser(command))
+                if not os.path.exists(command):
+                    uncallable.append(command)
+
             # if a command is a java file, modify the command
             if '.jar' in command:
                 command = "java -jar " + command
-            # if an environment variable is not expanded it means it points to
-            # an uncallable command
-            if '$' in command: 
-                uncallable.append(command)
 
             code = os.system("command -v {0} >/dev/null 2>&1 || {{ exit 1; }}".format(command))
             # If exit code is not 0, track which command failed
@@ -1422,6 +1364,10 @@ def _add_resources(args, res):
     # REQ
     for asset in ["chrom_sizes", BT2_IDX_KEY]:
         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+
+    for reference in args.prealignments:
+        for asset in [BT2_IDX_KEY]:
+            res[asset] = rgc.get_asset(reference, asset)
 
     # OPT
     msg = "The '{}' asset is not present in your REFGENIE config file."
@@ -1556,22 +1502,21 @@ def main():
 
     # Check that the required tools are callable by the pipeline
     tool_list = [v for k,v in tools.items()]    # extract tool list
+    tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tool_list]
+    tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tool_list]
+    opt_tools = ["fqdedup", "fastx_trimmer", "seqOutBias"]
     if args.trimmer == "fastx":  # update tool call
-        tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tool_list]
-    else:  # otherwise remove it
-        if 'fastx' in tool_list: tool_list.remove('fastx')
+        if 'fastx' in opt_tools: opt_tools.remove('fastx_trimmer')
 
-    if not args.dedup == "fqdedup":  # update tool call
-        if 'fqdedup' in tool_list: tool_list.remove('fqdedup')
+    if args.dedup == "fqdedup":  # update tool call
+        if 'fqdedup' in opt_tools: opt_tools.remove('fqdedup')
 
     if args.sob:
-        tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tool_list]
-    else:
-        if 'seqoutbias' in tool_list: tool_list.remove('seqoutbias')
+        if 'seqOutBias' in opt_tools: opt_tools.remove('seqOutBias')
 
     tool_list = dict((t,t) for t in tool_list)  # convert back to dict
 
-    if not check_commands(tool_list):
+    if not _check_commands(tool_list, opt_tools):
         err_msg = "Missing required tools. See message above."
         pm.fail_pipeline(RuntimeError(err_msg))
 
@@ -1581,11 +1526,6 @@ def main():
 
     # Set up reference resource according to genome prefix.
     res = _add_resources(args, res)
-
-    # Get bowtie2 indexes
-    _check_bowtie2_index(res.rgc, args.genome_assembly)
-    for reference in args.prealignments:
-        _check_bowtie2_index(res.rgc, reference)
 
     # Adapter file can be set in the config; if left null, we use a default.
     # TODO: use this option or just specify directly the adapter sequence as I do now
@@ -1661,7 +1601,7 @@ def main():
         fastqc_folder, args.sample_name + "_R1_rmAdapter.txt")
 
     if args.paired_end:
-        if args.complexity:
+        if args.complexity and args.umi_len > 0:
             unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, False,
                                                        untrimmed_fastq1,
                                                        outfolder=param.outfolder)
@@ -1719,7 +1659,7 @@ def main():
         pm.run([cmd1, cmd2, cmd3], dups_repair_target)
         pm.clean_add(dups_repair_target)
     else:
-        if args.complexity:
+        if args.complexity and args.umi_len > 0:
             unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, False,
                                                        untrimmed_fastq1,
                                                        outfolder=param.outfolder)
@@ -1748,7 +1688,7 @@ def main():
         print("Prealignment assemblies: " + str(args.prealignments))
         # Loop through any prealignment references and map to them sequentially
         for reference in args.prealignments:
-            if args.complexity:
+            if args.complexity and args.umi_len > 0:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1,
@@ -1832,7 +1772,7 @@ def main():
     unmap_genome_bam = os.path.join(
         map_genome_folder, args.sample_name + "_unmap.bam")
 
-    if args.complexity:
+    if args.complexity and args.umi_len > 0:
         mapping_genome_bam_dups = os.path.join(
             map_genome_folder, args.sample_name + "_sort_dups.bam")
         mapping_genome_bam_temp_dups = os.path.join(
@@ -1847,6 +1787,7 @@ def main():
 
     # samtools sort needs a temporary directory
     tempdir = tempfile.mkdtemp(dir=map_genome_folder)
+    os.chmod(tempdir, 0o771)
     pm.clean_add(tempdir)
 
     # check input for zipped or not
@@ -1873,7 +1814,7 @@ def main():
     cmd += " -T " + tempdir
     cmd += " -o " + mapping_genome_bam_temp
 
-    if args.complexity:
+    if args.complexity and args.umi_len > 0:
         # check input for zipped or not
         if pypiper.is_gzipped_fastq(unmap_fq1_dups):
             cmd = (ngstk.ziptool + " -d " + (unmap_fq1_dups + ".gz"))
@@ -1911,7 +1852,7 @@ def main():
 
     cmd2 += mapping_genome_bam_temp + " > " + mapping_genome_bam
 
-    if args.complexity:
+    if args.complexity and args.umi_len > 0:
         cmd2_dups = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
             " -U " + failQC_genome_bam_dups + " ")
         #if args.paired_end:
@@ -1953,7 +1894,7 @@ def main():
                                                  mapping_genome_bam),
            container=pm.container)
 
-    if args.complexity:
+    if args.complexity and args.umi_len > 0:
         pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups,
                container=pm.container)
 
@@ -1978,7 +1919,7 @@ def main():
         pm.run(cmd, temp_mapping_index)
         pm.clean_add(temp_mapping_index)
 
-        if args.complexity:
+        if args.complexity and args.umi_len > 0:
             cmd_dups = tools.samtools + " index " + mapping_genome_bam_temp_dups
             pm.run(cmd_dups, temp_mapping_index_dups)
             pm.clean_add(temp_mapping_index_dups)
@@ -2048,7 +1989,7 @@ def main():
     ############################################################################
     #                     Calculate library complexity                         #
     ############################################################################
-    if args.complexity:
+    if args.complexity and args.umi_len > 0:
         if os.path.exists(mapping_genome_bam_temp_dups):
             if not os.path.exists(temp_mapping_index_dups):
                 cmd = tools.samtools + " index " + mapping_genome_bam_temp_dups
@@ -2247,6 +2188,7 @@ def main():
         mapping_genome_bam,
         (">", plus_bam)
     ])
+
     cmd2 = build_command([
         tools.samtools,
         "view",
@@ -2256,7 +2198,7 @@ def main():
         (">", minus_bam)
     ])
     
-    pm.run([cmd1,cmd2], minus_bam)
+    pm.run([cmd1, cmd2], [plus_bam, minus_bam])
 
     ############################################################################
     #                             TSS enrichment                               #
@@ -2290,7 +2232,7 @@ def main():
         cmd = tool_path("pyTssEnrichment.py")
         cmd += " -a " + mapping_genome_bam + " -b " + plus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
-        cmd += " -z -v -s 4 -o " + Tss_plus
+        cmd += " -z -v -s 6 -o " + Tss_plus
         pm.run(cmd, Tss_plus, nofail=True)
         pm.clean_add(plus_TSS)
         pm.clean_add(Tss_plus)
@@ -2313,7 +2255,7 @@ def main():
         cmd = tool_path("pyTssEnrichment.py")
         cmd += " -a " + mapping_genome_bam + " -b " + minus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
-        cmd += " -z -v -s 4 -o " + Tss_minus
+        cmd += " -z -v -s 6 -o " + Tss_minus
         pm.run(cmd, Tss_minus, nofail=True)
         pm.clean_add(minus_TSS)
         pm.clean_add(Tss_minus)
@@ -2511,8 +2453,8 @@ def main():
                 args.sample_name + "_adapter_insertion_distribution.pdf")
             degradation_png = os.path.join(QC_folder,
                 args.sample_name + "_adapter_insertion_distribution.pdf")
-            cmd2 = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
-                    " cutadapt -i " + adapter_report)
+            cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
+                   " cutadapt -i " + adapter_report + " -o " + QC_folder)
             pm.run(cmd, degradation_pdf, nofail=True)
             pm.report_object("Adapter insertion distribution", degradation_pdf,
                              anchor_image=degradation_png)

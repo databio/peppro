@@ -26,7 +26,7 @@ make singularity
 
 Now you'll need to tell the pipeline where you saved the singularity image. You can either create an environment variable called `$SIMAGES` that points to the folder where your image is stored, or you can tweak the `pipeline_interface.yaml` file so that the `compute.singularity_image` attribute is pointing to the right location on disk.
 
- You can now use the containerized [compute packages](configure_compute.md), *e.g.*, `looper run --compute docker` or `looper run --compute singularity`.
+You can now use the containerized [compute packages](configure_compute.md), *e.g.*, `looper run --compute docker` or `looper run --compute singularity`.
 
 If your containers are set up correctly, then won't need to install any additional software. 
 
@@ -113,4 +113,3 @@ singularity instance.stop peppro_instance
 ## Running multiple samples in a container with looper
 
 To run multiple samples in a container, you simply need to configure `looper` to use a container-compatible template. The looper documentation has detailed instructions for [how to run pipelines in containers](http://code.databio.org/looper/containers/).
->>>>>>> master

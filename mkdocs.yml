@@ -20,9 +20,10 @@ nav:
   - How-to Guides:
     - Annotation files: 'howto/annotation_files.md'
     - Run PEPPRO directly: 'howto/run_direct.md'
-    - PEPPRO in containers: 'howto/use_container.md'
+    - Run PEPPRO in containers: 'howto/use_container.md'
     - Configuring prealignments: 'howto/prealignments.md'
     - Configuring computing: 'howto/configure_compute.md'
+    - Detailed install guide: 'howto/detailed_install.md'
   - Reference: 
     - FAQ: 'faq.md'
     - Usage: 'usage.md'

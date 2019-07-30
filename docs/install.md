@@ -19,8 +19,8 @@ Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it pers
 
 ```console
 refgenie pull -g hg38 -a bowtie2_index
+refgenie pull -g human_rDNA -a bowtie2_index
 refgenie pull -g rCRSd -a bowtie2_index
-refgenie pull -g human_repeats -a bowtie2_index
 ```
 
 ## 3: Install required software
@@ -50,7 +50,13 @@ Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming,
 
 `seqOutBias` can be used to take into account the mappability at a given read length to filter the sample signal.
 
-*Optional tools:* [fqdedup](https://github.com/guertinlab/fqdedup), [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/), [seqOutBias](https://github.com/guertinlab/seqOutBias), [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc), and [pigz (v2.3.4+)](https://zlib.net/pigz/).
+*Optional tools:*
+
+* [fqdedup](https://github.com/guertinlab/fqdedup)
+* [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
+* [seqOutBias](https://github.com/guertinlab/seqOutBias)
+* [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc)
+* [pigz (v2.3.4+)](https://zlib.net/pigz/)
 
 ## 4: Run an example project through PEPPRO
 
@@ -95,8 +101,6 @@ The sample annotation file must specify these columns:
 - read1
 - read2 (if paired)
 - whatever else you want
-
-This test example takes less than 5 minutes to complete. Read more about how to [run the test sample using `Looper`](howto/use_looper.md) with the included [example `peppro_test.yaml` file](https://github.com/databio/peppro/blob/master/examples/meta/peppro_test.yaml).
 
 ## Next steps
 

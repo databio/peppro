@@ -33,7 +33,6 @@ NULL
 #'                         (unique is optional, file is whitespace delimited)
 #' @param ignore_unique If FALSE, ignore information about unique read counts
 #'                   found in real_counts_path file.
-#' @param output_name Desired output name (produces both .pdf and .png files).
 #' @param x_min Lower x-limit (default 0)
 #' @param x_max Upper x-limit (default 500 million)
 #' @keywords preseq library complexity
@@ -46,7 +45,6 @@ NULL
 plotComplexityCurves <- function(ccurves,
                                  coverage=0, read_length=0,
                                  real_counts_path=NA, ignore_unique=FALSE,
-                                 output_name='complexity_curves',
                                  x_min=0, x_max=500000000) {
 
     if (x_min < 0 || x_max <= x_min) {
@@ -440,15 +438,7 @@ plotComplexityCurves <- function(ccurves,
                               ymax = max(preseq_ymax, max_unique)/2)
     }
 
-    # now save the plot
-    pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-        width= 10, height = 7, useDingbats=F)
-    print(fig)
-    invisible(dev.off())
-    png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-        width = 686, height = 480)
-    print(fig)
-    invisible(dev.off())
+    return(p)
 }
 
 #' Compute the axis value limit
@@ -664,20 +654,7 @@ plotFRiF <- function(sample_name, num_reads, output_name, bedFile) {
         p <- ggplot()
     }
 
-    pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-        width= 7, height = 7, useDingbats=F)
-    print(p)
-    invisible(dev.off())
-    png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-        width = 480, height = 480)
-    print(p)
-    invisible(dev.off())
-
-    if (exists("p")) {
-        write("Cumulative FRiF plot completed!\n", stdout())
-    } else {
-        write("Unable to produce FRiF plot!\n", stdout())
-    }
+    return(p)
 }
 
 
@@ -785,6 +762,12 @@ plotTSS <- function(TSSfile) {
         normTSS           <- plusMinus / mean(plusMinus[c(1:val), V1])
         colnames(normTSS) <- c("score")
         peakPos  <- which.max(normTSS$score)
+        # check for true peak
+        if ((normTSS$score[peakPos]/normTSS$score[peakPos-1]) > 1.5 &
+            (normTSS$score[peakPos]/normTSS$score[peakPos+1]) > 1.5) {
+            tmpTSS  <- normTSS$score[-peakPos]
+            peakPos <- which.max(tmpTSS) + 1
+        }
         TSSscore <- round(mean(normTSS[(max(0, peakPos-50)):(min(nrow(normTSS),
                                        peakPos+50)), score]),1)
         if (is.nan(TSSscore)) {
@@ -798,6 +781,12 @@ plotTSS <- function(TSSfile) {
         normTSS           <- plus / mean(plus[c(1:val), V1])
         colnames(normTSS) <- c("score")
         peakPos  <- which.max(normTSS$score)
+        # check for true peak
+        if ((normTSS$score[peakPos]/normTSS$score[peakPos-1]) > 1.5 &
+            (normTSS$score[peakPos]/normTSS$score[peakPos+1]) > 1.5) {
+            tmpTSS  <- normTSS$score[-peakPos]
+            peakPos <- which.max(tmpTSS) + 1
+        }
         TSSscore <- round(mean(normTSS[(max(0, peakPos-50)):(min(nrow(normTSS),
                                        peakPos+50)), score]),1)
         if (is.nan(TSSscore)) {
@@ -825,7 +814,7 @@ plotTSS <- function(TSSfile) {
         geom_smooth(method="loess", span=0.02,
                     se=FALSE, colour=lineColor) +
         labs(x = "Distance from TSS (bp)", y = "TSS Enrichment Score")
-    y_max <- max(30, roundUpNice(TSSscore))
+    y_max <- max(30, roundUpNice(TSSscore*1.1))
     p <- pre + t1 +
          scale_x_continuous(expand=c(0,0)) +
          scale_y_continuous(expand=c(0,0)) +
@@ -837,8 +826,15 @@ plotTSS <- function(TSSfile) {
         minusNormTSS           <- minus / mean(minus[c(1:val), V1])
         colnames(minusNormTSS) <- c("score")
         peakPos       <- which.max(minusNormTSS$score)
+        # check for true peak
+        if ((minusNormTSS$score[peakPos]/minusNormTSS$score[peakPos-1]) > 1.5 &
+            (minusNormTSS$score[peakPos]/minusNormTSS$score[peakPos+1]) > 1.5) {
+            tmpTSS  <- minusNormTSS$score[-peakPos]
+            peakPos <- which.max(tmpTSS) + 1
+        }
+
         minusTSSscore <- round(
-            mean(minusNormTSS[(max(0, peakPos-50)):(min(nrow(normTSS),
+            mean(minusNormTSS[(max(0, peakPos-50)):(min(nrow(minusNormTSS),
                                peakPos+50)), score]),1)
         if (is.nan(minusTSSscore)) {
             message(paste0("\nNaN produced.  Check ", TSSfile[2], "\n"))
@@ -846,7 +842,7 @@ plotTSS <- function(TSSfile) {
         }
         p <- p + geom_smooth(data=minusNormTSS,
                              aes(x=(as.numeric(rownames(minusNormTSS))-
-                                   (nrow(normTSS)/2)),
+                                   (nrow(minusNormTSS)/2)),
                                  y=score, group=1, colour="black"),
                              method="loess", span=0.02,
                              se=FALSE, colour="blue") +
@@ -871,17 +867,19 @@ plotTSS <- function(TSSfile) {
                           fontface = 2, size=10, hjust=0.5)
     }
 
-    png(filename = paste0(sample_name, "_TSSenrichment.png"),
-        width = 480, height = 480)
-    print(p)
-    invisible(dev.off())
+    return(p)
+}
 
-    pdf(file = paste0(sample_name, "_TSSenrichment.pdf"),
-        width= 7, height = 7, useDingbats=F)
-    print(p)
-    invisible(dev.off())
 
-    write("Completed TSS enrichment plot!\n", stdout())
+#' Derive the sample name from input file and return with full path
+#'
+#' @param path A path to a file for which you wish to extract the sample name
+#' @param num_fields An integer representing the number of fields to strip
+#' @param delim A delimiter for the fields splitting a path or string
+sampleName <- function(path, num_fields=2, delim='_') {
+    name <- basename(tools::file_path_sans_ext(path))
+    for(n in 1:num_fields) name <- gsub(paste0(delim, "[^", delim, "]*$"), "", name)
+    return(paste(dirname(path), name, sep="/"))
 }
 
 
@@ -900,12 +898,11 @@ plotTSS <- function(TSSfile) {
 #' data("frag_len")
 #' data("frag_len_count")
 #' plotFLD(fragL = "frag_len", fragL_count = "frag_len_count",
-#'         fragL_dis1 = "fragLenDistribution_example.pdf",
-#'         fragL_dis2 = "fragLenDistribution_example.txt")
+#'         fragL_txt = "fragLenDistribution_example.txt")
 #' @export
-plotFLD <- function(fragL, fragL_count,
-                    fragL_dis1="fragLenDistribution.pdf",
-                    fragL_dis2="fragLenDistribution.txt") {
+plotFLD <- function(fragL,
+                    fragL_count,
+                    fragL_txt="fragLenDistribution.txt") {
 
     if (exists(fragL_count)) {
         dat <- data.table(get(fragL_count))
@@ -940,22 +937,13 @@ plotFLD <- function(fragL, fragL_count,
                plot.title = element_text(hjust = 0.5))
 
     p <- ggplot(dat1, aes(x=V2, y=V1)) +
-             geom_line(aes(color='red')) +
-             xlab("Read length") + 
-             ylab("Read counts") +
-             ggtitle("Insert size distribution") +
-             t1
-
-    # Save plot to pdf file
-    pdf(file=fragL_dis1, width= 7, height = 7, useDingbats=F)
-    print(p)
-    invisible(dev.off())
-
-    # Save plot to png file
-    outfile_png <- gsub('pdf', 'png', fragL_dis1)
-    png(filename=outfile_png, width = 480, height = 480)
-    print(p)
-    invisible(dev.off())
+            geom_point(size=1, alpha=0.25) +
+            geom_line(alpha=0.5) +
+            geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
+            xlab("Fragment length") + 
+            ylab("Number of reads") +
+            ggtitle("Insert size distribution") +
+            t1
 
     summ <- data.table(Min=min(summary_table$V1),
                        Max=max(summary_table$V1),
@@ -963,7 +951,9 @@ plotFLD <- function(fragL, fragL_count,
                        Mean=mean(summary_table$V1),
                        Stdev=sd(summary_table$V1))
     # Write summary table to stats file
-    fwrite(summ, file=fragL_dis2, row.names=F, quote=F, sep="\t")
+    fwrite(summ, file=fragL_txt, row.names=F, quote=F, sep="\t")
+
+    return(p)
 }
 
 #' Return the count of the plot at 95% of the upper limit.
@@ -1056,11 +1046,6 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
     }
     colnames(RPKM) <- c("gene","intron","exon")
 
-    name           <- basename(tools::file_path_sans_ext(rpkm))
-    numFields      <- 2
-    for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
-    sample_name <- paste(dirname(rpkm), name, sep="/")
-
     finite_rpkm <- RPKM[is.finite(RPKM$exon/RPKM$intron),]
 
     if (raw) {
@@ -1123,17 +1108,7 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
                       hjust=0, vjust=1, label = label1, parse=TRUE)
     }
 
-    # Save plot to pdf file
-    pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
-        width= 7, height = 7, useDingbats=F)
-    print(q)
-    invisible(dev.off())
-         
-    # Save plot to png file
-    png(filename = paste0(sample_name, "_mRNA_contamination.png"),
-        width = 480, height = 480)
-    print(q)
-    invisible(dev.off())
+    return(p)
 }
 
 
@@ -1157,11 +1132,6 @@ plotPI <- function(pi) {
         quit(save = "no", status = 1, runLast = FALSE)
     }
     colnames(PI) <- c("pi")
-
-    name           <- basename(tools::file_path_sans_ext(pi))
-    numFields      <- 2
-    for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
-    sample_name <- paste(dirname(pi), name, sep="/")
 
     q <- ggplot(data = PI, aes(x="", y=pi)) +
             stat_boxplot(geom ='errorbar', width = 0.25) +
@@ -1202,23 +1172,14 @@ plotPI <- function(pi) {
     q <- q + annotate("text", x = 0.5, y = c(max_y, 0.95*max_y),
                       hjust=0, vjust=1, label = label1, parse=TRUE)
 
-    # Save plot to pdf file
-    pdf(file=paste0(sample_name, "_pause_index.pdf"),
-        width= 7, height = 7, useDingbats=F)
-    print(q)
-    invisible(dev.off())
-         
-    # Save plot to png file
-    png(filename = paste0(sample_name, "_pause_index.png"),
-        width = 480, height = 480)
-    print(q)
-    invisible(dev.off())
+    return(q)
 }
 
 
 #' Plot the distribution of adapter insertions
 #'
 #' @param input A cutadapt report
+#' @param name A sample name or identifier for the plot title
 #'
 #' @keywords cutadapt
 #' @export
@@ -1226,7 +1187,7 @@ plotPI <- function(pi) {
 #' data("cutadapt")
 #' plotCutadapt(input = "cutadapt")
 #' @export
-plotCutadapt <- function(input) {
+plotCutadapt <- function(input, name='cutadapt') {
     if (exists(input)) {
         report <- data.table(get(input))
     } else if (file.exists(input)) {
@@ -1235,11 +1196,6 @@ plotCutadapt <- function(input) {
         stop(paste0("FileExistsError: ", input, " could not be found."))
         quit(save = "no", status = 1, runLast = FALSE)
     }
-
-    name      <- basename(tools::file_path_sans_ext(input))
-    numFields <- 2
-    for(j in 1:numFields) name <- gsub("_[^_]*$", "", name)
-    sample_name <- paste(dirname(input), name, sep="/")
     
     # only keep sizes where the expected count represents less than 1% of 
     # the actual count
@@ -1250,6 +1206,8 @@ plotCutadapt <- function(input) {
 
     q <- ggplot(report, aes(x=max(length)-length, y=count)) +
             geom_point() +
+            geom_vline(xintercept = 20, linetype = "dotted", alpha=0.25) +
+            geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
             labs(title=name, x="Size of insertion", y="Number of reads") +
             theme_classic(base_size=14) +
             theme(axis.line = element_line(size = 0.5),
@@ -1260,17 +1218,7 @@ plotCutadapt <- function(input) {
                   panel.border = element_rect(colour = "black",
                                               fill=NA, size=0.5))
 
-    # Save plot to pdf file
-    pdf(file=paste0(sample_name, "_adapter_insertion_distribution.pdf"),
-        width= 7, height = 7, useDingbats=F)
-    print(q)
-    invisible(dev.off())
-         
-    # Save plot to png file
-    png(filename = paste0(sample_name, "_adapter_insertion_distribution.png"),
-        width = 480, height = 480)
-    print(q)
-    invisible(dev.off())
+    return(q)
 }
 
 

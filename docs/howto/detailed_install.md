@@ -62,6 +62,7 @@ The following tools are used by the pipeline:
 * [seqtk](https://github.com/lh3/seqtk)
 * [preseq](http://smithlabresearch.org/software/preseq/)
 * [fastq-pair](https://github.com/linsalrob/fastq-pair.git)
+* [picard](http://broadinstitute.github.io/picard/)
 * UCSC tools (v3.5.1)
     * [wigToBigWig (v4)](https://www.encodeproject.org/software/wigtobigwig/)
     * [bigWigCat (v4)](http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/)
@@ -164,6 +165,18 @@ cd build/
 cmake3 ..
 make
 make install
+```
+
+#### picard
+`PEPPRO` is built using `PyPiper` and relies upon the `PyPiper NGSTK` tool kit which itself employs `Picard`.  [Read the `picard` installation guide](http://broadinstitute.github.io/picard/) for more assistance.
+```console
+cd ../../
+wget https://github.com/broadinstitute/picard/releases/download/2.20.3/picard.jar
+chmod +x picard.jar
+```
+Create an environmental variable pointing to the `picard.jar` file called `$PICARD`.  Alternatively, [update the `peppro.yaml` file](https://github.com/databio/peppro/blob/master/pipelines/peppro.yaml) with the full PATH to the `picard.jar` file.
+```
+export PICARD="/path/to/peppro_tutorial/tools/picard.jar"
 ```
 
 #### UCSC utilities
