@@ -3,13 +3,8 @@ name: test
 
 metadata:
   sample_annotation: "peppro_test.csv"
-<<<<<<< HEAD
   output_dir: "peppro_test/"
   pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
-=======
-  output_dir: "$HOME/peppro_test/"
-  pipeline_interfaces: "$HOME/peppro/pipeline_interface.yaml" 
->>>>>>> master
   
 derived_columns: [read1]
 

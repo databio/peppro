@@ -1,4 +1,4 @@
-# <img src="../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:200px; margin-top:-15px; margin-bottom:-10px"> pipeline step-by-step guide
+# <img src="../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:50px; margin-top:-15px; margin-bottom:-10px"> pipeline step-by-step guide
 
 In this guide, we'll walk you through the step by step procedure of running a tutorial PRO-seq dataset through the pipeline.  The output from this process is the same as you see in the [example PRO-seq output](browse_output.md) we've provided.  To use this tutorial, you should have a basic familiarity with [working in a command line driven environment](http://matt.might.net/articles/basic-unix/). You also need to have already installed `PEPPRO` prerequisites, which you can do following the [detailed installation guide](howto/detailed_install.md).
 
