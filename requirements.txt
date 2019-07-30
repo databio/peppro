@@ -1,21 +1,8 @@
 cutadapt
 loopercli
 numpy
-<<<<<<< HEAD
-<<<<<<< HEAD
-loopercli
-pararead
 pandas
-piper
-=======
-=======
-pandas
->>>>>>> 7ca1b97a099b39310d4c3761f54790786bc23561
 pararead
 piper
 refgenconf
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> 7ca1b97a099b39310d4c3761f54790786bc23561
 refgenie
