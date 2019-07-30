@@ -59,7 +59,7 @@ def parse_arguments():
                         help="Remove umi with fastp")
 
     parser.add_argument("--umi_len", dest="umi_len",
-                        default="8",
+                        default="8", type=int,
                         help="Specify the length of the UMI."
                              "If your data does not utilize UMIs, set to 0.")
 

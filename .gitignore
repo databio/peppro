@@ -4,6 +4,7 @@
 
 # Tests
 .cache/
+*peppro_test*
 
 # MkDocs files
 site/
@@ -30,3 +31,4 @@ anno/mm10_annotations.bed.gz
 anno/mm10_annotations.bed
 anno/mm9_annotations.bed.gz
 anno/mm9_annotations.bed
+
