@@ -1115,6 +1115,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
 
         # samtools sort needs a temporary directory
         tempdir = tempfile.mkdtemp(dir=sub_outdir)
+        os.chmod(tempdir, 0o771)
         pm.clean_add(tempdir)
 
         # Build bowtie2 command
@@ -1786,6 +1787,7 @@ def main():
 
     # samtools sort needs a temporary directory
     tempdir = tempfile.mkdtemp(dir=map_genome_folder)
+    os.chmod(tempdir, 0o771)
     pm.clean_add(tempdir)
 
     # check input for zipped or not
