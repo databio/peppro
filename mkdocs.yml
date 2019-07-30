@@ -19,15 +19,14 @@ nav:
     - Extended tutorial: 'tutorial.md'
   - How-to Guides:
     - Run PEPPRO directly: 'run_direct.md'
-    - Run PEPPRO in containers: 'use_container.md'
+    - Run PEPPRO on a cluster: 'cluster.md'
+    - Run PEPPRO in containers: 'container.md'
     - Configuring prealignments: 'prealignments.md'
-    - Configuring computing: 'configure_compute.md'
     - Detailed install guide: 'detailed_install.md'
     - Annotation files: 'annotation.md'
   - Reference: 
     - FAQ: 'faq.md'
     - Usage: 'usage.md'
-    - Advanced container reference: 'container_reference.md'
     - Changelog: 'changelog.md'
     - Support: 'https://github.com/databio/peppro/issues'
     - Example output file structure: 'browse_output.md'

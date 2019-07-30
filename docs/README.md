@@ -4,19 +4,15 @@
 
 [![PEP compatible](http://pepkit.github.io/img/PEP-compatible-green.svg)](http://pepkit.github.io)
 
-`PEPPRO` is a pipeline designed to process PRO-seq data. It is optimized on unique features of PRO-seq to be fast and accurate. It performs  variable-length UMI adapter removal, read deduplication, trimming, mapping, and signal tracks (bigWig) for plus and minus strands using mappability-scaled or unscaled read counts. 
+`PEPPRO` is a pipeline for PRO-seq nascent RNA sequencing data. It is optimized on unique features of PRO-seq to be fast and accurate. It performs  variable-length UMI adapter removal, read deduplication, trimming, mapping, QC, and signal tracks (bigWig) for plus and minus strands using mappability-scaled or unscaled read counts. 
 
 ## Outputs
 
-`PEPPRO` produces quality control plots, summary statistics, and several data formats to set the stage for project-specific analysis. 
+`PEPPRO` produces quality control plots, statistics, and data formats to set the stage for project-specific analysis. We have produced an [interactive display of the output folder structure](browse_output/), which includes:
 
-- PEPPRO produces an easily-navigable HTML report: [HTML summary report demo](files/examples/tutorial/tutorial_summary.html)
-- We have produced an [interactive display of the output folder structure](browse_output/), which includes:
-	- [Easily parsable summary statistics file](files/examples/tutorial/results_pipeline/tutorial/stats.tsv)
-	- BigWig signal tracks (plus and minus stranded):
-	    - nucleotide-resolution, exact RNA polymerase position signal
-	    - smoothed signal
-	    - nucleotide-resolution signal corrected for enzymatic sequence bias
+- **HTML report**: an easily-navigable HTML report with pretty plots: [HTML summary report demo](files/examples/tutorial/tutorial_summary.html).
+- **Stats**: An easily parsable stats file: [Summary statistics demo file](files/examples/tutorial/results_pipeline/tutorial/stats.tsv).
+- **Processed data**: Several bigWig signal tracks (plus and minus stranded), including: smoothed signal; exact (nucleotide-resolution) RNA polymerase position signal; and nucleotide-resolution signal corrected for enzymatic sequence bias.
 
 ## User interface
 
