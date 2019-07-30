@@ -2188,6 +2188,7 @@ def main():
         mapping_genome_bam,
         (">", plus_bam)
     ])
+
     cmd2 = build_command([
         tools.samtools,
         "view",
@@ -2197,7 +2198,7 @@ def main():
         (">", minus_bam)
     ])
     
-    pm.run([cmd1,cmd2], minus_bam)
+    pm.run([cmd1, cmd2], [plus_bam, minus_bam])
 
     ############################################################################
     #                             TSS enrichment                               #
@@ -2231,7 +2232,7 @@ def main():
         cmd = tool_path("pyTssEnrichment.py")
         cmd += " -a " + mapping_genome_bam + " -b " + plus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
-        cmd += " -z -v -s 4 -o " + Tss_plus
+        cmd += " -z -v -s 6 -o " + Tss_plus
         pm.run(cmd, Tss_plus, nofail=True)
         pm.clean_add(plus_TSS)
         pm.clean_add(Tss_plus)
@@ -2254,7 +2255,7 @@ def main():
         cmd = tool_path("pyTssEnrichment.py")
         cmd += " -a " + mapping_genome_bam + " -b " + minus_TSS + " -p ends"
         cmd += " -c " + str(pm.cores)
-        cmd += " -z -v -s 4 -o " + Tss_minus
+        cmd += " -z -v -s 6 -o " + Tss_minus
         pm.run(cmd, Tss_minus, nofail=True)
         pm.clean_add(minus_TSS)
         pm.clean_add(Tss_minus)
