@@ -814,7 +814,7 @@ plotTSS <- function(TSSfile) {
         geom_smooth(method="loess", span=0.02,
                     se=FALSE, colour=lineColor) +
         labs(x = "Distance from TSS (bp)", y = "TSS Enrichment Score")
-    y_max <- max(30, roundUpNice(TSSscore))
+    y_max <- max(30, roundUpNice(TSSscore*1.1))
     p <- pre + t1 +
          scale_x_continuous(expand=c(0,0)) +
          scale_y_continuous(expand=c(0,0)) +
