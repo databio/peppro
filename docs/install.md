@@ -1,4 +1,4 @@
-# Install and run PEPPRO
+# Install and run <img src="../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:50px; margin-top:-15px; margin-bottom:-10px">
 
 ## 1: Clone the `PEPPRO` pipeline
 
@@ -33,8 +33,7 @@ Replace `hg38` if you need to use a different genome assembly. If these assets a
 
 ## 3: Install required software
 
-If you don't want to install the prerequisite software used by PEPPRO, you can follow our tutorial on [running PEPPRO directly in a container](use_container.md) and then skip this step. If you want to run it natively, you'll need to install the following: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/).
-
+If you don't want to install the prerequisite software used by PEPPRO, you can follow our tutorial on [running PEPPRO directly in a container](container.md) and then skip this step. If you want to run it natively, you'll need to install the following: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/). If you need help, we have [detailed installation instructions](detailed_install.md) for installing these.
 
 ### Python packages
 
@@ -112,4 +111,4 @@ The sample annotation file must specify these columns:
 
 ## Next steps
 
-This is just the beginning. For your next step, take a look at one of other detailed user guide links in the side menu.
+This is just the beginning. For your next step, the [extended tutorial](tutorial.md) will walk you through a real project. Or, take a look at one of other detailed user guide links in the side menu.

@@ -1,4 +1,4 @@
-# Run <img src="../../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:35px; margin-top:-15px; margin-bottom:-10px"> in a container
+# Running in a container
 
 We have produced both docker and singularity containers that hold all the necessary software for `PEPPRO`. If your containers are set up correctly, then you won't need to install any additional software. It's easy to run your jobs in a container by configuring `looper` to use a container-compatible template. Follow the instructions below for either `docker` or `singularity` as you wish:
 

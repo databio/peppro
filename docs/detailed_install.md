@@ -2,33 +2,7 @@
 
 This guide walks you through the minutiae of how to install each prerequisite component.  We'll presume you're installing this in a Linux environment.  If not the case, you'll need to go to each tool's respective site to find alternative installation approaches and options.
 
-## 1: Clone the `PEPPRO` pipeline
-
-To begin, we need to get the `PEPPRO` pipeline itself.  The pipeline is hosted on [github](https://github.com/databio/peppro).  If you don't have git installed, follow the [git installation instructions](https://git-scm.com/download/linux), and here is a [brief introduction to git](https://guides.github.com/introduction/git-handbook/). 
-
-From an open terminal, let's first create a directory we'll use to run through this guide:
-```console
-mkdir peppro_tutorial
-```
-
-Let's move into our newly created directory and create a few more folders that we'll use later.
-```console
-cd peppro_tutorial/
-mkdir data
-mkdir genomes
-mkdir processed
-mkdir templates
-mkdir tools
-cd tools/
-```
-
-Time to get PEPPRO!
-```
-git clone https://github.com/databio/peppro.git
-```
-(You could instead use SSH instead of HTTPS with `git clone git@github.com:databio/peppro.git`). Success! If you had any issues, feel free to [reach out to us with questions](https://github.com/databio/peppro/issues).  Otherwise, let's move on to installing additional software.
-
-## 2: Install required software
+## Install required software
 
 You have two options for installing the software prerequisites: 1) use a container, in which case you need only either `docker` or `singularity`; or 2) install all prerequisites natively. We'll install everything natively in this guide. If you want to try the container approach, read [PEPPRO in containers](container.md).
 
@@ -211,48 +185,4 @@ Don't forget to add this to your `PATH` too!
 ```
 export PATH="$PATH:/path/to/peppro_tutorial/tools/pigz-2.4/"
 ```
-That's it! Everything we need to run `PEPPRO` to its full potential should be installed.  If you are interested and have experience using containers, you can check out the [alternate installation methods](../install.md#121-use-containers).
-
-### Create environment variables
-
-We also need to create some environment variables to help point `looper` to where we keep our data files and our tools.  You may either set the environment variables up, like we're going to do now, or you may simply hard code the necessary locations in our configuration files.
-First, let's create a `PROCESSED` variable that represents the location where we want to save output.
-```
-export PROCESSED="/path/to/peppro_tutorial/processed/"
-```
-Second, we'll create a variable representing the root path to all our tools named `CODEBASE`.
-```
-export CODEBASE="/path/to/peppro_tutorial/tools/"
-```
-(Add these environment variables to your `.bashrc` or `.profile` so you don't have to always do this step).
-Fantastic! Now that we have the pipeline and its requirements installed, we're ready to get our reference genome(s).
-
-
-## 3: Download a reference genome
-
-
-PEPPRO uses [`refgenie`](http://refgenie.databio.org/) assets for alignment. If you haven't already, initialize a refgenie config file like this:
-
-```console
-pip install --user refgenie
-export REFGENIE=your_genome_folder/genome_config.yaml
-refgenie init -c $REFGENIE
-```
-
-Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it persists. Then, pull the assets you need. By default, that's these for human:
-
-```console
-refgenie pull -g hg38 -a bowtie2_index
-refgenie pull -g human_rDNA -a bowtie2_index
-refgenie pull -g rCRSd -a bowtie2_index
-```
-
-PEPPRO also uses [refgenie](https://refgenie.databio.org) to manage a variety of annotation files for quality control plots. Downloading them is very easy:
-
-```
-refgenie pull -g hg38 -a ensembl_gtf tss_annotation feat_annotation pi_tss pi_body
-```
-Replace `hg38` if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md).
-
-
-Alright! Time to setup the pipeline configuration files and run our sample.
+That's it! Everything we need to run `PEPPRO` to its full potential should be installed.
