@@ -21,9 +21,9 @@ nav:
     - Run PEPPRO directly: 'run_direct.md'
     - Run PEPPRO on a cluster: 'cluster.md'
     - Run PEPPRO in containers: 'container.md'
-    - Configuring prealignments: 'prealignments.md'
+    - Configure prealignments: 'prealignments.md'
     - Detailed install guide: 'detailed_install.md'
-    - Annotation files: 'annotation.md'
+    - Use custom reference data: 'annotation.md'
   - Reference: 
     - FAQ: 'faq.md'
     - Usage: 'usage.md'
