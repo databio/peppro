@@ -8,21 +8,28 @@ You need a FASTA file for your genome. You can insert this file into refgenie li
 ```
 refgenie build -g GENOME -a fasta --fasta path/to/file.fa
 ```
-
-## 2: Build the GTF asset
+## 2: Build the ensembl_gtf asset
 
 You also need an Ensembl GTF file (or equivalent) for your genome. You can insert this file into refgenie like this:
 
 ```
-refgenie build -g GENOME -a ensembl_gtf --GTF path/to/file.gtf
+refgenie build -g GENOME -a ensembl_gtf --gtf path/to/file.gtf
 ```
 
-## 3: Build all other assets
-Once you have those two assets installed, `refgenie` can automatically build all the remaining assets from them. Build the assets that are required like this:
+## 3: Build the refgene_anno asset
+
+You will need a refGene annotation. For hg38, we obtain this from [ucsc](http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz). Build it for a custom genome like this:
 
 ```
-refgenie build -g GENOME -a ensembl_gtf tss_annotation pre_mRNA_annotation \
-  feat_annotation pi_tss pi_body exon_annotation intron_annotation
+refgenie build -g GENOME -a refgene_anno --refgene path/to/file.txt.gz
+```
+
+
+## 4: Build the feat_annotation and bowtie2_index assets
+The `feat_annotation` asset includes feature annotations used to calculate various QC metrics. The `bowtie2_index` is used for alignment. `Refgenie` can automatically build these after you have the above assets installed:
+
+```
+refgenie build -g GENOME -a feat_annotation bowtie2_index
 ```
 
 That's it! These assets will be automatically detected by PEPPRO if you build them like this with refgenie. If you want to know what we're doing, or customize these, more details follow:

@@ -15,17 +15,14 @@ export REFGENIE=your_genome_folder/genome_config.yaml
 refgenie init -c $REFGENIE
 ```
 
-Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it persists. Then, pull the assets you need.
+Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it persists. 
 
-For your primary genome, PEPPRO will require these assets:
+Next, pull the assets you need. Replace `hg38` in the example below if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md). Download these required assets with this command:
 
 ```console
-refgenie pull -g hg38 -a bowtie2_index ensembl_gtf tss_annotation \
-	pre_mRNA_annotation feat_annotation exon_annotation intron_annotation \
-	pi_tss pi_body
+refgenie pull -g hg38 -a bowtie2_index ensembl_gtf ensembl_rb refgene_anno feat_annotation 
 ```
-
-Replace `hg38` if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md). PEPPRO also requires `bowtie2_index` for any pre-alignment genomes:
+PEPPRO also requires `bowtie2_index` for any pre-alignment genomes:
 
 ```console
 refgenie pull -g human_rDNA -a bowtie2_index
