@@ -88,7 +88,7 @@ export CODEBASE="/path/to/peppro_tutorial/tools/"
 Fantastic! Now that we have the pipeline and its requirements installed, we're ready to get our reference genome(s).
 
 ## 5: Use `looper` to run the pipeline
-Looper requires a few variables and configuration files to work for the specific user. Let's get those set up now. `Looper` uses [`divvy`](http://code.databio.org/divvy) to manage computing resource configuration so that projects and pipelines can easily travel among environments. For more detailed information, [check out the `looper` docs](https://looper.readthedocs.io/en/latest/cluster-computing/). Let's set it up.
+Looper requires a few variables and configuration files to work for the specific user. Let's get those set up now. `Looper` uses [`divvy`](https://divvy.databio.org/) to manage computing resource configuration so that projects and pipelines can easily travel among environments. For more detailed information, [check out the `looper` docs](https://looper.readthedocs.io/en/latest/cluster-computing/). Let's set it up.
 ```
 cd /path/to/peppro_tutorial/
 touch compute_config.yaml
@@ -109,7 +109,7 @@ Now, let's close and save that file and create an environment variable pointing 
 export DIVCFG="/path/to/peppro_tutorial/compute_config.yaml"
 ```
 (Remember to add `DIVCFG` to your `.bashrc` or `.profile` to ensure it persists).
-The `looper` environment configuration file points to submission template(s) in order to know how to run a samples locally or using cluster resources.  If you'd like to learn more, check out the [`DIVCFG` configuration file and submission templates](http://code.databio.org/divvy). We're going to simply setup a local template for the purposes of this tutorial.  You can also easily create [templates for cluster or container use as well](https://github.com/pepkit/divcfg/tree/master/templates)!
+The `looper` environment configuration file points to submission template(s) in order to know how to run a samples locally or using cluster resources.  If you'd like to learn more, check out the [`DIVCFG` configuration file and submission templates](https://divvy.databio.org/). We're going to simply setup a local template for the purposes of this tutorial.  You can also easily create [templates for cluster or container use as well](https://github.com/pepkit/divcfg/tree/master/templates)!
 Let's change to our `templates/` directory to make our first submission template.
 ```
 cd /path/to/peppro_tutorial/templates/
