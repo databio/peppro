@@ -48,7 +48,7 @@ zcat Homo_sapiens.GRCh38.97.gtf.gz | \
   awk '{OFS="\t";} {print $1,$4,$5,$20,$14,$7}' | \
   sed 's/";//g' | \
   sed 's/"//g' | \
-  awk '{if($6=="+"){print $1"\t"$2+20"\t"$3+120"\t"$4"\t"$5"\t"$6}else{print $1"\t"$3-120"\t"$3-20"\t"$4"\t"$5"\t"$6}}' | \
+  awk '{if($6=="+"){print $1"\t"$2+20"\t"$2+120"\t"$4"\t"$5"\t"$6}else{print $1"\t"$3-120"\t"$3-20"\t"$4"\t"$5"\t"$6}}' | \
   LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_PI_TSS.bed
 
 zcat Homo_sapiens.GRCh38.97.gtf.gz | \
