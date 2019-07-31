@@ -438,7 +438,7 @@ plotComplexityCurves <- function(ccurves,
                               ymax = max(preseq_ymax, max_unique)/2)
     }
 
-    return(q)
+    return(fig)
 }
 
 #' Compute the axis value limit
@@ -1116,13 +1116,14 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
 #'
 #' @param pi A single column containing the ratio of TSS densities/gene body
 #'           densities for the highest scoring TSSs
+#' @param name X-axis label, typically a sample name
 #' @keywords pause index
 #' @export
 #' @examples
 #' data("pidx")
 #' plotPI(pi = "pidx")
 #' @export
-plotPI <- function(pi) {
+plotPI <- function(pi, name='pause indicies') {
     if (exists(pi)) {
         PI <- data.table(get(pi))
     } else if (file.exists(pi)) {
@@ -1150,7 +1151,7 @@ plotPI <- function(pi) {
     } else if (max(PI$pi) > 100 & max(PI$pi) < 500) {
         q <- q + scale_y_continuous(breaks = round(seq(min(PI$pi),
                                               max(PI$pi),
-                                              by = 10), 0),
+                                              by = 25), 0),
                                     limits=c(0, max(PI$pi)))
     } else {
         q <- q + scale_y_continuous(breaks = round(seq(min(PI$pi),

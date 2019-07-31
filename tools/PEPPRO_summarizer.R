@@ -72,7 +72,7 @@ p <- plotComplexityCurves(ccurves = cc, coverage = 0, read_length = 0,
                           real_counts_path = rc, ignore_unique = FALSE)
 
 pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-            width= 10, height = 7, useDingbats=F)
+    width= 10, height = 7, useDingbats=F)
 print(p)
 invisible(dev.off())
 png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),

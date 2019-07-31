@@ -383,13 +383,13 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
             width= 7, height = 7, useDingbats=F)
-        print(q)
+        print(p)
         invisible(dev.off())
              
         # Save plot to png file
         png(filename = paste0(sample_name, "_mRNA_contamination.png"),
             width = 480, height = 480)
-        print(q)
+        print(p)
         invisible(dev.off())
 
         if (exists("p")) {
@@ -421,9 +421,9 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         input <- opt_get(name = c("input", "i"), required=TRUE,
                          description="Pause density/gene body density ratios.")
 
-        suppressWarnings(p <- plotPI(pi=input))
-
-        sample_name <- sampleName(input)
+        sample_name        <- sampleName(input)
+        name               <- basename(sample_name)
+        suppressWarnings(p <- plotPI(pi=input, name=name))
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_pause_index.pdf"),
