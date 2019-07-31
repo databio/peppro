@@ -21,7 +21,8 @@ refgenie build -g GENOME -a ensembl_gtf --GTF path/to/file.gtf
 Once you have those two assets installed, `refgenie` can automatically build all the remaining assets from them. Build the assets that are required like this:
 
 ```
-refgenie build -g GENOME -a ensembl_gtf tss_annotation pre_mRNA_annotation feat_annotation pi_tss pi_body
+refgenie build -g GENOME -a ensembl_gtf tss_annotation pre_mRNA_annotation \
+  feat_annotation pi_tss pi_body exon_annotation intron_annotation
 ```
 
 That's it! These assets will be automatically detected by PEPPRO if you build them like this with refgenie. If you want to know what we're doing, or customize these, more details follow:

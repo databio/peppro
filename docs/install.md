@@ -21,7 +21,8 @@ For your primary genome, PEPPRO will require these assets:
 
 ```console
 refgenie pull -g hg38 -a bowtie2_index ensembl_gtf tss_annotation \
-	pre_mRNA_annotation feat_annotation pi_tss pi_body
+	pre_mRNA_annotation feat_annotation exon_annotation intron_annotation \
+	pi_tss pi_body
 ```
 
 Replace `hg38` if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md). PEPPRO also requires `bowtie2_index` for any pre-alignment genomes:
