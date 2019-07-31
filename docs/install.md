@@ -31,7 +31,7 @@ refgenie pull -g rCRSd -a bowtie2_index
 
 ## 3: Install required software
 
-If you don't want to install the prerequisite software used by PEPPRO, you can follow our tutorial on [running PEPPRO directly in a container](container.md) and skip this step. If you want to run it natively, you'll need to install the following: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/). If you need help, we have [detailed installation instructions](detailed_install.md) for installing these.
+PEPPRO requires a set of Python and R packages to run.
 
 ### Python packages
 
@@ -48,6 +48,10 @@ pip install --user -r requirements.txt
 ```console
 Rscript -e 'install.packages("PEPPROr", repos=NULL, type="source")'
 ```
+
+The pipeline also relies on a set of publicly available bioinformatic tools, but if you don't want to install the prerequisite software used by PEPPRO natively, you can follow our tutorial on [running PEPPRO directly in a container](container.md) and skip this step.
+
+Otherwise, you'll need to install the following: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/). If you need help, we have [detailed installation instructions](detailed_install.md) for installing these.
 
 ### Optional software
 
