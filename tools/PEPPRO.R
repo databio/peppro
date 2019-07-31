@@ -168,11 +168,11 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         # now save the plot
         pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
             width= 10, height = 7, useDingbats=F)
-        print(fig)
+        print(p)
         invisible(dev.off())
         png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
             width = 686, height = 480)
-        print(fig)
+        print(p)
         invisible(dev.off())
 
         if (exists("p")) {
