@@ -55,4 +55,7 @@ looper run examples/meta/peppro_test.yaml \
 
 ## More details on containers
 
-The looper documentation has detailed instructions for [how to run pipelines in containers](http://looper.databio.org/en/latest/containers/).
+You may need to adjust the built-in templates to fit with how you run docker or singularity in your environment. For example, you'll need to make sure to mount any filesystems you need. To do this pretty easy, you will just need to tweak the default templates to fit your environment. Here are some resources to get you started:
+
+- [Divvy documentation on container templates](http://divvy.databio.org/en/latest/containers/)
+- Looper documentation detailed instructions for [how to run pipelines in containers](http://looper.databio.org/en/latest/containers/).

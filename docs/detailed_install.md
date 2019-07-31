@@ -4,18 +4,9 @@ This guide walks you through the minutiae of how to install each prerequisite co
 
 ## 1: Clone the `PEPPRO` pipeline
 
-To begin, we need to get the `PEPPRO` pipeline itself.  The pipeline is hosted on [github](https://github.com/databio/peppro).  If you don't have git installed, follow the [git installation instructions](https://git-scm.com/download/linux), and here is a [brief introduction to git](https://guides.github.com/introduction/git-handbook/). To install `PEPPRO`, you can use one of the following methods:
+To begin, we need to get the `PEPPRO` pipeline itself.  The pipeline is hosted on [github](https://github.com/databio/peppro).  If you don't have git installed, follow the [git installation instructions](https://git-scm.com/download/linux), and here is a [brief introduction to git](https://guides.github.com/introduction/git-handbook/). 
 
-* using SSH:
-```
-git clone git@github.com:databio/peppro.git
-```
-* using HTTPS:
-```
-git clone https://github.com/databio/peppro.git
-```
-
-We'll use HTTPS in this example.  From an open terminal, let's first create a directory we'll use to run through this guide:
+From an open terminal, let's first create a directory we'll use to run through this guide:
 ```console
 mkdir peppro_tutorial
 ```
@@ -35,11 +26,11 @@ Time to get PEPPRO!
 ```
 git clone https://github.com/databio/peppro.git
 ```
-Success! If you had any issues, feel free to [reach out to us with questions](https://github.com/databio/peppro/issues).  Otherwise, let's move on to installing additional software.
+(You could instead use SSH instead of HTTPS with `git clone git@github.com:databio/peppro.git`). Success! If you had any issues, feel free to [reach out to us with questions](https://github.com/databio/peppro/issues).  Otherwise, let's move on to installing additional software.
 
 ## 2: Install required software
 
-You have two options for installing the software prerequisites: 1) use a container, in which case you need only either `docker` or `singularity`; or 2) install all prerequisites natively. We'll install everything natively in this guide.
+You have two options for installing the software prerequisites: 1) use a container, in which case you need only either `docker` or `singularity`; or 2) install all prerequisites natively. We'll install everything natively in this guide. If you want to try the container approach, read [PEPPRO in containers](container.md).
 
 To use `PEPPRO`, we need the following software:
 **Python packages**. The pipeline uses [`pypiper`](http://pypiper.readthedocs.io/en/latest/) to run a single sample, [`looper`](http://looper.readthedocs.io/en/latest/) to handle multi-sample projects (for either local or cluster computation), [`pararead`](https://github.com/databio/pararead) for parallel processing sequence reads, [`refgenie`](http://refgenie.databio.org/en/latest/) to organize and build reference assemblies, [`cutadapt`](https://cutadapt.readthedocs.io/) to remove adapters for single-end data or optionally for paired-end, and the common `python` libraries [`numpy`](https://www.numpy.org/) and [`pandas`](https://pandas.pydata.org/). You can do a user-specific install using the included requirements.txt file in the pipeline directory:  
@@ -191,7 +182,7 @@ Add our `tools/` directory to our `PATH` environment variable.
 ```
 export PATH="$PATH:/path/to/peppro_tutorial/tools/"
 ```
-That should do it!  Now we'll [install some **optional** packages](../tutorial.md#install-optional-software).  Of course, these are not required, but for the purposes of this tutorial we're going to be completionists.
+That should do it!  Now we'll install some **optional** packages.  Of course, these are not required, but for the purposes of this tutorial we're going to be completionists.
 
 ### Optional software
 
@@ -239,39 +230,29 @@ Fantastic! Now that we have the pipeline and its requirements installed, we're r
 
 ## 3: Download a reference genome
 
-Before we analyze anything, we also need a reference genome.  `PEPPRO` uses `refgenie` genomes.  For the purposes of this tutorial, we'll just download pre-built genomes.  Follow the `'refgenie` instructions if you'd like to [build your own reference genome](https://github.com/databio/refgenie). First, let's change into our `genomes/` folder.
-```
-cd /path/to/peppro_tutorial/genomes/
-wget http://big.databio.org/refgenomes/hg38.tgz
-wget http://cloud.databio.org.s3.amazonaws.com/refgenomes/human_repeats_170502.tgz
-wget http://cloud.databio.org.s3.amazonaws.com/refgenomes/rCRSd_170502.tgz
-tar xvfz hg38.tgz
-tar xvfz human_repeats_170502.tgz
-tar xvfz rCRSd_170502.tgz
-rm hg38.tgz
-rm human_repeats_170502.tgz
-rm rCRSd_170502.tgz
+
+PEPPRO uses [`refgenie`](http://refgenie.databio.org/) assets for alignment. If you haven't already, initialize a refgenie config file like this:
+
+```console
+pip install --user refgenie
+export REFGENIE=your_genome_folder/genome_config.yaml
+refgenie init -c $REFGENIE
 ```
 
-## 4: Point the pipeline to your Refgenie assemblies
+Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it persists. Then, pull the assets you need. By default, that's these for human:
 
-Let's also create another environment variable that points to our genomes.
-```
-export GENOMES="/path/to/peppro_tutorial/genomes/
-```
-(Don't forget to add this to your `.bashrc` or `.profile` to ensure it persists).
-
-
-## 5: Download or create annotation files
-
-To calculate TSS enrichments, you will need a [TSS annotation file](http://big.databio.org/refgenomes/) in your reference genome directory.  If a pre-built version for your genome of interest isn't present, you can quickly create that file yourself. In the reference genome directory, you can perform the following commands for in this example, `hg38`:
-```
-wget -O hg38_TSS_full.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz \
-zcat hg38_TSS_full.txt.gz | \
-  awk  '{if($4=="+"){print $3"\t"$5"\t"$5"\t"$4"\t"$13}else{print $3"\t"$6"\t"$6"\t"$4"\t"$13}}' | \
-  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_TSS.tsv
+```console
+refgenie pull -g hg38 -a bowtie2_index
+refgenie pull -g human_rDNA -a bowtie2_index
+refgenie pull -g rCRSd -a bowtie2_index
 ```
 
-We also have [downloadable pre-built genome annotation files](http://big.databio.org/peppro/) for `hg38`, `hg19`, `mm10`, and `mm9` that you can use to annotate the reads and peaks.  These files annotate 3' and 5' UTR, Exonic, Intronic, Intergenic, Promoter, and Promoter Flanking Regions of the corresponding genome as indicated in Ensembl or UCSC.  Simply move the corresponding genome annotation file into the `peppro/anno` folder.  Once present in the `peppro/anno` folder you don't need to do anything else as the pipeline will look there automatically.   Alternatively, you can use the `--anno-name` pipeline option to directly point to this file when running.  You can also [learn how to create a custom annotation file](annotation_files.md) to calculate coverage using your own features of interest.
+PEPPRO also uses [refgenie](https://refgenie.databio.org) to manage a variety of annotation files for quality control plots. Downloading them is very easy:
+
+```
+refgenie pull -g hg38 -a ensembl_gtf tss_annotation feat_annotation pi_tss pi_body
+```
+Replace `hg38` if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md).
+
 
 Alright! Time to setup the pipeline configuration files and run our sample.
