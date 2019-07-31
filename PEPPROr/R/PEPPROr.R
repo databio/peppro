@@ -438,7 +438,7 @@ plotComplexityCurves <- function(ccurves,
                               ymax = max(preseq_ymax, max_unique)/2)
     }
 
-    return(p)
+    return(q)
 }
 
 #' Compute the axis value limit

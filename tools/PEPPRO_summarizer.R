@@ -66,12 +66,18 @@ rc <- paste(config(prj)$metadata$output_dir,
             paste0("QC_", samples(prj)$genome),
             paste0(samples(prj)$sample_name, "_preseq_counts.txt"),
             sep="/")
-plotComplexityCurves(ccurves = cc,
-    coverage = 0, read_length = 0,
-    real_counts_path = rc, ignore_unique = FALSE,
-    output_name = paste(config(prj)$metadata$output_dir,
-                        "summary",
-                        paste0(config(prj)$name, "_libComplexity"),
-                        sep="/"))
+output_name = paste(config(prj)$metadata$output_dir, "summary",
+                    paste0(config(prj)$name, "_libComplexity"), sep="/")
+p <- plotComplexityCurves(ccurves = cc, coverage = 0, read_length = 0,
+                          real_counts_path = rc, ignore_unique = FALSE)
+
+pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+            width= 10, height = 7, useDingbats=F)
+print(p)
+invisible(dev.off())
+png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+    width = 686, height = 480)
+print(p)
+invisible(dev.off())
 
 ###############################################################################
