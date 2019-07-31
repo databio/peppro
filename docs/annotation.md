@@ -3,13 +3,13 @@
 This document outlines how we created the reference data, so you can recreate it if you need to. The easiest way to do this is use `refgenie build`. All you need to do is:
 
 
-## Fasta file
+## 1: Build the fasta asset
 You need a FASTA file for your genome. You can insert this file into refgenie like this:
 ```
 refgenie build -g GENOME -a fasta --fasta path/to/file.fa
 ```
 
-## GTF file
+## 2: Build the GTF asset
 
 You also need an Ensembl GTF file (or equivalent) for your genome. You can insert this file into refgenie like this:
 
@@ -17,7 +17,7 @@ You also need an Ensembl GTF file (or equivalent) for your genome. You can inser
 refgenie build -g GENOME -a ensembl_gtf --GTF path/to/file.gtf
 ```
 
-## Other assets
+## 3: Build all other assets
 Once you have those two assets installed, `refgenie` can automatically build all the remaining assets from them. Build the assets that are required like this:
 
 ```
