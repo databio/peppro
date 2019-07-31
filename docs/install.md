@@ -15,25 +15,25 @@ export REFGENIE=your_genome_folder/genome_config.yaml
 refgenie init -c $REFGENIE
 ```
 
-Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it persists. Then, pull the assets you need. By default, that's these for human:
+Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it persists. Then, pull the assets you need.
+
+For your primary genome, PEPPRO will require these assets:
 
 ```console
-refgenie pull -g hg38 -a bowtie2_index
+refgenie pull -g hg38 -a bowtie2_index ensembl_gtf tss_annotation \
+	feat_annotation pi_tss pi_body
+```
+
+Replace `hg38` if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md). PEPPRO also requires `bowtie2_index` for any pre-alignment genomes:
+
+```console
 refgenie pull -g human_rDNA -a bowtie2_index
 refgenie pull -g rCRSd -a bowtie2_index
 ```
 
-PEPPRO also uses [refgenie](https://refgenie.databio.org) to manage a variety of annotation files for quality control plots. Downloading them is very easy:
-
-```
-refgenie pull -g hg38 -a ensembl_gtf tss_annotation feat_annotation pi_tss pi_body
-```
-Replace `hg38` if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md).
-
-
 ## 3: Install required software
 
-If you don't want to install the prerequisite software used by PEPPRO, you can follow our tutorial on [running PEPPRO directly in a container](container.md) and then skip this step. If you want to run it natively, you'll need to install the following: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/). If you need help, we have [detailed installation instructions](detailed_install.md) for installing these.
+If you don't want to install the prerequisite software used by PEPPRO, you can follow our tutorial on [running PEPPRO directly in a container](container.md) and skip this step. If you want to run it natively, you'll need to install the following: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/). If you need help, we have [detailed installation instructions](detailed_install.md) for installing these.
 
 ### Python packages
 
@@ -53,9 +53,7 @@ Rscript -e 'install.packages("PEPPROr", repos=NULL, type="source")'
 
 ### Optional software
 
-Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming, deduplication, and reverse complementation.  The use of `fqdedup`, in particular, is useful if you wish to minimize memory use at the expense of speed.  We suggest using the default tools simply due to the fact that `fastx toolkit` has not been supported since 2012.
-
-`seqOutBias` can be used to take into account the mappability at a given read length to filter the sample signal.
+Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming, deduplication, and reverse complementation.  The use of `fqdedup`, in particular, is useful if you wish to minimize memory use at the expense of speed.  We suggest using the default tools simply due to the fact that `fastx toolkit` has not been supported since 2012. `seqOutBias` can be used to take into account the mappability at a given read length to filter the sample signal.
 
 *Optional tools:*
 
