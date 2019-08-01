@@ -92,11 +92,11 @@ def parse_arguments():
                         help="file_name of TSS annotation file.")
 
     parser.add_argument("--pi-tss", default=None,
-                        dest="pi_tss", type=str,
+                        dest="ensembl_tss", type=str,
                         help="file_name of pause index TSS annotation file.")
 
     parser.add_argument("--pi-body", default=None,
-                        dest="pi_body", type=str,
+                        dest="ensembl_gene_body", type=str,
                         help="file_name of pause index gene body annotation file.")
 
     parser.add_argument("--pre-name", default=None,
@@ -1373,7 +1373,7 @@ def _add_resources(args, res):
     msg = "The '{}' asset is not present in your REFGENIE config file."
     err = "The '{}' asset does not exist."
 
-    asset = "tss_annotation"
+    asset = "refgene_tss"
     if args.TSS_name:        
         res[asset] = os.path.abspath(args.TSS_name)
     else:
@@ -1387,9 +1387,9 @@ def _add_resources(args, res):
             print(err.format(asset))
             print(msg)
 
-    asset = "pi_tss"
-    if args.pi_tss:        
-        res[asset] = os.path.abspath(args.pi_tss)
+    asset = "ensembl_tss"
+    if args.ensembl_tss:        
+        res[asset] = os.path.abspath(args.ensembl_tss)
     else:
         try:
             res[asset] = rgc.get_asset(args.genome_assembly, asset)
@@ -1401,9 +1401,9 @@ def _add_resources(args, res):
             print(err.format(asset))
             print(msg)
 
-    asset = "pi_body"
-    if args.pi_body:        
-        res[asset] = os.path.abspath(args.pi_body)
+    asset = "ensembl_gene_body"
+    if args.ensembl_gene_body:        
+        res[asset] = os.path.abspath(args.ensembl_gene_body)
     else:
         try:
             res[asset] = rgc.get_asset(args.genome_assembly, asset)
@@ -1415,7 +1415,7 @@ def _add_resources(args, res):
             print(err.format(asset))
             print(msg)
 
-    asset = "pre_mRNA_annotation"
+    asset = "refgene_pre_mRNA"
     if args.pre_name:
         res[asset] = os.path.abspath(args.pre_name)
     else:
@@ -1443,7 +1443,7 @@ def _add_resources(args, res):
             print(err.format(asset))
             print(msg)
 
-    asset = "exon_annotation"
+    asset = "refgene_exon"
     if args.exon_name:
         res[asset] = os.path.abspath(args.exon_name)
     else:
@@ -1457,7 +1457,7 @@ def _add_resources(args, res):
             print(err.format(asset))
             print(msg)
 
-    asset = "intron_annotation"
+    asset = "refgene_intron"
     if args.intron_name:
         res[asset] = os.path.abspath(args.intron_name)
     else:
@@ -1869,9 +1869,9 @@ def main():
             ar = float(ar)/2
         rr = float(pm.get_stat("Raw_reads"))
         tr = float(pm.get_stat("Trimmed_reads"))
-        if os.path.exists(res.pre_mRNA_annotation):
+        if os.path.exists(res.refgene_pre_mRNA):
             cmd = (tools.samtools + " depth -b " +
-                   res.pre_mRNA_annotation + " " + bam +
+                   res.refgene_pre_mRNA + " " + bam +
                    " | awk '{counter++;sum+=$3}END{print sum/counter}'")
             rd = pm.checkprint(cmd)
         else:
@@ -2203,9 +2203,9 @@ def main():
     ############################################################################
     #                             TSS enrichment                               #
     ############################################################################
-    if not os.path.exists(res.tss_annotation):
+    if not os.path.exists(res.refgene_tss):
         print("Skipping TSS -- TSS enrichment requires TSS annotation file: {}"
-              .format(res.tss_annotation))
+              .format(res.refgene_tss))
     else:
         pm.timestamp("### Calculate TSS enrichment")
 
@@ -2214,7 +2214,7 @@ def main():
         minus_TSS = os.path.join(QC_folder, "minus_TSS.tsv")
         cmd = ("sed -n -e '/[[:space:]]+/w " +
                plus_TSS + "' -e '/[[:space:]]-/w " +
-               minus_TSS + "' " + res.tss_annotation)
+               minus_TSS + "' " + res.refgene_tss)
         pm.run(cmd, [plus_TSS, minus_TSS])
 
         # pyTssEnrichment requires indexed bam
@@ -2310,28 +2310,28 @@ def main():
             pm.clean_add(chr_order)
             pm.clean_add(chr_keep)
 
-    if not os.path.exists(res.pi_tss):
-        if not os.path.exists(res.pi_body):
+    if not os.path.exists(res.ensembl_tss):
+        if not os.path.exists(res.ensembl_gene_body):
             print("Skipping PI -- Pause index requires 'TSS' and 'gene body' annotation files: {} and {}"
-                  .format(res.pi_tss, res.pi_body))
+                  .format(res.ensembl_tss, res.ensembl_gene_body))
         else:
             print("Skipping PI -- Pause index requires 'TSS' annotation file: {}"
-                  .format(res.pi_tss))
-    elif not os.path.exists(res.pi_body):
+                  .format(res.ensembl_tss))
+    elif not os.path.exists(res.ensembl_gene_body):
         print("Skipping PI -- Pause index requires 'gene body' annotation file: {}"
-                  .format(res.pi_body))
+                  .format(res.ensembl_gene_body))
     else:
         pm.timestamp("### Calculate Pause Index (PI)")
 
         # Remove missing chr from PI annotations
         tss_local = os.path.join(QC_folder,
-                                 args.genome_assembly + "_PI_TSS.bed")
+                                 args.genome_assembly + "_ensembl_tss.bed")
         body_local = os.path.join(QC_folder,
-                                  args.genome_assembly + "_PI_body.bed")
-        cmd1 = ("grep -wf " + chr_keep + " " + res.pi_tss + " | " +
+                                  args.genome_assembly + "_ensembl_gene_body.bed")
+        cmd1 = ("grep -wf " + chr_keep + " " + res.ensembl_tss + " | " +
                 tools.bedtools + " sort -i stdin -faidx " + chr_order + 
                 " > " + tss_local)
-        cmd2 = ("grep -wf " + chr_keep + " " + res.pi_body + " | " +
+        cmd2 = ("grep -wf " + chr_keep + " " + res.ensembl_gene_body + " | " +
                 tools.bedtools + " sort -i stdin -faidx " + chr_order + 
                 " > " + body_local)
         pm.run([cmd1,cmd2], [tss_local, body_local], nofail=True)
@@ -2392,19 +2392,19 @@ def main():
     ############################################################################
     #           Calculate Fraction of Reads in Pre-mRNA (FRiP)                 #
     ############################################################################
-    if not os.path.exists(res.pre_mRNA_annotation):
+    if not os.path.exists(res.refgene_pre_mRNA):
         print("Skipping FRiP -- Fraction of reads in pre-mRNA requires "
               "pre-mRNA annotation file: {}"
-              .format(res.pre_mRNA_annotation))
+              .format(res.refgene_pre_mRNA))
     else:
         pm.timestamp("### Calculate FRiP")
         # Plus
-        plus_frip = calc_frip(plus_bam, res.pre_mRNA_annotation,
+        plus_frip = calc_frip(plus_bam, res.refgene_pre_mRNA,
                               frip_func=ngstk.simple_frip,
                               pipeline_manager=pm)
         pm.report_result("Plus FRiP", round(plus_frip, 2))
         # Minus
-        minus_frip = calc_frip(minus_bam, res.pre_mRNA_annotation,
+        minus_frip = calc_frip(minus_bam, res.refgene_pre_mRNA,
                                frip_func=ngstk.simple_frip,
                                pipeline_manager=pm)
         pm.report_result("Minus FRiP", round(minus_frip, 2))
@@ -2609,8 +2609,8 @@ def main():
     ############################################################################
     #                         Report mRNA contamination                        #
     ############################################################################
-    if (os.path.exists(res.exon_annotation) and
-        os.path.exists(res.intron_annotation)):
+    if (os.path.exists(res.refgene_exon) and
+        os.path.exists(res.refgene_intron)):
 
         pm.timestamp("### Calculate mRNA contamination")
 
@@ -2619,11 +2619,11 @@ def main():
                                   "_exons_sort.bed")
         introns_sort = os.path.join(QC_folder, args.genome_assembly +
                                     "_introns_sort.bed")
-        cmd1 = ("grep -wf " + chr_keep + " " + res.exon_annotation +
+        cmd1 = ("grep -wf " + chr_keep + " " + res.refgene_exon +
                 " | " + tools.bedtools + " sort -i stdin -faidx " +
                 chr_order + " > " + exons_sort)
         # a single sort fails to sort a 1 bp different start position intron
-        cmd2 = ("grep -wf " + chr_keep + " " + res.intron_annotation +
+        cmd2 = ("grep -wf " + chr_keep + " " + res.refgene_intron +
                 " | " + tools.bedtools + " sort -i stdin -faidx " +
                 chr_order + " | " + tools.bedtools + " sort -i stdin -faidx " +
                 chr_order + " > " + introns_sort)
