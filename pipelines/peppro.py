@@ -1471,8 +1471,8 @@ def _add_resources(args, res):
             print(err.format(asset))
             print(msg)
 
-    res.rgc = rgc
-    return res
+    # res.rgc = rgc
+    return res, rgc
 
 
 ###############################################################################
@@ -1525,7 +1525,7 @@ def main():
         pm.fail_pipeline(RuntimeError(err_msg))
 
     # Set up reference resource according to genome prefix.
-    res = _add_resources(args, res)
+    res, rgc = _add_resources(args, res)
 
     # Adapter file can be set in the config; if left null, we use a default.
     # TODO: use this option or just specify directly the adapter sequence as I do now
@@ -1694,7 +1694,7 @@ def main():
                         args, tools, args.paired_end, False, unmap_fq1,
                         unmap_fq2, reference,
                         assembly_bt2=os.path.join(
-                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
                         outfolder=param.outfolder,
                         aligndir="prealignments")
 
@@ -1702,17 +1702,19 @@ def main():
                         args, tools, args.paired_end, False, unmap_fq1_dups,
                         unmap_fq2_dups, reference,
                         assembly_bt2=os.path.join(
-                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         dups=True)
                     
                 else:
+                    print(type(rgc))
+                    print(rgc)
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1,
                         unmap_fq2, reference,
                         assembly_bt2=os.path.join(
-                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
                         outfolder=param.outfolder,
                         aligndir="prealignments")
 
@@ -1720,7 +1722,7 @@ def main():
                         args, tools, args.paired_end, True, unmap_fq1_dups,
                         unmap_fq2_dups, reference,
                         assembly_bt2=os.path.join(
-                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         dups=True)
@@ -1738,7 +1740,7 @@ def main():
                         args, tools, args.paired_end, False,
                         unmap_fq1, unmap_fq2, reference,
                         assembly_bt2=os.path.join(
-                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
                         outfolder=param.outfolder,
                         aligndir="prealignments")
                 else:
@@ -1746,7 +1748,7 @@ def main():
                         args, tools, args.paired_end, True,
                         unmap_fq1, unmap_fq2, reference,
                         assembly_bt2=os.path.join(
-                            res.rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
                         outfolder=param.outfolder,
                         aligndir="prealignments")
                 if args.paired_end:
@@ -1803,7 +1805,7 @@ def main():
     cmd += bt2_options
     cmd += " --rg-id " + args.sample_name
     cmd += " -x " + os.path.join(
-        res.rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
+        rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
                           args.genome_assembly)
     if args.paired_end:
         cmd += " --rf -1 " + unmap_fq1 + " -2 " + unmap_fq2
@@ -1828,7 +1830,7 @@ def main():
         cmd_dups += bt2_options
         cmd_dups += " --rg-id " + args.sample_name
         cmd_dups += " -x " + os.path.join(
-            res.rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
+            rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
                               args.genome_assembly)
         if args.paired_end:
             cmd_dups += " --rf -1 " + unmap_fq1_dups + " -2 " + unmap_fq2_dups
@@ -2730,7 +2732,7 @@ def main():
     ############################################################################
     #                        Shift and produce BigWig's                        #
     ############################################################################
-    genome_fq = os.path.join(res.rgc.genome_folder,
+    genome_fq = os.path.join(rgc.genome_folder,
                              args.genome_assembly,
                              (args.genome_assembly + ".fa"))
     signal_folder = os.path.join(
@@ -2779,7 +2781,7 @@ def main():
         # Do that in the $GENOMES folder, in a subfolder called "mappability"
         # Only need to do that once for each read-size of interest
         # default would be read-size 30 (args.max_len)
-        mappability_folder = os.path.join(res.rgc.genome_folder,
+        mappability_folder = os.path.join(rgc.genome_folder,
                                           args.genome_assembly,
                                           "mappability")
         ngstk.make_dir(mappability_folder)
