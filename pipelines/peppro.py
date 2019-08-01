@@ -367,6 +367,8 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                 dedup_cmd_chunks.extend(["-"])
 
             dedup_cmd = build_command(dedup_cmd_chunks)
+    else:
+        dedup_cmd = ""
 
     # Create trimming and reverse complementing command(s).
     # TODO: Can also use seqkit for these steps instead of seqtk...
@@ -1772,15 +1774,14 @@ def main():
     unmap_genome_bam = os.path.join(
         map_genome_folder, args.sample_name + "_unmap.bam")
 
-    if args.complexity and args.umi_len > 0:
-        mapping_genome_bam_dups = os.path.join(
-            map_genome_folder, args.sample_name + "_sort_dups.bam")
-        mapping_genome_bam_temp_dups = os.path.join(
-            map_genome_folder, args.sample_name + "_temp_dups.bam")
-        failQC_genome_bam_dups = os.path.join(
-            map_genome_folder, args.sample_name + "_fail_qc_dups.bam")
-        unmap_genome_bam_dups = os.path.join(
-            map_genome_folder, args.sample_name + "_unmap_dups.bam")
+    mapping_genome_bam_dups = os.path.join(
+        map_genome_folder, args.sample_name + "_sort_dups.bam")
+    mapping_genome_bam_temp_dups = os.path.join(
+        map_genome_folder, args.sample_name + "_temp_dups.bam")
+    failQC_genome_bam_dups = os.path.join(
+        map_genome_folder, args.sample_name + "_fail_qc_dups.bam")
+    unmap_genome_bam_dups = os.path.join(
+        map_genome_folder, args.sample_name + "_unmap_dups.bam")
 
     bt2_options = " --very-sensitive"
     bt2_options += " -X 2000"
@@ -1989,6 +1990,8 @@ def main():
     ############################################################################
     #                     Calculate library complexity                         #
     ############################################################################
+    QC_folder = os.path.join(param.outfolder, "QC_" + args.genome_assembly)
+
     if args.complexity and args.umi_len > 0:
         if os.path.exists(mapping_genome_bam_temp_dups):
             if not os.path.exists(temp_mapping_index_dups):
@@ -2040,7 +2043,6 @@ def main():
             mapping_genome_bam_dups = dups_pe1_bam
 
         pm.timestamp("### Calculate library complexity")
-        QC_folder = os.path.join(param.outfolder, "QC_" + args.genome_assembly)
         ngstk.make_dir(QC_folder)
 
         preseq_output = os.path.join(
