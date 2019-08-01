@@ -1028,6 +1028,7 @@ fancyNumbers <- function(n){
 #'
 #' @param rpkm A three column TSV format file containing
 #'             "gene", "intron RPKM", "exon RPKM" columns.
+#' @param name X-axis label, typically a sample name
 #' @param raw Plot raw distribution
 #' @keywords mRNA contamination
 #' @export
@@ -1035,7 +1036,9 @@ fancyNumbers <- function(n){
 #' data("rpkm_ratios")
 #' mRNAcontamination(rpkm = "rpkm_ratios")
 #' @export
-mRNAcontamination <- function(rpkm, raw=FALSE) {
+mRNAcontamination <- function(rpkm,
+                              name='mRNA contamination ratios',
+                              raw=FALSE) {
     if (exists(rpkm)) {
         RPKM <- data.table(get(rpkm))
     } else if (file.exists(rpkm)) {
@@ -1108,7 +1111,7 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
                       hjust=0, vjust=1, label = label1, parse=TRUE)
     }
 
-    return(p)
+    return(q)
 }
 
 
