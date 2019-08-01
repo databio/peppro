@@ -2701,7 +2701,8 @@ def main():
         if os.path.exists(exons_rpkm) and os.path.exists(introns_rpkm):
             cmd = ("join --nocheck-order -a1 -a2 -j4 " +
                    introns_rpkm + " " + exons_rpkm + " | " +
-                   "awk 'NF==11 {print $7, $8, $9, $1, ($10/$5), $11}'" +
+                   "awk -v OFS='\t' " +
+                   "'NF==11 {print $7, $8, $9, $1, ($10/$5), $11}'" +
                    " | sort -k1,1 -k2,2n > " + intron_exon)
             pm.run(cmd, intron_exon, nofail=True)
 
