@@ -376,7 +376,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         raw  <- opt_get(name = c("raw", "w"), required=FALSE, default=FALSE,
                         description="Plot raw ratios (Default = FALSE).")
 
-        sample_name        <- sampleName(rpkm)
+        sample_name        <- sampleName(rpkm, 3)
         name               <- basename(sample_name)
         suppressWarnings(p <- mRNAcontamination(rpkm=rpkm, name=name, raw=raw))
 
