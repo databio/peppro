@@ -2361,17 +2361,17 @@ def main():
 
         # Determine pause index
         pause_index = os.path.join(QC_folder, args.sample_name +
-                                   "_pause_index.txt")
-        cmd = ("join -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 2.2 2.3 2.7 " +
+                                   "_pause_index.bed")
+        cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 2.2 2.3 2.7 " +
                TSS_density + " " + body_density +
-               " | awk '{print ($6/($3-$2))/($9/($8-$7))}' > " +
+               " | awk -v OFS='\t' '{print $1, $2, $3, $4, ($6/($3-$2))" + 
+               "/($9/($8-$7)), $5}' | env LC_COLLATE=C sort -k1,1 -k2,2n > " +
                pause_index)
         pm.run(cmd, pause_index, nofail=True)
-        pm.clean_add(pause_index)
 
-        # Number of reads / window length
-        cmd = ("sort -n " + pause_index +
-               " | awk ' { a[i++]=$1; } END " + 
+        # Median pause index
+        cmd = ("sort -k5,5n " + pause_index +
+               " | awk ' { a[i++]=$5; } END " + 
                "{ x=int((i+1)/2); if (x < (i+1)/2) " +
                "print (a[x-1]+a[x])/2; else print a[x-1]; }'")
         val = pm.checkprint(cmd)

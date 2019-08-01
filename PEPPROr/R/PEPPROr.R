@@ -1135,7 +1135,7 @@ plotPI <- function(pi, name='pause indicies') {
         stop(paste0("FileExistsError: ", pi, " could not be found."))
         quit(save = "no", status = 1, runLast = FALSE)
     }
-    colnames(PI) <- c("pi")
+    colnames(PI) <- c("chr", "start", "end", "name", "pi", "strand")
 
     q <- ggplot(data = PI, aes(x="", y=pi)) +
             stat_boxplot(geom ='errorbar', width = 0.25) +
