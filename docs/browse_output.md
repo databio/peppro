@@ -10,6 +10,7 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: [plus_frif.html](../files/examples/tutorial/reports/plus_frif.html)
     * :fa-file-code-o: [mrna_contamination.html](../files/examples/tutorial/reports/mrna_contamination.html)
     * :fa-file-code-o: [objects.html](../files/examples/tutorial/reports/objects.html)
+    * :fa-file-code-o: [pause_index.html](../files/examples/tutorial/reports/pause_index.html)
     * :fa-file-code-o: [samples.html](../files/examples/tutorial/reports/samples.html)
     * :fa-file-code-o: [status.html](../files/examples/tutorial/reports/status.html)
     * :fa-file-code-o: [tss_enrichment.html](../files/examples/tutorial/reports/tss_enrichment.html)
