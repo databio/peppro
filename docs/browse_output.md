@@ -77,7 +77,7 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: tutorial.yaml
     * :fa-file-text-o: peppro.py_tutorial.log
 * ??? danger ":fa-folder-open-o: summary/"
-    * :fa-file-pdf-o: [tutorial_library_complexity.pdf](../files/examples/tutorial/summary/tutorial_library_complexity.pdf)
-    * :fa-file-image-o: [tutorial_library_complexity.png](../files/examples/tutorial/summary/tutorial_library_complexity.png)
+    * :fa-file-pdf-o: [tutorial_libComplexity.pdf](../files/examples/tutorial/summary/tutorial_libComplexity.pdf)
+    * :fa-file-image-o: [tutorial_liComplexity.png](../files/examples/tutorial/summary/tutorial_libComplexity.png)
 * :fa-file-text-o: [tutorial_stats_summary.tsv](../files/examples/tutorial/tutorial_stats_summary.tsv)
 * :fa-file-code-o: [tutorial_summary.html](../files/examples/tutorial/tutorial_summary.html)
