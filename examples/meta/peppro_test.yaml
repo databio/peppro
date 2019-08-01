@@ -22,10 +22,6 @@ implied_columns:
       runon: pro      # Default
       umi_len: 8      # Default
       max_len: 30     # Default
-      TSS_name: $HOME/genomes/hg38/hg38_TSS.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
-      CpA_name: $HOME/genomes/hg38/hg38_CpA.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
-      pre_name: $HOME/genomes/hg38/hg38_pre-mRNA.tsv         # Default. Pipeline checks corresponding genome folder without specifying.
-      anno_name: $HOME/genomes/hg38/hg38_annotations.bed.gz  # Default. Pipeline checks corresponding genome folder without specifying.
 
 pipeline_args:
 #  peppro.py:
