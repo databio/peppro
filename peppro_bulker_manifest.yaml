@@ -1,0 +1,25 @@
+manifest:
+  name: peppro
+  commands:
+  - command: samtools
+    dockerargs: "-i"
+    docker_image: quay.io/biocontainers/samtools:1.9--h91753b0_8
+  - command: bowtie2
+    docker_image: quay.io/biocontainers/bowtie2:2.3.5--py37he860b03_0
+  - command: seqkit
+    docker_image: quay.io/biocontainers/seqkit:0.10.2--0
+  - command: fastp
+    docker_image: quay.io/biocontainers/fastp:0.20.0--hdbcaa40_0
+  - command: seqtk
+    dockerargs: "-i"
+    docker_image: quay.io/biocontainers/seqtk:1.3--hed695b0_2
+  - command: preseq
+    docker_image: quay.io/biocontainers/preseq:2.0.3--h26b358d_2
+  - command: fastq-pair 
+    docker_image: quay.io/biocontainers/fastq-pair:1.0--hf484d3e_02 
+  - command: wigToBigWig
+    docker_image: quay.io/biocontainers/ucsc-wigtobigwig:357--h35c10e6_3 
+  - command: wigToBigWig
+    docker_image: quay.io/biocontainers/ucsc-bigwigcat:377--h199ee4e_0
+  - command: fastqc
+    docker_image: quay.io/biocontainers/fastqc:0.11.8--1
