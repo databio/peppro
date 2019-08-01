@@ -1710,8 +1710,6 @@ def main():
                         dups=True)
                     
                 else:
-                    print(type(rgc))
-                    print(rgc)
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1,
                         unmap_fq2, reference,
