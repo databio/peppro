@@ -1047,13 +1047,13 @@ mRNAcontamination <- function(rpkm,
         stop(paste0("FileExistsError: ", rpkm, " could not be found."))
         quit(save = "no", status = 1, runLast = FALSE)
     }
-    colnames(RPKM) <- c("gene","intron","exon")
+    colnames(RPKM) <- c("chr", "start", "end", "gene","ratio","strand")
 
-    finite_rpkm <- RPKM[is.finite(RPKM$exon/RPKM$intron),]
+    finite_rpkm <- RPKM[is.finite(RPKM$ratio),]
 
     if (raw) {
         q <- ggplot(data = finite_rpkm, 
-                    aes(x="", y=(exon/intron))) +
+                    aes(x="", y=(ratio))) +
                 stat_boxplot(geom ='errorbar', width = 0.25) +
                 geom_boxplot(width = 0.25,
                              outlier.color='red',
@@ -1062,7 +1062,7 @@ mRNAcontamination <- function(rpkm,
                              shape = 1, size = 2) +
                 labs(x=name,
                      y=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                ylim(c(0, ceiling(summary(finite_rpkm$exon/finite_rpkm$intron)[5]))) +
+                ylim(c(0, ceiling(summary(finite_rpkm$ratio)[5]))) +
                 theme_classic(base_size=14) +
                 theme(axis.line = element_line(size = 0.5)) +
                 theme(panel.grid.major = element_blank(),
@@ -1072,7 +1072,7 @@ mRNAcontamination <- function(rpkm,
                                                   fill=NA, size=0.5))
     } else {
         q <- ggplot(data = finite_rpkm, 
-                    aes(x="", y=log10(exon/intron))) +
+                    aes(x="", y=log10(ratio))) +
                 stat_boxplot(geom ='errorbar', width = 0.25) +
                 geom_boxplot(width = 0.25,
                              outlier.color='red',
@@ -1097,9 +1097,9 @@ mRNAcontamination <- function(rpkm,
     }
 
     label1 <- c(paste("'median'[log[10]]", ":~",
-                round(median(log10((finite_rpkm$exon/finite_rpkm$intron))), 2)),
+                round(median(log10((finite_rpkm$ratio))), 2)),
                 paste("'median'[raw]", ":",
-                round(median(finite_rpkm$exon/finite_rpkm$intron), 2)))
+                round(median(finite_rpkm$ratio), 2)))
 
     max_y  <- layer_scales(q)$y$range$range[2]
 

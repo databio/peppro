@@ -2651,47 +2651,64 @@ def main():
         scaling_factor = float(ar/1000000)
 
         exons_rpkm = os.path.join(QC_folder, args.sample_name +
-                                  "_exons_rpkm.tsv")
+                                  "_exons_rpkm.bed")
         introns_rpkm = os.path.join(QC_folder, args.sample_name +
-                                    "_introns_rpkm.tsv")
+                                    "_introns_rpkm.bed")
 
         # determine exonic RPKM for individual genes
         if os.path.exists(exons_cov):
-            cmd = ("awk -v OFS='\t' '{readCount[$4] += $7; " + 
-                   "exonCount[$4] += 1; geneSizeKB[$4] += " +
-                   "(sqrt(($3-$2+0.00000001)^2)/1000); " +
-                   "gene[$4] = $4} END { for (a in readCount) " +
-                   "{ print gene[a], (readCount[a]/" +
-                    str(scaling_factor) + ")/geneSizeKB[a]}}' " + exons_cov +
-                    " | awk '$2>0' | sort -k1 > " + exons_rpkm)
+            cmd = ("awk -v OFS='\t' '{chrom[$4] = $1; " +
+                   "if($4!=prev4) {chromStart[$4] = $2} " +
+                   "strand[$4] = $6; " +
+                   "readCount[$4] += $7; " + 
+                   "exonCount[$4] += 1; " +
+                   "geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); " +
+                   "gene[$4] = $4; " +
+                   "chromEnd[$4]=$3; " +
+                   "prev4=$4} END " +
+                   "{ for (a in readCount) " +
+                   "{ print chrom[a], chromStart[a], chromEnd[a], gene[a], " +
+                   "(readCount[a]/" + str(scaling_factor) +
+                   ")/geneSizeKB[a], strand[a]}}' " +
+                    exons_cov + " | awk '$5>0' | sort -k4 > " +
+                    exons_rpkm)
             pm.run(cmd, exons_rpkm, nofail=True)
             pm.clean_add(exons_rpkm)
 
         # determine intronic RPKM for individual genes
         if os.path.exists(introns_cov):
-            cmd = ("awk -v OFS='\t' '{readCount[$4] += $7; " + 
-                   "exonCount[$4] += 1; geneSizeKB[$4] += " +
-                   "(sqrt(($3-$2+0.00000001)^2)/1000); " +
-                   "gene[$4] = $4} END { for (a in readCount) " +
-                   "{ print gene[a], (readCount[a]/" +
-                    str(scaling_factor) + ")/geneSizeKB[a]}}' " + introns_cov +
-                    " | awk '$2>0' | sort -k1 > " + introns_rpkm)
+            cmd = ("awk -v OFS='\t' '{chrom[$4] = $1; " +
+                   "if($4!=prev4) {chromStart[$4] = $2} " +
+                   "strand[$4] = $6; " +
+                   "readCount[$4] += $7; " + 
+                   "exonCount[$4] += 1; " +
+                   "geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); " +
+                   "gene[$4] = $4; " +
+                   "chromEnd[$4]=$3; " +
+                   "prev4=$4} END " +
+                   "{ for (a in readCount) " +
+                   "{ print chrom[a], chromStart[a], chromEnd[a], gene[a], " +
+                   "(readCount[a]/" + str(scaling_factor) +
+                   ")/geneSizeKB[a], strand[a]}}' " +
+                    introns_cov + " | awk '$5>0' | sort -k4 > " +
+                    introns_rpkm)
             pm.run(cmd, introns_rpkm, nofail=True)
             pm.clean_add(introns_rpkm)
 
-        # join intron, exon RPKM on gene name
+        # join intron, exon RPKM on gene name and calculate ratio
         intron_exon = os.path.join(QC_folder, args.sample_name +
-                                   "_intron_exon.tsv")
+                                   "_exon_intron_ratios.bed")
         if os.path.exists(exons_rpkm) and os.path.exists(introns_rpkm):
-            cmd = ("join -a1 -a2 -j1 -e0 -o 0 1.2 2.2 " +
-                   introns_rpkm + " " + exons_rpkm + " > " + intron_exon)
+            cmd = ("join --nocheck-order -a1 -a2 -j4 " +
+                   introns_rpkm + " " + exons_rpkm + " | " +
+                   "awk 'NF==11 {print $7, $8, $9, $1, ($10/$5), $11}'" +
+                   " | sort -k1,1 -k2,2n > " + intron_exon)
             pm.run(cmd, intron_exon, nofail=True)
-            pm.clean_add(intron_exon)
 
-        # compare intron to exon RPKM and report result
+        # report median ratio
         if os.path.exists(intron_exon):
-            cmd = ("awk '$2>0' " + intron_exon +
-                   " | awk '{print $3/$2}' | sort -n | awk ' { a[i++]=$1; }" +
+            cmd = ("awk '{print $5}' " + intron_exon +
+                   " | sort -n | awk ' { a[i++]=$1; }" +
                    " END { x=int((i+1)/2);" +
                    " if (x < (i+1)/2) print (a[x-1]+a[x])/2;" +
                    " else print a[x-1]; }'")
