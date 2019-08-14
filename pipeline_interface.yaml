@@ -44,6 +44,7 @@ pipelines:
     compute:
       singularity_image: ${SIMAGES}peppro
       docker_image: databio/peppro
+      bulker_crate: peppro
     summarizers:
       - tools/PEPPRO_summarizer.R
     summary_results:

@@ -19,12 +19,15 @@ from pypiper import build_command
 from refgenconf import RefGenConf as RGC, select_genome_config
 
 TOOLS_FOLDER = "tools"
-RUNON_SOURCE = ["pro", "gro"]
+RUNON_SOURCE_PRO = ["PRO", "pro", "PRO-SEQ", "PRO-seq", "proseq", "PROSEQ"]
+RUNON_SOURCE_GRO = ["GRO", "gro", "groseq", "GROSEQ", "GRO-SEQ", "GRO-seq"]
+RUNUN_SOURCE = RUNON_SOURCE_PRO + RUNON_SOURCE_GRO
 ADAPTER_REMOVAL = ["fastp", "cutadapt"]
 DEDUPLICATORS = ["seqkit", "fqdedup"]
 TRIMMERS = ["seqtk", "fastx"]
 BT2_IDX_KEY = "bowtie2_index"
-
+DEFAULT_UMI_LEN = 0
+DEFAULT_MAX_LEN = 30
 
 def parse_arguments():
     """
@@ -38,7 +41,7 @@ def parse_arguments():
         required=["input", "genome", "sample-name", "output-parent"])
 
     # Pipeline-specific arguments
-    parser.add_argument("--runon", dest="runon",
+    parser.add_argument("--protocol", dest="protocol",
                         default="pro", choices=RUNON_SOURCE,
                         help="Run on sequencing type.")
 
@@ -57,16 +60,16 @@ def parse_arguments():
     parser.add_argument("--umi", action='store_true', default=False,
                         dest="umi",
                         help="Remove umi with fastp")
-
+    
     parser.add_argument("--umi_len", dest="umi_len",
-                        default="8", type=int,
+                        default=DEFAULT_UMI_LEN, type=int,
                         help="Specify the length of the UMI."
-                             "If your data does not utilize UMIs, set to 0.")
+                             "If your data does not utilize UMIs, set to 0. Default: {}".format(DEFAULT_UMI_LEN))
 
     parser.add_argument("--max_len", dest="max_len",
-                        default="30",
+                        default=DEFAULT_MAX_LEN,
                         help="Trim reads to maximum length."
-                             " Set to -1 to disable length trimming.")
+                             " Set to -1 to disable length trimming. Default: {}".format(DEFAULT_MAX_LEN))
 
     parser.add_argument("--sob", action='store_true',
                         dest="sob", default=False,
@@ -385,7 +388,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         ("-e", str(args.umi_len))
                     ]
                     trim_cmd_chunks_R2.extend(["-"])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks_R2.extend([
                             (">", trimmed_fastq_R2)                        
                         ])
@@ -417,7 +420,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     else:
                         trim_cmd_chunks.extend(["-"])
 
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)                        
                         ])
@@ -465,7 +468,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     trim_cmd_chunks_R2.extend([
                         ("-t", str(int(float(args.umi_len))))
                     ])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks_R2.extend([
                             ("-o", trimmed_fastq_R2)                        
                         ])
@@ -492,7 +495,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                             ("-i", dedup_fastq)
                         ])
 
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks.extend([
                             ("-o", processed_fastq)                        
                         ])
@@ -530,7 +533,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                             ("-L", str(args.max_len))
                         ]) 
                     trim_cmd_chunks_R2.extend(["-"])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks_R2.extend([
                             (">", trimmed_fastq_R2)                        
                         ])
@@ -561,7 +564,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     else:
                         trim_cmd_chunks.extend(["-"])
 
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)                        
                         ])
@@ -602,7 +605,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         ("-L", args.max_len)
                     ])
                 trim_cmd_chunks_R2.extend(["-"])
-                if args.runon.lower() == "gro":
+                if args.protocol.lower() in RUNON_SOURCE_GRO:
                     trim_cmd_chunks_R2.extend([
                         (">", trimmed_fastq_R2)
                     ])
@@ -637,7 +640,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                             ("-L", args.max_len)
                         ])
                     trim_cmd_chunks_nodedup.extend(["-"])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks_nodedup.extend([
                             (">", trimmed_fastq)
                         ])
@@ -664,7 +667,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                             ("-L", args.max_len)
                         ])
                     trim_cmd_chunks.extend(["-"])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)
                         ])
@@ -693,7 +696,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                             ("-L", args.max_len)
                         ])
                     trim_cmd_chunks.extend(["-"])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)
                         ])
@@ -714,7 +717,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     ("-e", str(args.umi_len))
                 ]
                 trim_cmd_chunks_R2.extend(["-"])
-                if args.runon.lower() == "gro":
+                if args.protocol.lower() in RUNON_SOURCE_GRO:
                     trim_cmd_chunks_R2.extend([
                         (">", trimmed_fastq_R2)
                     ])
@@ -739,7 +742,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
                     trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
                     trim_cmd_chunks_nodedup.extend([noadap_fastq])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks_nodedup.extend([
                             (">", trimmed_fastq)
                         ])
@@ -751,7 +754,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                             (">", trimmed_fastq)
                         ])
                     trim_cmd_chunks.extend([dedup_fastq])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)
                         ])
@@ -764,7 +767,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         ])
                 else:
                     trim_cmd_chunks.extend(["-"])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)
                         ])
@@ -801,7 +804,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks_R2.extend([
                     ("-t", str(int(float(args.umi_len))))
                 ])
-                if args.runon.lower() == "gro":
+                if args.protocol.lower() in RUNON_SOURCE_GRO:
                     trim_cmd_chunks_R2.extend([
                         ("-o", trimmed_fastq_R2)
                     ])
@@ -827,7 +830,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     trim_cmd_chunks.extend([
                         ("-i", dedup_fastq)
                     ])
-                if args.runon.lower() == "gro":
+                if args.protocol.lower() in RUNON_SOURCE_GRO:
                     trim_cmd_chunks.extend([
                         ("-o", processed_fastq)
                     ])
@@ -861,7 +864,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     ("-e", str(args.umi_len))
                 ]
                 trim_cmd_chunks_R2.extend(["-"])
-                if args.runon.lower() == "gro":
+                if args.protocol.lower() in RUNON_SOURCE_GRO:
                     trim_cmd_chunks_R2.extend([
                         (">", trimmed_fastq_R2)
                     ])
@@ -886,7 +889,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                     #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
                     trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
                     trim_cmd_chunks_nodedup.extend([noadap_fastq])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks_nodedup.extend([
                             (">", trimmed_fastq)
                         ])
@@ -898,7 +901,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                             (">", trimmed_fastq)
                         ])
                     trim_cmd_chunks.extend([dedup_fastq])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)
                         ])
@@ -911,7 +914,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
                         ])
                 else:
                     trim_cmd_chunks.extend(["-"])
-                    if args.runon.lower() == "gro":
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
                         trim_cmd_chunks.extend([
                             (">", processed_fastq)
                         ])
@@ -2454,7 +2457,7 @@ def main():
             degradation_pdf = os.path.join(QC_folder,
                 args.sample_name + "_adapter_insertion_distribution.pdf")
             degradation_png = os.path.join(QC_folder,
-                args.sample_name + "_adapter_insertion_distribution.pdf")
+                args.sample_name + "_adapter_insertion_distribution.png")
             cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                    " cutadapt -i " + adapter_report + " -o " + QC_folder)
             pm.run(cmd, degradation_pdf, nofail=True)
@@ -2730,7 +2733,7 @@ def main():
         pm.report_object("mRNA contamination", mRNApdf, anchor_image=mRNApng)
 
     ############################################################################
-    #                        Shift and produce BigWig's                        #
+    #                        Shift and produce BigWigs                         #
     ############################################################################
     genome_fq = os.path.join(rgc.genome_folder,
                              args.genome_assembly,
@@ -2759,7 +2762,7 @@ def main():
             cmd2 += " -o " + plus_bw  # DEBUG formerly smoothed " -w " + plus_bw
             cmd2 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd2 += " --variable-step"
-            if args.runon.lower() == "pro":
+            if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd2 += " --tail-edge"
             pm.run([cmd1, cmd2], plus_bw)
 
@@ -2770,7 +2773,7 @@ def main():
             cmd4 += " -o " + minus_bw # DEBUG formerly smoothed " -w " + minus_bw
             cmd4 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd4 += " --variable-step"
-            if args.runon.lower() == "pro":
+            if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd4 += " --tail-edge"
             pm.run([cmd3, cmd4], minus_bw)
         else:
@@ -2911,7 +2914,7 @@ def main():
                 "--skip-bed",
                 str("--bw=" + plus_bw)
             ]
-            if args.runon.lower() == "pro":
+            if args.protocol.lower() in RUNON_SOURCE_PRO:
                 scale_plus_chunks.extend([("--tail-edge")])
             scale_plus_cmd = build_command(scale_plus_chunks)
 
@@ -2922,7 +2925,7 @@ def main():
                 "--skip-bed",
                 str("--bw=" + minus_bw),
             ]
-            if args.runon.lower() == "pro":
+            if args.protocol.lower() in RUNON_SOURCE_PRO:
                 scale_minus_chunks.extend([("--tail-edge")])
             scale_minus_cmd = build_command(scale_minus_chunks)
         else:
@@ -2934,7 +2937,7 @@ def main():
                 "--skip-bed",
                 str("--bw=" + plus_bw)
             ]
-            if args.runon.lower() == "pro":
+            if args.protocol.lower() in RUNON_SOURCE_PRO:
                 scale_plus_chunks.extend([("--tail-edge")])
             scale_plus_cmd = build_command(scale_plus_chunks)
 
@@ -2946,7 +2949,7 @@ def main():
                 "--skip-bed",
                 str("--bw=" + minus_bw),
             ]
-            if args.runon.lower() == "pro":
+            if args.protocol.lower() in RUNON_SOURCE_PRO:
                 scale_minus_chunks.extend([("--tail-edge")])
             scale_minus_cmd = build_command(scale_minus_chunks)
 

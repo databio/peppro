@@ -1,5 +1,6 @@
 manifest:
   name: peppro
+  version: 1.0.0
   commands:
   - command: samtools
     dockerargs: "-i"
