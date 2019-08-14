@@ -7,6 +7,10 @@ protocol_mapping:
   PRO-seq: peppro
   PROSEQ: peppro
   proseq: peppro
+  groseq: peppro
+  GROSEQ: peppro
+  GRO-SEQ: peppro
+  GRO-seq: peppro
 
 pipelines:
   peppro:
@@ -23,7 +27,7 @@ pipelines:
       "--single-or-paired": read_type
     optional_arguments:
       "--input2": read2
-      "--runon": runon
+      "--protocol": protocol
       "--adapter": adapter
       "--dedup": dedup
       "--trimmer": trimmer
