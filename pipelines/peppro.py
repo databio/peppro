@@ -21,7 +21,7 @@ from refgenconf import RefGenConf as RGC, select_genome_config
 TOOLS_FOLDER = "tools"
 RUNON_SOURCE_PRO = ["PRO", "pro", "PRO-SEQ", "PRO-seq", "proseq", "PROSEQ"]
 RUNON_SOURCE_GRO = ["GRO", "gro", "groseq", "GROSEQ", "GRO-SEQ", "GRO-seq"]
-RUNUN_SOURCE = RUNON_SOURCE_PRO + RUNON_SOURCE_GRO
+RUNON_SOURCE = RUNON_SOURCE_PRO + RUNON_SOURCE_GRO
 ADAPTER_REMOVAL = ["fastp", "cutadapt"]
 DEDUPLICATORS = ["seqkit", "fqdedup"]
 TRIMMERS = ["seqtk", "fastx"]
