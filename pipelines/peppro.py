@@ -324,7 +324,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
         adapter_cmd = build_command(adapter_cmd_chunks)
 
     # Create deduplication command(s).
-    if not read2 and not args.umi_len <=0:
+    if not read2 and not args.umi_len <= 0:
         if args.dedup == "seqkit":
             dedup_cmd_chunks = [
                 (tools.seqkit, "rmdup"),
@@ -373,6 +373,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
     else:
         dedup_cmd = ""
 
+    pm.debug("Dedup command: {}".format(dedup_cmd))
     # Create trimming and reverse complementing command(s).
     # TODO: Can also use seqkit for these steps instead of seqtk...
     if args.umi:
@@ -1019,7 +1020,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
             return processed_fastq, trimmed_fastq
         else:
             process_fastq_cmd = build_command([
-                adapter_cmd, "|", dedup_cmd, "|", trim_cmd1])
+                adapter_cmd, "|", trim_cmd1])
             pm.run(process_fastq_cmd, processed_fastq,
                follow=ngstk.check_trim(processed_fastq, False, None))
             return processed_fastq      
