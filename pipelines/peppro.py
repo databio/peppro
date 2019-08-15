@@ -1995,6 +1995,7 @@ def main():
     #                     Calculate library complexity                         #
     ############################################################################
     QC_folder = os.path.join(param.outfolder, "QC_" + args.genome_assembly)
+    ngstk.make_dir(QC_folder)
 
     if args.complexity and args.umi_len > 0:
         if os.path.exists(mapping_genome_bam_temp_dups):
@@ -2047,7 +2048,6 @@ def main():
             mapping_genome_bam_dups = dups_pe1_bam
 
         pm.timestamp("### Calculate library complexity")
-        ngstk.make_dir(QC_folder)
 
         preseq_output = os.path.join(
             QC_folder, args.sample_name + "_preseq_out.txt")
