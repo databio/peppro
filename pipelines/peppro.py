@@ -938,23 +938,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
         """
         Report QC metrics on intermediate steps of fastq file preparation
         """
-        if args.adapter == "fastp":
-            adapter_term = "reads with adapter trimmed:"
-            too_short_term = "reads failed due to too short:"
-            total_bases_term = "total bases:"
-
-            ac_cmd = ("grep '" + adapter_term + "' " +
-                       adapter_report + " | head -n 1 | awk '{print $NF}'")
-            ts_cmd = ("grep '" + too_short_term + "' " +
-                       adapter_report + " | head -n 1 | awk '{print $NF}'")
-            bases = ("grep '" + total_bases_term + "' " +
-                     adapter_report + " | head -n 1 | awk '{print $NF}'")
-            adapter_bases = ("grep 'bases trimmed due to adapters:' " +
-                             adapter_report + " | awk '{print $NF}'")
-
-            pm.report_object("FastP_report", adapter_html)
-
-        elif args.adapter == "cutadapt":
+        if args.adapter == "cutadapt":
             adapter_term = "Reads with adapters:"
             too_short_term = "Reads that were too short:"
             total_bases_term = "Total basepairs processed:"
@@ -1646,6 +1630,7 @@ def main():
         # Re-pair the duplicates (but only if we could identify duplicates)
 
         if args.umi_len > 0:
+
             r1_dups_repair = os.path.join(
                 fastq_folder, args.sample_name + "_R1_trimmed.fastq.paired.fq")
             r2_dups_repair = os.path.join(
