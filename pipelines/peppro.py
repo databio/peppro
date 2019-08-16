@@ -1643,27 +1643,30 @@ def main():
         pm.run([cmd1, cmd2, cmd3], repair_target)
         pm.clean_add(repair_target)
 
-        r1_dups_repair = os.path.join(
-            fastq_folder, args.sample_name + "_R1_trimmed.fastq.paired.fq")
-        r2_dups_repair = os.path.join(
-            fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.paired.fq")
+        # Re-pair the duplicates (but only if we could identify duplicates)
 
-        r1_dups_repair_single = os.path.join(
-            fastq_folder, args.sample_name + "_R1_trimmed.fastq.single.fq")
-        r2_dups_repair_single = os.path.join(
-            fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.single.fq")
+        if args.umi_len > 0:
+            r1_dups_repair = os.path.join(
+                fastq_folder, args.sample_name + "_R1_trimmed.fastq.paired.fq")
+            r2_dups_repair = os.path.join(
+                fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.paired.fq")
 
-        cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " +
-               unmap_fq1_dups + " " + unmap_fq2_dups)
-        pm.run(cmd, [r1_dups_repair, r2_dups_repair])
-        pm.clean_add(r1_dups_repair_single)
-        pm.clean_add(r2_dups_repair_single)
-        cmd1 = ("mv " + r1_dups_repair + " " + unmap_fq1_dups)
-        cmd2 = ("mv " + r2_dups_repair + " " + unmap_fq2_dups)
-        dups_repair_target = os.path.join(fastq_folder, "dups_repaired.flag")
-        cmd3 = ("touch dups_repaired.flag")
-        pm.run([cmd1, cmd2, cmd3], dups_repair_target)
-        pm.clean_add(dups_repair_target)
+            r1_dups_repair_single = os.path.join(
+                fastq_folder, args.sample_name + "_R1_trimmed.fastq.single.fq")
+            r2_dups_repair_single = os.path.join(
+                fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.single.fq")
+
+            cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " +
+                   unmap_fq1_dups + " " + unmap_fq2_dups)
+            pm.run(cmd, [r1_dups_repair, r2_dups_repair])
+            pm.clean_add(r1_dups_repair_single)
+            pm.clean_add(r2_dups_repair_single)
+            cmd1 = ("mv " + r1_dups_repair + " " + unmap_fq1_dups)
+            cmd2 = ("mv " + r2_dups_repair + " " + unmap_fq2_dups)
+            dups_repair_target = os.path.join(fastq_folder, "dups_repaired.flag")
+            cmd3 = ("touch dups_repaired.flag")
+            pm.run([cmd1, cmd2, cmd3], dups_repair_target)
+            pm.clean_add(dups_repair_target)
     else:
         if args.complexity and args.umi_len > 0:
             unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, False,
