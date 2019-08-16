@@ -13,12 +13,11 @@ from operator import methodcaller
 import os
 import subprocess
 import sys
-
+import logmuse
 import pararead
 import pysam
 
-from pararead import add_logging_options, ParaReadProcessor
-from pararead import logger_via_cli
+from pararead import  ParaReadProcessor
 
 MODES = ["dnase", "atac"]
 
@@ -46,8 +45,9 @@ class CutTracer(pararead.ParaReadProcessor):
             _LOGGER.info("Cutting parallel chroms in half to accommodate two tracks.")
             nProc = max(int(nProc / 2), 1)
 
-        super(CutTracer,self).__init__(reads_filename, nProc,
-            self.resultAcronym, temp_parent, limit, allow_unaligned=False,
+        super(CutTracer,self).__init__(path_reads_file=reads_filename, cores=nProc,
+            action=self.resultAcronym, temp_folder_parent_path=temp_parent, 
+            limit=limit, allow_unaligned=False,
             retain_temp=retain_temp)
         self.exactbw = exactbw
         self.summary_filename = summary_filename
@@ -95,7 +95,7 @@ class CutTracer(pararead.ParaReadProcessor):
         chrom_size = self.get_chrom_size(chrom)
 
         #self.unbuffered_write("[Name: " + chrom + "; Size: " + str(chrom_size) + "]")
-        _LOGGER.info("[Name: " + chrom + "; Size: " + str(chrom_size) + "]")
+        _LOGGER.debug("[Name: " + chrom + "; Size: " + str(chrom_size) + "]")
         reads = self.fetch_chunk(chrom)
 
         chromOutFile = self._tempf(chrom)
@@ -339,15 +339,16 @@ def parse_args(cmdl):
     parser.add_argument('--retain-temp', action='store_true', default=False,
         help="Retain temporary files? Default: False")
 
-    parser = add_logging_options(parser)
-    return parser.parse_args(cmdl)
+    parser = logmuse.add_logging_options(parser)
+    args = parser.parse_args(cmdl)
+    if not (args.exactbw or args.smoothbw):
+        parser.error('No output requested, use --exactbw and/or --smoothbw')
+    return args
 
 if __name__ == "__main__":
 
     args = parse_args(sys.argv[1:])
-    if not (args.exactbw or args.smoothbw):
-        parser.error('No output requested, use --exactbw and/or --smoothbw')
-    _LOGGER = logger_via_cli(args)
+    _LOGGER = logmuse.logger_via_cli(args, make_root=True)
 
     if args.mode == "dnase":
         shift_factor = {"+":1, "-":0}  # DNase
@@ -355,7 +356,6 @@ if __name__ == "__main__":
         shift_factor = {"+":4, "-":-5}  # ATAC
     else:
         shift_factor = {"+":0, "-":0}
-
     ct = CutTracer( reads_filename=args.infile,
                     chrom_sizes_file=args.chrom_sizes_file,
                     summary_filename=args.summary_file,
