@@ -847,75 +847,8 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                     ])
 
         else:
-            # Default to seqtk
-            if paired_end:
-                trim_cmd_chunks_R2 = [
-                    tools.seqtk,
-                    "trimfq",
-                    ("-e", str(args.umi_len))
-                ]
-                trim_cmd_chunks_R2.extend(["-"])
-                if args.protocol.lower() in RUNON_SOURCE_GRO:
-                    trim_cmd_chunks_R2.extend([
-                        (">", trimmed_fastq_R2)
-                    ])
-                else:
-                    trim_cmd_chunks_R2.extend([
-                        "|",
-                        (tools.seqtk, "seq"),
-                        ("-r", "-"),
-                        (">", trimmed_fastq_R2)
-                    ])
-            else:
-                trim_cmd_chunks = [
-                    tools.seqtk,
-                    "trimfq",
-                    ("-b", str(args.umi_len))
-                ]
-                if args.max_len != -1:
-                    trim_cmd_chunks.extend([
-                        ("-L", str(args.max_len))
-                    ])
-                if args.complexity and args.umi_len > 0:
-                    #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
-                    trim_cmd_chunks_nodedup = list(trim_cmd_chunks)
-                    trim_cmd_chunks_nodedup.extend([noadap_fastq])
-                    if args.protocol.lower() in RUNON_SOURCE_GRO:
-                        trim_cmd_chunks_nodedup.extend([
-                            (">", trimmed_fastq)
-                        ])
-                    else:
-                        trim_cmd_chunks_nodedup.extend([
-                            "|",
-                            (tools.seqtk, "seq"),
-                            ("-r", "-"),
-                            (">", trimmed_fastq)
-                        ])
-                    trim_cmd_chunks.extend([dedup_fastq])
-                    if args.protocol.lower() in RUNON_SOURCE_GRO:
-                        trim_cmd_chunks.extend([
-                            (">", processed_fastq)
-                        ])
-                    else:
-                        trim_cmd_chunks.extend([
-                            "|",
-                            (tools.seqtk, "seq"),
-                            ("-r", "-"),
-                            (">", processed_fastq)
-                        ])
-                else:
-                    trim_cmd_chunks.extend(["-"])
-                    if args.protocol.lower() in RUNON_SOURCE_GRO:
-                        trim_cmd_chunks.extend([
-                            (">", processed_fastq)
-                        ])
-                    else:
-                        trim_cmd_chunks.extend([
-                            "|",
-                            (tools.seqtk, "seq"),
-                            ("-r", "-"),
-                            (">", processed_fastq)
-                        ])
+            pm.fail_pipeline("I don't understand '{}' for args.trimmer ".format(args.trimmer )))
+            # This should never happen...
 
     if paired_end:
         trim_cmd2 = build_command(trim_cmd_chunks_R2)
@@ -975,8 +908,10 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
 
     # Put it all together
     if paired_end:
+        # cutadapt directs its report to stderr if the command lacks
+        # a -o and the actual reads are directed to stdout.
         process_fastq_cmd2 = build_command([
-            adapter_cmd, "|", trim_cmd2])
+            "(", adapter_cmd, "|", trim_cmd1, ") 2> ", cutadapt_report])
         #print("process_fastq_cmd2: {}".format(process_fastq_cmd2))
         pm.run(process_fastq_cmd2, trimmed_fastq_R2)
         cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
@@ -994,7 +929,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             return processed_fastq, trimmed_fastq
         else:
             process_fastq_cmd = build_command([
-                adapter_cmd, "|", trim_cmd1])
+                "(", adapter_cmd, "|", trim_cmd1, ") 2> ", cutadapt_report])
             pm.run(process_fastq_cmd, processed_fastq,
                follow=ngstk.check_trim(processed_fastq, False, None))
             return processed_fastq      
@@ -2429,16 +2364,16 @@ def main():
         if not args.adapter == "cutadapt":
             print("Skipping sample degradation plotting...")
             print("This requires the use of 'cutadapt' for adapter clipping.")
-        elif not os.path.exists(adapter_report):
+        elif not os.path.exists(cutadapt_report):
             print("Skipping sample degradation plotting...")
-            print("Could not find {}.`".format(adapter_report))
+            print("Could not find {}.`".format(cutadapt_report))
         else:
             degradation_pdf = os.path.join(QC_folder,
                 args.sample_name + "_adapter_insertion_distribution.pdf")
             degradation_png = os.path.join(QC_folder,
                 args.sample_name + "_adapter_insertion_distribution.png")
             cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
-                   " cutadapt -i " + adapter_report + " -o " + QC_folder)
+                   " cutadapt -i " + cutadapt_report + " -o " + QC_folder)
             pm.run(cmd, degradation_pdf, nofail=True)
             pm.report_object("Adapter insertion distribution", degradation_pdf,
                              anchor_image=degradation_png)
