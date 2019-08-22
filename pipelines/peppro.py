@@ -163,49 +163,30 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
     # Create names for processed FASTQ files.
     fastq_folder = os.path.join(outfolder, "fastq")
     fastqc_folder=os.path.join(outfolder, "fastqc")
+    sname = args.sample_name  # for concise code
+    cutadapt_report = os.path.join(fastqc_folder, sname + "_cutadapt.txt")
 
-
-    cutadap_report = os.path.join(
-        fastqc_folder, args.sample_name + "_R1_rmAdapter.txt")
-
-    noadap_fastq = os.path.join(
-        fastq_folder, args.sample_name + "_R1_noadap.fastq")
-    dedup_fastq = os.path.join(
-        fastq_folder, args.sample_name + "_R1_dedup.fastq")
-    trimmed_fastq = os.path.join(
-        fastq_folder, args.sample_name + "_R1_trimmed.fastq")
-    processed_fastq = os.path.join(
-        fastq_folder, args.sample_name + "_R1_processed.fastq")
+    noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
+    dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
+    trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
+    processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
     
-    adapter_html = os.path.join(
-        fastqc_folder, args.sample_name + "_R1_rmAdapter.html")
-    adapter_json = os.path.join(
-        fastqc_folder, args.sample_name + "_R1_rmAdapter.json")
-    adapter_report = os.path.join(
-        fastqc_folder, args.sample_name + "_R1_rmAdapter.txt")
-    umi_report = os.path.join(
-        fastqc_folder, args.sample_name + "_R1_rmUmi.html")
-    umi_json = os.path.join(
-        fastqc_folder, args.sample_name + "_R1_rmUmi.json")
+    adapter_html = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.html")
+    adapter_json = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.json")
+    adapter_report = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.txt")
+    umi_report = os.path.join(fastqc_folder, sname + "_R1_rmUmi.html")
+    umi_json = os.path.join(fastqc_folder, sname + "_R1_rmUmi.json")
 
     # PE2 names
-    noadap_fastq_R2 = os.path.join(
-        fastq_folder, args.sample_name + "_R2_noadap.fastq")
-    trimmed_fastq_R2 = os.path.join(
-        fastq_folder, args.sample_name + "_R2_trimmed.fastq")
-    trimmed_dups_fastq_R2 = os.path.join(
-        fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq")
+    noadap_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
+    trimmed_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
+    trimmed_dups_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
 
-    adapter_html_R2 = os.path.join(
-        fastqc_folder, args.sample_name + "_R2_rmAdapter.html")
-    adapter_json_R2 = os.path.join(
-        fastqc_folder, args.sample_name + "_R2_rmAdapter.json")
-    adapter_report_R2 = os.path.join(
-        fastqc_folder, args.sample_name + "_R2_rmAdapter.txt")
-    umi_report_R2 = os.path.join(
-        fastqc_folder, args.sample_name + "_R2_rmUmi.html")
-    umi_json_R2 = os.path.join(
-        fastqc_folder, args.sample_name + "_R2_rmUmi.json")
+    adapter_html_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.html")
+    adapter_json_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.json")
+    adapter_report_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.txt")
+    umi_report_R2 = os.path.join(fastqc_folder, sname + "_R2_rmUmi.html")
+    umi_json_R2 = os.path.join(fastqc_folder, sname + "_R2_rmUmi.json")
     
     # If single-end, must use cutadapt for plotting purposes
     if not args.paired_end:
@@ -232,7 +213,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", adapter_html_R2),
                 ("--json", adapter_json_R2),
-                ("--report_title", ("'" + args.sample_name + "'"))
+                ("--report_title", ("'" + sname + "'"))
             ])
         else:
             adapter_cmd_chunks.extend([
@@ -240,7 +221,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", adapter_html),
                 ("--json", adapter_json),
-                ("--report_title", ("'" + args.sample_name + "'"))
+                ("--report_title", ("'" + sname + "'"))
             ])
 
         if args.complexity and not paired_end:
@@ -311,7 +292,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", adapter_html_R2),
                 ("--json", adapter_json_R2),
-                ("--report_title", ("'" + args.sample_name + "'"))
+                ("--report_title", ("'" + sname + "'"))
             ])
         else:
             adapter_cmd_chunks.extend([
@@ -319,7 +300,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", adapter_html),
                 ("--json", adapter_json),
-                ("--report_title", ("'" + args.sample_name + "'"))
+                ("--report_title", ("'" + sname + "'"))
             ])
 
         if args.complexity and not paired_end:
