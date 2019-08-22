@@ -162,9 +162,11 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
     """
     # Create names for processed FASTQ files.
     fastq_folder = os.path.join(outfolder, "fastq")
-    fastqc_folder=os.path.join(outfolder, "fastqc")
+    fastqc_folder = os.path.join(outfolder, "fastqc")
+    cutadapt_folder = os.path.join(outfolder, "fastqc")
+
     sname = args.sample_name  # for concise code
-    cutadapt_report = os.path.join(fastqc_folder, sname + "_cutadapt.txt")
+    cutadapt_report = os.path.join(cutadapt_folder, sname + "_cutadapt.txt")
 
     noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
@@ -213,7 +215,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", adapter_html_R2),
                 ("--json", adapter_json_R2),
-                ("--report_title", ("'" + sname + "'"))
+                ("--report_title", ("'" + args.sample_name + "'"))
             ])
         else:
             adapter_cmd_chunks.extend([
@@ -221,7 +223,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", adapter_html),
                 ("--json", adapter_json),
-                ("--report_title", ("'" + sname + "'"))
+                ("--report_title", ("'" + args.sample_name + "'"))
             ])
 
         if args.complexity and not paired_end:
@@ -237,7 +239,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
 
     elif args.adapter == "cutadapt":
         cut_version = float(pm.checkprint("cutadapt --version"))
-
+        ngstk.make_dir(cutadapt_folder)
         if paired_end:
             adapter_cmd_chunks = [tools.cutadapt]
             # old versions of cutadapt can not use multiple cores
