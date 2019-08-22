@@ -248,7 +248,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                     ("-a", "GATCGTCGGACTGTAGAACTCTGAAC"),
                     fq_file,
                     ("-o", noadap_fastq + ")"),
-                    (">", adapter_report)
+                    (">", cutadapt_report)
             ])
         else:
             if args.complexity and args.umi_len > 0:
@@ -261,7 +261,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                     ("-a", "TGGAATTCTCGGGTGCCAAGG"),
                     fq_file,
                     ("-o", noadap_fastq + ")"),
-                    (">", adapter_report)
+                    (">", cutadapt_report)
                 ])
             else:
                 adapter_cmd_chunks = ["(" + tools.cutadapt]
@@ -273,7 +273,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                     ("-a", "TGGAATTCTCGGGTGCCAAGG"),
                     fq_file,
                     ("-o", noadap_fastq + ")"),
-                    (">", adapter_report)
+                    (">", cutadapt_report)
                 ])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
