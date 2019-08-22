@@ -265,7 +265,9 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             adapter_cmd_chunks.extend([
                     ("-m", (18 + int(float(args.umi_len)))),
                     ("-a", "GATCGTCGGACTGTAGAACTCTGAAC"),
-                    fq_file
+                    fq_file,
+                    ("-o", noadap_fastq + ")"),
+                    (">", adapter_report)
             ])
         else:
             if args.complexity and args.umi_len > 0:
