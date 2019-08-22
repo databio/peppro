@@ -209,6 +209,8 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
     
     # If single-end, must use cutadapt for plotting purposes
     if not args.paired_end:
+        if args.adapter != "cutadapt":
+            pm.warn("You must select cutadapt for adapter with single end data. Reset!")
         args.adapter = "cutadapt"
 
     # Check quality encoding for use with FastX_Tools
@@ -279,7 +281,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                     (">", adapter_report)
                 ])
             else:
-                adapter_cmd_chunks = [tools.cutadapt]
+                adapter_cmd_chunks = ["(" + tools.cutadapt]
                 # old versions of cutadapt can not use multiple cores
                 if cut_version >= 1.15:
                     adapter_cmd_chunks.extend([("-j", str(pm.cores))])
@@ -287,6 +289,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                     ("-m", (18 + int(float(args.umi_len)))),
                     ("-a", "TGGAATTCTCGGGTGCCAAGG"),
                     fq_file,
+                    ("-o", noadap_fastq + ")"),
                     (">", adapter_report)
                 ])
 
