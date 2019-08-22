@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 
 from argparse import ArgumentParser
@@ -163,7 +163,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
     # Create names for processed FASTQ files.
     fastq_folder = os.path.join(outfolder, "fastq")
     fastqc_folder = os.path.join(outfolder, "fastqc")
-    cutadapt_folder = os.path.join(outfolder, "fastqc")
+    cutadapt_folder = os.path.join(outfolder, "cutadapt")
 
     sname = args.sample_name  # for concise code
     cutadapt_report = os.path.join(cutadapt_folder, sname + "_cutadapt.txt")
@@ -193,7 +193,8 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
     # If single-end, must use cutadapt for plotting purposes
     if not args.paired_end:
         if args.adapter != "cutadapt":
-            pm.warn("You must select cutadapt for adapter with single end data. Reset!")
+            pm.warning("You set adapter arg to '{}' but you must select 'cutadapt'" 
+                " for single end data. Overriding.".format(args.adapter))
         args.adapter = "cutadapt"
 
     # Check quality encoding for use with FastX_Tools
@@ -248,9 +249,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             adapter_cmd_chunks.extend([
                     ("-m", (18 + int(float(args.umi_len)))),
                     ("-a", "GATCGTCGGACTGTAGAACTCTGAAC"),
-                    fq_file,
-                    ("-o", noadap_fastq + ")"),
-                    (">", cutadapt_report)
+                    fq_file
             ])
         else:
             if args.complexity and args.umi_len > 0:
@@ -266,16 +265,14 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                     (">", cutadapt_report)
                 ])
             else:
-                adapter_cmd_chunks = ["(" + tools.cutadapt]
+                adapter_cmd_chunks = [tools.cutadapt]
                 # old versions of cutadapt can not use multiple cores
                 if cut_version >= 1.15:
                     adapter_cmd_chunks.extend([("-j", str(pm.cores))])
                 adapter_cmd_chunks.extend([
                     ("-m", (18 + int(float(args.umi_len)))),
                     ("-a", "TGGAATTCTCGGGTGCCAAGG"),
-                    fq_file,
-                    ("-o", noadap_fastq + ")"),
-                    (">", cutadapt_report)
+                    fq_file
                 ])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
