@@ -163,10 +163,10 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
     # Create names for processed FASTQ files.
     fastq_folder = os.path.join(outfolder, "fastq")
     fastqc_folder = os.path.join(outfolder, "fastqc")
-    cutadapt_folder = os.path.join(outfolder, "cutadapt")
-
     sname = args.sample_name  # for concise code
-    cutadapt_report = os.path.join(cutadapt_folder, sname + "_cutadapt.txt")
+
+    cutadapt_folder = os.path.join(outfolder, "cutadapt")
+    cutadapt_report = os.path.join(cutadapt_folder, args.sample_name + "_cutadapt.txt")
 
     noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
@@ -847,7 +847,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                     ])
 
         else:
-            pm.fail_pipeline("I don't understand '{}' for args.trimmer ".format(args.trimmer )))
+            pm.fail_pipeline("I don't understand '{}' for args.trimmer ".format(args.trimmer ))
             # This should never happen...
 
     if paired_end:
@@ -1511,9 +1511,8 @@ def main():
     #                          Process read files                              #
     ############################################################################
     pm.timestamp("### FASTQ processing: ")
-
-    adapter_report = os.path.join(
-        fastqc_folder, args.sample_name + "_R1_rmAdapter.txt")
+    cutadapt_folder = os.path.join(outfolder, "cutadapt")
+    cutadapt_report = os.path.join(cutadapt_folder, args.sample_name + "_cutadapt.txt")
 
     if args.paired_end:
         if args.complexity and args.umi_len > 0:
@@ -1589,6 +1588,27 @@ def main():
                                        untrimmed_fastq1,
                                        outfolder=param.outfolder)
             unmap_fq2 = ""
+
+
+    pm.timestamp("### Plot adapter insertion distribution")
+    if not args.adapter == "cutadapt":
+        pm.info("Skipping sample degradation plotting...")
+        pm.info("This requires using 'cutadapt' for adapter clipping.")
+    elif not os.path.exists(cutadapt_report):
+        pm.info("Skipping sample degradation plotting...")
+        pm.info("Could not find {}.`".format(cutadapt_report))
+    else:
+        degradation_pdf = os.path.join(cutadapt_folder,
+            args.sample_name + "_adapter_insertion_distribution.pdf")
+        degradation_png = os.path.join(cutadapt_folder,
+            args.sample_name + "_adapter_insertion_distribution.png")
+        cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
+               " cutadapt -i " + cutadapt_report + " -o " + cutadapt_folder)
+        pm.run(cmd, degradation_pdf, nofail=True)
+        pm.report_object("Adapter insertion distribution", degradation_pdf,
+                         anchor_image=degradation_png)
+
+
 
     pm.clean_add(os.path.join(fastq_folder, "*.fq"), conditional=True)
     pm.clean_add(os.path.join(fastq_folder, "*.fastq"), conditional=True)
@@ -2360,23 +2380,9 @@ def main():
         pm.report_object("Fragment distribution", fragL_dis1,
                          anchor_image=fragL_png)
     else:
-        pm.timestamp("### Plot adapter insertion distribution")
-        if not args.adapter == "cutadapt":
-            print("Skipping sample degradation plotting...")
-            print("This requires the use of 'cutadapt' for adapter clipping.")
-        elif not os.path.exists(cutadapt_report):
-            print("Skipping sample degradation plotting...")
-            print("Could not find {}.`".format(cutadapt_report))
-        else:
-            degradation_pdf = os.path.join(QC_folder,
-                args.sample_name + "_adapter_insertion_distribution.pdf")
-            degradation_png = os.path.join(QC_folder,
-                args.sample_name + "_adapter_insertion_distribution.png")
-            cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
-                   " cutadapt -i " + cutadapt_report + " -o " + QC_folder)
-            pm.run(cmd, degradation_pdf, nofail=True)
-            pm.report_object("Adapter insertion distribution", degradation_pdf,
-                             anchor_image=degradation_png)
+        pass
+        # Used to plot adapter distribution here, but moved to cutadapt.
+
 
     ############################################################################
     #                        Extract genomic features                          #
