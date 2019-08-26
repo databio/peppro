@@ -70,13 +70,13 @@ def parse_arguments():
                         dest="umi",
                         help="Remove umi with fastp")
     
-    parser.add_argument("--umi_len", dest="umi_len",
+    parser.add_argument("--umi-len", 
                         default=DEFAULT_UMI_LEN, type=int,
                         help="Specify the length of the UMI."
                              "If your data does not utilize UMIs, set to 0. "
                              "Default: {}".format(DEFAULT_UMI_LEN))
 
-    parser.add_argument("--max_len", dest="max_len",
+    parser.add_argument("--max-len",
                         default=DEFAULT_MAX_LEN,
                         help="Trim reads to maximum length. "
                              "Set to -1 to disable length trimming. "
