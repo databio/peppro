@@ -847,7 +847,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                     ])
 
         else:
-            pm.fail_pipeline("I don't understand '{}' for args.trimmer ".format(args.trimmer ))
+            pm.fail_pipeline(RuntimeError("I don't understand '{}' for args.trimmer ".format(args.trimmer)))
             # This should never happen...
 
     if paired_end:
@@ -1528,6 +1528,14 @@ def main():
                                                    untrimmed_fastq2,
                                                    outfolder=param.outfolder)
 
+        # Gut check
+        # Processing fastq should have trimmed the reads.
+        tr = float(pm.get_stat("Trimmed_reads"))
+        if (tr < 1):
+            pm.fail_pipeline(RuntimeError("No reads left after trimming. Check trimmer settings"))
+
+
+
         # Re-pair fastq files
         r1_repair = os.path.join(
             fastq_folder, args.sample_name + "_R1_processed.fastq.paired.fq")
@@ -1836,11 +1844,6 @@ def main():
     if args.complexity and args.umi_len > 0:
         pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups,
                container=pm.container)
-
-    # 
-    tr = float(pm.get_stat("Trimmed_reads"))
-    if (tr < 1):
-        pm.fail_pipeline("No reads left after trimming. Check trimmer settings")
 
 
 
