@@ -66,7 +66,7 @@ def parse_arguments():
                         help="Name of read trimming program. "
                             "Default: {}".format(DEFAULT_TRIMMER))
 
-    parser.add_argument("--umi", action='store_true', default=False,
+    parser.add_argument("--umi-fastp", action='store_true', default=False,
                         dest="umi",
                         help="Remove umi with fastp")
     
@@ -379,7 +379,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
     pm.debug("Dedup command: {}".format(dedup_cmd))
     # Create trimming and reverse complementing command(s).
     # TODO: Can also use seqkit for these steps instead of seqtk...
-    if args.umi:
+    if args.umi_fastp:
         if args.adapter != "fastp":
             print("To remove UMI intelligently, you must process your reads using 'fastp'")
             print("Defaulting to removing the first {} "
