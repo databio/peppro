@@ -58,7 +58,7 @@ def parse_arguments():
 
     parser.add_argument("--dedup", dest="dedup",
                         default=DEFAULT_DEDUPLICATOR, choices=DEDUPLICATORS,
-                        help="Name of program that removes duplicate reads. "
+                        help="Program to use to duplicate reads. "
                             "Default: {}".format(DEFAULT_DEDUPLICATOR))
 
     parser.add_argument("--trimmer", dest="trimmer",
@@ -67,8 +67,8 @@ def parse_arguments():
                             "Default: {}".format(DEFAULT_TRIMMER))
 
     parser.add_argument("--umi-fastp", action='store_true', default=False,
-                        dest="umi",
-                        help="Remove umi with fastp")
+                        help="Use fastp to remove UMIs. Default: Use "
+                        "tool selected for 'trimmer' option.")
     
     parser.add_argument("--umi-len", 
                         default=DEFAULT_UMI_LEN, type=int,
@@ -381,7 +381,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
     # TODO: Can also use seqkit for these steps instead of seqtk...
     if args.umi_fastp:
         if args.adapter != "fastp":
-            print("To remove UMI intelligently, you must process your reads using 'fastp'")
+            print("To remove UMI intelligently, you must process adapters using 'fastp'")
             print("Defaulting to removing the first {} "
                   "bp instead via trimming".format(str(args.umi_len)))
             if args.trimmer == "seqtk":
