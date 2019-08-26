@@ -66,18 +66,32 @@ rc <- paste(config(prj)$metadata$output_dir,
             paste0("QC_", samples(prj)$genome),
             paste0(samples(prj)$sample_name, "_preseq_counts.txt"),
             sep="/")
+
+hasBoth =file.exists(cc) & file.exists(rc)
+
+ccSub = cc[hasBoth]
+rcSub = rc[hasBoth]
+message(ccSub, rcSub)
+message(paste0(length(ccSub), " of ", length(cc), " files available"))
+
 output_name = paste(config(prj)$metadata$output_dir, "summary",
                     paste0(config(prj)$name, "_libComplexity"), sep="/")
-p <- plotComplexityCurves(ccurves = cc, coverage = 0, read_length = 0,
-                          real_counts_path = rc, ignore_unique = FALSE)
 
-pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-    width= 10, height = 7, useDingbats=F)
-print(p)
-invisible(dev.off())
-png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-    width = 686, height = 480)
-print(p)
-invisible(dev.off())
+if (sum(hasBoth) > 0){
+
+    p <- plotComplexityCurves(ccurves = ccSub, coverage = 0, read_length = 0,
+                              real_counts_path = rcSub, ignore_unique = FALSE)
+
+    pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+        width= 10, height = 7, useDingbats=F)
+    print(p)
+    invisible(dev.off())
+    png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+        width = 686, height = 480)
+    print(p)
+    invisible(dev.off())
+} else {
+    message("No samples have available library complexity files.")
+}
 
 ###############################################################################
