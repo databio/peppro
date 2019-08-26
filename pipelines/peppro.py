@@ -911,7 +911,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
         # cutadapt directs its report to stderr if the command lacks
         # a -o and the actual reads are directed to stdout.
         process_fastq_cmd2 = build_command([
-            "(", adapter_cmd, "|", trim_cmd1, ") 2> ", cutadapt_report])
+            "(", adapter_cmd, "|", trim_cmd2, ") 2> ", cutadapt_report])
         #print("process_fastq_cmd2: {}".format(process_fastq_cmd2))
         pm.run(process_fastq_cmd2, trimmed_fastq_R2)
         cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
