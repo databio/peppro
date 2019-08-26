@@ -167,6 +167,8 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
 
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
     cutadapt_report = os.path.join(cutadapt_folder, args.sample_name + "_cutadapt.txt")
+    if args.adapter == "cutadapt":
+        ngstk.make_dir(cutadapt_folder)
 
     noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
@@ -240,7 +242,6 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
 
     elif args.adapter == "cutadapt":
         cut_version = float(pm.checkprint("cutadapt --version"))
-        ngstk.make_dir(cutadapt_folder)
         if paired_end:
             adapter_cmd_chunks = [tools.cutadapt]
             # old versions of cutadapt can not use multiple cores
@@ -1486,6 +1487,14 @@ def main():
 
     # PRO-seq pipeline
     # Each (major) step should have its own subfolder
+
+
+    if args.protocol.lower() in RUNON_SOURCE_GRO:
+        pm.info("Detected GRO input")
+    elif args.protocol.lower() in RUNON_SOURCE_PRO:
+        pm.info("Detected PRO input")
+    else:
+        pm.fail_pipeline(RuntimeError("Input protocol must be GRO or PRO."))
 
     raw_folder = os.path.join(param.outfolder, "raw")
     fastq_folder = os.path.join(param.outfolder, "fastq")
