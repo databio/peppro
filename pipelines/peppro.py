@@ -22,9 +22,15 @@ TOOLS_FOLDER = "tools"
 RUNON_SOURCE_PRO = ["PRO", "pro", "PRO-SEQ", "PRO-seq", "proseq", "PROSEQ"]
 RUNON_SOURCE_GRO = ["GRO", "gro", "groseq", "GROSEQ", "GRO-SEQ", "GRO-seq"]
 RUNON_SOURCE = RUNON_SOURCE_PRO + RUNON_SOURCE_GRO
-ADAPTER_REMOVAL = ["fastp", "cutadapt"]
+
+ADAPTER_REMOVERS = ["fastp", "cutadapt"]
 DEDUPLICATORS = ["seqkit", "fqdedup"]
 TRIMMERS = ["seqtk", "fastx"]
+
+DEFAULT_REMOVER = "fastp"
+DEFAULT_DEDUPLICATOR = "seqkit"
+DEFAULT_TRIMMER = "seqtk"
+
 BT2_IDX_KEY = "bowtie2_index"
 DEFAULT_UMI_LEN = 0
 DEFAULT_MAX_LEN = 30
@@ -46,16 +52,19 @@ def parse_arguments():
                         help="Run on sequencing type.")
 
     parser.add_argument("--adapter", dest="adapter",
-                        default="fastp", choices=ADAPTER_REMOVAL,
-                        help="Name of adapter removal program")
+                        default=DEFAULT_REMOVER, choices=ADAPTER_REMOVERS,
+                        help="Name of adapter removal program."
+                        "Default: {}".format(DEFAULT_REMOVER))
 
     parser.add_argument("--dedup", dest="dedup",
-                        default="seqkit", choices=DEDUPLICATORS,
-                        help="Name of program that removes duplicate reads")
+                        default=DEFAULT_DEDUPLICATOR, choices=DEDUPLICATORS,
+                        help="Name of program that removes duplicate reads. "
+                            "Default: {}".format(DEFAULT_DEDUPLICATOR))
 
     parser.add_argument("--trimmer", dest="trimmer",
-                        default="seqtk", choices=TRIMMERS,
-                        help="Name of read trimming program")
+                        default=DEFAULT_TRIMMER, choices=TRIMMERS,
+                        help="Name of read trimming program. "
+                            "Default: {}".format(DEFAULT_TRIMMER))
 
     parser.add_argument("--umi", action='store_true', default=False,
                         dest="umi",
@@ -64,12 +73,14 @@ def parse_arguments():
     parser.add_argument("--umi_len", dest="umi_len",
                         default=DEFAULT_UMI_LEN, type=int,
                         help="Specify the length of the UMI."
-                             "If your data does not utilize UMIs, set to 0. Default: {}".format(DEFAULT_UMI_LEN))
+                             "If your data does not utilize UMIs, set to 0. "
+                             "Default: {}".format(DEFAULT_UMI_LEN))
 
     parser.add_argument("--max_len", dest="max_len",
                         default=DEFAULT_MAX_LEN,
-                        help="Trim reads to maximum length."
-                             " Set to -1 to disable length trimming. Default: {}".format(DEFAULT_MAX_LEN))
+                        help="Trim reads to maximum length. "
+                             "Set to -1 to disable length trimming. "
+                             "Default: {}".format(DEFAULT_MAX_LEN))
 
     parser.add_argument("--sob", action='store_true',
                         dest="sob", default=False,
