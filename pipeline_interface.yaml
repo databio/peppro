@@ -49,6 +49,8 @@ pipelines:
       singularity_image: ${SIMAGES}peppro
       docker_image: databio/peppro
       bulker_crate: peppro
+    outputs:
+      cutadapt_report: "cutadapt_folder/{sample.sample_name}_cutadapt.txt"
     summarizers:
       - tools/PEPPRO_summarizer.R
     summary_results:

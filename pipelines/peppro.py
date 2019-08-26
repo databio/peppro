@@ -1414,6 +1414,7 @@ def main():
     tools = pm.config.tools
     param = pm.config.parameters
     res   = pm.config.resources
+    #sstructure = pm.sample_structure  # maybe possible in the future?
 
     # Check that the required tools are callable by the pipeline
     tool_list = [v for k,v in tools.items()]    # extract tool list
@@ -1835,6 +1836,13 @@ def main():
     if args.complexity and args.umi_len > 0:
         pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups,
                container=pm.container)
+
+    # 
+    tr = float(pm.get_stat("Trimmed_reads"))
+    if (tr < 1):
+        pm.fail_pipeline("No reads left after trimming. Check trimmer settings")
+
+
 
     pm.timestamp("### Compress all unmapped read files")
     for unmapped_fq in to_compress:
