@@ -238,7 +238,7 @@ def parse_args(cmdl):
 if __name__ == "__main__":
 
     args = parse_args(sys.argv[1:])
-    _LOGGER = logmuse.ogger_via_cli(args)
+    _LOGGER = logmuse.logger_via_cli(args)
 
     qc = bamQC(reads_filename=args.infile,
                out_filename=args.outfile,
