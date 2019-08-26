@@ -167,8 +167,6 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
 
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
     cutadapt_report = os.path.join(cutadapt_folder, args.sample_name + "_cutadapt.txt")
-    if args.adapter == "cutadapt":
-        ngstk.make_dir(cutadapt_folder)
 
     noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
@@ -198,6 +196,9 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             pm.warning("You set adapter arg to '{}' but you must select 'cutadapt'" 
                 " for single end data. Overriding.".format(args.adapter))
         args.adapter = "cutadapt"
+
+    if args.adapter == "cutadapt":
+        ngstk.make_dir(cutadapt_folder)
 
     # Check quality encoding for use with FastX_Tools
     if args.trimmer == "fastx":
