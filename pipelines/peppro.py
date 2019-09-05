@@ -880,13 +880,13 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             total_bases_term = "Total basepairs processed:"
 
             ac_cmd = ("grep '" + adapter_term + "' " +
-                      adapter_report + " | awk '{print $(NF-1)}'")
+                      cutadapt_report + " | awk '{print $(NF-1)}'")
             ts_cmd = ("grep '" + too_short_term + "' " +
-                      adapter_report + " | awk '{print $(NF-1)}'")
+                      cutadapt_report + " | awk '{print $(NF-1)}'")
             bases = ("grep '" + total_bases_term + "' " +
-                     adapter_report + " | awk '{print $(NF-1)}'")
+                     cutadapt_report + " | awk '{print $(NF-1)}'")
             adapter_bases = ("awk '{sum+=$1*$2} END {printf \"%.0f\", sum}' " +
-                             adapter_report)
+                             cutadapt_report)
 
         else:  # default to fastp
             adapter_term = "reads with adapter trimmed:"
