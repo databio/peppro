@@ -1308,8 +1308,17 @@ def _add_resources(args, res):
     """
     rgc = RGC(select_genome_config(res.get("genome_config")))
     # REQ
-    for asset in ["chrom_sizes", BT2_IDX_KEY]:
-        res[asset] = rgc.get_asset(args.genome_assembly, asset)
+    refgenie_assets = [
+        ("fasta", "chrom_sizes", None),
+        (BT2_IDX_KEY, None, None)]
+
+    for asset, seek_key, tag in refgenie_assets:
+        if not seek_key:
+            res[asset] = rgc.get_asset(args.genome_assembly, asset, tag_name=tag)
+        else:
+            res[seek_key] = rgc.get_asset(args.genome_assembly, asset, 
+                                          tag_name=tag,
+                                          seek_key=seek_key)
 
     for reference in args.prealignments:
         for asset in [BT2_IDX_KEY]:
