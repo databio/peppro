@@ -179,27 +179,41 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
     cutadapt_report = os.path.join(cutadapt_folder, args.sample_name + "_cutadapt.txt")
 
+
+    fastp_folder = os.path.join(outfolder, "fastp") 
+    
+    fastp_pfx_R2 = os.path.join(fastp_folder, sname + "_R2_fastp_adapter")
+    fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
+    fastp_report_txt = fastp_pfx + ".txt"
+    fastp_report_html = fastp_pfx + ".html"
+    fastp_report_json = fastp_pfx + ".json"
+    fastp_report_txt_R2 = fastp_pfx_R2 + ".txt"
+    fastp_report_html_R2 = fastp_pfx_R2 + ".html"
+    fastp_report_json_R2 = fastp_pfx_R2 + ".json"
+
+
     noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
     trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
     processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
     
-    adapter_html = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.html")
-    adapter_json = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.json")
-    adapter_report = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.txt")
-    umi_report = os.path.join(fastqc_folder, sname + "_R1_rmUmi.html")
-    umi_json = os.path.join(fastqc_folder, sname + "_R1_rmUmi.json")
+    # fastp_report_html = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.html")
+    # fastp_report_json = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.json")
+    # adapter_report = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.txt")
+    umi_report = os.path.join(fastp_folder, sname + "_R1_rmUmi.html")
+    umi_json = os.path.join(fastp_folder, sname + "_R1_rmUmi.json")
 
     # PE2 names
     noadap_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
     trimmed_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
     trimmed_dups_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
 
-    adapter_html_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.html")
-    adapter_json_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.json")
-    adapter_report_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.txt")
-    umi_report_R2 = os.path.join(fastqc_folder, sname + "_R2_rmUmi.html")
-    umi_json_R2 = os.path.join(fastqc_folder, sname + "_R2_rmUmi.json")
+    # fastp_report_html_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.html")
+    # fastp_report_json_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.json")
+    # fastp_report_txt_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.txt")
+
+    umi_report_R2 = os.path.join(fastp_folder, sname + "_R2_rmUmi.html")
+    umi_json_R2 = os.path.join(fastp_folder, sname + "_R2_rmUmi.json")
     
     # If single-end, must use cutadapt for plotting purposes
     if not args.paired_end:
@@ -210,6 +224,10 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
 
     if args.adapter == "cutadapt":
         ngstk.make_dir(cutadapt_folder)
+        adapter_report = cutadapt_report
+    elif args.adapter == "fastp":
+        ngstk.make_dir(fastp_folder)
+        adapter_report = fastp_report_txt
 
     # Check quality encoding for use with FastX_Tools
     if args.trimmer == "fastx":
@@ -228,16 +246,16 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             adapter_cmd_chunks.extend([
                 ("--adapter_sequence", "GATCGTCGGACTGTAGAACTCTGAAC"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_html_R2),
-                ("--json", adapter_json_R2),
+                ("--html", fastp_report_html_R2),
+                ("--json", fastp_report_json_R2),
                 ("--report_title", ("'" + args.sample_name + "'"))
             ])
         else:
             adapter_cmd_chunks.extend([
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_html),
-                ("--json", adapter_json),
+                ("--html", fastp_report_html),
+                ("--json", fastp_report_json),
                 ("--report_title", ("'" + args.sample_name + "'"))
             ])
 
@@ -247,7 +265,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             adapter_cmd_chunks.extend([("--stdout")])
 
         adapter_cmd_chunks.extend([
-            (") 2>", adapter_report)
+            (") 2>", fastp_report_txt)
         ])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
@@ -302,16 +320,16 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             adapter_cmd_chunks.extend([
                 ("--adapter_sequence", "GATCGTCGGACTGTAGAACTCTGAAC"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_html_R2),
-                ("--json", adapter_json_R2),
+                ("--html", fastp_report_html_R2),
+                ("--json", fastp_report_json_R2),
                 ("--report_title", ("'" + sname + "'"))
             ])
         else:
             adapter_cmd_chunks.extend([
                 ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
-                ("--html", adapter_html),
-                ("--json", adapter_json),
+                ("--html", fastp_report_html),
+                ("--json", fastp_report_json),
                 ("--report_title", ("'" + sname + "'"))
             ])
 
@@ -321,7 +339,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             adapter_cmd_chunks.extend([("--stdout")])
 
         adapter_cmd_chunks.extend([
-            (") 2>", adapter_report)
+            (") 2>", fastp_report_txt)
         ])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
@@ -894,15 +912,15 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             total_bases_term = "total bases:"
 
             ac_cmd = ("grep '" + adapter_term + "' " +
-                       adapter_report + " | head -n 1 | awk '{print $NF}'")
+                       fastp_report_txt + " | head -n 1 | awk '{print $NF}'")
             ts_cmd = ("grep '" + too_short_term + "' " +
-                       adapter_report + " | head -n 1 | awk '{print $NF}'")
+                       fastp_report_txt + " | head -n 1 | awk '{print $NF}'")
             bases = ("grep '" + total_bases_term + "' " +
-                     adapter_report + " | head -n 1 | awk '{print $NF}'")
+                     fastp_report_txt + " | head -n 1 | awk '{print $NF}'")
             adapter_bases = ("grep 'bases trimmed due to adapters:' " +
-                             adapter_report + " | awk '{print $NF}'")
+                             fastp_report_txt + " | awk '{print $NF}'")
 
-            pm.report_object("FastP_report", adapter_html)
+            pm.report_object("FastP_report", fastp_report_html)
 
         ac = float(pm.checkprint(ac_cmd).replace(',',''))
         pm.report_result("Reads_with_adapter", ac)
@@ -924,7 +942,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
         # cutadapt directs its report to stderr if the command lacks
         # a -o and the actual reads are directed to stdout.
         process_fastq_cmd2 = build_command([
-            "(", adapter_cmd, "|", trim_cmd2, ") 2> ", cutadapt_report])
+            "(", adapter_cmd, "|", trim_cmd2, ") 2> ", adapter_report])
         #print("process_fastq_cmd2: {}".format(process_fastq_cmd2))
         pm.run(process_fastq_cmd2, trimmed_fastq_R2)
         cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
@@ -942,7 +960,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             return processed_fastq, trimmed_fastq
         else:
             process_fastq_cmd = build_command([
-                "(", adapter_cmd, "|", trim_cmd1, ") 2> ", cutadapt_report])
+                "(", adapter_cmd, "|", trim_cmd1, ") 2> ", adapter_report])
             pm.run(process_fastq_cmd, processed_fastq,
                follow=ngstk.check_trim(processed_fastq, False, None))
             return processed_fastq      
