@@ -1312,6 +1312,9 @@ def _add_resources(args, res):
         ("fasta", "chrom_sizes", None),
         (BT2_IDX_KEY, None, None)]
 
+
+    # Loop to find missing assets
+
     for asset, seek_key, tag in refgenie_assets:
         if not seek_key:
             res[asset] = rgc.get_asset(args.genome_assembly, asset, tag_name=tag)
@@ -1325,106 +1328,140 @@ def _add_resources(args, res):
             res[asset] = rgc.get_asset(reference, asset)
 
     # OPT
-    msg = "The '{}' asset is not present in your REFGENIE config file."
-    err = "The '{}' asset does not exist."
+    check_list = [
+    {"asset":"refgene_tss", "arg":"TSS_name", "user_arg":"TSS-name"},
+    {"asset":"ensembl_tss", "arg":"ensembl_tss", "user_arg":"pi-tss"},
+    {"asset":"ensembl_gene_body", "arg":"ensembl_gene_body", "user_arg":"pi-body"},
+    {"asset":"refgene_pre_mRNA", "arg":"pre_name", "user_arg":"pre-name"},
+    {"asset":"feat_annotation", "arg":"anno_name", "user_arg":"anno-name"},
+    {"asset":"refgene_exon", "arg":"exon_name", "user_arg":"exon-name"},
+    {"asset":"refgene_intron", "arg":"intron_name", "user_arg":"intron-name"}
+    ]
 
-    asset = "refgene_tss"
-    if args.TSS_name:        
-        res[asset] = os.path.abspath(args.TSS_name)
-    else:
-        try:
-            res[asset] = rgc.get_asset(args.genome_assembly, asset)
-        except KeyError:
-            print(msg.format(asset))
-        except:            
-            msg = ("Update your REFGENIE config file to include this asset, or "
-                   "point directly to the file using --TSS-name.\n")
-            print(err.format(asset))
-            print(msg)
+    key_errors = []
+    exist_errors = []
+    for item in check_list:
+        asset = item["asset"]
+        arg = item["arg"]
+        user_arg = item["user_arg"]
+        if hasattr(args, arg) and getattr(args, arg):
+            res[asset] = os.path.abspath(getattr(args, arg))
+        else:
+            try:
+                res[asset] = rgc.get_asset(args.genome_assembly, asset)
+            except KeyError:
+                key_errors.append(item)
+            except:
+                exist_errors.append(item)
 
-    asset = "ensembl_tss"
-    if args.ensembl_tss:        
-        res[asset] = os.path.abspath(args.ensembl_tss)
-    else:
-        try:
-            res[asset] = rgc.get_asset(args.genome_assembly, asset)
-        except KeyError:
-            print(msg.format(asset))
-        except:            
-            msg = ("Update your REFGENIE config file to include this asset, or "
-                   "point directly to the file using --pi-tss.\n")
-            print(err.format(asset))
-            print(msg)
+    if len(key_errors) > 0 or len(exist_errors) > 0:
+        print("Some assets are not found. You can update your REFGENIE config"
+        " file or point directly to the file using the noted command-line arguments:")
 
-    asset = "ensembl_gene_body"
-    if args.ensembl_gene_body:        
-        res[asset] = os.path.abspath(args.ensembl_gene_body)
-    else:
-        try:
-            res[asset] = rgc.get_asset(args.genome_assembly, asset)
-        except KeyError:
-            print(msg.format(asset))
-        except:            
-            msg = ("Update your REFGENIE config file to include this asset, or "
-                   "point directly to the file using --pi-body.\n")
-            print(err.format(asset))
-            print(msg)
+    if len(key_errors) > 0:
+        print("  Assets missing from REFGENIE config file: {}".format(", ".join(key_errors)))
 
-    asset = "refgene_pre_mRNA"
-    if args.pre_name:
-        res[asset] = os.path.abspath(args.pre_name)
-    else:
-        try:
-            res[asset] = rgc.get_asset(args.genome_assembly, asset)
-        except KeyError:
-            print(msg.format(asset))
-        except:
-            msg = ("Update your REFGENIE config file to include this asset, or "
-                   "point directly to the file using --pre-name.\n")
-            print(err.format(asset))
-            print(msg)
+    if len(exist_errors) > 0:
+        print("  Assets not existing: {}".format(", ".join(["{asset} (--{user_arg})".format(**x) for x in exist_errors])))
 
-    asset = "feat_annotation"
-    if args.anno_name:
-        res[asset] = os.path.abspath(args.anno_name)
-    else:
-        try:
-            res[asset] = rgc.get_asset(args.genome_assembly, asset)
-        except KeyError:
-            print(msg.format(asset))
-        except:
-            msg = ("Update your REFGENIE config file to include this asset, or "
-                   "point directly to the file using --anno-name.\n")
-            print(err.format(asset))
-            print(msg)
+            
+    # asset = "refgene_tss"
+    # if args.TSS_name:        
+    #     res[asset] = os.path.abspath(args.TSS_name)
+    # else:
+    #     try:
+    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+    #     except KeyError:
+    #         print(msg.format(asset))
+    #     except:            
+    #         msg = ("Update your REFGENIE config file to include this asset, or "
+    #                "point directly to the file using --TSS-name.\n")
+    #         print(err.format(asset))
+    #         print(msg)
 
-    asset = "refgene_exon"
-    if args.exon_name:
-        res[asset] = os.path.abspath(args.exon_name)
-    else:
-        try:
-            res[asset] = rgc.get_asset(args.genome_assembly, asset)
-        except KeyError:
-            print(msg.format(asset))
-        except:
-            msg = ("Update your REFGENIE config file to include this asset, or "
-                   "point directly to the file using --exon-name.\n")
-            print(err.format(asset))
-            print(msg)
+    # asset = "ensembl_tss"
+    # if args.ensembl_tss:        
+    #     res[asset] = os.path.abspath(args.ensembl_tss)
+    # else:
+    #     try:
+    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+    #     except KeyError:
+    #         print(msg.format(asset))
+    #     except:            
+    #         msg = ("Update your REFGENIE config file to include this asset, or "
+    #                "point directly to the file using --pi-tss.\n")
+    #         print(err.format(asset))
+    #         print(msg)
 
-    asset = "refgene_intron"
-    if args.intron_name:
-        res[asset] = os.path.abspath(args.intron_name)
-    else:
-        try:
-            res[asset] = rgc.get_asset(args.genome_assembly, asset)
-        except KeyError:
-            print(msg.format(asset))
-        except:
-            msg = ("Update your REFGENIE config file to include this asset, or "
-                   "point directly to the file using --intron-name.\n")
-            print(err.format(asset))
-            print(msg)
+    # asset = "ensembl_gene_body"
+    # if args.ensembl_gene_body:        
+    #     res[asset] = os.path.abspath(args.ensembl_gene_body)
+    # else:
+    #     try:
+    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+    #     except KeyError:
+    #         print(msg.format(asset))
+    #     except:            
+    #         msg = ("Update your REFGENIE config file to include this asset, or "
+    #                "point directly to the file using --pi-body.\n")
+    #         print(err.format(asset))
+    #         print(msg)
+
+    # asset = "refgene_pre_mRNA"
+    # if args.pre_name:
+    #     res[asset] = os.path.abspath(args.pre_name)
+    # else:
+    #     try:
+    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+    #     except KeyError:
+    #         print(msg.format(asset))
+    #     except:
+    #         msg = ("Update your REFGENIE config file to include this asset, or "
+    #                "point directly to the file using --pre-name.\n")
+    #         print(err.format(asset))
+    #         print(msg)
+
+    # asset = "feat_annotation"
+    # if args.anno_name:
+    #     res[asset] = os.path.abspath(args.anno_name)
+    # else:
+    #     try:
+    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+    #     except KeyError:
+    #         print(msg.format(asset))
+    #     except:
+    #         msg = ("Update your REFGENIE config file to include this asset, or "
+    #                "point directly to the file using --anno-name.\n")
+    #         print(err.format(asset))
+    #         print(msg)
+
+    # asset = "refgene_exon"
+    # if args.exon_name:
+    #     res[asset] = os.path.abspath(args.exon_name)
+    # else:
+    #     try:
+    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+    #     except KeyError:
+    #         print(msg.format(asset))
+    #     except:
+    #         msg = ("Update your REFGENIE config file to include this asset, or "
+    #                "point directly to the file using --exon-name.\n")
+    #         print(err.format(asset))
+    #         print(msg)
+
+    # asset = "refgene_intron"
+    # if args.intron_name:
+    #     res[asset] = os.path.abspath(args.intron_name)
+    # else:
+    #     try:
+    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
+    #     except KeyError:
+    #         print(msg.format(asset))
+    #     except:
+    #         msg = ("Update your REFGENIE config file to include this asset, or "
+    #                "point directly to the file using --intron-name.\n")
+    #         print(err.format(asset))
+    #         print(msg)
 
     # res.rgc = rgc
     return res, rgc
@@ -2112,6 +2149,7 @@ def main():
 
     bamQC = os.path.join(QC_folder, args.sample_name + "_bamQC.tsv")
     cmd = tool_path("bamQC.py")
+    cmd += " --silent"
     cmd += " -i " + mapping_genome_bam
     cmd += " -c " + str(pm.cores)
     cmd += " -o " + bamQC
