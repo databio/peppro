@@ -1309,8 +1309,8 @@ def _add_resources(args, res):
     rgc = RGC(select_genome_config(res.get("genome_config")))
     # REQ
     refgenie_assets = [
-        ("fasta", "chrom_sizes", None),
-        (BT2_IDX_KEY, None, None)]
+        ("fasta", "chrom_sizes", "default"),
+        (BT2_IDX_KEY, None, "default")]
 
     for asset, seek_key, tag in refgenie_assets:
         if not seek_key:
