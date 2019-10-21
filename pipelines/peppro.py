@@ -2115,6 +2115,7 @@ def main():
     cmd += " -i " + mapping_genome_bam
     cmd += " -c " + str(pm.cores)
     cmd += " -o " + bamQC
+    cmd += " --silent"
 
     def report_bam_qc(bamqc_log):
         # Reported BAM QC metrics via the bamQC metrics file
