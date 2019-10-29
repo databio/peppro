@@ -158,63 +158,39 @@ def parse_arguments():
     return args
 
 
-def _process_fastq(args, tools, paired_end, fq_file, outfolder):
+def _remove_adapters(args, tools, read2, fq_file, outfolder):
     """
-    A helper function to prepare read files for downstream processing.
+    A helper function to build a command for adapter removal.
 
     :param argparse.Namespace args: binding between option name and argument,
         e.g. from parsing command-line options
     :param looper.models.AttributeDict tools: binding between tool name and
         value, e.g. for tools/resources used by the pipeline
-    :param bool paired_end: if True, use paired-end processing
+    :param bool read2: if True, do not deduplicate and do not retain
+        intermediate files
     :param str fq_file: path to FASTQ file
     :param str outfolder: path to output directory for the pipeline
-    :return (str, str): pair (R1, R2) of paths to FASTQ files
+    :return str: command to remove adapters
     """
-    # Create names for processed FASTQ files.
-    fastq_folder = os.path.join(outfolder, "fastq")
-    fastqc_folder = os.path.join(outfolder, "fastqc")
+
     sname = args.sample_name  # for concise code
 
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
-    cutadapt_report = os.path.join(cutadapt_folder, args.sample_name + "_cutadapt.txt")
+    cutadapt_report = os.path.join(cutadapt_folder, sname + "_cutadapt.txt")
 
+    fastp_folder = os.path.join(outfolder, "fastp")
+    fastq_folder = os.path.join(outfolder, "fastq")
+    noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
 
-    fastp_folder = os.path.join(outfolder, "fastp") 
-    
-    fastp_pfx_R2 = os.path.join(fastp_folder, sname + "_R2_fastp_adapter")
     fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
+    fastp_pfx_R2 = os.path.join(fastp_folder, sname + "_R2_fastp_adapter")
+
     fastp_report_txt = fastp_pfx + ".txt"
     fastp_report_html = fastp_pfx + ".html"
     fastp_report_json = fastp_pfx + ".json"
-    fastp_report_txt_R2 = fastp_pfx_R2 + ".txt"
     fastp_report_html_R2 = fastp_pfx_R2 + ".html"
     fastp_report_json_R2 = fastp_pfx_R2 + ".json"
 
-
-    noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
-    dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
-    trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
-    processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
-    
-    # fastp_report_html = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.html")
-    # fastp_report_json = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.json")
-    # adapter_report = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.txt")
-    umi_report = os.path.join(fastp_folder, sname + "_R1_rmUmi.html")
-    umi_json = os.path.join(fastp_folder, sname + "_R1_rmUmi.json")
-
-    # PE2 names
-    noadap_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
-    trimmed_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
-    trimmed_dups_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
-
-    # fastp_report_html_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.html")
-    # fastp_report_json_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.json")
-    # fastp_report_txt_R2 = os.path.join(fastqc_folder, sname + "_R2_rmAdapter.txt")
-
-    umi_report_R2 = os.path.join(fastp_folder, sname + "_R2_rmUmi.html")
-    umi_json_R2 = os.path.join(fastp_folder, sname + "_R2_rmUmi.json")
-    
     # If single-end, must use cutadapt for plotting purposes
     if not args.paired_end:
         if args.adapter != "cutadapt":
@@ -222,6 +198,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 " for single end data. Overriding.".format(args.adapter))
         args.adapter = "cutadapt"
 
+    # Setup report output folders
     if args.adapter == "cutadapt":
         ngstk.make_dir(cutadapt_folder)
         adapter_report = cutadapt_report
@@ -233,7 +210,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
     if args.trimmer == "fastx":
         encoding = _guess_encoding(fq_file)
         #print("Encoding: {}".format(str(encoding)))  # DEBUG
-        
+
     # Create adapter trimming command(s).
     if args.adapter == "fastp":
         adapter_cmd_chunks = [
@@ -242,13 +219,13 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             ("--thread", str(pm.cores)),
             ("--in1", fq_file)
         ]
-        if paired_end:
+        if read2:
             adapter_cmd_chunks.extend([
                 ("--adapter_sequence", "GATCGTCGGACTGTAGAACTCTGAAC"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", fastp_report_html_R2),
                 ("--json", fastp_report_json_R2),
-                ("--report_title", ("'" + args.sample_name + "'"))
+                ("--report_title", ("'" + sname + "'"))
             ])
         else:
             adapter_cmd_chunks.extend([
@@ -256,10 +233,11 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", fastp_report_html),
                 ("--json", fastp_report_json),
-                ("--report_title", ("'" + args.sample_name + "'"))
+                ("--report_title", ("'" + sname + "'"))
             ])
-
-        if args.complexity and not paired_end:
+        # If calculating library complexity and this is read 1 or single-end,
+        # must produce an intermediate file.
+        if args.complexity and args.umi_len > 0 and not read2 :
             adapter_cmd_chunks.extend([("-o", noadap_fastq)])
         else:
             adapter_cmd_chunks.extend([("--stdout")])
@@ -272,7 +250,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
 
     elif args.adapter == "cutadapt":
         cut_version = float(pm.checkprint("cutadapt --version"))
-        if paired_end:
+        if read2:
             adapter_cmd_chunks = [tools.cutadapt]
             # old versions of cutadapt can not use multiple cores
             if cut_version >= 1.15:
@@ -316,7 +294,7 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
             ("--thread", str(pm.cores)),
             ("--in1", fq_file)
         ]
-        if paired_end:
+        if read2:
             adapter_cmd_chunks.extend([
                 ("--adapter_sequence", "GATCGTCGGACTGTAGAACTCTGAAC"),
                 ("--length_required", (18 + int(float(args.umi_len)))),
@@ -332,8 +310,9 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 ("--json", fastp_report_json),
                 ("--report_title", ("'" + sname + "'"))
             ])
-
-        if args.complexity and not paired_end:
+        # If calculating library complexity and this is read 1 or single-end,
+        # must produce a physical output file.
+        if args.complexity and not read2:
             adapter_cmd_chunks.extend([("-o", noadap_fastq)])
         else:
             adapter_cmd_chunks.extend([("--stdout")])
@@ -344,8 +323,27 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
 
         adapter_cmd = build_command(adapter_cmd_chunks)
 
+    return adapter_cmd
+
+
+def _deduplicate(args, tools, fq_file, outfolder):
+    """
+    A helper function to build a command for deduplication.
+
+    :param argparse.Namespace args: binding between option name and argument,
+        e.g. from parsing command-line options
+    :param looper.models.AttributeDict tools: binding between tool name and
+        value, e.g. for tools/resources used by the pipeline
+    :param str fq_file: path to FASTQ file
+    :param str outfolder: path to output directory for the pipeline
+    :return str: command to remove adapters
+    """
+    sname = args.sample_name  # for concise code
+    fastq_folder = os.path.join(outfolder, "fastq")
+    noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
+    dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
     # Create deduplication command(s).
-    if not paired_end and not args.umi_len <= 0:
+    if args.complexity and args.umi_len > 0:
         if args.dedup == "seqkit":
             dedup_cmd_chunks = [
                 (tools.seqkit, "rmdup"),
@@ -354,26 +352,18 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 "--ignore-case",
                 "-o"           
             ]
-            if args.complexity and args.umi_len > 0:
+            if args.complexity:
                 dedup_cmd_chunks.extend([
                     (dedup_fastq, noadap_fastq)
                 ])
             else:
                 dedup_cmd_chunks.extend(["-"])
-
             dedup_cmd = build_command(dedup_cmd_chunks)
-
         elif args.dedup == "fqdedup":
             dedup_cmd_chunks = [tools.fqdedup]
-            if args.complexity and args.umi_len > 0:
-                dedup_cmd_chunks.extend([("-i", noadap_fastq)])
-                dedup_cmd_chunks.extend([("-o", dedup_fastq)])
-            else:
-                dedup_cmd_chunks.extend([("-i", "-")])
-                dedup_cmd_chunks.extend([("-o", "-")])
-
+            dedup_cmd_chunks.extend([("-i", noadap_fastq)])
+            dedup_cmd_chunks.extend([("-o", dedup_fastq)])
             dedup_cmd = build_command(dedup_cmd_chunks)
-
         else:
             # Default to seqkit
             dedup_cmd_chunks = [
@@ -383,27 +373,55 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                 "--ignore-case",
                 "-o"           
             ]
-            if args.complexity and args.umi_len > 0:
-                dedup_cmd_chunks.extend([
-                    (dedup_fastq, noadap_fastq)
-                ])
-            else:
-                dedup_cmd_chunks.extend(["-"])
-
+            dedup_cmd_chunks.extend([
+                (dedup_fastq, noadap_fastq)
+            ])
             dedup_cmd = build_command(dedup_cmd_chunks)
     else:
+        # Don't deduplicate a read2 file nor deduplicate if there are no UMI's
         dedup_cmd = ""
 
-    pm.debug("Dedup command: {}".format(dedup_cmd))
+    return dedup_cmd
+
+
+def _trim_reads(args, tools, read2, fq_file, outfolder):
+    """
+    A helper function to build a command for read trimming.
+
+    :param argparse.Namespace args: binding between option name and argument,
+        e.g. from parsing command-line options
+    :param looper.models.AttributeDict tools: binding between tool name and
+        value, e.g. for tools/resources used by the pipeline
+    :param bool read2: if True, do not deduplicate and do not retain
+        intermediate files
+    :param str fq_file: path to FASTQ file
+    :param str outfolder: path to output directory for the pipeline
+    :return str: command to remove adapters
+    """
+    sname = args.sample_name  # for concise code
+    fastq_folder = os.path.join(outfolder, "fastq")
+    fastp_folder = os.path.join(outfolder, "fastp")
+
+    trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
+    processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
+    umi_report = os.path.join(fastp_folder, sname + "_R1_rmUmi.html")
+    umi_json = os.path.join(fastp_folder, sname + "_R1_rmUmi.json")
+
+    # TODO: split into two paths, one for read1 and one for read2?
+    trimmed_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
+    trimmed_dups_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
+    umi_report_R2 = os.path.join(fastp_folder, sname + "_R2_rmUmi.html")
+    umi_json_R2 = os.path.join(fastp_folder, sname + "_R2_rmUmi.json")
+
     # Create trimming and reverse complementing command(s).
     # TODO: Can also use seqkit for these steps instead of seqtk...
-    if args.umi_fastp:
-        if args.adapter != "fastp":
-            print("To remove UMI intelligently, you must process adapters using 'fastp'")
-            print("Defaulting to removing the first {} "
-                  "bp instead via trimming".format(str(args.umi_len)))
-            if args.trimmer == "seqtk":
-                if paired_end:
+    if read2:
+        if args.umi_fastp:
+            if args.adapter != "fastp":
+                print("To remove UMI intelligently, you must process adapters using 'fastp'")
+                print("Defaulting to removing the first {} "
+                      "bp instead via trimming".format(str(args.umi_len)))
+                if args.trimmer == "seqtk":
                     trim_cmd_chunks_R2 = [
                         tools.seqtk,
                         "trimfq",
@@ -421,8 +439,169 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                             ("seq", "-r"),
                             ("-", ">"),
                             trimmed_fastq_R2
-                        ])                
+                        ])
+                elif args.trimmer == "fastx":
+                    trim_tool = tools.fastx + "_trimmer"
+                    rc_tool = tools.fastx + "_reverse_complement"
+                    trim_cmd_chunks = [trim_tool]
+
+                    if encoding == "Illumina-1.8":
+                        trim_cmd_chunks.extend([
+                            ("-Q", str(33))
+                        ])
+                    trim_cmd_chunks.extend([
+                        ("-f", str(int(float(args.umi_len)) + 1))
+                    ])
+                    if args.max_len != -1:
+                        trim_cmd_chunks.extend([
+                            ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                        ])
+                    trim_cmd_chunks_R2 = [trim_tool]
+                    if encoding == "Illumina-1.8":
+                        trim_cmd_chunks_R2.extend([
+                            ("-Q", str(33))
+                        ])
+                    trim_cmd_chunks_R2.extend([
+                        ("-t", str(int(float(args.umi_len))))
+                    ])
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
+                        trim_cmd_chunks_R2.extend([
+                            ("-o", trimmed_fastq_R2)                        
+                        ])
+                    else:
+                        trim_cmd_chunks_R2.extend([
+                            ("|", rc_tool)
+                        ])
+                        if encoding == "Illumina-1.8":
+                            trim_cmd_chunks_R2.extend([
+                                ("-Q", str(33))
+                            ])
+                        trim_cmd_chunks_R2.extend([
+                            ("-o", trimmed_fastq_R2)
+                        ])                            
                 else:
+                    # Default to seqtk
+                    trim_cmd_chunks_R2 = [
+                        tools.seqtk,
+                        "trimfq",
+                        ("-e", str(args.umi_len))
+                    ]
+                    if args.max_len != -1:
+                        trim_cmd_chunks_R2.extend([
+                            ("-L", str(args.max_len))
+                        ]) 
+                    trim_cmd_chunks_R2.extend(["-"])
+                    if args.protocol.lower() in RUNON_SOURCE_GRO:
+                        trim_cmd_chunks_R2.extend([
+                            (">", trimmed_fastq_R2)                        
+                        ])
+                    else:
+                        trim_cmd_chunks_R2.extend(["|"])
+                        trim_cmd_chunks_R2.extend([
+                            tools.seqtk,
+                            ("seq", "-r"),
+                            ("-", ">"),
+                            trimmed_fastq_R2
+                        ])
+            else:
+                trim_cmd_chunks_R2 = [
+                    tools.fastp,
+                    ("--thread", str(pm.cores)),
+                    ("--stdin", "--stdout"),
+                    "--umi",
+                    ("--umi_loc", "paired_end"),
+                    ("--umi_len", args.umi_len),
+                    ("--html", umi_report_R2),
+                    ("--json", umi_json_R2),
+                    "|",
+                    (tools.seqtk, "trimfq")
+                ]
+                if args.max_len != -1:
+                    trim_cmd_chunks_R2.extend([
+                        ("-L", args.max_len)
+                    ])
+                trim_cmd_chunks_R2.extend(["-"])
+                if args.protocol.lower() in RUNON_SOURCE_GRO:
+                    trim_cmd_chunks_R2.extend([
+                        (">", trimmed_fastq_R2)
+                    ])
+                else:
+                    trim_cmd_chunks_R2.extend([
+                        "|",
+                        (tools.seqtk, "seq"),
+                        ("-r", "-"),
+                        (">", trimmed_fastq_R2)
+                    ])
+        else:
+            if args.trimmer == "seqtk":
+                trim_cmd_chunks_R2 = [
+                    tools.seqtk,
+                    "trimfq",
+                    ("-e", str(args.umi_len))
+                ]
+                trim_cmd_chunks_R2.extend(["-"])
+                if args.protocol.lower() in RUNON_SOURCE_GRO:
+                    trim_cmd_chunks_R2.extend([
+                        (">", trimmed_fastq_R2)
+                    ])
+                else:
+                    trim_cmd_chunks_R2.extend([
+                        "|",
+                        (tools.seqtk, "seq"),
+                        ("-r", "-"),
+                        (">", trimmed_fastq_R2)
+                    ])
+            elif args.trimmer == "fastx":
+                trim_tool = tools.fastx + "_trimmer"
+                rc_tool = tools.fastx + "_reverse_complement"
+                trim_cmd_chunks = [trim_tool]
+                if encoding == "Illumina-1.8":
+                    trim_cmd_chunks.extend([
+                        ("-Q", str(33))
+                    ])
+                trim_cmd_chunks.extend([
+                    ("-f", str(int(float(args.umi_len)) + 1))
+                ])
+                if args.max_len != -1:
+                    trim_cmd_chunks.extend([
+                        ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                    ])
+                trim_cmd_chunks_R2 = [trim_tool]
+                if encoding == "Illumina-1.8":
+                    trim_cmd_chunks_R2.extend([
+                        ("-Q", str(33))
+                    ])
+                trim_cmd_chunks_R2.extend([
+                    ("-t", str(int(float(args.umi_len))))
+                ])
+                if args.protocol.lower() in RUNON_SOURCE_GRO:
+                    trim_cmd_chunks_R2.extend([
+                        ("-o", trimmed_fastq_R2)
+                    ])
+                else:
+                    trim_cmd_chunks_R2.extend([
+                        ("|", rc_tool)
+                    ])
+                    if encoding == "Illumina-1.8":
+                        trim_cmd_chunks_R2.extend([
+                            ("-Q", str(33))
+                        ])
+                    trim_cmd_chunks_R2.extend([
+                        ("-o", trimmed_fastq_R2)
+                    ])
+            else:
+                pm.fail_pipeline(RuntimeError("I don't understand '{}' for args.trimmer ".format(args.trimmer)))
+
+        trim_cmd = build_command(trim_cmd_chunks_R2)
+        return trim_cmd
+    # If args.complexity and args.umi_len > 0 retain intermediate files
+    else:
+        if args.umi_fastp:
+            if args.adapter != "fastp":
+                print("To remove UMI intelligently, you must process adapters using 'fastp'")
+                print("Defaulting to removing the first {} "
+                      "bp instead via trimming".format(str(args.umi_len)))
+                if args.trimmer == "seqtk":
                     trim_cmd_chunks = [
                         tools.seqtk,
                         "trimfq",
@@ -464,48 +643,22 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                             ("-", ">"),
                             trimmed_fastq
                         ])
+                elif args.trimmer == "fastx":
+                    trim_tool = tools.fastx + "_trimmer"
+                    rc_tool = tools.fastx + "_reverse_complement"
+                    trim_cmd_chunks = [trim_tool]
 
-            elif args.trimmer == "fastx":
-                trim_tool = tools.fastx + "_trimmer"
-                rc_tool = tools.fastx + "_reverse_complement"
-                trim_cmd_chunks = [trim_tool]
-
-                if encoding == "Illumina-1.8":
-                    trim_cmd_chunks.extend([
-                        ("-Q", str(33))
-                    ])
-                trim_cmd_chunks.extend([
-                    ("-f", str(int(float(args.umi_len)) + 1))
-                ])
-                if args.max_len != -1:
-                    trim_cmd_chunks.extend([
-                        ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
-                    ])
-                if paired_end:
-                    trim_cmd_chunks_R2 = [trim_tool]
                     if encoding == "Illumina-1.8":
-                        trim_cmd_chunks_R2.extend([
+                        trim_cmd_chunks.extend([
                             ("-Q", str(33))
                         ])
-                    trim_cmd_chunks_R2.extend([
-                        ("-t", str(int(float(args.umi_len))))
+                    trim_cmd_chunks.extend([
+                        ("-f", str(int(float(args.umi_len)) + 1))
                     ])
-                    if args.protocol.lower() in RUNON_SOURCE_GRO:
-                        trim_cmd_chunks_R2.extend([
-                            ("-o", trimmed_fastq_R2)                        
+                    if args.max_len != -1:
+                        trim_cmd_chunks.extend([
+                            ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
                         ])
-                    else:
-                        trim_cmd_chunks_R2.extend([
-                            ("|", rc_tool)
-                        ])
-                        if encoding == "Illumina-1.8":
-                            trim_cmd_chunks_R2.extend([
-                                ("-Q", str(33))
-                            ])
-                        trim_cmd_chunks_R2.extend([
-                            ("-o", trimmed_fastq_R2)
-                        ])
-                else:
                     if args.complexity and args.umi_len > 0:
                         # Need undeduplicated results for complexity calculation
                         #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
@@ -541,33 +694,8 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                         trim_cmd_chunks_nodedup.extend([
                             ("-o", trimmed_fastq)
                         ])
-                            
-            else:
-                # Default to seqtk
-                if paired_end:
-                    trim_cmd_chunks_R2 = [
-                        tools.seqtk,
-                        "trimfq",
-                        ("-e", str(args.umi_len))
-                    ]
-                    if args.max_len != -1:
-                        trim_cmd_chunks_R2.extend([
-                            ("-L", str(args.max_len))
-                        ]) 
-                    trim_cmd_chunks_R2.extend(["-"])
-                    if args.protocol.lower() in RUNON_SOURCE_GRO:
-                        trim_cmd_chunks_R2.extend([
-                            (">", trimmed_fastq_R2)                        
-                        ])
-                    else:
-                        trim_cmd_chunks_R2.extend(["|"])
-                        trim_cmd_chunks_R2.extend([
-                            tools.seqtk,
-                            ("seq", "-r"),
-                            ("-", ">"),
-                            trimmed_fastq_R2
-                        ])                
                 else:
+                    # Default to seqtk
                     trim_cmd_chunks = [
                         tools.seqtk,
                         "trimfq",
@@ -608,36 +736,6 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                             ("-", ">"),
                             trimmed_fastq
                         ])
-        else:
-            if paired_end:
-                trim_cmd_chunks_R2 = [
-                    tools.fastp,
-                    ("--thread", str(pm.cores)),
-                    ("--stdin", "--stdout"),
-                    "--umi",
-                    ("--umi_loc", "paired_end"),
-                    ("--umi_len", args.umi_len),
-                    ("--html", umi_report_R2),
-                    ("--json", umi_json_R2),
-                    "|",
-                    (tools.seqtk, "trimfq")
-                ]
-                if args.max_len != -1:
-                    trim_cmd_chunks_R2.extend([
-                        ("-L", args.max_len)
-                    ])
-                trim_cmd_chunks_R2.extend(["-"])
-                if args.protocol.lower() in RUNON_SOURCE_GRO:
-                    trim_cmd_chunks_R2.extend([
-                        (">", trimmed_fastq_R2)
-                    ])
-                else:
-                    trim_cmd_chunks_R2.extend([
-                        "|",
-                        (tools.seqtk, "seq"),
-                        ("-r", "-"),
-                        (">", trimmed_fastq_R2)
-                    ])
             else:
                 if args.complexity and args.umi_len > 0:
                     trim_cmd_chunks = [
@@ -729,28 +827,9 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                             ("-r", "-"),
                             (">", processed_fastq)
                         ])
-
-    else:
-        if args.trimmer == "seqtk":
-            if paired_end:
-                trim_cmd_chunks_R2 = [
-                    tools.seqtk,
-                    "trimfq",
-                    ("-e", str(args.umi_len))
-                ]
-                trim_cmd_chunks_R2.extend(["-"])
-                if args.protocol.lower() in RUNON_SOURCE_GRO:
-                    trim_cmd_chunks_R2.extend([
-                        (">", trimmed_fastq_R2)
-                    ])
-                else:
-                    trim_cmd_chunks_R2.extend([
-                        "|",
-                        (tools.seqtk, "seq"),
-                        ("-r", "-"),
-                        (">", trimmed_fastq_R2)
-                    ])
-            else:
+        # Do not remove umi using fastp
+        else:
+            if args.trimmer == "seqtk":
                 trim_cmd_chunks = [
                     tools.seqtk,
                     "trimfq",
@@ -800,48 +879,21 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                             ("-r", "-"),
                             (">", processed_fastq)
                         ])
-
-        elif args.trimmer == "fastx":
-            trim_tool = tools.fastx + "_trimmer"
-            rc_tool = tools.fastx + "_reverse_complement"
-            trim_cmd_chunks = [trim_tool]
-            if encoding == "Illumina-1.8":
-                trim_cmd_chunks.extend([
-                    ("-Q", str(33))
-                ])
-            trim_cmd_chunks.extend([
-                ("-f", str(int(float(args.umi_len)) + 1))
-            ])
-            if args.max_len != -1:
-                trim_cmd_chunks.extend([
-                    ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
-                ])
-
-            if paired_end:
-                trim_cmd_chunks_R2 = [trim_tool]
+            elif args.trimmer == "fastx":
+                trim_tool = tools.fastx + "_trimmer"
+                rc_tool = tools.fastx + "_reverse_complement"
+                trim_cmd_chunks = [trim_tool]
                 if encoding == "Illumina-1.8":
-                    trim_cmd_chunks_R2.extend([
+                    trim_cmd_chunks.extend([
                         ("-Q", str(33))
                     ])
-                trim_cmd_chunks_R2.extend([
-                    ("-t", str(int(float(args.umi_len))))
+                trim_cmd_chunks.extend([
+                    ("-f", str(int(float(args.umi_len)) + 1))
                 ])
-                if args.protocol.lower() in RUNON_SOURCE_GRO:
-                    trim_cmd_chunks_R2.extend([
-                        ("-o", trimmed_fastq_R2)
+                if args.max_len != -1:
+                    trim_cmd_chunks.extend([
+                        ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
                     ])
-                else:
-                    trim_cmd_chunks_R2.extend([
-                        ("|", rc_tool)
-                    ])
-                    if encoding == "Illumina-1.8":
-                        trim_cmd_chunks_R2.extend([
-                            ("-Q", str(33))
-                        ])
-                    trim_cmd_chunks_R2.extend([
-                        ("-o", trimmed_fastq_R2)
-                    ])
-            else:
                 if args.complexity and args.umi_len > 0:
                     # Need undeduplicated results for complexity calculation
                     #trim_cmd_chunks_nodedup = trim_cmd_chunks.copy()  #python3
@@ -877,16 +929,54 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
                         ("-o", trimmed_fastq)
                     ])
 
-        else:
-            pm.fail_pipeline(RuntimeError("I don't understand '{}' for args.trimmer ".format(args.trimmer)))
-            # This should never happen...
-
-    if paired_end:
-        trim_cmd2 = build_command(trim_cmd_chunks_R2)
-    else:
-        trim_cmd1 = build_command(trim_cmd_chunks)
+        trim_cmd = build_command(trim_cmd_chunks)
+        pm.info("trim_cmd: {}".format(build_command(trim_cmd_chunks)))
         if args.complexity and args.umi_len > 0:
-            trim_cmd_nodedup = build_command(trim_cmd_chunks_nodedup)
+            trim_cmd = build_command(trim_cmd_chunks_nodedup)
+            pm.info("trim_cmd_nodedup: {}".format(build_command(trim_cmd_chunks_nodedup)))
+
+        return trim_cmd
+
+
+def _process_fastq(args, tools, read2, fq_file, outfolder):
+    """
+    A helper function to prepare read files for downstream processing.
+
+    :param argparse.Namespace args: binding between option name and argument,
+        e.g. from parsing command-line options
+    :param looper.models.AttributeDict tools: binding between tool name and
+        value, e.g. for tools/resources used by the pipeline
+    :param bool read2: if True, do not deduplicate and do not retain
+        intermediate files
+    :param str fq_file: path to FASTQ file
+    :param str outfolder: path to output directory for the pipeline
+    :return (str, str): pair (R1, R2) of paths to FASTQ files
+    """
+    # Create names for processed FASTQ files.
+    fastq_folder = os.path.join(outfolder, "fastq")
+    fastqc_folder = os.path.join(outfolder, "fastqc")
+    sname = args.sample_name  # for concise code
+
+    noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
+    adapter_command = _remove_adapters(args, tools, read2, fq_file, outfolder)
+    pm.info("Adapter command: {}".format(adapter_command))
+    pm.info("Read2 status: {}".format(read2))
+
+    dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
+    if not read2 and args.complexity and args.umi_len > 0:
+        deduplicate_command = _deduplicate(args, tools, fq_file, outfolder)
+        #pm.debug("Dedup command: {}".format(deduplicate_command))
+        pm.info("Dedup command: {}".format(deduplicate_command))
+
+    trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
+    trimmed_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
+    trimmed_dups_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
+    processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
+    trim_command = _trim_reads(args, tools, read2, fq_file, outfolder)
+    if args.complexity and args.umi_len > 0:
+        trim_command2 = _trim_reads(args, tools, read2, fq_file, outfolder)
+
+    adapter_report = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.txt")
 
     def report_fastq():
         """
@@ -938,29 +1028,29 @@ def _process_fastq(args, tools, paired_end, fq_file, outfolder):
         pm.report_result("Duplicate_reads", dups)
 
     # Put it all together
-    if paired_end:
+    if read2:
         # cutadapt directs its report to stderr if the command lacks
         # a -o and the actual reads are directed to stdout.
         process_fastq_cmd2 = build_command([
-            "(", adapter_cmd, "|", trim_cmd2, ") 2> ", adapter_report])
-        #print("process_fastq_cmd2: {}".format(process_fastq_cmd2))
+            "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
+        pm.debug("process_fastq_cmd2: {}".format(process_fastq_cmd2))
         pm.run(process_fastq_cmd2, trimmed_fastq_R2)
         cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
         pm.run(cp_cmd, trimmed_dups_fastq_R2)
         return trimmed_fastq_R2, trimmed_dups_fastq_R2
     else:
         if args.complexity and args.umi_len > 0:
-            pm.run([adapter_cmd, dedup_cmd, trim_cmd_nodedup],
-                   trimmed_fastq, follow=report_fastq)
-            pm.run(trim_cmd1, processed_fastq,
+            pm.run(trim_command, processed_fastq,
                    follow=ngstk.check_trim(processed_fastq, False, None))
+            pm.run([adapter_command, deduplicate_command, trim_command2],
+                   trimmed_fastq, follow=report_fastq)
             pm.clean_add(noadap_fastq)
             pm.clean_add(dedup_fastq)
             pm.clean_add(trimmed_fastq)
             return processed_fastq, trimmed_fastq
         else:
             process_fastq_cmd = build_command([
-                "(", adapter_cmd, "|", trim_cmd1, ") 2> ", adapter_report])
+                "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
             pm.run(process_fastq_cmd, processed_fastq,
                follow=ngstk.check_trim(processed_fastq, False, None))
             return processed_fastq      
@@ -1648,7 +1738,6 @@ def main():
         # Re-pair the duplicates (but only if we could identify duplicates)
 
         if args.umi_len > 0:
-
             r1_dups_repair = os.path.join(
                 fastq_folder, args.sample_name + "_R1_trimmed.fastq.paired.fq")
             r2_dups_repair = os.path.join(
@@ -1683,7 +1772,6 @@ def main():
                                        outfolder=param.outfolder)
             unmap_fq2 = ""
 
-
     pm.timestamp("### Plot adapter insertion distribution")
     if not args.adapter == "cutadapt":
         pm.info("Skipping sample degradation plotting...")
@@ -1701,8 +1789,6 @@ def main():
         pm.run(cmd, degradation_pdf, nofail=True)
         pm.report_object("Adapter insertion distribution", degradation_pdf,
                          anchor_image=degradation_png)
-
-
 
     pm.clean_add(os.path.join(fastq_folder, "*.fq"), conditional=True)
     pm.clean_add(os.path.join(fastq_folder, "*.fastq"), conditional=True)
