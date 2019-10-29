@@ -15,7 +15,7 @@ implied_columns:
   organism:
     human:
       genome: hg38
-      prealignments: human_rDNA rCRSd
+      prealignments: human_rDNA
       adapter: fastp  # Default
       dedup: seqkit   # Default
       trimmer: seqtk  # Default
