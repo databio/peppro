@@ -407,7 +407,6 @@ def _trim_reads(args, tools, read2, fq_file, outfolder):
     umi_report = os.path.join(fastp_folder, sname + "_R1_rmUmi.html")
     umi_json = os.path.join(fastp_folder, sname + "_R1_rmUmi.json")
 
-    # TODO: split into two paths, one for read1 and one for read2?
     trimmed_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
     trimmed_dups_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
     umi_report_R2 = os.path.join(fastp_folder, sname + "_R2_rmUmi.html")
@@ -1402,9 +1401,7 @@ def _add_resources(args, res):
         ("fasta", "chrom_sizes", "default"),
         (BT2_IDX_KEY, None, "default")]
 
-
     # Loop to find missing assets
-
     for asset, seek_key, tag in refgenie_assets:
         if not seek_key:
             res[asset] = rgc.get_asset(args.genome_assembly, asset, tag_name=tag)
@@ -1419,26 +1416,31 @@ def _add_resources(args, res):
 
     # OPT
     check_list = [
-    {"asset":"refgene_tss", "arg":"TSS_name", "user_arg":"TSS-name"},
-    {"asset":"ensembl_tss", "arg":"ensembl_tss", "user_arg":"pi-tss"},
-    {"asset":"ensembl_gene_body", "arg":"ensembl_gene_body", "user_arg":"pi-body"},
-    {"asset":"refgene_pre_mRNA", "arg":"pre_name", "user_arg":"pre-name"},
-    {"asset":"feat_annotation", "arg":"anno_name", "user_arg":"anno-name"},
-    {"asset":"refgene_exon", "arg":"exon_name", "user_arg":"exon-name"},
-    {"asset":"refgene_intron", "arg":"intron_name", "user_arg":"intron-name"}
+    {"asset":"refgene_anno", "seek_key":"refgene_tss", "arg":"TSS_name", "user_arg":"TSS-name"},
+    {"asset":"ensembl_gtf", "seek_key":"ensembl_tss", "arg":"ensembl_tss", "user_arg":"pi-tss"},
+    {"asset":"ensembl_gtf", "seek_key":"ensembl_gene_body", "arg":"ensembl_gene_body", "user_arg":"pi-body"},
+    {"asset":"refgene_anno", "seek_key":"refgene_pre_mRNA", "arg":"pre_name", "user_arg":"pre-name"},
+    {"asset":"feat_annotation", "seek_key":"feat_annotation", "arg":"anno_name", "user_arg":"anno-name"},
+    {"asset":"refgene_anno", "seek_key":"refgene_exon", "arg":"exon_name", "user_arg":"exon-name"},
+    {"asset":"refgene_anno", "seek_key":"refgene_intron", "arg":"intron_name", "user_arg":"intron-name"}
     ]
 
     key_errors = []
     exist_errors = []
     for item in check_list:
         asset = item["asset"]
+        seek_key = item["seek_key"]
         arg = item["arg"]
         user_arg = item["user_arg"]
+
         if hasattr(args, arg) and getattr(args, arg):
             res[asset] = os.path.abspath(getattr(args, arg))
         else:
             try:
-                res[asset] = rgc.get_asset(args.genome_assembly, asset)
+                pm.debug("asset key: {}".format(asset))
+                res[asset] = rgc.get_asset(args.genome_assembly, asset, 
+                                          seek_key=seek_key)
+                pm.debug("res[asset]: {}".format(res[asset]))
             except KeyError:
                 key_errors.append(item)
             except:
@@ -1454,106 +1456,6 @@ def _add_resources(args, res):
     if len(exist_errors) > 0:
         print("  Assets not existing: {}".format(", ".join(["{asset} (--{user_arg})".format(**x) for x in exist_errors])))
 
-            
-    # asset = "refgene_tss"
-    # if args.TSS_name:        
-    #     res[asset] = os.path.abspath(args.TSS_name)
-    # else:
-    #     try:
-    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
-    #     except KeyError:
-    #         print(msg.format(asset))
-    #     except:            
-    #         msg = ("Update your REFGENIE config file to include this asset, or "
-    #                "point directly to the file using --TSS-name.\n")
-    #         print(err.format(asset))
-    #         print(msg)
-
-    # asset = "ensembl_tss"
-    # if args.ensembl_tss:        
-    #     res[asset] = os.path.abspath(args.ensembl_tss)
-    # else:
-    #     try:
-    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
-    #     except KeyError:
-    #         print(msg.format(asset))
-    #     except:            
-    #         msg = ("Update your REFGENIE config file to include this asset, or "
-    #                "point directly to the file using --pi-tss.\n")
-    #         print(err.format(asset))
-    #         print(msg)
-
-    # asset = "ensembl_gene_body"
-    # if args.ensembl_gene_body:        
-    #     res[asset] = os.path.abspath(args.ensembl_gene_body)
-    # else:
-    #     try:
-    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
-    #     except KeyError:
-    #         print(msg.format(asset))
-    #     except:            
-    #         msg = ("Update your REFGENIE config file to include this asset, or "
-    #                "point directly to the file using --pi-body.\n")
-    #         print(err.format(asset))
-    #         print(msg)
-
-    # asset = "refgene_pre_mRNA"
-    # if args.pre_name:
-    #     res[asset] = os.path.abspath(args.pre_name)
-    # else:
-    #     try:
-    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
-    #     except KeyError:
-    #         print(msg.format(asset))
-    #     except:
-    #         msg = ("Update your REFGENIE config file to include this asset, or "
-    #                "point directly to the file using --pre-name.\n")
-    #         print(err.format(asset))
-    #         print(msg)
-
-    # asset = "feat_annotation"
-    # if args.anno_name:
-    #     res[asset] = os.path.abspath(args.anno_name)
-    # else:
-    #     try:
-    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
-    #     except KeyError:
-    #         print(msg.format(asset))
-    #     except:
-    #         msg = ("Update your REFGENIE config file to include this asset, or "
-    #                "point directly to the file using --anno-name.\n")
-    #         print(err.format(asset))
-    #         print(msg)
-
-    # asset = "refgene_exon"
-    # if args.exon_name:
-    #     res[asset] = os.path.abspath(args.exon_name)
-    # else:
-    #     try:
-    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
-    #     except KeyError:
-    #         print(msg.format(asset))
-    #     except:
-    #         msg = ("Update your REFGENIE config file to include this asset, or "
-    #                "point directly to the file using --exon-name.\n")
-    #         print(err.format(asset))
-    #         print(msg)
-
-    # asset = "refgene_intron"
-    # if args.intron_name:
-    #     res[asset] = os.path.abspath(args.intron_name)
-    # else:
-    #     try:
-    #         res[asset] = rgc.get_asset(args.genome_assembly, asset)
-    #     except KeyError:
-    #         print(msg.format(asset))
-    #     except:
-    #         msg = ("Update your REFGENIE config file to include this asset, or "
-    #                "point directly to the file using --intron-name.\n")
-    #         print(err.format(asset))
-    #         print(msg)
-
-    # res.rgc = rgc
     return res, rgc
 
 
@@ -1963,20 +1865,11 @@ def main():
     # -q 10: skip alignments with MAPQ less than 10
     cmd2 = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
             " -U " + failQC_genome_bam + " ")
-    #if args.paired_end:
-        # add a step to accept only reads mapped in proper pair
-        # ?not appropriate with reverse complemented proseq reads?
-        #cmd2 += "-f 2 "
-
     cmd2 += mapping_genome_bam_temp + " > " + mapping_genome_bam
 
     if args.complexity and args.umi_len > 0:
         cmd2_dups = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
             " -U " + failQC_genome_bam_dups + " ")
-        #if args.paired_end:
-            # add a step to accept only reads mapped in proper pair
-            #cmd2_dups += "-f 2 "
-
         cmd2_dups += mapping_genome_bam_temp_dups + " > " + mapping_genome_bam_dups
         pm.clean_add(failQC_genome_bam_dups)
 
@@ -2016,8 +1909,6 @@ def main():
         pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups,
                container=pm.container)
 
-
-
     pm.timestamp("### Compress all unmapped read files")
     for unmapped_fq in to_compress:
         # Compress unmapped fastq reads
@@ -2028,7 +1919,6 @@ def main():
                 cmd = (ngstk.ziptool + " " + unmapped_fq)
                 unmapped_fq = unmapped_fq + ".gz"
                 pm.run(cmd, unmapped_fq)
-
 
     temp_mapping_index = os.path.join(mapping_genome_bam_temp + ".bai")
     temp_mapping_index_dups = os.path.join(mapping_genome_bam_temp_dups + ".bai")
