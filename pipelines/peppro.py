@@ -1657,10 +1657,6 @@ def main():
             print("Prealignment assemblies: " + str(args.prealignments))
             # Loop through any prealignment references and map to them sequentially
             for reference in args.prealignments:
-                # fq1_gz = os.path.join(param.outfolder, "prealignments",
-                #                       args.sample_name + "_" +
-                #                       reference + "_unmap_R1.fq.gz")
-                #if not _itsa_file(fq1_gz) or args.new_start:
                 if args.complexity and args.umi_len > 0:
                     if args.no_fifo:
                         unmap_fq1, unmap_fq2 = _align_with_bt2(
@@ -2406,7 +2402,6 @@ def main():
     else:
         pass
         # Used to plot adapter distribution here, but moved to cutadapt.
-
 
     ############################################################################
     #                        Extract genomic features                          #
