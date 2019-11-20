@@ -191,13 +191,6 @@ def _remove_adapters(args, tools, read2, fq_file, outfolder):
     fastp_report_html_R2 = fastp_pfx_R2 + ".html"
     fastp_report_json_R2 = fastp_pfx_R2 + ".json"
 
-    # If single-end, must use cutadapt for plotting purposes
-    if not args.paired_end:
-        if args.adapter != "cutadapt":
-            pm.warning("You set adapter arg to '{}' but you must select 'cutadapt'" 
-                " for single end data. Overriding.".format(args.adapter))
-        args.adapter = "cutadapt"
-
     # Setup report output folders
     if args.adapter == "cutadapt":
         ngstk.make_dir(cutadapt_folder)
@@ -881,12 +874,16 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
     trimmed_dups_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
     processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
 
-    adapter_report = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.txt")
+    if args.adapter == "cutadapt":
+        cutadapt_folder = os.path.join(outfolder, "cutadapt")
+        cutadapt_report = os.path.join(cutadapt_folder, sname + "_cutadapt.txt")
+        adapter_report = cutadapt_report
+    else:
+        adapter_report = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.txt")
+
     fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
     fastp_report_txt = fastp_pfx + ".txt"
     fastp_report_html = fastp_pfx + ".html"
-    cutadapt_folder = os.path.join(outfolder, "cutadapt")
-    cutadapt_report = os.path.join(cutadapt_folder, sname + "_cutadapt.txt")
 
     adapter_command = _remove_adapters(args, tools, read2, fq_file, outfolder)
     pm.debug("Adapter command: {}".format(adapter_command))
@@ -1336,76 +1333,121 @@ def _itsa_empty_file(anyfile):
     return(os.path.isfile(anyfile) and os.stat(anyfile).st_size == 0)
 
 
-def _add_resources(args, res):
+def _add_resources(args, res, asset_dict=None):
     """
     Add additional resources needed for pipeline.
 
     :param argparse.Namespace args: binding between option name and argument,
         e.g. from parsing command-line options
     :param pm.config.resources res: pipeline manager resources list
+    :param asset_dict list: list of asset dicts to add
     """
-    rgc = RGC(select_genome_config(res.get("genome_config")))
-    # REQ
-    refgenie_assets = [
-        ("fasta", "chrom_sizes", "default"),
-        (BT2_IDX_KEY, None, "default")]
 
-    # Loop to find missing assets
-    for asset, seek_key, tag in refgenie_assets:
-        if not seek_key:
-            res[asset] = rgc.get_asset(args.genome_assembly, asset, tag_name=tag)
-        else:
-            res[seek_key] = rgc.get_asset(args.genome_assembly, asset, 
-                                          tag_name=tag,
-                                          seek_key=seek_key)
-
-    for reference in args.prealignments:
-        for asset in [BT2_IDX_KEY]:
-            res[asset] = rgc.get_asset(reference, asset)
-
-    # OPT
+    # Potential assets
     check_list = [
-    {"asset":"refgene_anno", "seek_key":"refgene_tss", "arg":"TSS_name", "user_arg":"TSS-name"},
-    {"asset":"ensembl_gtf", "seek_key":"ensembl_tss", "arg":"ensembl_tss", "user_arg":"pi-tss"},
-    {"asset":"ensembl_gtf", "seek_key":"ensembl_gene_body", "arg":"ensembl_gene_body", "user_arg":"pi-body"},
-    {"asset":"refgene_anno", "seek_key":"refgene_pre_mRNA", "arg":"pre_name", "user_arg":"pre-name"},
-    {"asset":"feat_annotation", "seek_key":"feat_annotation", "arg":"anno_name", "user_arg":"anno-name"},
-    {"asset":"refgene_anno", "seek_key":"refgene_exon", "arg":"exon_name", "user_arg":"exon-name"},
-    {"asset":"refgene_anno", "seek_key":"refgene_intron", "arg":"intron_name", "user_arg":"intron-name"}
+        {"asset_name":"refgene_anno", "seek_key":"refgene_tss", "arg":"TSS_name", "user_arg":"TSS-name"},
+        {"asset_name":"ensembl_gtf", "seek_key":"ensembl_tss", "arg":"ensembl_tss", "user_arg":"pi-tss"},
+        {"asset_name":"ensembl_gtf", "seek_key":"ensembl_gene_body", "arg":"ensembl_gene_body", "user_arg":"pi-body"},
+        {"asset_name":"refgene_anno", "seek_key":"refgene_pre_mRNA", "arg":"pre_name", "user_arg":"pre-name"},
+        {"asset_name":"feat_annotation", "seek_key":"feat_annotation", "arg":"anno_name", "user_arg":"anno-name"},
+        {"asset_name":"refgene_anno", "seek_key":"refgene_exon", "arg":"exon_name", "user_arg":"exon-name"},
+        {"asset_name":"refgene_anno", "seek_key":"refgene_intron", "arg":"intron_name", "user_arg":"intron-name"}
     ]
+    rgc = RGC(select_genome_config(res.get("genome_config")))
 
-    key_errors = []
-    exist_errors = []
-    for item in check_list:
-        asset = item["asset"]
-        seek_key = item["seek_key"]
-        arg = item["arg"]
-        user_arg = item["user_arg"]
+    if not asset_dict:
+        # REQ
+        refgenie_assets = [
+            ("fasta", "chrom_sizes", "default"),
+            ("fasta", None, "default"),
+            (BT2_IDX_KEY, None, "default")]
 
-        if hasattr(args, arg) and getattr(args, arg):
-            res[asset] = os.path.abspath(getattr(args, arg))
-        else:
-            try:
-                pm.debug("asset key: {}".format(seek_key))
+        # Loop to find missing assets
+        for asset, seek_key, tag in refgenie_assets:
+            if not seek_key:
+                res[asset] = rgc.get_asset(args.genome_assembly,
+                                           asset, tag_name=tag)
+            else:
                 res[seek_key] = rgc.get_asset(args.genome_assembly, asset, 
-                                          seek_key=seek_key)
-                pm.debug("res[seek_key]: {}".format(res[seek_key]))
-            except KeyError:
-                key_errors.append(item)
-            except:
-                exist_errors.append(item)
+                                              tag_name=tag,
+                                              seek_key=seek_key)
 
-    if len(key_errors) > 0 or len(exist_errors) > 0:
-        print("Some assets are not found. You can update your REFGENIE config"
-        " file or point directly to the file using the noted command-line arguments:")
+        for reference in args.prealignments:
+            for asset in [BT2_IDX_KEY]:
+                res[asset] = rgc.get_asset(reference, asset)      
 
-    if len(key_errors) > 0:
-        print("  Assets missing from REFGENIE config file: {}".format(", ".join(key_errors)))
+        key_errors = []
+        exist_errors = []
+        for item in check_list:
+            asset = item["asset_name"]
+            seek_key = item["seek_key"]
+            arg = item["arg"]
+            user_arg = item["user_arg"]
 
-    if len(exist_errors) > 0:
-        print("  Assets not existing: {}".format(", ".join(["{asset} (--{user_arg})".format(**x) for x in exist_errors])))
+            if hasattr(args, arg) and getattr(args, arg):
+                res[asset] = os.path.abspath(getattr(args, arg))
+            else:
+                try:
+                    pm.debug("asset key: {}".format(seek_key))
+                    res[seek_key] = rgc.get_asset(args.genome_assembly, asset, 
+                                                  seek_key=seek_key)
+                    pm.debug("res[seek_key]: {}".format(res[seek_key]))
+                except KeyError:
+                    key_errors.append(item)
+                except:
+                    exist_errors.append(item)
 
-    return res, rgc
+        if len(key_errors) > 0 or len(exist_errors) > 0:
+            print("Some assets are not found. You can update your REFGENIE "
+                  "config file or point directly to the file using the noted "
+                  "command-line arguments:")
+
+        if len(key_errors) > 0:
+            print("Assets missing from REFGENIE config file: {}".format(", ".join(key_errors)))
+
+        if len(exist_errors) > 0:
+            print("Assets not existing: {}".format(", ".join(["{asset} (--{user_arg})".format(**x) for x in exist_errors])))
+
+        return res, rgc
+    else:
+        key_errors = []
+        exist_errors = []
+        for item in asset_dict:
+            pm.debug("item: {}".format(item))  # DEBUG
+            asset = item["asset_name"]
+            seek_key = item["seek_key"]
+            tag = item["tag_name"]
+            arg = item["arg"]
+            user_arg = item["user_arg"]
+
+            if hasattr(args, arg) and getattr(args, arg):
+                res[seek_key] = os.path.abspath(getattr(args, arg))
+            else:
+                try:
+                    pm.debug("asset key: {}".format(seek_key))  # DEBUG
+                    pm.debug("asset tag: {}".format(tag))  # DEBUG
+                    res[seek_key] = rgc.get_asset(args.genome_assembly,
+                                                  asset,
+                                                  tag_name=tag,
+                                                  seek_key=seek_key)
+                    pm.debug("res[seek_key]: {}".format(res[seek_key]))  # DEBUG
+                except KeyError:
+                    key_errors.append(item)
+                except:
+                    exist_errors.append(item)
+
+        if len(key_errors) > 0 or len(exist_errors) > 0:
+            print("Some assets are not found. You can update your REFGENIE "
+                  "config file or point directly to the file using the noted "
+                  "command-line arguments:")
+
+        if len(key_errors) > 0:
+            print("Assets missing from REFGENIE config file: {}".format(", ".join(key_errors)))
+
+        if len(exist_errors) > 0:
+            print("Assets not existing: {}".format(", ".join(["{asset} (--{user_arg})".format(**x) for x in exist_errors])))
+
+        return res, rgc
 
 
 ###############################################################################
@@ -1541,6 +1583,13 @@ def main():
     cutadapt_report = os.path.join(cutadapt_folder, args.sample_name + "_cutadapt.txt")
     repair_target = os.path.join(fastq_folder, "repaired.flag")
     dups_repair_target = os.path.join(fastq_folder, "dups_repaired.flag")
+
+    # If single-end, must use cutadapt for plotting purposes
+    if not args.paired_end:
+        if args.adapter != "cutadapt":
+            pm.warning("You set adapter arg to '{}' but you must select 'cutadapt'" 
+                " for single end data. Overriding.".format(args.adapter))
+        args.adapter = "cutadapt"
 
     # If we've already aligned to the primary genome, skip these steps unless
     # it's a --new-start
@@ -1728,6 +1777,8 @@ def main():
     #                           Map to primary genome                          #
     ############################################################################
     pm.timestamp("### Map to genome")
+
+    # Set up named files and options
     map_genome_folder = os.path.join(
         param.outfolder, "aligned_" + args.genome_assembly)
     ngstk.make_dir(map_genome_folder)
@@ -1750,6 +1801,11 @@ def main():
     unmap_genome_bam_dups = os.path.join(
         map_genome_folder, args.sample_name + "_unmap_dups.bam")
 
+    temp_mapping_index = os.path.join(mapping_genome_bam_temp + ".bai")
+    temp_mapping_index_dups = os.path.join(mapping_genome_bam_temp_dups + ".bai")
+
+    mito_name = ["chrM", "chrMT", "M", "MT", "rCRSd", "rCRSd_3k"]
+
     bt2_options = " --very-sensitive"
     bt2_options += " -X 2000"
 
@@ -1758,6 +1814,7 @@ def main():
     os.chmod(tempdir, 0o771)
     pm.clean_add(tempdir)
 
+    # Skip if this is a recovery and the following has already occurred
     if not pm.get_stat("Aligned_reads") or args.new_start:
         # check input for zipped or not
         if pypiper.is_gzipped_fastq(unmap_fq1):
@@ -1773,7 +1830,7 @@ def main():
         cmd += " --rg-id " + args.sample_name
         cmd += " -x " + os.path.join(
             rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
-                              args.genome_assembly)
+            args.genome_assembly)
         if args.paired_end:
             cmd += " --rf -1 " + unmap_fq1 + " -2 " + unmap_fq2
         else:
@@ -1798,7 +1855,7 @@ def main():
             cmd_dups += " --rg-id " + args.sample_name
             cmd_dups += " -x " + os.path.join(
                 rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
-                                  args.genome_assembly)
+                args.genome_assembly)
             if args.paired_end:
                 cmd_dups += " --rf -1 " + unmap_fq1_dups + " -2 " + unmap_fq2_dups
             else:
@@ -1869,9 +1926,6 @@ def main():
                     unmapped_fq = unmapped_fq + ".gz"
                     pm.run(cmd, unmapped_fq)
 
-        temp_mapping_index = os.path.join(mapping_genome_bam_temp + ".bai")
-        temp_mapping_index_dups = os.path.join(mapping_genome_bam_temp_dups + ".bai")
-
         if not args.prealignments and os.path.exists(mapping_genome_bam_temp):
             # Index the temporary bam file
             cmd = tools.samtools + " index " + mapping_genome_bam_temp
@@ -1885,7 +1939,6 @@ def main():
                 pm.clean_add(mapping_genome_bam_temp_dups)
 
         # Determine mitochondrial read counts
-        mito_name = ["chrM", "chrMT", "M", "MT", "rCRSd", "rCRSd_3k"]
         if os.path.exists(mapping_genome_bam_temp):
             if not os.path.exists(temp_mapping_index):
                 cmd = tools.samtools + " index " + mapping_genome_bam_temp
@@ -1920,14 +1973,6 @@ def main():
                 pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam)
                 pm.clean_add(mapping_genome_index)
 
-        # Determine maximum read length
-        cmd = (tools.samtools + " stats " + mapping_genome_bam +
-               " | grep '^SN' | cut -f 2- | grep 'maximum length:' | cut -f 2-")
-        max_len = int(pm.checkprint(cmd))
-
-        if args.max_len != -1:
-            max_len = args.max_len
-
         # Remove PE2 reads
         if args.paired_end:
             pm.timestamp("### Split BAM file")
@@ -1943,6 +1988,34 @@ def main():
                     " > " + mapping_pe2_bam)
             pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
             mapping_genome_bam = mapping_pe1_bam
+
+    # Determine maximum read length
+    if int(args.max_len) != -1:
+        max_len = args.max_len
+    elif _itsa_file(mapping_genome_bam):
+        cmd = (tools.samtools + " stats " + mapping_genome_bam +
+               " | grep '^SN' | cut -f 2- | grep 'maximum length:' | cut -f 2-")
+        max_len = int(pm.checkprint(cmd))
+    else:
+        max_len = DEFAULT_MAX_LEN
+
+    # TODO: at this point I can check for seqOutBias required indicies
+    # Can't do it earlier because I haven't determined the read_length of 
+    # of interest for mappability purposes.
+    if args.sob:
+        if max_len == DEFAULT_MAX_LEN:
+            search_asset = [{"asset_name":"tallymer_index",
+                             "seek_key":"search_file",
+                             "tag_name":"default",
+                             "arg":"search_file",
+                             "user_arg":"search-file"}]
+        else:
+            search_asset = [{"asset_name":"tallymer_index",
+                             "seek_key":"search_file",
+                             "tag_name":max_len,
+                             "arg":"search_file",
+                             "user_arg":"search-file"}]
+        res, rgc = _add_resources(args, res, search_asset)
 
     ############################################################################
     #                     Calculate library complexity                         #
@@ -2150,7 +2223,7 @@ def main():
         tools.samtools,
         "view",
         "-bh",
-        ("-f", 0x10),
+        ("-f", 16),
         mapping_genome_bam,
         (">", minus_bam)
     ])
@@ -2674,9 +2747,9 @@ def main():
     ############################################################################
     #                        Shift and produce BigWigs                         #
     ############################################################################
-    genome_fq = os.path.join(rgc.genome_folder,
-                             args.genome_assembly,
-                             (args.genome_assembly + ".fa"))
+    genome_fq = rgc.get_asset(args.genome_assembly,
+                              asset_name="fasta",
+                              seek_key="fasta")
     signal_folder = os.path.join(
         param.outfolder, "signal_" + args.genome_assembly)
     ngstk.make_dir(signal_folder)
@@ -2723,103 +2796,127 @@ def main():
         # Do that in the $GENOMES folder, in a subfolder called "mappability"
         # Only need to do that once for each read-size of interest
         # default would be read-size 30 (args.max_len)
-        mappability_folder = os.path.join(rgc.genome_folder,
-                                          args.genome_assembly,
-                                          "mappability")
-        ngstk.make_dir(mappability_folder)
+        pm.debug("The max read length is {}".format(str(max_len)))
+        # mappability_folder = os.path.join(rgc.genome_folder,
+        #                                   args.genome_assembly,
+        #                                   "mappability",
+        #                                   str(max_len))
+        # ngstk.make_dir(mappability_folder)
+
+        # seqOutBias will use a temporary directory
+        tempdir = tempfile.mkdtemp(dir=signal_folder)
+        os.chmod(tempdir, 0o771)
+        pm.clean_add(tempdir)
 
         # Link fasta file
-        genome_fq_ln = os.path.join(mappability_folder,
-                                   (args.genome_assembly + ".fa"))
-        if not os.path.isfile(genome_fq_ln):
-            cmd = "ln -sf " + genome_fq + " " + genome_fq_ln
-            pm.run(cmd, genome_fq_ln)
+        # TODO: switch to refgenie fasta asset
+        # genome_fq_ln = os.path.join(mappability_folder,
+        #                             (args.genome_assembly + ".fa"))
+        # if not os.path.isfile(genome_fq_ln):
+        #     cmd = "ln -sf " + genome_fq + " " + genome_fq_ln
+        #     pm.run(cmd, genome_fq_ln)
 
-        if args.max_len != -1:
-            max_len = args.max_len
+        # These next two files are universal to all indicies?
+        # suffix_index = os.path.join(mappability_folder,
+        #                             (args.genome_assembly + ".sft"))
+        # suffix_check = os.path.join(mappability_folder,
+        #                             (args.genome_assembly + ".sft.suf"))
+        # tally_index = os.path.join(mappability_folder,
+        #                            (args.genome_assembly + ".tal_" +
+        #                            str(max_len)))
+        # tally_check = os.path.join(mappability_folder,
+        #                            (args.genome_assembly + ".tal_" + 
+        #                            str(max_len) + ".mer"))
+        # search_file = os.path.join(mappability_folder,
+        #                            (args.genome_assembly + ".tal_" +
+        #                            str(max_len) + ".gtTxt"))
 
-        suffix_index = os.path.join(mappability_folder,
-                                    (args.genome_assembly + ".sft"))
-        suffix_check = os.path.join(mappability_folder,
-                                    (args.genome_assembly + ".sft.suf"))
-        tally_index = os.path.join(mappability_folder,
-                                   (args.genome_assembly + ".tal_" +
-                                   str(max_len)))
-        tally_check = os.path.join(mappability_folder,
-                                   (args.genome_assembly + ".tal_" + 
-                                   str(max_len) + ".mer"))
-        search_file = os.path.join(mappability_folder,
-                                   (args.genome_assembly + ".tal_" +
-                                   str(max_len) + ".gtTxt"))
-
-        map_files = [suffix_check, tally_check, search_file]
-        already_mapped = False
+        # map_files = [suffix_check, tally_check, search_file]
+        # already_mapped = False
+        # in_progress = False
         
-        for file in map_files:
-            if _itsa_file(file):
-                already_mapped = True
-            else:
-                already_mapped = False
-        
-        if not already_mapped:
-            pm.timestamp("### Compute mappability information")
-        
-            suffix_cmd_chunks = [
-                ("gt", "suffixerator"),
-                "-dna",
-                "-pl",
-                "-tis",
-                "-suf",
-                "-lcp",
-                "-v",
-                ("-parts", args.parts),
-                ("-db", genome_fq_ln),
-                ("-indexname", suffix_index)
-            ]
-            suffix_cmd = build_command(suffix_cmd_chunks)
-            pm.run(suffix_cmd, suffix_index)
+        # NOTE: potential clash if multiple samples are at this point
+        #       concurrently and try to build these files
+        # for file in map_files:
+        #     if _itsa_file(file):
+        #         already_mapped = True
+        #     elif _itsa_empty_file(file):
+        #         already_mapped = False
+        #         in_progress = True
+        #         err_msg = ("{} appears to be underconstruction by another " \
+        #                    "pipeline run. Confirm the file is complete and " \
+        #                    "restart this sample to resume.")
+        #         pm.fail_pipeline(IOError(err_msg.format(file)))
+        #     else:
+        #         already_mapped = False
 
-            tally_cmd_chunks = [
-                ("gt", "tallymer"),
-                "mkindex",
-                ("-mersize", max_len),
-                ("-minocc", 2),
-                ("-indexname", tally_index),
-                "-counts",
-                "-pl",
-                ("-esa", suffix_index)
-            ]
-            tally_cmd = build_command(tally_cmd_chunks)
-            pm.run(tally_cmd, tally_index)
+        # if not already_mapped:
+        #     pm.debug("Available memory is {}".format(args.mem))
+            
+        #     pm.timestamp("### Compute mappability information")
+        #     # This file is universal to the genome...
+        #     # 45 minutes with 24 GB mem
+        #     suffix_cmd_chunks = [
+        #         ("gt", "suffixerator"),
+        #         "-dna",
+        #         "-pl",
+        #         "-tis",
+        #         "-suf",
+        #         "-lcp",
+        #         "-v",
+        #         "-showprogress",
+        #         #("-parts", args.parts),
+        #         ("-memlimit", str(int(args.mem)*0.95) + "MB"),
+        #         ("-db", genome_fq_ln),
+        #         ("-indexname", suffix_index)
+        #     ]
+        #     suffix_cmd = build_command(suffix_cmd_chunks)
+        #     pm.run(suffix_cmd, suffix_index)
 
-            search_cmd_chunks = [
-                ("gt", "tallymer"),
-                "search",
-                "-output", 
-                ("qseqnum", "qpos"),
-                ("-strand", "fp"),
-                ("-tyr", tally_index),
-                ("-q", genome_fq_ln),
-                (">", search_file)
-            ]
-            search_cmd = build_command(search_cmd_chunks)
-            pm.run(search_cmd, search_file)
+        #     # This is unique to the read_length
+        #     # 30 minutes for 70kmer with 24GB available mem
+        #     tally_cmd_chunks = [
+        #         ("gt", "tallymer"),
+        #         "mkindex",
+        #         ("-mersize", max_len),
+        #         ("-minocc", 2),
+        #         ("-indexname", tally_index),
+        #         "-counts",
+        #         "-v",
+        #         "-pl",
+        #         ("-esa", suffix_index)
+        #     ]
+        #     tally_cmd = build_command(tally_cmd_chunks)
+        #     pm.run(tally_cmd, tally_index)
+
+        #     search_cmd_chunks = [
+        #         ("gt", "tallymer"),
+        #         "search",
+        #         "-output", 
+        #         ("qseqnum", "qpos"),
+        #         ("-strand", "fp"),
+        #         ("-tyr", tally_index),
+        #         ("-q", genome_fq_ln),
+        #         (">", search_file)
+        #     ]
+        #     search_cmd = build_command(search_cmd_chunks)
+        #     pm.run(search_cmd, search_file)
 
         pm.timestamp("### Use seqOutBias to produce bigWig files")
 
-        seqtable = os.path.join(res.genomes, args.genome_assembly,
-            mappability_folder, (args.genome_assembly + ".tbl"))
+        seqtable = os.path.join(signal_folder, (args.genome_assembly + ".tbl"))
 
         seqtable_cmd = build_command([
             (tools.seqoutbias, "seqtable"),
-            genome_fq_ln,
-            str("--tallymer=" + search_file),
-            str("--gt-workdir=" + mappability_folder),  # TODO
-            str("--read-size=" + max_len),
+            res.fasta,
+            str("--tallymer=" + res.search_file),
+            str("--gt-workdir=" + tempdir),
+            str("--read-size=" + str(max_len)),
             str("--out=" + seqtable)
         ])
 
         pm.run(seqtable_cmd, seqtable)
+        pm.clean_add(seqtable)
 
         plus_table = os.path.join(
             signal_folder, (args.genome_assembly + "_plus_tbl.txt"))
