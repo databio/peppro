@@ -92,11 +92,6 @@ def parse_arguments():
                         help="Scale output with seqOutBias when producing"
                              " signal tracks.")
 
-    parser.add_argument("--parts", dest="parts",
-                        default="4",
-                        help="Split suffix tree generation into <n> parts. "
-                             "Increase this value to lower memory use.")
-
     parser.add_argument("--prealignments", default=[], type=str, nargs="+",
                         help="Space-delimited list of reference genomes to "
                              "align to before primary alignment.")
@@ -128,6 +123,11 @@ def parse_arguments():
     parser.add_argument("--intron-name", default=None,
                         dest="intron_name", type=str,
                         help="file_name of intron annotation file.")
+
+    parser.add_argument("--search-file", default=None,
+                        dest="search_file", type=str,
+                        help="file_name of read length matched gt tallymer "
+                             "index search file")
 
     parser.add_argument("--coverage", action='store_true', default=False,
                         dest="coverage",
@@ -1340,112 +1340,81 @@ def _add_resources(args, res, asset_dict=None):
     :param argparse.Namespace args: binding between option name and argument,
         e.g. from parsing command-line options
     :param pm.config.resources res: pipeline manager resources list
-    :param asset_dict list: list of asset dicts to add
+    :param asset_dict list: list of dictionary of assets to add
     """
 
-    # Potential assets
-    check_list = [
-        {"asset_name":"refgene_anno", "seek_key":"refgene_tss", "arg":"TSS_name", "user_arg":"TSS-name"},
-        {"asset_name":"ensembl_gtf", "seek_key":"ensembl_tss", "arg":"ensembl_tss", "user_arg":"pi-tss"},
-        {"asset_name":"ensembl_gtf", "seek_key":"ensembl_gene_body", "arg":"ensembl_gene_body", "user_arg":"pi-body"},
-        {"asset_name":"refgene_anno", "seek_key":"refgene_pre_mRNA", "arg":"pre_name", "user_arg":"pre-name"},
-        {"asset_name":"feat_annotation", "seek_key":"feat_annotation", "arg":"anno_name", "user_arg":"anno-name"},
-        {"asset_name":"refgene_anno", "seek_key":"refgene_exon", "arg":"exon_name", "user_arg":"exon-name"},
-        {"asset_name":"refgene_anno", "seek_key":"refgene_intron", "arg":"intron_name", "user_arg":"intron-name"}
-    ]
     rgc = RGC(select_genome_config(res.get("genome_config")))
 
+    key_errors = []
+    exist_errors = []
+    required_list = []
+
+    # Check that bowtie2 indicies exist for specified prealignments
+    for reference in args.prealignments:
+        for asset in [BT2_IDX_KEY]:
+            try:
+                res[asset] = rgc.get_asset(reference, asset)
+            except KeyError:
+                err_msg = "{} for {} is missing from REFGENIE config file."
+                pm.fail_pipeline(KeyError(err_msg.format(asset, reference)))
+            except:
+                err_msg = "{} for {} does not exist."
+                pm.fail_pipeline(IOError(err_msg.format(asset, reference)))
+
+    # Check specified assets
     if not asset_dict:
-        # REQ
-        refgenie_assets = [
-            ("fasta", "chrom_sizes", "default"),
-            ("fasta", None, "default"),
-            (BT2_IDX_KEY, None, "default")]
-
-        # Loop to find missing assets
-        for asset, seek_key, tag in refgenie_assets:
-            if not seek_key:
-                res[asset] = rgc.get_asset(args.genome_assembly,
-                                           asset, tag_name=tag)
-            else:
-                res[seek_key] = rgc.get_asset(args.genome_assembly, asset, 
-                                              tag_name=tag,
-                                              seek_key=seek_key)
-
-        for reference in args.prealignments:
-            for asset in [BT2_IDX_KEY]:
-                res[asset] = rgc.get_asset(reference, asset)      
-
-        key_errors = []
-        exist_errors = []
-        for item in check_list:
-            asset = item["asset_name"]
-            seek_key = item["seek_key"]
-            arg = item["arg"]
-            user_arg = item["user_arg"]
-
-            if hasattr(args, arg) and getattr(args, arg):
-                res[asset] = os.path.abspath(getattr(args, arg))
-            else:
-                try:
-                    pm.debug("asset key: {}".format(seek_key))
-                    res[seek_key] = rgc.get_asset(args.genome_assembly, asset, 
-                                                  seek_key=seek_key)
-                    pm.debug("res[seek_key]: {}".format(res[seek_key]))
-                except KeyError:
-                    key_errors.append(item)
-                except:
-                    exist_errors.append(item)
-
-        if len(key_errors) > 0 or len(exist_errors) > 0:
-            print("Some assets are not found. You can update your REFGENIE "
-                  "config file or point directly to the file using the noted "
-                  "command-line arguments:")
-
-        if len(key_errors) > 0:
-            print("Assets missing from REFGENIE config file: {}".format(", ".join(key_errors)))
-
-        if len(exist_errors) > 0:
-            print("Assets not existing: {}".format(", ".join(["{asset} (--{user_arg})".format(**x) for x in exist_errors])))
-
         return res, rgc
     else:
-        key_errors = []
-        exist_errors = []
         for item in asset_dict:
             pm.debug("item: {}".format(item))  # DEBUG
             asset = item["asset_name"]
-            seek_key = item["seek_key"]
-            tag = item["tag_name"]
+            seek_key = item["seek_key"] or item["asset_name"]
+            tag = item["tag_name"] or "default"
             arg = item["arg"]
             user_arg = item["user_arg"]
+            req = item["required"]
 
-            if hasattr(args, arg) and getattr(args, arg):
+            if arg and hasattr(args, arg) and getattr(args, arg):
                 res[seek_key] = os.path.abspath(getattr(args, arg))
             else:
                 try:
-                    pm.debug("asset key: {}".format(seek_key))  # DEBUG
-                    pm.debug("asset tag: {}".format(tag))  # DEBUG
+                    pm.debug("{} - {}.{}:{}".format(args.genome_assembly,
+                                                    asset,
+                                                    seek_key,
+                                                    tag))  # DEBUG
                     res[seek_key] = rgc.get_asset(args.genome_assembly,
-                                                  asset,
-                                                  tag_name=tag,
-                                                  seek_key=seek_key)
-                    pm.debug("res[seek_key]: {}".format(res[seek_key]))  # DEBUG
+                                                  asset_name=str(asset),
+                                                  tag_name=str(tag),
+                                                  seek_key=str(seek_key))
                 except KeyError:
                     key_errors.append(item)
+                    if req:
+                        required_list.append(item)
                 except:
                     exist_errors.append(item)
+                    if req:
+                        required_list.append(item)
 
         if len(key_errors) > 0 or len(exist_errors) > 0:
-            print("Some assets are not found. You can update your REFGENIE "
-                  "config file or point directly to the file using the noted "
-                  "command-line arguments:")
+            pm.info("Some assets are not found. You can update your REFGENIE "
+                    "config file or point directly to the file using the noted "
+                    "command-line arguments:")
 
         if len(key_errors) > 0:
-            print("Assets missing from REFGENIE config file: {}".format(", ".join(key_errors)))
+            if required_list:
+                err_msg = "Required assets missing from REFGENIE config file: {}"
+                pm.fail_pipeline(IOError(err_msg.format(", ".join(["{asset_name}.{seek_key}:{tag_name}".format(**x) for x in required_list]))))
+            else:
+                warning_msg = "Optional assets missing from REFGENIE config file: {}"
+                pm.info(warning_msg.format(", ".join(["{asset_name}.{seek_key}:{tag_name}".format(**x) for x in key_errors])))
 
         if len(exist_errors) > 0:
-            print("Assets not existing: {}".format(", ".join(["{asset} (--{user_arg})".format(**x) for x in exist_errors])))
+            if required_list:
+                err_msg = "Required assets not existing: {}"
+                pm.fail_pipeline(IOError(err_msg.format(", ".join(["{asset_name}.{seek_key}:{tag_name} (--{user_arg})".format(**x) for x in required_list]))))
+            else:
+                warning_msg = "Optional assets not existing: {}"
+                pm.info(warning_msg.format(", ".join(["{asset_name}.{seek_key}:{tag_name} (--{user_arg})".format(**x) for x in exist_errors])))
 
         return res, rgc
 
@@ -1501,7 +1470,39 @@ def main():
         pm.fail_pipeline(RuntimeError(err_msg))
 
     # Set up reference resource according to genome prefix.
-    res, rgc = _add_resources(args, res)
+    check_list = [
+        {"asset_name":"fasta", "seek_key":"chrom_sizes",
+         "tag_name":"default", "arg":None, "user_arg":None,
+         "required":True},
+        {"asset_name":"fasta", "seek_key":None,
+         "tag_name":"default", "arg":None, "user_arg":None,
+         "required":True},
+        {"asset_name":BT2_IDX_KEY, "seek_key":None,
+         "tag_name":"default", "arg":None, "user_arg":None,
+         "required":True},
+        {"asset_name":"refgene_anno", "seek_key":"refgene_tss",
+         "tag_name":"default", "arg":"TSS_name", "user_arg":"TSS-name",
+         "required":False},
+        {"asset_name":"ensembl_gtf", "seek_key":"ensembl_tss",
+         "tag_name":"default", "arg":"ensembl_tss", "user_arg":"pi-tss",
+         "required":False},
+        {"asset_name":"ensembl_gtf", "seek_key":"ensembl_gene_body",
+         "tag_name":"default", "arg":"ensembl_gene_body", "user_arg":"pi-body",
+         "required":False},
+        {"asset_name":"refgene_anno", "seek_key":"refgene_pre_mRNA",
+         "tag_name":"default", "arg":"pre_name", "user_arg":"pre-name",
+         "required":False},
+        {"asset_name":"feat_annotation", "seek_key":"feat_annotation",
+         "tag_name":"default", "arg":"anno_name", "user_arg":"anno-name",
+         "required":False},
+        {"asset_name":"refgene_anno", "seek_key":"refgene_exon",
+         "tag_name":"default", "arg":"exon_name", "user_arg":"exon-name",
+         "required":False},
+        {"asset_name":"refgene_anno", "seek_key":"refgene_intron",
+         "tag_name":"default", "arg":"intron_name", "user_arg":"intron-name",
+         "required":False}
+    ]
+    res, rgc = _add_resources(args, res, check_list)
 
     # Adapter file can be set in the config; if left null, we use a default.
     # TODO: use this option or just specify directly the adapter sequence as I do now
@@ -1989,7 +1990,10 @@ def main():
             pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
             mapping_genome_bam = mapping_pe1_bam
 
-    # Determine maximum read length
+    ############################################################################
+    #       Determine maximum read length and add seqOutBias resource          #
+    ############################################################################
+
     if int(args.max_len) != -1:
         max_len = args.max_len
     elif _itsa_file(mapping_genome_bam):
@@ -1999,22 +2003,25 @@ def main():
     else:
         max_len = DEFAULT_MAX_LEN
 
-    # TODO: at this point I can check for seqOutBias required indicies
-    # Can't do it earlier because I haven't determined the read_length of 
-    # of interest for mappability purposes.
+    # At this point we can check for seqOutBias required indicies.
+    # Can't do it earlier because we haven't determined the read_length of 
+    # interest for mappability purposes.
     if args.sob:
+        pm.debug("max_len: {}".format(max_len))  # DEBUG
         if max_len == DEFAULT_MAX_LEN:
             search_asset = [{"asset_name":"tallymer_index",
                              "seek_key":"search_file",
                              "tag_name":"default",
                              "arg":"search_file",
-                             "user_arg":"search-file"}]
+                             "user_arg":"search-file",
+                             "required":True}]
         else:
             search_asset = [{"asset_name":"tallymer_index",
                              "seek_key":"search_file",
                              "tag_name":max_len,
                              "arg":"search_file",
-                             "user_arg":"search-file"}]
+                             "user_arg":"search-file",
+                             "required":True}]
         res, rgc = _add_resources(args, res, search_asset)
 
     ############################################################################
@@ -2792,115 +2799,12 @@ def main():
             print("Skipping signal track production -- Could not call \'wigToBigWig\'.")
             print("Check that you have the required UCSC tools in your PATH.")
     else:
-        # Need to run seqOutBias tallymer separately
-        # Do that in the $GENOMES folder, in a subfolder called "mappability"
-        # Only need to do that once for each read-size of interest
-        # default would be read-size 30 (args.max_len)
         pm.debug("The max read length is {}".format(str(max_len)))
-        # mappability_folder = os.path.join(rgc.genome_folder,
-        #                                   args.genome_assembly,
-        #                                   "mappability",
-        #                                   str(max_len))
-        # ngstk.make_dir(mappability_folder)
 
-        # seqOutBias will use a temporary directory
+        # seqOutBias needs a working directory, we'll make that temporary
         tempdir = tempfile.mkdtemp(dir=signal_folder)
         os.chmod(tempdir, 0o771)
         pm.clean_add(tempdir)
-
-        # Link fasta file
-        # TODO: switch to refgenie fasta asset
-        # genome_fq_ln = os.path.join(mappability_folder,
-        #                             (args.genome_assembly + ".fa"))
-        # if not os.path.isfile(genome_fq_ln):
-        #     cmd = "ln -sf " + genome_fq + " " + genome_fq_ln
-        #     pm.run(cmd, genome_fq_ln)
-
-        # These next two files are universal to all indicies?
-        # suffix_index = os.path.join(mappability_folder,
-        #                             (args.genome_assembly + ".sft"))
-        # suffix_check = os.path.join(mappability_folder,
-        #                             (args.genome_assembly + ".sft.suf"))
-        # tally_index = os.path.join(mappability_folder,
-        #                            (args.genome_assembly + ".tal_" +
-        #                            str(max_len)))
-        # tally_check = os.path.join(mappability_folder,
-        #                            (args.genome_assembly + ".tal_" + 
-        #                            str(max_len) + ".mer"))
-        # search_file = os.path.join(mappability_folder,
-        #                            (args.genome_assembly + ".tal_" +
-        #                            str(max_len) + ".gtTxt"))
-
-        # map_files = [suffix_check, tally_check, search_file]
-        # already_mapped = False
-        # in_progress = False
-        
-        # NOTE: potential clash if multiple samples are at this point
-        #       concurrently and try to build these files
-        # for file in map_files:
-        #     if _itsa_file(file):
-        #         already_mapped = True
-        #     elif _itsa_empty_file(file):
-        #         already_mapped = False
-        #         in_progress = True
-        #         err_msg = ("{} appears to be underconstruction by another " \
-        #                    "pipeline run. Confirm the file is complete and " \
-        #                    "restart this sample to resume.")
-        #         pm.fail_pipeline(IOError(err_msg.format(file)))
-        #     else:
-        #         already_mapped = False
-
-        # if not already_mapped:
-        #     pm.debug("Available memory is {}".format(args.mem))
-            
-        #     pm.timestamp("### Compute mappability information")
-        #     # This file is universal to the genome...
-        #     # 45 minutes with 24 GB mem
-        #     suffix_cmd_chunks = [
-        #         ("gt", "suffixerator"),
-        #         "-dna",
-        #         "-pl",
-        #         "-tis",
-        #         "-suf",
-        #         "-lcp",
-        #         "-v",
-        #         "-showprogress",
-        #         #("-parts", args.parts),
-        #         ("-memlimit", str(int(args.mem)*0.95) + "MB"),
-        #         ("-db", genome_fq_ln),
-        #         ("-indexname", suffix_index)
-        #     ]
-        #     suffix_cmd = build_command(suffix_cmd_chunks)
-        #     pm.run(suffix_cmd, suffix_index)
-
-        #     # This is unique to the read_length
-        #     # 30 minutes for 70kmer with 24GB available mem
-        #     tally_cmd_chunks = [
-        #         ("gt", "tallymer"),
-        #         "mkindex",
-        #         ("-mersize", max_len),
-        #         ("-minocc", 2),
-        #         ("-indexname", tally_index),
-        #         "-counts",
-        #         "-v",
-        #         "-pl",
-        #         ("-esa", suffix_index)
-        #     ]
-        #     tally_cmd = build_command(tally_cmd_chunks)
-        #     pm.run(tally_cmd, tally_index)
-
-        #     search_cmd_chunks = [
-        #         ("gt", "tallymer"),
-        #         "search",
-        #         "-output", 
-        #         ("qseqnum", "qpos"),
-        #         ("-strand", "fp"),
-        #         ("-tyr", tally_index),
-        #         ("-q", genome_fq_ln),
-        #         (">", search_file)
-        #     ]
-        #     search_cmd = build_command(search_cmd_chunks)
-        #     pm.run(search_cmd, search_file)
 
         pm.timestamp("### Use seqOutBias to produce bigWig files")
 

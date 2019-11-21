@@ -36,11 +36,11 @@ pipelines:
       "--max-len": max_len
       "--sob": sob
       "--scale": scale
-      "--parts": parts
       "--prealignments": prealignments
       "--TSS-name": TSS_name
       "--pre-name": pre_name
       "--anno-name": anno_name
+      "--search-file": search_file
       "--coverage": coverage
       "--keep": keep
       "--noFIFO": no_fifo
