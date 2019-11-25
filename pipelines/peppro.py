@@ -154,14 +154,16 @@ def parse_arguments():
     return args
 
 
-def _remove_adapters(args, tools, read2, fq_file, outfolder):
+def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
     """
     A helper function to build a command for adapter removal.
 
     :param argparse.Namespace args: binding between option name and argument,
         e.g. from parsing command-line options
+    :param looper.models.AttributeDict res: binding between resources and
+        value, e.g. for resources used by the pipeline
     :param looper.models.AttributeDict tools: binding between tool name and
-        value, e.g. for tools/resources used by the pipeline
+        value, e.g. for tools used by the pipeline
     :param bool read2: if True, do not deduplicate and do not retain
         intermediate files
     :param str fq_file: path to FASTQ file
@@ -187,6 +189,16 @@ def _remove_adapters(args, tools, read2, fq_file, outfolder):
     fastp_report_html_R2 = fastp_pfx_R2 + ".html"
     fastp_report_json_R2 = fastp_pfx_R2 + ".json"
 
+    if _itsa_file(res.adapters):
+        five_prime = pm.checkprint("awk '/5prime/{getline; print}' " +
+            res.adapters) or "TGGAATTCTCGGGTGCCAAGG"
+        three_prime = pm.checkprint("awk '/3prime/{getline; print}' " +
+            res.adapters) or "GATCGTCGGACTGTAGAACTCTGAAC"
+    else:
+        # Default to the hardcoded values as a fallback
+        five_prime = "TGGAATTCTCGGGTGCCAAGG"
+        three_prime = "GATCGTCGGACTGTAGAACTCTGAAC"
+
     # Setup report output folders
     if args.adapter == "cutadapt":
         ngstk.make_dir(cutadapt_folder)
@@ -209,7 +221,7 @@ def _remove_adapters(args, tools, read2, fq_file, outfolder):
         ]
         if read2:
             adapter_cmd_chunks.extend([
-                ("--adapter_sequence", "GATCGTCGGACTGTAGAACTCTGAAC"),
+                ("--adapter_sequence", three_prime),
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", fastp_report_html_R2),
                 ("--json", fastp_report_json_R2),
@@ -217,7 +229,7 @@ def _remove_adapters(args, tools, read2, fq_file, outfolder):
             ])
         else:
             adapter_cmd_chunks.extend([
-                ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
+                ("--adapter_sequence", five_prime),
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", fastp_report_html),
                 ("--json", fastp_report_json),
@@ -245,7 +257,7 @@ def _remove_adapters(args, tools, read2, fq_file, outfolder):
                 adapter_cmd_chunks.extend([("-j", str(pm.cores))])
             adapter_cmd_chunks.extend([
                     ("-m", (18 + int(float(args.umi_len)))),
-                    ("-a", "GATCGTCGGACTGTAGAACTCTGAAC"),
+                    ("-a", three_prime),
                     fq_file
             ])
         else:
@@ -256,7 +268,7 @@ def _remove_adapters(args, tools, read2, fq_file, outfolder):
                     adapter_cmd_chunks.extend([("-j", str(pm.cores))])
                 adapter_cmd_chunks.extend([
                     ("-m", (18 + int(float(args.umi_len)))),
-                    ("-a", "TGGAATTCTCGGGTGCCAAGG"),
+                    ("-a", five_prime),
                     fq_file,
                     ("-o", noadap_fastq + ")"),
                     (">", cutadapt_report)
@@ -268,7 +280,7 @@ def _remove_adapters(args, tools, read2, fq_file, outfolder):
                     adapter_cmd_chunks.extend([("-j", str(pm.cores))])
                 adapter_cmd_chunks.extend([
                     ("-m", (18 + int(float(args.umi_len)))),
-                    ("-a", "TGGAATTCTCGGGTGCCAAGG"),
+                    ("-a", five_prime),
                     fq_file
                 ])
 
@@ -284,7 +296,7 @@ def _remove_adapters(args, tools, read2, fq_file, outfolder):
         ]
         if read2:
             adapter_cmd_chunks.extend([
-                ("--adapter_sequence", "GATCGTCGGACTGTAGAACTCTGAAC"),
+                ("--adapter_sequence", three_prime),
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", fastp_report_html_R2),
                 ("--json", fastp_report_json_R2),
@@ -292,7 +304,7 @@ def _remove_adapters(args, tools, read2, fq_file, outfolder):
             ])
         else:
             adapter_cmd_chunks.extend([
-                ("--adapter_sequence", "TGGAATTCTCGGGTGCCAAGG"),
+                ("--adapter_sequence", five_prime),
                 ("--length_required", (18 + int(float(args.umi_len)))),
                 ("--html", fastp_report_html),
                 ("--json", fastp_report_json),
@@ -844,14 +856,16 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
     return trim_cmd
 
 
-def _process_fastq(args, tools, read2, fq_file, outfolder):
+def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     """
     A helper function to prepare read files for downstream processing.
 
     :param argparse.Namespace args: binding between option name and argument,
         e.g. from parsing command-line options
+    :param looper.models.AttributeDict res: binding between resources and
+        value, e.g. for resources used by the pipeline
     :param looper.models.AttributeDict tools: binding between tool name and
-        value, e.g. for tools/resources used by the pipeline
+        value, e.g. for tools used by the pipeline
     :param bool read2: if True, do not deduplicate and do not retain
         intermediate files
     :param str fq_file: path to FASTQ file
@@ -883,7 +897,7 @@ def _process_fastq(args, tools, read2, fq_file, outfolder):
     fastp_report_txt = fastp_pfx + ".txt"
     fastp_report_html = fastp_pfx + ".html"
 
-    adapter_command = _remove_adapters(args, tools, read2, fq_file, outfolder)
+    adapter_command = _remove_adapters(args, tools, res, read2, fq_file, outfolder)
     pm.debug("Adapter command: {}".format(adapter_command))
     pm.debug("Read2 status: {}".format(read2))
 
@@ -1503,8 +1517,8 @@ def main():
     res, rgc = _add_resources(args, res, check_list)
 
     # Adapter file can be set in the config; if left null, we use a default.
-    # TODO: use this option or just specify directly the adapter sequence as I do now
-    res.adapters = res.adapters or tool_path("PRO-seq_adapter.fa")
+    # Expects headers to include >5prime and >3prime
+    res.adapters = res.adapters or tool_path("adapter.fa")
 
     param.outfolder = outfolder
 
@@ -1584,6 +1598,7 @@ def main():
     dups_repair_target = os.path.join(fastq_folder, "dups_repaired.flag")
 
     # If single-end, must use cutadapt for plotting purposes
+    # TODO: make this a warning, not a hard switch...
     if not args.paired_end:
         if args.adapter != "cutadapt":
             pm.warning("You set adapter arg to '{}' but you must select 'cutadapt'" 
@@ -1595,14 +1610,15 @@ def main():
     if not pm.get_stat("Aligned_reads") or args.new_start:
         if args.paired_end:
             if args.complexity and args.umi_len > 0:
-                unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, False,
+                unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, res,
+                                                           False,
                                                            untrimmed_fastq1,
                                                            outfolder=param.outfolder)
             else:
-                unmap_fq1 = _process_fastq(args, tools, False,
+                unmap_fq1 = _process_fastq(args, tools, res, False,
                                            untrimmed_fastq1,
                                            outfolder=param.outfolder)
-            unmap_fq2, unmap_fq2_dups = _process_fastq(args, tools, True,
+            unmap_fq2, unmap_fq2_dups = _process_fastq(args, tools, res, True,
                                                        untrimmed_fastq2,
                                                        outfolder=param.outfolder)
 
@@ -1657,13 +1673,14 @@ def main():
                 pm.run([cmd1, cmd2, cmd3], dups_repair_target)
         else:
             if args.complexity and args.umi_len > 0:
-                unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, False,
+                unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, res,
+                                                           False,
                                                            untrimmed_fastq1,
                                                            outfolder=param.outfolder)
                 unmap_fq2 = ""
                 unmap_fq2_dups = ""
             else:
-                unmap_fq1 = _process_fastq(args, tools, False,
+                unmap_fq1 = _process_fastq(args, tools, res, False,
                                            untrimmed_fastq1,
                                            outfolder=param.outfolder)
                 unmap_fq2 = ""
