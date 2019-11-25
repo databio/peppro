@@ -809,12 +809,12 @@ plotTSS <- function(TSSfile) {
     pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-
                                  (nrow(normTSS)/2)),
                                y=score, group=1, colour="black")) +
-        geom_hline(yintercept = 6, linetype = 2,
-                   color = "grey", size = 0.25) +
+        # geom_hline(yintercept = 6, linetype = 2,
+        #            color = "grey", size = 0.25) +
         geom_smooth(method="loess", span=0.02,
                     se=FALSE, colour=lineColor) +
         labs(x = "Distance from TSS (bp)", y = "TSS Enrichment Score")
-    y_max <- max(30, roundUpNice(TSSscore*1.1))
+    y_max <- roundUpNice(TSSscore)
     p <- pre + t1 +
          scale_x_continuous(expand=c(0,0)) +
          scale_y_continuous(expand=c(0,0)) +
