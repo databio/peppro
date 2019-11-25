@@ -441,9 +441,11 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             ])
     else:
         if args.umi_fastp and args.adapter != "fastp":
-            print("To remove UMI intelligently, you must process adapters using 'fastp'")
-            print("Defaulting to removing the first {} "
-                  "bp instead via trimming".format(str(args.umi_len)))
+            pm.info("To remove UMI intelligently, you must process "
+                    "adapters using 'fastp'")
+            if args.umi_len > 0:
+                pm.info("Defaulting to removing the first {} "
+                        "bp instead via trimming".format(str(args.umi_len)))
         if args.trimmer == "seqtk":
             trim_cmd_chunks = [
                 tools.seqtk,
@@ -592,9 +594,11 @@ def _trim_adapter_files(args, tools, fq_file, outfolder):
             ])
     else:
         if args.umi_fastp and args.adapter != "fastp":
-            print("To remove UMI intelligently, you must process adapters using 'fastp'")
-            print("Defaulting to removing the first {} "
-                  "bp instead via trimming".format(str(args.umi_len)))
+            pm.info("To remove UMI intelligently, you must process "
+                    "adapters using 'fastp'")
+            if args.umi_len > 0:
+                pm.info("Defaulting to removing the first {} "
+                        "bp instead via trimming".format(str(args.umi_len)))
         if args.trimmer == "seqtk":
             trim_cmd_chunks = [
                 tools.seqtk,
@@ -757,9 +761,11 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
     # If args.complexity and args.umi_len > 0 retain intermediate files
     else:
         if args.umi_fastp and args.adapter != "fastp":
-            print("To remove UMI intelligently, you must process adapters using 'fastp'")
-            print("Defaulting to removing the first {} "
-                  "bp instead via trimming".format(str(args.umi_len)))
+            pm.info("To remove UMI intelligently, you must process "
+                    "adapters using 'fastp'")
+            if args.umi_len > 0:
+                pm.info("Defaulting to removing the first {} "
+                        "bp instead via trimming".format(str(args.umi_len)))
         if args.trimmer == "seqtk":
             trim_cmd_chunks = [
                 tools.seqtk,
