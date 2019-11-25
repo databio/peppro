@@ -1083,7 +1083,7 @@ mRNAcontamination <- function(rpkm,
                 geom_vline(aes(xintercept=mean(ratio)),
                            color="light gray", linetype="dotted", size=1) +
                 labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                xlim(c(0, ceiling(summary(finite_rpkm$ratio)[5])))
+                xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
         } else {
             plot = base_plot +
                 geom_histogram(col="black", fill=I("transparent")) +
@@ -1109,7 +1109,7 @@ mRNAcontamination <- function(rpkm,
                                  shape = 1, size = 2) +
                     labs(x=name,
                          y=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                    ylim(c(0, ceiling(summary(finite_rpkm$ratio)[5])))
+                    ylim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
         } else {
             plot <- base_plot +
                 stat_boxplot(geom ='errorbar', width = 0.25) +
@@ -1138,7 +1138,7 @@ mRNAcontamination <- function(rpkm,
                              shape = 1, size = 2) +
                 labs(x=name,
                      y=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                ylim(c(0, ceiling(summary(finite_rpkm$ratio)[5])))
+                ylim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
         } else {
             plot <- base_plot +
                 stat_boxplot(geom ='errorbar', width = 0.25) +
@@ -1166,7 +1166,7 @@ mRNAcontamination <- function(rpkm,
                 geom_vline(aes(xintercept=mean(ratio)),
                            color="light gray", linetype="dotted", size=1) +
                 labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                xlim(c(0, ceiling(summary(finite_rpkm$ratio)[5])))
+                xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
         } else {
             plot = base_plot +
                 geom_histogram(col="black", fill=I("transparent")) +
