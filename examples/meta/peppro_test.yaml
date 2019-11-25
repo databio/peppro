@@ -19,7 +19,7 @@ implied_columns:
       adapter: fastp  # Default
       dedup: seqkit   # Default
       trimmer: seqtk  # Default
-      runon: pro      # Default
+      protocol: pro   # Default
       umi_len: 8      # Default
       max_len: 30     # Default
 
@@ -27,7 +27,6 @@ pipeline_args:
 #  peppro.py:
 #    "--sob": null        # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
 #    "--scale": null      # Default is FALSE. Pass flag to scale seqOutBias signal tracks
-#    "--parts": 4         # Default. Split suffix tree generation into <4> parts. Higher number == less memory use.
 #    "--coverage": null   # Default is FALSE. Pass flag to use coverage when producing library complexity plots.
 #    "--keep": null       # Default is FALSE. Pass flag to keep prealignment BAM files.
 #    "--noFIFO": null     # Default is FALSE. Pass flag to NOT use named pipes during prealignments.
