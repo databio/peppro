@@ -2062,7 +2062,6 @@ def main():
     #       Determine maximum read length and add seqOutBias resource          #
     ############################################################################
 
-    # TODO: report this as a stat, so we can pm.get_stat() on re-runs or recoveries
     if not pm.get_stat("Maximum_read_length") or args.new_start:
         if int(args.max_len) != -1:
             max_len = int(args.max_len)
@@ -2073,6 +2072,8 @@ def main():
         else:
             max_len = int(DEFAULT_MAX_LEN)
         pm.report_result("Maximum_read_length", max_len)
+    else:
+        max_len = int(pm.get_stat("Maximum_read_length"))
 
     # At this point we can check for seqOutBias required indicies.
     # Can't do it earlier because we haven't determined the read_length of 
