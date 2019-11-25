@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.8.1"
+__version__ = "0.8.5"
 
 
 from argparse import ArgumentParser
@@ -53,7 +53,7 @@ def parse_arguments():
 
     parser.add_argument("--adapter-tool", dest="adapter",
                         default=DEFAULT_REMOVER, choices=ADAPTER_REMOVERS,
-                        help="Name of adapter removal program."
+                        help="Name of adapter removal program. "
                              "Default: {}".format(DEFAULT_REMOVER))
 
     parser.add_argument("--dedup-tool", dest="dedup",
