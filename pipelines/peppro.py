@@ -138,7 +138,7 @@ def parse_arguments():
                         dest="no_fifo",
                         help="Do NOT use named pipes during prealignments.")
 
-    parser.add_argument("--complexity", action='store_false', default=True,
+    parser.add_argument("--no-complexity", action='store_true', default=False,
                         dest="complexity",
                         help="Disable library complexity calculation (faster).")
 
@@ -237,7 +237,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             ])
         # If calculating library complexity and this is read 1 or single-end,
         # must produce an intermediate file.
-        if args.complexity and args.umi_len > 0 and not read2 :
+        if not args.complexity and args.umi_len > 0 and not read2 :
             adapter_cmd_chunks.extend([("-o", noadap_fastq)])
         else:
             adapter_cmd_chunks.extend([("--stdout")])
@@ -261,7 +261,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
                     fq_file
             ])
         else:
-            if args.complexity and args.umi_len > 0:
+            if not args.complexity and args.umi_len > 0:
                 adapter_cmd_chunks = ["(" + tools.cutadapt]
                 # old versions of cutadapt can not use multiple cores
                 if cut_version >= 1.15:
@@ -312,7 +312,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             ])
         # If calculating library complexity and this is read 1 or single-end,
         # must produce a physical output file.
-        if args.complexity and not read2:
+        if not args.complexity and not read2:
             adapter_cmd_chunks.extend([("-o", noadap_fastq)])
         else:
             adapter_cmd_chunks.extend([("--stdout")])
@@ -345,7 +345,7 @@ def _deduplicate(args, tools, fq_file, outfolder):
     dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
 
     # Create deduplication command(s).
-    if args.complexity and args.umi_len > 0:
+    if not args.complexity and args.umi_len > 0:
         if args.dedup == "seqkit":
             dedup_cmd_chunks = [
                 (tools.seqkit, "rmdup"),
@@ -354,7 +354,7 @@ def _deduplicate(args, tools, fq_file, outfolder):
                 "--ignore-case",
                 "-o"           
             ]
-            if args.complexity:
+            if not args.complexity:
                 dedup_cmd_chunks.extend([
                     (dedup_fastq, noadap_fastq)
                 ])
@@ -815,7 +815,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 ]
             else:
                 trim_cmd_chunks = []
-    # If args.complexity and args.umi_len > 0 retain intermediate files
+    # if not args.complexity and args.umi_len > 0 retain intermediate files
     elif args.trimmer == "seqtk":
         trim_cmd_chunks = [
             tools.seqtk,
@@ -949,7 +949,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
 
     if read2:
         trim_command = _trim_pipes(args, tools, True, fq_file, outfolder)
-    elif args.complexity and args.umi_len > 0:
+    elif not args.complexity and args.umi_len > 0:
         deduplicate_command = _deduplicate(args, tools, fq_file, outfolder)
         pm.debug("Dedup command: {}".format(deduplicate_command))
         trim_command = _trim_adapter_files(args, tools, fq_file, outfolder)
@@ -1018,7 +1018,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pm.run(cp_cmd, trimmed_dups_fastq_R2)
         return trimmed_fastq_R2, trimmed_dups_fastq_R2
     else:
-        if args.complexity and args.umi_len > 0:
+        if not args.complexity and args.umi_len > 0:
             # This trim command DOES need the adapter file...
             pm.debug("\ntrim_command1: {} + {}\n".format(adapter_command, trim_command))
             pm.run([adapter_command, trim_command], processed_fastq,
@@ -1659,7 +1659,7 @@ def main():
     # it's a --new-start
     if not pm.get_stat("Aligned_reads") or args.new_start:
         if args.paired_end:
-            if args.complexity and args.umi_len > 0:
+            if not args.complexity and args.umi_len > 0:
                 unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, res,
                                                            False,
                                                            untrimmed_fastq1,
@@ -1722,7 +1722,7 @@ def main():
                 cmd3 = ("touch dups_repaired.flag")
                 pm.run([cmd1, cmd2, cmd3], dups_repair_target)
         else:
-            if args.complexity and args.umi_len > 0:
+            if not args.complexity and args.umi_len > 0:
                 unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, res,
                                                            False,
                                                            untrimmed_fastq1,
@@ -1772,7 +1772,7 @@ def main():
             print("Prealignment assemblies: " + str(args.prealignments))
             # Loop through any prealignment references and map to them sequentially
             for reference in args.prealignments:
-                if args.complexity and args.umi_len > 0:
+                if not args.complexity and args.umi_len > 0:
                     if args.no_fifo:
                         unmap_fq1, unmap_fq2 = _align_with_bt2(
                             args, tools, args.paired_end, False, unmap_fq1,
@@ -1906,7 +1906,7 @@ def main():
         cmd += " -T " + tempdir
         cmd += " -o " + mapping_genome_bam_temp
 
-        if args.complexity and args.umi_len > 0:
+        if not args.complexity and args.umi_len > 0:
             # check input for zipped or not
             if pypiper.is_gzipped_fastq(unmap_fq1_dups):
                 cmd = (ngstk.ziptool + " -d " + (unmap_fq1_dups + ".gz"))
@@ -1939,7 +1939,7 @@ def main():
                 " -U " + failQC_genome_bam + " ")
         cmd2 += mapping_genome_bam_temp + " > " + mapping_genome_bam
 
-        if args.complexity and args.umi_len > 0:
+        if not args.complexity and args.umi_len > 0:
             cmd2_dups = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
                 " -U " + failQC_genome_bam_dups + " ")
             cmd2_dups += mapping_genome_bam_temp_dups + " > " + mapping_genome_bam_dups
@@ -1980,7 +1980,7 @@ def main():
                                                      mapping_genome_bam),
                container=pm.container)
 
-        if args.complexity and args.umi_len > 0:
+        if not args.complexity and args.umi_len > 0:
             pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups,
                    container=pm.container)
 
@@ -2001,7 +2001,7 @@ def main():
             pm.run(cmd, temp_mapping_index)
             pm.clean_add(temp_mapping_index)
 
-            if args.complexity and args.umi_len > 0:
+            if not args.complexity and args.umi_len > 0:
                 cmd_dups = tools.samtools + " index " + mapping_genome_bam_temp_dups
                 pm.run(cmd_dups, temp_mapping_index_dups)
                 pm.clean_add(temp_mapping_index_dups)
@@ -2115,7 +2115,7 @@ def main():
         QC_folder, args.sample_name + "_preseq_plot.png")
 
     if not _itsa_file(preseq_plot) or args.new_start:
-        if args.complexity and args.umi_len > 0:
+        if not args.complexity and args.umi_len > 0:
             if os.path.exists(mapping_genome_bam_temp_dups):
                 if not os.path.exists(temp_mapping_index_dups):
                     cmd = tools.samtools + " index " + mapping_genome_bam_temp_dups
