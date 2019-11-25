@@ -66,10 +66,6 @@ def parse_arguments():
                         help="Name of read trimming program. "
                             "Default: {}".format(DEFAULT_TRIMMER))
 
-    parser.add_argument("--umi-fastp", action='store_true', default=False,
-                        help="Use fastp to remove UMIs. Default: Use "
-                        "tool selected for 'trimmer' option.")
-    
     parser.add_argument("--umi-len", 
                         default=DEFAULT_UMI_LEN, type=int,
                         help="Specify the length of the UMI."
@@ -409,7 +405,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
     if args.trimmer == "fastx":
         encoding = _guess_encoding(fq_file)
 
-    if args.umi_fastp and args.adapter == "fastp":
+    if args.adapter == "fastp":
+        # Remove UMI by specifying location of UMI
         trim_cmd_chunks = [
             tools.fastp,
             ("--thread", str(pm.cores)),
@@ -424,6 +421,7 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             (tools.seqtk, "trimfq")
         ]
 
+        # Trim to max length if specified
         if args.max_len != -1:
             trim_cmd_chunks.extend([("-L", args.max_len)])
 
@@ -439,89 +437,86 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
                 ("-r", "-"),
                 (">", processed_fastq)
             ])
-    else:
-        if args.umi_fastp and args.adapter != "fastp":
-            pm.info("To remove UMI intelligently, you must process "
-                    "adapters using 'fastp'")
-            if args.umi_len > 0:
-                pm.info("Defaulting to removing the first {} "
-                        "bp instead via trimming".format(str(args.umi_len)))
-        if args.trimmer == "seqtk":
-            trim_cmd_chunks = [
+    elif args.trimmer == "seqtk":
+        # Remove UMI by blind trimming
+        trim_cmd_chunks = [
+            tools.seqtk,
+            "trimfq",
+            ("-b", str(args.umi_len))
+        ]
+
+        # Trim to max length if specified
+        if args.max_len != -1:
+            trim_cmd_chunks.extend([("-L", str(args.max_len))])
+
+        trim_cmd_chunks.extend([dedup_fastq])
+
+        # Do not reverse complement for GRO-seq
+        if args.protocol.lower() in RUNON_SOURCE_GRO:
+            trim_cmd_chunks.extend([(">", processed_fastq)])                           
+        else:
+            trim_cmd_chunks.extend([
+                "|",
                 tools.seqtk,
-                "trimfq",
-                ("-b", str(args.umi_len))
-            ]
+                ("seq", "-r"),
+                ("-", ">"),
+                processed_fastq
+            ])
+    elif args.trimmer == "fastx":
+        trim_tool = tools.fastx + "_trimmer"
+        rc_tool = tools.fastx + "_reverse_complement"
+        trim_cmd_chunks = [trim_tool]
 
-            if args.max_len != -1:
-                trim_cmd_chunks.extend([("-L", str(args.max_len))])
+        if encoding == "Illumina-1.8":
+            trim_cmd_chunks.extend([
+                ("-Q", str(33))
+            ])
 
-            trim_cmd_chunks.extend([dedup_fastq])
+        # Remove UMI blindly
+        trim_cmd_chunks.extend([("-f", str(int(float(args.umi_len)) + 1))])
 
-            # Do not reverse complement for GRO-seq
-            if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([(">", processed_fastq)])                           
-            else:
-                trim_cmd_chunks.extend([
-                    "|",
-                    tools.seqtk,
-                    ("seq", "-r"),
-                    ("-", ">"),
-                    processed_fastq
-                ])
-        elif args.trimmer == "fastx":
-            trim_tool = tools.fastx + "_trimmer"
-            rc_tool = tools.fastx + "_reverse_complement"
-            trim_cmd_chunks = [trim_tool]
+        # Trim to max length if specified
+        if args.max_len != -1:
+            trim_cmd_chunks.extend([
+                ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+            ])
 
+        trim_cmd_chunks.extend([("-i", dedup_fastq)])
+
+        # Do not reverse complement if GRO-seq
+        if args.protocol.lower() in RUNON_SOURCE_GRO:
+            trim_cmd_chunks.extend([("-o", processed_fastq)])                        
+        else:
+            trim_cmd_chunks.extend([("|", rc_tool)])
             if encoding == "Illumina-1.8":
                 trim_cmd_chunks.extend([
                     ("-Q", str(33))
                 ])
+            trim_cmd_chunks.extend([("-o", processed_fastq)])
+    else:
+        # Default to seqtk
+        trim_cmd_chunks = [
+            tools.seqtk,
+            "trimfq",
+            ("-b", str(args.umi_len))
+        ]
 
-            trim_cmd_chunks.extend([("-f", str(int(float(args.umi_len)) + 1))])
+        if args.max_len != -1:
+            trim_cmd_chunks.extend([("-L", str(args.max_len))])
 
-            if args.max_len != -1:
-                trim_cmd_chunks.extend([
-                    ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
-                ])
+        trim_cmd_chunks.extend([dedup_fastq])
 
-            trim_cmd_chunks.extend([("-i", dedup_fastq)])
-
-            # Do not reverse complement if GRO-seq
-            if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([("-o", processed_fastq)])                        
-            else:
-                trim_cmd_chunks.extend([("|", rc_tool)])
-                if encoding == "Illumina-1.8":
-                    trim_cmd_chunks.extend([
-                        ("-Q", str(33))
-                    ])
-                trim_cmd_chunks.extend([("-o", processed_fastq)])
+        # Do not reverse complement for GRO-seq
+        if args.protocol.lower() in RUNON_SOURCE_GRO:
+            trim_cmd_chunks.extend([(">", processed_fastq)])                           
         else:
-            # Default to seqtk
-            trim_cmd_chunks = [
+            trim_cmd_chunks.extend([
+                "|",
                 tools.seqtk,
-                "trimfq",
-                ("-b", str(args.umi_len))
-            ]
-
-            if args.max_len != -1:
-                trim_cmd_chunks.extend([("-L", str(args.max_len))])
-
-            trim_cmd_chunks.extend([dedup_fastq])
-
-            # Do not reverse complement for GRO-seq
-            if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([(">", processed_fastq)])                           
-            else:
-                trim_cmd_chunks.extend([
-                    "|",
-                    tools.seqtk,
-                    ("seq", "-r"),
-                    ("-", ">"),
-                    processed_fastq
-                ])
+                ("seq", "-r"),
+                ("-", ">"),
+                processed_fastq
+            ])
 
     trim_cmd = build_command(trim_cmd_chunks)
     pm.debug("trim_deduplicated_cmd: {}".format(build_command(trim_cmd_chunks)))
@@ -548,8 +543,6 @@ def _trim_adapter_files(args, tools, fq_file, outfolder):
     fastq_folder = os.path.join(outfolder, "fastq")
     noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
-    #trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
-    #processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
 
     fastp_folder = os.path.join(outfolder, "fastp") 
     umi_report = os.path.join(fastp_folder, sname + "_R1_rmUmi.html")
@@ -559,8 +552,8 @@ def _trim_adapter_files(args, tools, fq_file, outfolder):
     if args.trimmer == "fastx":
         encoding = _guess_encoding(fq_file)
     
-    if args.umi_fastp and args.adapter == "fastp":
-        # Use FastP
+    if args.adapter == "fastp":
+        # Remove UMI and specify location of UMI
         # Still requires seqtk for reverse complementation
         trim_cmd_chunks = [
             tools.fastp,
@@ -576,6 +569,7 @@ def _trim_adapter_files(args, tools, fq_file, outfolder):
             (tools.seqtk, "trimfq")
         ]
 
+        # Trim tp max length if specified
         if args.max_len != -1:
             trim_cmd_chunks.extend([("-L", args.max_len)])
 
@@ -592,92 +586,95 @@ def _trim_adapter_files(args, tools, fq_file, outfolder):
                 ("-r", "-"),
                 (">", trimmed_fastq)
             ])
-    else:
-        if args.umi_fastp and args.adapter != "fastp":
-            pm.info("To remove UMI intelligently, you must process "
-                    "adapters using 'fastp'")
-            if args.umi_len > 0:
-                pm.info("Defaulting to removing the first {} "
-                        "bp instead via trimming".format(str(args.umi_len)))
-        if args.trimmer == "seqtk":
-            trim_cmd_chunks = [
-                tools.seqtk,
-                "trimfq",
-                ("-b", str(args.umi_len))
-            ]
-            if args.max_len != -1:
-                trim_cmd_chunks.extend([
-                    ("-L", str(args.max_len))
-                ])
-            
-            trim_cmd_chunks.extend([noadap_fastq])
-            if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([
-                    (">", trimmed_fastq)
-                ])
-            else:
-                trim_cmd_chunks.extend([
-                    "|",
-                    (tools.seqtk, "seq"),
-                    ("-r", "-"),
-                    (">", trimmed_fastq)
-                ])
-        elif args.trimmer == "fastx":
-            trim_tool = tools.fastx + "_trimmer"
-            rc_tool = tools.fastx + "_reverse_complement"
-            trim_cmd_chunks = [trim_tool]
+    elif args.trimmer == "seqtk":
+        # Remove UMI blindly by position
+        trim_cmd_chunks = [
+            tools.seqtk,
+            "trimfq",
+            ("-b", str(args.umi_len))
+        ]
+
+        # Trim tp max length if specified
+        if args.max_len != -1:
+            trim_cmd_chunks.extend([
+                ("-L", str(args.max_len))
+            ])
+        
+        trim_cmd_chunks.extend([noadap_fastq])
+        if args.protocol.lower() in RUNON_SOURCE_GRO:
+            trim_cmd_chunks.extend([
+                (">", trimmed_fastq)
+            ])
+        else:
+            trim_cmd_chunks.extend([
+                "|",
+                (tools.seqtk, "seq"),
+                ("-r", "-"),
+                (">", trimmed_fastq)
+            ])
+    elif args.trimmer == "fastx":
+        trim_tool = tools.fastx + "_trimmer"
+        rc_tool = tools.fastx + "_reverse_complement"
+        trim_cmd_chunks = [trim_tool]
+        if encoding == "Illumina-1.8":
+            trim_cmd_chunks.extend([
+                ("-Q", str(33))
+            ])
+
+        # Remove UMI blindly by position only
+        trim_cmd_chunks.extend([
+            ("-f", str(int(float(args.umi_len)) + 1))
+        ])
+
+        # Trim tp max length if specified
+        if args.max_len != -1:
+            trim_cmd_chunks.extend([
+                ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+            ])
+
+        # Need undeduplicated results for complexity calculation
+        trim_cmd_chunks.extend([
+            ("-i", noadap_fastq)
+        ])
+        if args.protocol.lower() in RUNON_SOURCE_GRO:
+            trim_cmd_chunks.extend([
+                ("-o", trimmed_fastq)
+            ])
+        else:
             if encoding == "Illumina-1.8":
                 trim_cmd_chunks.extend([
                     ("-Q", str(33))
                 ])
             trim_cmd_chunks.extend([
-                ("-f", str(int(float(args.umi_len)) + 1))
+                ("-o", trimmed_fastq)
             ])
-            if args.max_len != -1:
-                trim_cmd_chunks.extend([
-                    ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
-                ])
-            # Need undeduplicated results for complexity calculation
-            
-            trim_cmd_chunks.extend([
-                ("-i", noadap_fastq)
-            ])
-            if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([
-                    ("-o", trimmed_fastq)
-                ])
-            else:
-                if encoding == "Illumina-1.8":
-                    trim_cmd_chunks.extend([
-                        ("-Q", str(33))
-                    ])
-                trim_cmd_chunks.extend([
-                    ("-o", trimmed_fastq)
-                ])
+    else:
         # Default to seqtk
+        # Remove UMI blindly by position only
+        trim_cmd_chunks = [
+            tools.seqtk,
+            "trimfq",
+            ("-b", str(args.umi_len))
+        ]
+
+        # Trim to max length if specified
+        if args.max_len != -1:
+            trim_cmd_chunks.extend([
+                ("-L", str(args.max_len))
+            ])
+
+        trim_cmd_chunks.extend([noadap_fastq])
+        if args.protocol.lower() in RUNON_SOURCE_GRO:
+            trim_cmd_chunks.extend([
+                (">", trimmed_fastq)
+            ])
         else:
-            trim_cmd_chunks = [
-                tools.seqtk,
-                "trimfq",
-                ("-b", str(args.umi_len))
-            ]
-            if args.max_len != -1:
-                trim_cmd_chunks.extend([
-                    ("-L", str(args.max_len))
-                ])
-            
-            trim_cmd_chunks.extend([noadap_fastq])
-            if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([
-                    (">", trimmed_fastq)
-                ])
-            else:
-                trim_cmd_chunks.extend([
-                    "|",
-                    (tools.seqtk, "seq"),
-                    ("-r", "-"),
-                    (">", trimmed_fastq)
-                ])
+            trim_cmd_chunks.extend([
+                "|",
+                (tools.seqtk, "seq"),
+                ("-r", "-"),
+                (">", trimmed_fastq)
+            ])
 
     trim_cmd = build_command(trim_cmd_chunks)
     pm.debug("trim_cmd_nodedup: {}".format(build_command(trim_cmd_chunks)))
@@ -721,8 +718,9 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
     if args.trimmer == "fastx":
         encoding = _guess_encoding(fq_file)
 
-    if args.umi_fastp and args.adapter == "fastp":
+    if args.adapter == "fastp":
         # There are no intermediate files, just pipes
+        # Remove UMI
         trim_cmd_chunks = [
             tools.fastp,
             ("--thread", str(pm.cores)),
@@ -743,6 +741,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             (tools.seqtk, "trimfq")
         ])
 
+        # Trim to max length if specified
         if args.max_len != -1:
             trim_cmd_chunks.extend([("-L", args.max_len)])
 
@@ -759,91 +758,84 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 (">", processed_fastq)
             ])
     # If args.complexity and args.umi_len > 0 retain intermediate files
-    else:
-        if args.umi_fastp and args.adapter != "fastp":
-            pm.info("To remove UMI intelligently, you must process "
-                    "adapters using 'fastp'")
-            if args.umi_len > 0:
-                pm.info("Defaulting to removing the first {} "
-                        "bp instead via trimming".format(str(args.umi_len)))
-        if args.trimmer == "seqtk":
-            trim_cmd_chunks = [
+    elif args.trimmer == "seqtk":
+        trim_cmd_chunks = [
+            tools.seqtk,
+            "trimfq"
+        ]
+
+        if read2:
+            trim_cmd_chunks.extend([("-e", str(args.umi_len))])
+        else:
+            trim_cmd_chunks.extend([("-b", str(args.umi_len))])
+            if args.max_len != -1:
+                trim_cmd_chunks.extend([("-L", str(args.max_len))])
+
+        trim_cmd_chunks.extend(["-"])
+
+        # Do not reverse complement for GRO-seq
+        if args.protocol.lower() in RUNON_SOURCE_GRO:
+            trim_cmd_chunks.extend([(">", processed_fastq)])                           
+        else:
+            trim_cmd_chunks.extend([
+                "|",
                 tools.seqtk,
-                "trimfq"
-            ]
+                ("seq", "-r"),
+                ("-", ">"),
+                processed_fastq
+            ])
+    elif args.trimmer == "fastx":
+        trim_tool = tools.fastx + "_trimmer"
+        rc_tool = tools.fastx + "_reverse_complement"
+        trim_cmd_chunks = [trim_tool]
 
-            if read2:
-                trim_cmd_chunks.extend([("-e", str(args.umi_len))])
-            else:
-                trim_cmd_chunks.extend([("-b", str(args.umi_len))])
-                if args.max_len != -1:
-                    trim_cmd_chunks.extend([("-L", str(args.max_len))])
+        if encoding == "Illumina-1.8":
+            trim_cmd_chunks.extend([("-Q", str(33))])
 
-            trim_cmd_chunks.extend(["-"])
-
-            # Do not reverse complement for GRO-seq
-            if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([(">", processed_fastq)])                           
-            else:
+        if read2:
+            trim_cmd_chunks.extend([("-t", str(int(float(args.umi_len))))])
+        else:
+            trim_cmd_chunks.extend([("-f", str(int(float(args.umi_len)) + 1))])
+            if args.max_len != -1:
                 trim_cmd_chunks.extend([
-                    "|",
-                    tools.seqtk,
-                    ("seq", "-r"),
-                    ("-", ">"),
-                    processed_fastq
+                    ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
                 ])
-        elif args.trimmer == "fastx":
-            trim_tool = tools.fastx + "_trimmer"
-            rc_tool = tools.fastx + "_reverse_complement"
-            trim_cmd_chunks = [trim_tool]
 
+        # Do not reverse complement for GRO-seq
+        if args.protocol.lower() in RUNON_SOURCE_GRO:
+            trim_cmd_chunks.extend([("-o", processed_fastq)])                        
+        else:
+            trim_cmd_chunks.extend([("|", rc_tool)])
             if encoding == "Illumina-1.8":
                 trim_cmd_chunks.extend([("-Q", str(33))])
+            trim_cmd_chunks.extend([("-o", processed_fastq)])
+    else:
+        # Default to seqtk
+        trim_cmd_chunks = [
+            tools.seqtk,
+            "trimfq"
+        ]
 
-            if read2:
-                trim_cmd_chunks.extend([("-t", str(int(float(args.umi_len))))])
-            else:
-                trim_cmd_chunks.extend([("-f", str(int(float(args.umi_len)) + 1))])
-                if args.max_len != -1:
-                    trim_cmd_chunks.extend([
-                        ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
-                    ])
-
-            # Do not reverse complement for GRO-seq
-            if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([("-o", processed_fastq)])                        
-            else:
-                trim_cmd_chunks.extend([("|", rc_tool)])
-                if encoding == "Illumina-1.8":
-                    trim_cmd_chunks.extend([("-Q", str(33))])
-                trim_cmd_chunks.extend([("-o", processed_fastq)])
+        if read2:
+            trim_cmd_chunks.extend([("-e", str(args.umi_len))])
         else:
-            # Default to seqtk
-            trim_cmd_chunks = [
+            trim_cmd_chunks.extend([("-b", str(args.umi_len))])
+            if args.max_len != -1:
+                trim_cmd_chunks.extend([("-L", str(args.max_len))])
+
+        trim_cmd_chunks.extend(["-"])
+
+        # Do not reverse complement for GRO-seq
+        if args.protocol.lower() in RUNON_SOURCE_GRO:
+            trim_cmd_chunks.extend([(">", processed_fastq)])                           
+        else:
+            trim_cmd_chunks.extend([
+                "|",
                 tools.seqtk,
-                "trimfq"
-            ]
-
-            if read2:
-                trim_cmd_chunks.extend([("-e", str(args.umi_len))])
-            else:
-                trim_cmd_chunks.extend([("-b", str(args.umi_len))])
-                if args.max_len != -1:
-                    trim_cmd_chunks.extend([("-L", str(args.max_len))])
-
-            trim_cmd_chunks.extend(["-"])
-
-            # Do not reverse complement for GRO-seq
-            if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([(">", processed_fastq)])                           
-            else:
-                trim_cmd_chunks.extend([
-                    "|",
-                    tools.seqtk,
-                    ("seq", "-r"),
-                    ("-", ">"),
-                    processed_fastq
-                ])
+                ("seq", "-r"),
+                ("-", ">"),
+                processed_fastq
+            ])
 
     trim_cmd = build_command(trim_cmd_chunks)
     pm.debug("trim_pipes_cmd: {}".format(build_command(trim_cmd_chunks)))

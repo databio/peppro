@@ -31,7 +31,6 @@ pipelines:
       "--adapter": adapter
       "--dedup": dedup
       "--trimmer": trimmer
-      "--umi": umi
       "--umi-len": umi_len
       "--max-len": max_len
       "--sob": sob
