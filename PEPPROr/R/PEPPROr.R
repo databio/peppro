@@ -1038,7 +1038,8 @@ fancyNumbers <- function(n){
 #' @export
 mRNAcontamination <- function(rpkm,
                               name='mRNA contamination ratios',
-                              raw=FALSE) {
+                              raw=FALSE,
+                              type=c("histogram", "boxplot", "violin")) {
     if (exists(rpkm)) {
         RPKM <- data.table(get(rpkm))
     } else if (file.exists(rpkm)) {
@@ -1051,28 +1052,66 @@ mRNAcontamination <- function(rpkm,
 
     finite_rpkm <- RPKM[is.finite(RPKM$ratio),]
 
+    plot_theme <- theme_classic(base_size=14) +
+              theme(axis.line = element_line(size = 0.5),
+                    panel.grid.major = element_blank(),
+                    panel.grid.minor = element_blank(),
+                    aspect.ratio = 1,
+                    panel.border = element_rect(colour = "black",
+                                                fill=NA, size=0.5))
+
     if (raw) {
-        q <- ggplot(data = finite_rpkm, 
-                    aes(x="", y=(ratio))) +
-                stat_boxplot(geom ='errorbar', width = 0.25) +
-                geom_boxplot(width = 0.25,
-                             outlier.color='red',
-                             outlier.shape=1) +
-                stat_summary(fun.y = "mean", geom = "point",
-                             shape = 1, size = 2) +
-                labs(x=name,
-                     y=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                ylim(c(0, ceiling(summary(finite_rpkm$ratio)[5]))) +
-                theme_classic(base_size=14) +
-                theme(axis.line = element_line(size = 0.5)) +
-                theme(panel.grid.major = element_blank(),
-                      panel.grid.minor = element_blank(),
-                      aspect.ratio = 1,
-                      panel.border = element_rect(colour = "black",
-                                                  fill=NA, size=0.5))
+        if (type == "histogram") {
+            base_plot <- ggplot(data = finite_rpkm,  aes(ratio))
+        } else {
+            base_plot <- ggplot(data = finite_rpkm,  aes(x="", y=(ratio)))
+        }
     } else {
-        q <- ggplot(data = finite_rpkm, 
-                    aes(x="", y=log10(ratio))) +
+        if (type == "histogram") {
+            base_plot <- ggplot(data = finite_rpkm, aes(log10(ratio)))
+        } else {
+            base_plot <- ggplot(data = finite_rpkm, aes(x="", y=log10(ratio)))
+        }
+    }
+
+    if (type == "histogram") {
+        if (raw) {
+            plot = base_plot +
+                geom_histogram(col="black", fill=I("transparent")) +
+                geom_vline(aes(xintercept=median(ratio)),
+                           color="gray", linetype="dashed", size=1) +
+                geom_vline(aes(xintercept=mean(ratio)),
+                           color="light gray", linetype="dotted", size=1) +
+                labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                xlim(c(0, ceiling(summary(finite_rpkm$ratio)[5])))
+        } else {
+            plot = base_plot +
+                geom_histogram(col="black", fill=I("transparent")) +
+                geom_vline(aes(xintercept=median(log10(ratio))),
+                           color="gray", linetype="dashed", size=1) +
+                geom_vline(aes(xintercept=mean(log10(ratio))),
+                           color="light gray", linetype="dotted", size=1) +
+                labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                scale_x_log10(limits = c(0.001, 50),
+                              expand = expand_scale(mult = c(0, 0)),
+                              labels=fancyNumbers,
+                              breaks=prettyLogs) +
+                annotation_logticks(sides = c("rl"))
+        }
+    } else if (type == "boxplot") {
+        if (raw) {
+            plot = base_plot +
+                    stat_boxplot(geom ='errorbar', width = 0.25) +
+                    geom_boxplot(width = 0.25,
+                                 outlier.color='red',
+                                 outlier.shape=1) +
+                    stat_summary(fun.y = "mean", geom = "point",
+                                 shape = 1, size = 2) +
+                    labs(x=name,
+                         y=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                    ylim(c(0, ceiling(summary(finite_rpkm$ratio)[5])))
+        } else {
+            plot <- base_plot +
                 stat_boxplot(geom ='errorbar', width = 0.25) +
                 geom_boxplot(width = 0.25,
                              outlier.color='red',
@@ -1086,30 +1125,75 @@ mRNAcontamination <- function(rpkm,
                               breaks=prettyLogs) +
                 annotation_logticks(sides = c("rl")) +
                 labs(x=name,
-                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                theme_classic(base_size=14) +
-                theme(axis.line = element_line(size = 0.5)) +
-                theme(panel.grid.major = element_blank(),
-                      panel.grid.minor = element_blank(),
-                      aspect.ratio = 1,
-                      panel.border = element_rect(colour = "black",
-                                                  fill=NA, size=0.5))
-    }
-
-    label1 <- c(paste("'median'[log[10]]", ":~",
-                round(median(log10((finite_rpkm$ratio))), 2)),
-                paste("'median'[raw]", ":",
-                round(median(finite_rpkm$ratio), 2)))
-
-    max_y  <- layer_scales(q)$y$range$range[2]
-
-    if (raw) {
-        q <- q + annotate("text", x = 0.5, y = c(max_y, 0.95*max_y),
-                      hjust=0, vjust=1, label = label1, parse=TRUE)
+                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene))
+        }
+    } else if (type == "violin") {
+        if (raw) {
+            plot = base_plot +
+                stat_boxplot(geom ='errorbar', width = 0.25) +
+                geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
+                            linetype="dashed") +
+                geom_violin(width=0.25, fill="transparent", draw_quantiles = 0.5) +
+                stat_summary(fun.y = "mean", geom = "point",
+                             shape = 1, size = 2) +
+                labs(x=name,
+                     y=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                ylim(c(0, ceiling(summary(finite_rpkm$ratio)[5])))
+        } else {
+            plot <- base_plot +
+                stat_boxplot(geom ='errorbar', width = 0.25) +
+                geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
+                            linetype="dashed") +
+                geom_violin(width=0.25, fill="transparent", draw_quantiles = 0.5) +
+                stat_summary(fun.data = n_fun, geom = "text", hjust = 0.5) +
+                stat_summary(fun.y = "mean", geom = "point",
+                             shape = 1, size = 2) +
+                scale_y_log10(limits = c(0.001, 50),
+                              expand = expand_scale(mult = c(0, 0)),
+                              labels=fancyNumbers,
+                              breaks=prettyLogs) +
+                annotation_logticks(sides = c("rl")) +
+                labs(x=name,
+                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene))
+        }
     } else {
-        q <- q + annotate("text", x = 0.5, y = c(10^max_y, 10^max_y-10),
-                      hjust=0, vjust=1, label = label1, parse=TRUE)
+        # Default to histogram
+        if (raw) {
+            plot = base_plot +
+                geom_histogram(col="black", fill=I("transparent")) +
+                geom_vline(aes(xintercept=median(ratio)),
+                           color="gray", linetype="dashed", size=1) +
+                geom_vline(aes(xintercept=mean(ratio)),
+                           color="light gray", linetype="dotted", size=1) +
+                labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                xlim(c(0, ceiling(summary(finite_rpkm$ratio)[5])))
+        } else {
+            plot = base_plot +
+                geom_histogram(col="black", fill=I("transparent")) +
+                geom_vline(aes(xintercept=median(log10(ratio))),
+                           color="gray", linetype="dashed", size=1) +
+                geom_vline(aes(xintercept=mean(log10(ratio))),
+                           color="light gray", linetype="dotted", size=1) +
+                labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                scale_x_log10(limits = c(0.001, 50),
+                              expand = expand_scale(mult = c(0, 0)),
+                              labels=fancyNumbers,
+                              breaks=prettyLogs) +
+                annotation_logticks(sides = c("rl"))
+        }
     }
+
+
+    label1 <- paste("'median'[log[10]]", ":~", round(median(log10((finite_rpkm$ratio))), 2))
+    label2 <- paste("'median'[raw]", ":", round(median(finite_rpkm$ratio), 2))
+
+    max_y  <- layer_scales(plot)$y$range$range[2]
+
+    q <- plot + annotate("text", x = -Inf, y = Inf, hjust=-0.01, vjust=1.05,
+                         label = label1, parse=TRUE) +
+         annotate("text", x = -Inf, y = Inf, hjust=-0.01, vjust=2.05,
+                  label = label2, parse=TRUE) +
+         plot_theme
 
     return(q)
 }
