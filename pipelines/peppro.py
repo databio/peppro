@@ -1652,7 +1652,7 @@ def main():
         if args.adapter != "cutadapt":
             pm.warning("You set adapter arg to '{}' but you must select "
                        "'cutadapt' to plot the adapter insertion distribution "
-                       " for single end data.".format(args.adapter))
+                       "for single end data.".format(args.adapter))
         #args.adapter = "cutadapt"
 
     # If we've already aligned to the primary genome, skip these steps unless
