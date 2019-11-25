@@ -2062,14 +2062,17 @@ def main():
     #       Determine maximum read length and add seqOutBias resource          #
     ############################################################################
 
-    if int(args.max_len) != -1:
-        max_len = args.max_len
-    elif _itsa_file(mapping_genome_bam):
-        cmd = (tools.samtools + " stats " + mapping_genome_bam +
-               " | grep '^SN' | cut -f 2- | grep 'maximum length:' | cut -f 2-")
-        max_len = int(pm.checkprint(cmd))
-    else:
-        max_len = DEFAULT_MAX_LEN
+    # TODO: report this as a stat, so we can pm.get_stat() on re-runs or recoveries
+    if not pm.get_stat("Maximum_read_length") or args.new_start:
+        if int(args.max_len) != -1:
+            max_len = int(args.max_len)
+        elif _itsa_file(mapping_genome_bam):
+            cmd = (tools.samtools + " stats " + mapping_genome_bam +
+                   " | grep '^SN' | cut -f 2- | grep 'maximum length:' | cut -f 2-")
+            max_len = int(pm.checkprint(cmd))
+        else:
+            max_len = int(DEFAULT_MAX_LEN)
+        pm.report_result("Maximum_read_length", max_len)
 
     # At this point we can check for seqOutBias required indicies.
     # Can't do it earlier because we haven't determined the read_length of 
