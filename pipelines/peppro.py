@@ -51,20 +51,20 @@ def parse_arguments():
                         default="pro", choices=RUNON_SOURCE,
                         help="Run on sequencing type.")
 
-    parser.add_argument("--adapter", dest="adapter",
+    parser.add_argument("--adapter-tool", dest="adapter",
                         default=DEFAULT_REMOVER, choices=ADAPTER_REMOVERS,
                         help="Name of adapter removal program."
-                        "Default: {}".format(DEFAULT_REMOVER))
+                             "Default: {}".format(DEFAULT_REMOVER))
 
-    parser.add_argument("--dedup", dest="dedup",
+    parser.add_argument("--dedup-tool", dest="dedup",
                         default=DEFAULT_DEDUPLICATOR, choices=DEDUPLICATORS,
                         help="Program to use to duplicate reads. "
-                            "Default: {}".format(DEFAULT_DEDUPLICATOR))
+                             "Default: {}".format(DEFAULT_DEDUPLICATOR))
 
-    parser.add_argument("--trimmer", dest="trimmer",
+    parser.add_argument("--trimmer-tool", dest="trimmer",
                         default=DEFAULT_TRIMMER, choices=TRIMMERS,
                         help="Name of read trimming program. "
-                            "Default: {}".format(DEFAULT_TRIMMER))
+                             "Default: {}".format(DEFAULT_TRIMMER))
 
     parser.add_argument("--umi-len", 
                         default=DEFAULT_UMI_LEN, type=int,

@@ -28,9 +28,9 @@ pipelines:
     optional_arguments:
       "--input2": read2
       "--protocol": protocol
-      "--adapter": adapter
-      "--dedup": dedup
-      "--trimmer": trimmer
+      "--adapter-tool": adapter
+      "--dedup-tool": dedup
+      "--trimmer-tool": trimmer
       "--umi-len": umi_len
       "--max-len": max_len
       "--sob": sob
