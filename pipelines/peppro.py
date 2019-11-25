@@ -1601,9 +1601,10 @@ def main():
     # TODO: make this a warning, not a hard switch...
     if not args.paired_end:
         if args.adapter != "cutadapt":
-            pm.warning("You set adapter arg to '{}' but you must select 'cutadapt'" 
-                " for single end data. Overriding.".format(args.adapter))
-        args.adapter = "cutadapt"
+            pm.warning("You set adapter arg to '{}' but you must select "
+                       "'cutadapt' to plot the adapter insertion distribution "
+                       " for single end data. ".format(args.adapter))
+        #args.adapter = "cutadapt"
 
     # If we've already aligned to the primary genome, skip these steps unless
     # it's a --new-start
@@ -1688,7 +1689,7 @@ def main():
     pm.timestamp("### Plot adapter insertion distribution")
     if not args.adapter == "cutadapt":
         pm.info("Skipping sample degradation plotting...")
-        pm.info("This requires using 'cutadapt' for adapter clipping.")
+        pm.info("This requires using 'cutadapt' for adapter removal.")
     elif not os.path.exists(cutadapt_report):
         pm.info("Skipping sample degradation plotting...")
         pm.info("Could not find {}.`".format(cutadapt_report))
