@@ -1154,7 +1154,11 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 print("Trimmed reads is not reported.")
             else:
                 res_key = "Alignment_rate_" + assembly_identifier
-                pm.report_result(res_key, round(float(ar) * 100 / float(tr), 2))
+                if float(ar) > 0:
+                    pm.report_result(res_key,
+                        round(float(ar) * 100 / float(tr), 2))
+                else:
+                    pm.report_result(res_key, 0)
         
         if paired:
             unmap_fq1 = out_fastq_r1
@@ -1598,12 +1602,11 @@ def main():
     dups_repair_target = os.path.join(fastq_folder, "dups_repaired.flag")
 
     # If single-end, must use cutadapt for plotting purposes
-    # TODO: make this a warning, not a hard switch...
     if not args.paired_end:
         if args.adapter != "cutadapt":
             pm.warning("You set adapter arg to '{}' but you must select "
                        "'cutadapt' to plot the adapter insertion distribution "
-                       " for single end data. ".format(args.adapter))
+                       " for single end data.".format(args.adapter))
         #args.adapter = "cutadapt"
 
     # If we've already aligned to the primary genome, skip these steps unless
@@ -1899,6 +1902,9 @@ def main():
         def check_alignment_genome(temp_bam, bam):
             mr = ngstk.count_mapped_reads(temp_bam, args.paired_end)
             ar = ngstk.count_mapped_reads(bam, args.paired_end)
+            if float(ar) < 1:
+                err_msg = "No aligned reads. Check alignment settings."
+                pm.fail_pipeline(RuntimeError(err_msg))
             if args.paired_end:
                 ar = float(ar)/2
             rr = float(pm.get_stat("Raw_reads"))
