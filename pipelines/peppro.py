@@ -1397,6 +1397,16 @@ def _itsa_empty_file(anyfile):
     return(os.path.isfile(anyfile) and os.stat(anyfile).st_size == 0)
 
 
+def is_gzipped(file_name):
+    """
+    Determine whether indicated file appears to be gzipped.
+    :param str file_name: Name/path of file to check as gzipped.
+    :return bool: Whether indicated file appears to be in gzipped format.
+    """
+    _, ext = os.path.splitext(file_name)
+    return file_name.endswith(".gz")
+
+
 def _add_resources(args, res, asset_dict=None):
     """
     Add additional resources needed for pipeline.
@@ -2502,6 +2512,11 @@ def main():
         pm.run(cmd, pi_pdf, nofail=True)
         pm.report_object("Pause index", pi_pdf, anchor_image=pi_png)
 
+        if not is_gzipped(pause_index):
+            cmd = (ngstk.ziptool + " -f " + pause_index)
+            pause_index = pause_index + ".gz"
+            pm.run(cmd, pause_index)
+
     ############################################################################
     #           Calculate Fraction of Reads in Pre-mRNA (FRiP)                 #
     ############################################################################
@@ -2713,6 +2728,7 @@ def main():
         pm.timestamp("### Calculate mRNA contamination")
         intron_exon = os.path.join(QC_folder, args.sample_name +
                                    "_exon_intron_ratios.bed")
+
         if not pm.get_stat("mRNA_contamination") or args.new_start:
             # Sort exons and introns
             exons_sort = os.path.join(QC_folder, args.genome_assembly +
@@ -2824,6 +2840,11 @@ def main():
         cmd = build_command(mRNAplot)
         pm.run(cmd, mRNApdf, nofail=False)
         pm.report_object("mRNA contamination", mRNApdf, anchor_image=mRNApng)
+
+        if not is_gzipped(intron_exon):
+            cmd = (ngstk.ziptool + " -f " + intron_exon)
+            intron_exon = intron_exon + ".gz"
+            pm.run(cmd, intron_exon)
 
     ############################################################################
     #                        Shift and produce BigWigs                         #
@@ -2968,6 +2989,17 @@ def main():
             scale_minus_cmd = build_command(scale_minus_chunks)
 
         pm.run([scale_plus_cmd, scale_minus_cmd], minus_bw)
+
+    # Remove potentially empty folders
+    if os.path.exists(raw_folder) and os.path.isdir(raw_folder):
+        if not os.listdir(raw_folder):
+            pm_clean_add(raw_folder)
+    if os.path.exists(fastq_folder) and os.path.isdir(fastq_folder):
+        if not os.listdir(fastq_folder):
+            pm_clean_add(fastq_folder)
+    if os.path.exists(fastqc_folder) and os.path.isdir(fastqc_folder):
+        if not os.listdir(fastqc_folder):
+            pm_clean_add(fastqc_folder)
 
     ############################################################################
     #                            PIPELINE COMPLETE!                            #
