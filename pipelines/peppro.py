@@ -1765,9 +1765,7 @@ def main():
         pm.report_object("Adapter insertion distribution", degradation_pdf,
                          anchor_image=degradation_png)
 
-    pm.clean_add(os.path.join(fastq_folder, "*.fq"), conditional=True)
-    pm.clean_add(os.path.join(fastq_folder, "*.fastq"), conditional=True)
-    pm.clean_add(os.path.join(fastq_folder, "*.log"), conditional=True)
+    pm.clean_add(fastq_folder, conditional=True)
 
     ############################################################################
     #                  Map to any requested prealignments                      #
@@ -2237,7 +2235,6 @@ def main():
     cmd += " -i " + mapping_genome_bam
     cmd += " -c " + str(pm.cores)
     cmd += " -o " + bamQC
-    cmd += " --silent"
 
     def report_bam_qc(bamqc_log):
         # Reported BAM QC metrics via the bamQC metrics file
@@ -2994,9 +2991,6 @@ def main():
     if os.path.exists(raw_folder) and os.path.isdir(raw_folder):
         if not os.listdir(raw_folder):
             pm_clean_add(raw_folder)
-    if os.path.exists(fastq_folder) and os.path.isdir(fastq_folder):
-        if not os.listdir(fastq_folder):
-            pm_clean_add(fastq_folder)
     if os.path.exists(fastqc_folder) and os.path.isdir(fastqc_folder):
         if not os.listdir(fastqc_folder):
             pm_clean_add(fastqc_folder)
