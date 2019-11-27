@@ -1038,7 +1038,7 @@ fancyNumbers <- function(n){
 #' @export
 mRNAcontamination <- function(rpkm,
                               name='mRNA contamination ratios',
-                              raw=FALSE,
+                              raw=TRUE,
                               type=c("histogram", "boxplot", "violin")) {
     if (exists(rpkm)) {
         RPKM <- data.table(get(rpkm))
@@ -1053,12 +1053,12 @@ mRNAcontamination <- function(rpkm,
     finite_rpkm <- RPKM[is.finite(RPKM$ratio),]
 
     plot_theme <- theme_classic(base_size=14) +
-              theme(axis.line = element_line(size = 0.5),
-                    panel.grid.major = element_blank(),
-                    panel.grid.minor = element_blank(),
-                    aspect.ratio = 1,
-                    panel.border = element_rect(colour = "black",
-                                                fill=NA, size=0.5))
+                  theme(axis.line = element_line(size = 0.5),
+                        panel.grid.major = element_blank(),
+                        panel.grid.minor = element_blank(),
+                        aspect.ratio = 1,
+                        panel.border = element_rect(colour = "black",
+                                                    fill=NA, size=0.5))
 
     if (raw) {
         if (type == "histogram") {
@@ -1133,7 +1133,8 @@ mRNAcontamination <- function(rpkm,
                 stat_boxplot(geom ='errorbar', width = 0.25) +
                 geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
                             linetype="dashed") +
-                geom_violin(width=0.25, fill="transparent", draw_quantiles = 0.5) +
+                geom_violin(width=0.25, fill="transparent",
+                            draw_quantiles = 0.5) +
                 stat_summary(fun.y = "mean", geom = "point",
                              shape = 1, size = 2) +
                 labs(x=name,
@@ -1144,7 +1145,8 @@ mRNAcontamination <- function(rpkm,
                 stat_boxplot(geom ='errorbar', width = 0.25) +
                 geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
                             linetype="dashed") +
-                geom_violin(width=0.25, fill="transparent", draw_quantiles = 0.5) +
+                geom_violin(width=0.25, fill="transparent",
+                            draw_quantiles = 0.5) +
                 stat_summary(fun.data = n_fun, geom = "text", hjust = 0.5) +
                 stat_summary(fun.y = "mean", geom = "point",
                              shape = 1, size = 2) +
@@ -1183,11 +1185,12 @@ mRNAcontamination <- function(rpkm,
         }
     }
 
-
-    label1 <- paste("'median'[log[10]]", ":~", round(median(log10((finite_rpkm$ratio))), 2))
+    label1 <- paste("'median'[log[10]]", ":~",
+                    round(median(log10((finite_rpkm$ratio))), 2))
     label2 <- paste("'median'[raw]", ":", round(median(finite_rpkm$ratio), 2))
 
-    max_y  <- layer_scales(plot)$y$range$range[2]
+    max_y  <- suppressMessages(
+                suppressWarnings(layer_scales(plot)$y$range$range[2]))
 
     q <- plot + annotate("text", x = -Inf, y = Inf, hjust=-0.01, vjust=1.05,
                          label = label1, parse=TRUE) +

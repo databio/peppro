@@ -3,7 +3,7 @@
 # PEPPRO R parser
 
 ###############################################################################
-version <- 0.5
+version <- 0.6
 ##### Load dependencies #####
 
 required_libraries <- c("PEPPROr")
@@ -357,7 +357,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Version: ", version, "\n\n",
         "Command: mrna \t plot mRNA contamination distribution\n\n",
         " -i, --rpkm\t Three column TSV of intron and exon RPKM by gene.\n",
-        " -w, --raw\t Plot raw exon/intron ratios instead of log10.\n"
+        " -w, --raw\t Plot raw exon/intron ratios instead of log10.\n",
+        " -y, --type\t Choose plot type from: histogram, boxplot, or violin.\n"
     )
 
     help <- opt_get(name = c("help", "?", "h"), required=FALSE,
@@ -375,21 +376,23 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                         description="Three column TSV containing gene exon and intron RPKMs.")
         raw  <- opt_get(name = c("raw", "w"), required=FALSE, default=FALSE,
                         description="Plot raw ratios (Default = FALSE).")
+        type <- opt_get(name = c("type", "y"), required=FALSE, default="histogram",
+                        description="Choose plot type from: histogram, boxplot, or violin (Default = histogram).")
 
         sample_name        <- sampleName(rpkm, 3)
         name               <- basename(sample_name)
-        suppressWarnings(p <- mRNAcontamination(rpkm=rpkm, name=name, raw=raw))
+        suppressWarnings(p <- mRNAcontamination(rpkm=rpkm, name=name, raw=raw, type=type))
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
             width= 7, height = 7, useDingbats=F)
-        suppressWarnings(suppressWarnings(print(p)))
+        suppressMessages(suppressWarnings(print(p)))
         invisible(dev.off())
              
         # Save plot to png file
         png(filename = paste0(sample_name, "_mRNA_contamination.png"),
             width = 480, height = 480)
-        suppressWarnings(suppressWarnings(print(p)))
+        suppressMessages(suppressWarnings(print(p)))
         invisible(dev.off())
 
         if (exists("p")) {
