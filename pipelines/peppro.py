@@ -400,7 +400,7 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
     :return str: command to trim adapter trimmed and deduplicated reads
     """
 
-    # Only call this when args.complexity and args.umi_len > 0
+    # Only call this when args.complexity32 and args.umi_len > 0
     sname = args.sample_name  # for concise code
 
     fastq_folder = os.path.join(outfolder, "fastq")
@@ -1022,7 +1022,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             # This trim command DOES need the adapter file...
             pm.debug("\ntrim_command1: {} + {}\n".format(adapter_command, trim_command))
             pm.run([adapter_command, trim_command], processed_fastq,
-                   follow=ngstk.check_trim(processed_fastq, False, None))
+                   follow=ngstk.check_trim(processed_fastq, False, None,
+                                           fastqc_folder=fastqc_folder))
             # This needs to produce the trimmed_fastq file
             pm.debug("\ntrim_command2: {} + {} + {}\n".format(adapter_command, deduplicate_command, trim_command2))
             pm.run([adapter_command, deduplicate_command, trim_command2],
@@ -1036,7 +1037,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             process_fastq_cmd = build_command([
                 "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
             pm.run(process_fastq_cmd, processed_fastq,
-               follow=ngstk.check_trim(processed_fastq, False, None))
+               follow=ngstk.check_trim(processed_fastq, False, None,
+                                       fastqc_folder=fastqc_folder))
             return processed_fastq      
 
 
