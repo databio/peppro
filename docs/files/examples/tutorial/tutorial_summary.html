@@ -163,7 +163,7 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
               <li class="nav-item active">
-                <a class="nav-link" href="/sfs/lustre/allocations/shefflab/processed/peppro_tutorial/pe/07-31-19/tutorial_summary.html">Summary<span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="/project/shefflab/processed/proseq/peppro_tutorial/pe/11-27-19/tutorial_summary.html">Summary<span class="sr-only">(current)</span></a>
               </li>
                             
               <!-- if the status_page_name is not defined, the status page link is omitted -->
@@ -182,13 +182,10 @@
                     <div class="dropdown-divider"></div>
                     
                       
-                      <a class="dropdown-item" href="reports/fastp_report.html">FastP_report</a>
+                      <a class="dropdown-item" href="reports/fastqc_report_r1.html">FastQC report r1</a>
                     
                       
                       <a class="dropdown-item" href="reports/fragment_distribution.html">Fragment distribution</a>
-                    
-                      
-                      <a class="dropdown-item" href="reports/library_complexity.html">Library complexity</a>
                     
                       
                       <a class="dropdown-item" href="reports/minus_frif.html">Minus FRiF</a>
@@ -261,14 +258,6 @@
 					
 						<th>Fastq_reads</th>
 					
-						<th>Reads_with_adapter</th>
-					
-						<th>Pct_adapter_contamination</th>
-					
-						<th>Reads_too_short</th>
-					
-						<th>Duplicate_reads</th>
-					
 						<th>Trimmed_reads</th>
 					
 						<th>Trim_loss_rate</th>
@@ -276,10 +265,6 @@
 						<th>Aligned_reads_human_rDNA</th>
 					
 						<th>Alignment_rate_human_rDNA</th>
-					
-						<th>Aligned_reads_rCRSd</th>
-					
-						<th>Alignment_rate_rCRSd</th>
 					
 						<th>Mapped_reads</th>
 					
@@ -295,6 +280,8 @@
 					
 						<th>Mitochondrial_reads</th>
 					
+						<th>Maximum_read_length</th>
+					
 						<th>NRF</th>
 					
 						<th>PBC1</th>
@@ -307,13 +294,13 @@
 					
 						<th>TSS_Minus_Score</th>
 					
-						<th>Pause index</th>
+						<th>Pause_index</th>
 					
 						<th>Plus FRiP</th>
 					
 						<th>Minus FRiP</th>
 					
-						<th>mRNA contamination</th>
+						<th>mRNA_contamination</th>
 					
 						<th>Time</th>
 					
@@ -351,13 +338,13 @@
 							
 								
 									<td class="text">
-										/scratch/jps3dp/DATA/proseq/tutorial_r1.fq.gz
+										/scratch/jps3dp/DATA/proseq/data/fastq/tutorial_r1.fq.gz
 									</td>
 								
 							
 								
 									<td class="text">
-										/scratch/jps3dp/DATA/proseq/tutorial_r2.fq.gz
+										/scratch/jps3dp/DATA/proseq/data/fastq/tutorial_r2.fq.gz
 									</td>
 								
 							
@@ -393,103 +380,73 @@
 							
 								
 									<td class="text">
-										598996.0
+										497796
 									</td>
 								
 							
 								
 									<td class="text">
-										0.44
+										75.11
 									</td>
 								
 							
 								
 									<td class="text">
-										522549.0
+										5860.0
 									</td>
 								
 							
 								
 									<td class="text">
-										3022.0
+										1.18
 									</td>
 								
 							
 								
 									<td class="text">
-										461368
+										431804
 									</td>
 								
 							
 								
 									<td class="text">
-										76.93
+										274898
 									</td>
 								
 							
 								
 									<td class="text">
-										68452.0
+										156906.0
 									</td>
 								
 							
 								
 									<td class="text">
-										14.84
+										31.52
 									</td>
 								
 							
 								
 									<td class="text">
-										12998.0
+										7.85
 									</td>
 								
 							
 								
 									<td class="text">
-										2.82
+										1.17
 									</td>
 								
 							
 								
 									<td class="text">
-										711524
+										5357
 									</td>
 								
 							
 								
 									<td class="text">
-										384789
-									</td>
-								
-							
-								
-									<td class="text">
-										326735.0
-									</td>
-								
-							
-								
-									<td class="text">
-										70.82
-									</td>
-								
-							
-								
-									<td class="text">
-										16.34
-									</td>
-								
-							
-								
-									<td class="text">
-										1.35
-									</td>
-								
-							
-								
-									<td class="text">
-										249
+										30
 									</td>
 								
 							
@@ -501,67 +458,67 @@
 							
 								
 									<td class="text">
-										164998.5
+										15975.0
 									</td>
 								
 							
 								
 									<td class="text">
-										164998.5
+										15975.0
 									</td>
 								
 							
 								
 									<td class="text">
-										44906
+										468224
 									</td>
 								
 							
 								
 									<td class="text">
-										56.2
+										33.3
 									</td>
 								
 							
 								
 									<td class="text">
-										17.9
+										4.3
 									</td>
 								
 							
 								
 									<td class="text">
-										108.18
+										228.97
 									</td>
 								
 							
 								
 									<td class="text">
-										0.37
+										0.07
 									</td>
 								
 							
 								
 									<td class="text">
-										0.36
+										0.07
 									</td>
 								
 							
 								
 									<td class="text">
-										0.63
+										4.26
 									</td>
 								
 							
 								
 									<td class="text">
-										0:14:01
+										0:09:52
 									</td>
 								
 							
 								
 									<td class="text">
-										07-31-20:57:16
+										11-27-14:04:51
 									</td>
 								
 							
@@ -596,26 +553,7 @@
 		</div>
     			<div class='container'>
 			
-				<hr>
-				<h3>Looper project objects</h3>
 			
-			
-        		<h5>Figures</h5>
-					<!-- figures go here -->
-					<div class='row justify-content-start'>
-	        		
-						
-			            <figure class="figure">
-			                <a href='summary/tutorial_libComplexity.pdf'>
-			                	<img id="fig" src='summary/tutorial_libComplexity.png' class="figure-img img-fluid rounded" alt="">
-			                </a>
-			                <a href='summary/tutorial_libComplexity.pdf'>
-								<figcaption class="figure-caption text-center"><b>Fig.0 </b><i>Library complexity file</i></figcaption>
-			                </a>
-			            </figure>
-	        		
-					</div>
-        	
         	
 		</div>
     </div>
@@ -705,7 +643,7 @@ Generated with <code>looper v0.12.5-dev</code>
 
     //var table = document.getElementById("data-table");
     var plotDict = {}; // variable containing column values (col_name:string -> col_values:list)
-    var statsTable = {"0":{"0":"sample_name","1":"tutorial"},"1":{"0":"organism","1":"human"},"2":{"0":"protocol","1":"PROSEQ"},"3":{"0":"read_type","1":"paired"},"4":{"0":"read1","1":"\/scratch\/jps3dp\/DATA\/proseq\/tutorial_r1.fq.gz"},"5":{"0":"read2","1":"\/scratch\/jps3dp\/DATA\/proseq\/tutorial_r2.fq.gz"},"6":{"0":"File_mb","1":"50.42"},"7":{"0":"Read_type","1":"paired"},"8":{"0":"Genome","1":"hg38"},"9":{"0":"Raw_reads","1":"2000000"},"10":{"0":"Fastq_reads","1":"2000000"},"11":{"0":"Reads_with_adapter","1":"598996.0"},"12":{"0":"Pct_adapter_contamination","1":"0.44"},"13":{"0":"Reads_too_short","1":"522549.0"},"14":{"0":"Duplicate_reads","1":"3022.0"},"15":{"0":"Trimmed_reads","1":"461368"},"16":{"0":"Trim_loss_rate","1":"76.93"},"17":{"0":"Aligned_reads_human_rDNA","1":"68452.0"},"18":{"0":"Alignment_rate_human_rDNA","1":"14.84"},"19":{"0":"Aligned_reads_rCRSd","1":"12998.0"},"20":{"0":"Alignment_rate_rCRSd","1":"2.82"},"21":{"0":"Mapped_reads","1":"711524"},"22":{"0":"QC_filtered_reads","1":"384789"},"23":{"0":"Aligned_reads","1":"326735.0"},"24":{"0":"Alignment_rate","1":"70.82"},"25":{"0":"Total_efficiency","1":"16.34"},"26":{"0":"Read_depth","1":"1.35"},"27":{"0":"Mitochondrial_reads","1":"249"},"28":{"0":"NRF","1":"1.0"},"29":{"0":"PBC1","1":"164998.5"},"30":{"0":"PBC2","1":"164998.5"},"31":{"0":"Unmapped_reads","1":"44906"},"32":{"0":"TSS_Plus_Score","1":"56.2"},"33":{"0":"TSS_Minus_Score","1":"17.9"},"34":{"0":"Pause index","1":"108.18"},"35":{"0":"Plus FRiP","1":"0.37"},"36":{"0":"Minus FRiP","1":"0.36"},"37":{"0":"mRNA contamination","1":"0.63"},"38":{"0":"Time","1":"0:14:01"},"39":{"0":"Success","1":"07-31-20:57:16"}}; // Jinja template variable
+    var statsTable = {"0":{"0":"sample_name","1":"tutorial"},"1":{"0":"organism","1":"human"},"2":{"0":"protocol","1":"PROSEQ"},"3":{"0":"read_type","1":"paired"},"4":{"0":"read1","1":"\/scratch\/jps3dp\/DATA\/proseq\/data\/fastq\/tutorial_r1.fq.gz"},"5":{"0":"read2","1":"\/scratch\/jps3dp\/DATA\/proseq\/data\/fastq\/tutorial_r2.fq.gz"},"6":{"0":"File_mb","1":"50.42"},"7":{"0":"Read_type","1":"paired"},"8":{"0":"Genome","1":"hg38"},"9":{"0":"Raw_reads","1":"2000000"},"10":{"0":"Fastq_reads","1":"2000000"},"11":{"0":"Trimmed_reads","1":"497796"},"12":{"0":"Trim_loss_rate","1":"75.11"},"13":{"0":"Aligned_reads_human_rDNA","1":"5860.0"},"14":{"0":"Alignment_rate_human_rDNA","1":"1.18"},"15":{"0":"Mapped_reads","1":"431804"},"16":{"0":"QC_filtered_reads","1":"274898"},"17":{"0":"Aligned_reads","1":"156906.0"},"18":{"0":"Alignment_rate","1":"31.52"},"19":{"0":"Total_efficiency","1":"7.85"},"20":{"0":"Read_depth","1":"1.17"},"21":{"0":"Mitochondrial_reads","1":"5357"},"22":{"0":"Maximum_read_length","1":"30"},"23":{"0":"NRF","1":"1.0"},"24":{"0":"PBC1","1":"15975.0"},"25":{"0":"PBC2","1":"15975.0"},"26":{"0":"Unmapped_reads","1":"468224"},"27":{"0":"TSS_Plus_Score","1":"33.3"},"28":{"0":"TSS_Minus_Score","1":"4.3"},"29":{"0":"Pause_index","1":"228.97"},"30":{"0":"Plus FRiP","1":"0.07"},"31":{"0":"Minus FRiP","1":"0.07"},"32":{"0":"mRNA_contamination","1":"4.26"},"33":{"0":"Time","1":"0:09:52"},"34":{"0":"Success","1":"11-27-14:04:51"}}; // Jinja template variable
     // make a list of the first column values, which are the names of the samples
     var sample_names = [];
     var j = 1;

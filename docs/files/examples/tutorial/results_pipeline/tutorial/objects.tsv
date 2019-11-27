@@ -1,5 +1,4 @@
-FastP_report	fastqc/tutorial_R1_rmAdapter.html	FastP_report	None	PEPPRO
-Library complexity	QC_hg38/tutorial_preseq_plot.pdf	Library complexity	QC_hg38/tutorial_preseq_plot.png	PEPPRO
+FastQC report r1	fastqc/tutorial_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO
 TSS enrichment	QC_hg38/tutorial_TSSenrichment.pdf	TSS enrichment	QC_hg38/tutorial_TSSenrichment.png	PEPPRO
 Pause index	QC_hg38/tutorial_pause_index.pdf	Pause index	QC_hg38/tutorial_pause_index.png	PEPPRO
 Fragment distribution	QC_hg38/tutorial_fragLenDistribution.pdf	Fragment distribution	QC_hg38/tutorial_fragLenDistribution.png	PEPPRO
