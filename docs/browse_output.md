@@ -25,9 +25,13 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: tutorial_unmap.bam
         * ???+ danger ":fa-folder-open-o: fastq/"
         * ??? danger ":fa-folder-open-o: fastqc/"
-            * [:fa-file-code-o: tutorial_rmAdapter.html](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_rmAdapter.html)
-            * [:fa-file-code-o: tutorial_rmAdapter.json](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_rmAdapter.json)
-            * [:fa-file-text-o: tutorial_rmAdapter.txt](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_rmAdapter.txt)
+            * [:fa-file-code-o: tutorial_R1_rmAdapter.html](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R1_rmAdapter.html)
+            * [:fa-file-code-o: tutorial_R1_rmAdapter.json](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R1_rmAdapter.json)
+            * [:fa-file-text-o: tutorial_R1_rmAdapter.txt](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R1_rmAdapter.txt)
+            * [:fa-file-code-o: tutorial_R2_rmAdapter.html](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R2_rmAdapter.html)
+            * [:fa-file-code-o: tutorial_R2_rmAdapter.json](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R2_rmAdapter.json)
+            * [:fa-file-text-o: tutorial_R2_rmAdapter.txt](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R2_rmAdapter.txt)
+            * [:fa-file-text-o: tutorial_R1_processed_fastqc.html](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R1_processed_fastqc.html)
         * ??? danger ":fa-folder-open-o: prealignments/"
             * :fa-file-text-o: tutorial_rCRSd_3k_bt_aln_summary.log
             * :fa-file-archive-o: tutorial_rCRSd_3k_unmap_R1.fq.gz
