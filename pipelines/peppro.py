@@ -1158,35 +1158,42 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             cmd += " | " + tools.samtools + " sort - -@ 1"  # sort output
             cmd += " -T " + tempdir
             cmd += " -o " + mapped_bam
+            cmd += ") 2>&1"
         else:
-            cmd += " > /dev/null"
-        cmd += ") 2>" + summary_file
+            cmd += " 2>&1 > /dev/null)"
+        #cmd += ")"
+        #cmd += ") 2> " + summary_file
 
         if paired:
             if args.keep or not useFIFO:
-                pm.run([cmd, filter_pair], mapped_bam)
+                aln_stats = pm.checkprint(cmd, mapped_bam)
+                pm.run(filter_pair, mapped_bam)
             else:
                 pm.wait = False
-                pm.run(filter_pair, [summary_file, out_fastq_r2_gz],
-                       container=pm.container)
+                pm.run(filter_pair, [summary_file, out_fastq_r2_gz])
                 pm.wait = True
-                pm.run(cmd, [summary_file, out_fastq_r2_gz],
-                       container=pm.container)
+                aln_stats = pm.checkprint(cmd, [summary_file, out_fastq_r2_gz])
         else:
             if args.keep:
-                pm.run(cmd, mapped_bam)
+                aln_stats = pm.checkprint(cmd, mapped_bam)
             else:
                 # TODO: switch to this once filter_paired_fq works with SE
                 #pm.run(cmd2, summary_file)
                 #pm.run(cmd1, out_fastq_r1)
-                pm.run(cmd, out_fastq_tmp_gz)
+                aln_stats = pm.checkprint(cmd, out_fastq_tmp_gz)
 
         pm.clean_add(out_fastq_tmp)
 
         if not dups:
-            cmd = ("grep 'aligned exactly 1 time' " + summary_file +
-                   " | awk '{print $1}'")
-            align_exact = pm.checkprint(cmd)
+            if aln_stats:
+                pm.info(aln_stats)  # Log alignment statistics
+                align_exact = re.search(r".*aligned exactly 1 time", aln_stats).group().split()[0]
+            else:
+                align_exact = None
+            # cmd = ("grep 'aligned exactly 1 time' " + summary_file +
+            #        " | awk '{print $1}'")
+            # align_exact = pm.checkprint(cmd)
+
             if align_exact:
                 ar = float(align_exact)*2
             else:
@@ -1620,7 +1627,6 @@ def main():
     pm.report_result("Genome", args.genome_assembly)
 
     # PRO-seq pipeline
-    # Each (major) step should have its own subfolder
     if args.protocol.lower() in RUNON_SOURCE_GRO:
         pm.info("Detected GRO input")
     elif args.protocol.lower() in RUNON_SOURCE_PRO:
@@ -1628,6 +1634,7 @@ def main():
     else:
         pm.fail_pipeline(RuntimeError("Input protocol must be GRO or PRO."))
 
+    # Each (major) step should have its own subfolder
     raw_folder = os.path.join(param.outfolder, "raw")
     fastq_folder = os.path.join(param.outfolder, "fastq")
     fastqc_folder=os.path.join(param.outfolder, "fastqc")
@@ -1643,8 +1650,7 @@ def main():
     if not pm.get_stat("Raw_reads") or args.new_start:
         pm.run(cmd, unaligned_fastq,
                follow=ngstk.check_fastq(
-                   local_input_files, unaligned_fastq, args.paired_end),
-               container=pm.container)
+                   local_input_files, unaligned_fastq, args.paired_end))
         pm.clean_add(out_fastq_pre + "*.fastq", conditional=True)
     pm.info(local_input_files)
     untrimmed_fastq1 = out_fastq_pre + "_R1.fastq"
@@ -1655,7 +1661,8 @@ def main():
     ############################################################################
     pm.timestamp("### FASTQ processing: ")
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
-    cutadapt_report = os.path.join(cutadapt_folder, args.sample_name + "_cutadapt.txt")
+    cutadapt_report = os.path.join(cutadapt_folder,
+                                   args.sample_name + "_cutadapt.txt")
     repair_target = os.path.join(fastq_folder, "repaired.flag")
     dups_repair_target = os.path.join(fastq_folder, "dups_repaired.flag")
 
@@ -1672,17 +1679,16 @@ def main():
     if not pm.get_stat("Aligned_reads") or args.new_start:
         if args.paired_end:
             if not args.complexity and args.umi_len > 0:
-                unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, res,
-                                                           False,
-                                                           untrimmed_fastq1,
-                                                           outfolder=param.outfolder)
+                unmap_fq1, unmap_fq1_dups = _process_fastq(
+                    args, tools, res, False,
+                    untrimmed_fastq1, outfolder=param.outfolder)
             else:
-                unmap_fq1 = _process_fastq(args, tools, res, False,
-                                           untrimmed_fastq1,
-                                           outfolder=param.outfolder)
-            unmap_fq2, unmap_fq2_dups = _process_fastq(args, tools, res, True,
-                                                       untrimmed_fastq2,
-                                                       outfolder=param.outfolder)
+                unmap_fq1 = _process_fastq(
+                    args, tools, res, False,
+                    untrimmed_fastq1, outfolder=param.outfolder)
+            unmap_fq2, unmap_fq2_dups = _process_fastq(
+                args, tools, res, True,
+                untrimmed_fastq2, outfolder=param.outfolder)
 
             # Gut check
             # Processing fastq should have trimmed the reads.
@@ -1702,8 +1708,8 @@ def main():
                 fastq_folder, args.sample_name + "_R2_trimmed.fastq.single.fq")
 
             rr = float(pm.get_stat("Raw_reads"))
-            cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + unmap_fq1 +
-                   " " + unmap_fq2)
+            cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
+                   unmap_fq1 + " " + unmap_fq2)
             pm.run(cmd, [r1_repair, r2_repair])
             pm.clean_add(r1_repair_single)
             pm.clean_add(r2_repair_single)
@@ -1735,16 +1741,15 @@ def main():
                 pm.run([cmd1, cmd2, cmd3], dups_repair_target)
         else:
             if not args.complexity and args.umi_len > 0:
-                unmap_fq1, unmap_fq1_dups = _process_fastq(args, tools, res,
-                                                           False,
-                                                           untrimmed_fastq1,
-                                                           outfolder=param.outfolder)
+                unmap_fq1, unmap_fq1_dups = _process_fastq(
+                    args, tools, res, False,
+                    untrimmed_fastq1, outfolder=param.outfolder)
                 unmap_fq2 = ""
                 unmap_fq2_dups = ""
             else:
-                unmap_fq1 = _process_fastq(args, tools, res, False,
-                                           untrimmed_fastq1,
-                                           outfolder=param.outfolder)
+                unmap_fq1 = _process_fastq(
+                    args, tools, res, False,
+                    untrimmed_fastq1, outfolder=param.outfolder)
                 unmap_fq2 = ""
 
     pm.timestamp("### Plot adapter insertion distribution")
@@ -1987,12 +1992,10 @@ def main():
 
         pm.run([cmd, cmd2], mapping_genome_bam,
                follow=lambda: check_alignment_genome(mapping_genome_bam_temp,
-                                                     mapping_genome_bam),
-               container=pm.container)
+                                                     mapping_genome_bam))
 
         if not args.complexity and args.umi_len > 0:
-            pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups,
-                   container=pm.container)
+            pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups)
 
         pm.timestamp("### Compress all unmapped read files")
         for unmapped_fq in to_compress:
@@ -2261,8 +2264,7 @@ def main():
         pm.report_result("PBC1", round(float(pbc1),2))
         pm.report_result("PBC2", round(float(pbc2), 2))
 
-    pm.run(cmd, bamQC, follow=lambda: report_bam_qc(bamQC),
-           container=pm.container)
+    pm.run(cmd, bamQC, follow=lambda: report_bam_qc(bamQC))
 
     ############################################################################
     #                     Produce unmapped reads file                          #
@@ -2283,8 +2285,7 @@ def main():
         unmap_cmd += " -f 4 "
 
     unmap_cmd += " " + mapping_genome_bam_temp + " > " + unmap_genome_bam
-    pm.run(unmap_cmd, unmap_genome_bam, follow=count_unmapped_reads,
-           container=pm.container)
+    pm.run(unmap_cmd, unmap_genome_bam, follow=count_unmapped_reads)
 
     # Remove temporary bam file from unmapped file production
     pm.clean_add(mapping_genome_bam_temp)
@@ -2990,10 +2991,10 @@ def main():
     # Remove potentially empty folders
     if os.path.exists(raw_folder) and os.path.isdir(raw_folder):
         if not os.listdir(raw_folder):
-            pm_clean_add(raw_folder)
+            pm.clean_add(raw_folder)
     if os.path.exists(fastqc_folder) and os.path.isdir(fastqc_folder):
         if not os.listdir(fastqc_folder):
-            pm_clean_add(fastqc_folder)
+            pm.clean_add(fastqc_folder)
 
     ############################################################################
     #                            PIPELINE COMPLETE!                            #
