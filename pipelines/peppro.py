@@ -1187,7 +1187,13 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         if not dups:
             if aln_stats:
                 pm.info(aln_stats)  # Log alignment statistics
-                align_exact = re.search(r".*aligned exactly 1 time", aln_stats).group().split()[0]
+                try:
+                    align_exact = re.search(r".*aligned exactly 1 time", aln_stats).group().split()[0]
+                except AttributeError:
+                    align_exact = None
+                except:
+                    err_msg = "Unable to determine alignment statistics for {}."
+                    pm.fail_pipeline(RuntimeError(err_msg.format(args.genome_assembly)))
             else:
                 align_exact = None
             # cmd = ("grep 'aligned exactly 1 time' " + summary_file +
