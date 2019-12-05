@@ -167,11 +167,11 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                   x_max = x_max)
         # now save the plot
         pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-            width= 10, height = 7, useDingbats=F)
+            width = 5, height = 4, useDingbats=F)
         suppressWarnings(print(p))
         invisible(dev.off())
         png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-            width = 686, height = 480)
+            width = 343, height = 275)
         suppressWarnings(print(p))
         invisible(dev.off())
 
@@ -221,11 +221,11 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                       bedFile = bed)
 
         pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-        width= 7, height = 7, useDingbats=F)
+            width = 4, height = 4, useDingbats=F)
         suppressWarnings(print(p))
         invisible(dev.off())
         png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-            width = 480, height = 480)
+            width = 275, height = 275)
         suppressWarnings(print(p))
         invisible(dev.off())
 
@@ -282,12 +282,12 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         sample_name <- sampleName(TSSfile[1])
 
         png(filename = paste0(sample_name, "_TSSenrichment.png"),
-        width = 480, height = 480)
+            width = 275, height = 275)
         suppressWarnings(print(p))
         invisible(dev.off())
 
         pdf(file = paste0(sample_name, "_TSSenrichment.pdf"),
-            width= 7, height = 7, useDingbats=F)
+            width = 4, height = 4, useDingbats=F)
         suppressWarnings(print(p))
         invisible(dev.off())
 
@@ -334,13 +334,13 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                      fragL_txt = fragL_txt)
 
         # Save plot to pdf file
-        pdf(file=fragL_name, width= 7, height = 7, useDingbats=F)
+        pdf(file=fragL_name, width = 4, height = 4, useDingbats=F)
         suppressWarnings(print(p))
         invisible(dev.off())
 
         # Save plot to png file
         outfile_png <- gsub('pdf', 'png', fragL_name)
-        png(filename=outfile_png, width = 480, height = 480)
+        png(filename=outfile_png, width = 275, height = 275)
         suppressWarnings(print(p))
         invisible(dev.off())
 
@@ -385,13 +385,13 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
-            width= 7, height = 7, useDingbats=F)
+            width = 4, height = 4, useDingbats=F)
         suppressMessages(suppressWarnings(print(p)))
         invisible(dev.off())
              
         # Save plot to png file
         png(filename = paste0(sample_name, "_mRNA_contamination.png"),
-            width = 480, height = 480)
+            width = 275, height = 275)
         suppressMessages(suppressWarnings(print(p)))
         invisible(dev.off())
 
@@ -430,13 +430,13 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_pause_index.pdf"),
-            width= 7, height = 7, useDingbats=F)
+            width = 4, height = 4, useDingbats=F)
         suppressWarnings(print(p))
         invisible(dev.off())
              
         # Save plot to png file
         png(filename = paste0(sample_name, "_pause_index.png"),
-            width = 480, height = 480)
+            width = 275, height = 275)
         suppressWarnings(print(p))
         invisible(dev.off())
 
@@ -478,14 +478,14 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_adapter_insertion_distribution.pdf"),
-            width= 7, height = 7, useDingbats=F)
+            width = 4, height = 4, useDingbats=F)
         suppressWarnings(print(p))
         invisible(dev.off())
              
         # Save plot to png file
         png(filename = paste0(sample_name,
                               "_adapter_insertion_distribution.png"),
-            width = 480, height = 480)
+            width = 275, height = 275)
         suppressWarnings(print(p))
         invisible(dev.off())
 

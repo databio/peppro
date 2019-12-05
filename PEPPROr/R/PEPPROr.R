@@ -670,7 +670,7 @@ roundUpNice <- function(x, nice=c(1,2,3,4,5,6,7,8,9,10)) {
 
 #' Plot TSS enrichment
 #'
-#' This function plots the global TSS enrichment and produces pdf/png files.
+#' This function plots the global TSS enrichment.
 #'
 #' @param TSSfile TSS enrichment file
 #' @keywords TSS enrichment
@@ -696,26 +696,17 @@ plotTSS <- function(TSSfile) {
         }
     }
 
-    t1 <- theme(
-        plot.background  = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border     = element_rect(colour = "black", fill=NA, size=0.5),
-        panel.background = element_blank(),
-        axis.line    = element_blank(),
-        axis.text.x  = element_text(face = "plain", color = "black",
-                                    size = 20, hjust = 0.5),
-        axis.text.y  = element_text(face = "plain", color = "black",
-                                    size = 20, hjust = 0.5),
-        axis.title.x = element_text(face = "plain", color = "black", size = 22,
-                                    hjust = 0.5, vjust=0.5),
-        axis.title.y = element_text(face = "plain", color = "black", size = 22,
-                                    hjust = 0.5),
-        plot.title   = element_text(face="bold", color = "black", size=12,
-                                    hjust=0.5),
-        legend.position="none",
-        axis.ticks.length = unit(2, "mm")
-    )
+    t1 <- theme_classic(base_size=14) + 
+            theme(plot.background  = element_blank(),
+                  panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank(),
+                  panel.border     = element_rect(colour = "black",
+                                                  fill=NA, size=0.5),
+                  panel.background = element_blank(),
+                  axis.line    = element_blank(),
+                  legend.position="none",
+                  aspect.ratio = 1,
+                  axis.ticks.length = unit(2, "mm"))
 
     iMat <- data.table(V1 = numeric())
     if (length(TSSfile) == 1) {
@@ -818,7 +809,7 @@ plotTSS <- function(TSSfile) {
     p <- pre + t1 +
          scale_x_continuous(expand=c(0,0)) +
          scale_y_continuous(expand=c(0,0)) +
-         coord_cartesian(xlim=c(-2300, 2300), ylim=c(0, y_max+2))
+         coord_cartesian(xlim=c(-2300, 2300), ylim=c(0, 1.1*y_max))
     if (exists("minus")) {
         val      <- 0.025*nrow(minus)
         # normTSS  <- (minus / mean(minus[c(1:val,
@@ -846,25 +837,25 @@ plotTSS <- function(TSSfile) {
                                  y=score, group=1, colour="black"),
                              method="loess", span=0.02,
                              se=FALSE, colour="blue") +
-                 annotate("rect", xmin=1200, xmax=2300, ymin=y_max-8,
-                          ymax=y_max+2, fill="gray95", size = 0.5) +
-                 annotate("text", x=1750, y=y_max, label="TSS Score",
-                          fontface = 1, size=6, hjust=0.5) +
-                 annotate("text", x=1500, y=y_max-2, label="+", fontface = 2,
-                          size=8, hjust=0.5, color=lineColor) +
-                 annotate("text", x=1500, y=y_max-5, label=TSSscore,
-                          fontface = 2, size=8, hjust=0.5, color=lineColor) +
-                 annotate("text", x=2000, y=y_max-2, label="-",
-                          fontface = 2, size=8, hjust=0.5, color="blue") +
-                 annotate("text", x=2000, y=y_max-5, label=minusTSSscore,
-                          fontface = 2, size=8, hjust=0.5, color="blue")
+                annotate("rect", xmin=1200, xmax=2300, ymin=0.9*y_max,
+                         ymax=1.1*y_max, fill="gray95") +
+                annotate("text", x=1750, y=1.05*y_max, label="TSS Score",
+                         fontface = 1, hjust=0.5) +
+                annotate("text", x=1500, y=y_max, label="+", fontface = 2,
+                          hjust=0.5, color=lineColor) +
+                annotate("text", x=1500, y=0.95*y_max, label=TSSscore,
+                         fontface = 2,  hjust=0.5, color=lineColor) +
+                annotate("text", x=2000, y=y_max, label="-",
+                         fontface = 2,  hjust=0.5, color="blue") +
+                annotate("text", x=2000, y=0.95*y_max, label=minusTSSscore,
+                         fontface = 2,  hjust=0.5, color="blue")
     } else {
-        p <- p + annotate("rect", xmin=1200, xmax=2300, ymin=y_max-4,
-                          ymax=y_max+2, fill="gray95", size = 0.5) +
-                 annotate("text", x=1750, y=y_max+1, label="TSS Score",
-                          fontface = 1, size=6, hjust=0.5) +
-                 annotate("text", x=1750, y=y_max-1, label=TSSscore,
-                          fontface = 2, size=10, hjust=0.5)
+        p <- p + annotate("rect", xmin=1200, xmax=2300, ymin=0.9*y_max,
+                          ymax=1.1*y_max, fill="gray95") +
+                 annotate("text", x=1750, y=1.05*y_max, label="TSS Score",
+                          fontface = 1, hjust=0.5) +
+                 annotate("text", x=1750, y=0.95*y_max, label=TSSscore,
+                          fontface = 2, hjust=0.5)
     }
 
     return(p)
@@ -898,11 +889,12 @@ sampleName <- function(path, num_fields=2, delim='_') {
 #' data("frag_len")
 #' data("frag_len_count")
 #' plotFLD(fragL = "frag_len", fragL_count = "frag_len_count",
-#'         fragL_txt = "fragLenDistribution_example.txt")
+#'         fragL_txt = "fragLenDistribution_example.txt", max_fragment=200)
 #' @export
 plotFLD <- function(fragL,
                     fragL_count,
-                    fragL_txt="fragLenDistribution.txt") {
+                    fragL_txt="fragLenDistribution.txt",
+                    max_fragment = 200) {
 
     if (exists(fragL_count)) {
         dat <- data.table(get(fragL_count))
@@ -922,10 +914,12 @@ plotFLD <- function(fragL,
         quit(save = "no", status = 1, runLast = FALSE)
     }
 
-    dat1 <- dat[dat$V2<=600,]
+    dat1 <- dat[dat$V2<=max_fragment,]
     tmp  <- seq(1:as.numeric(dat1[1,2]-1))
     dat0 <- data.table(V1=rep(0,length(tmp)),V2=tmp)
     dat2 <- rbind(dat0, dat1)
+
+    x_min = which.min(dat1$V1[1:which.max(dat1$V1)])
 
     t1 = theme_classic(base_size=14) +
          theme(axis.line = element_line(size = 0.5), 
@@ -934,15 +928,17 @@ plotFLD <- function(fragL,
                legend.position = "none",
                aspect.ratio = 1,
                panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-               plot.title = element_text(hjust = 0.5))
+               plot.title = element_text(hjust = 0.5))    
 
-    p <- ggplot(dat1, aes(x=V2, y=V1)) +
+    p <- ggplot(dat1[x_min:nrow(dat1),], aes(x=V2, y=V1)) +
             geom_point(size=1, alpha=0.25) +
             geom_line(alpha=0.5) +
-            geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
+            annotate("rect", xmin=-Inf, xmax=30, ymin=-Inf, ymax=Inf,
+                     alpha=0.2, fill="red") +
+            annotate("text", x=15, y=(max(dat1$V1)/2), label="Degraded sample",
+                     angle=90) +
             xlab("Fragment length") + 
             ylab("Number of reads") +
-            ggtitle("Insert size distribution") +
             t1
 
     summ <- data.table(Min=min(summary_table$V1),
@@ -1080,9 +1076,14 @@ mRNAcontamination <- function(rpkm,
                 geom_histogram(col="black", fill=I("transparent")) +
                 geom_vline(aes(xintercept=median(ratio)),
                            color="gray", linetype="dashed", size=1) +
+                annotate("text", x=median(finite_rpkm$ratio), y=(max(finite_rpkm$ratio)/2), label="median",
+             angle=90, color="gray", vjust=1) +
                 geom_vline(aes(xintercept=mean(ratio)),
                            color="light gray", linetype="dotted", size=1) +
+                annotate("text", x=mean(finite_rpkm$ratio), y=(max(finite_rpkm$ratio)/2), label="mean",
+             angle=90, color="light gray", vjust=1) +
                 labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                #coord_cartesian(xlim=c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
                 xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
         } else {
             plot = base_plot +
@@ -1165,9 +1166,14 @@ mRNAcontamination <- function(rpkm,
                 geom_histogram(col="black", fill=I("transparent")) +
                 geom_vline(aes(xintercept=median(ratio)),
                            color="gray", linetype="dashed", size=1) +
+                annotate("text", x=median(finite_rpkm$ratio), y=(max(finite_rpkm$ratio)/2), label="median",
+             angle=90, color="gray", vjust=1) +
                 geom_vline(aes(xintercept=mean(ratio)),
                            color="light gray", linetype="dotted", size=1) +
+                annotate("text", x=mean(finite_rpkm$ratio), y=(max(finite_rpkm$ratio)/2), label="mean",
+             angle=90, color="light gray", vjust=1) +
                 labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                #coord_cartesian(xlim=c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
                 xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
         } else {
             plot = base_plot +
@@ -1189,14 +1195,22 @@ mRNAcontamination <- function(rpkm,
                     round(median(log10((finite_rpkm$ratio))), 2))
     label2 <- paste("'median'[raw]", ":", round(median(finite_rpkm$ratio), 2))
 
-    max_y  <- suppressMessages(
-                suppressWarnings(layer_scales(plot)$y$range$range[2]))
+    max_x <- suppressMessages(
+        suppressWarnings(layer_scales(plot)$x$range$range[2]))
+    max_y <- suppressMessages(
+        suppressWarnings(layer_scales(plot)$y$range$range[2]))
 
-    q <- plot + annotate("text", x = -Inf, y = Inf, hjust=-0.01, vjust=1.05,
+    # TODO: shift label to top right (more likely to be empty)
+    # TODO: look at Tessa's method to flex bins
+    # TODO: make summary plot of these that IS boxplots
+    # TODO: adjust font sizes to coincide with smaller canvas
+    q <- plot + annotate("text", x = floor(max_x), y = floor(max_y),
+                         hjust="right", vjust=1.05, 
                          label = label1, parse=TRUE) +
-         annotate("text", x = -Inf, y = Inf, hjust=-0.01, vjust=2.05,
-                  label = label2, parse=TRUE) +
-         plot_theme
+            annotate("text", x = floor(max_x), y = floor(max_y),
+                     hjust="right", vjust=2.05,
+                     label = label2, parse=TRUE) +
+            plot_theme
 
     return(q)
 }
@@ -1214,6 +1228,8 @@ mRNAcontamination <- function(rpkm,
 #' plotPI(pi = "pidx")
 #' @export
 plotPI <- function(pi, name='pause indicies') {
+    # TODO: also plot as histogram like mRNA contamination plot
+    # TODO: make summary plot of these that IS boxplots
     if (exists(pi)) {
         PI <- data.table(get(pi))
     } else if (file.exists(pi)) {
@@ -1251,8 +1267,8 @@ plotPI <- function(pi, name='pause indicies') {
     }
     q <- q + coord_cartesian(ylim=c(0, ceiling(boxplot(PI$pi)$stats[5]))) +
             theme_classic(base_size=14) +
-            theme(axis.line = element_line(size = 0.5)) +
-            theme(panel.grid.major = element_blank(),
+            theme(axis.line = element_line(size = 0.5),
+                  panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank(),
                   aspect.ratio = 1,
                   panel.border = element_rect(colour = "black",
