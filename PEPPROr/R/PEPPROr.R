@@ -14,6 +14,25 @@ NULL
 
 ################################################################################
 # FUNCTIONS
+#' A standardized ggplot theme for PEPPRO plots
+#'
+#' @keywords ggplot2 theme
+#' @examples
+#' theme_PEPPRO()
+theme_PEPPRO <- function(base_family = "sans", ...){
+  theme_classic(base_family = base_family, base_size = 14, ...) +
+  theme(
+    axis.line = element_line(size = 0.5),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    aspect.ratio = 1,
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5),
+    panel.border = element_rect(colour = "black", fill=NA, size=0.5)
+  )
+}
+
 
 #' Plot library complexity curves
 #'
@@ -362,14 +381,7 @@ plotComplexityCurves <- function(ccurves,
     fig <- fig +
         labs(col = "") +
         scale_color_discrete(labels=c(clist$SAMPLE_NAME)) +
-        theme_classic(base_size=14) +
-        theme(axis.line = element_line(size = 0.5)) +
-        theme(panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(),
-              aspect.ratio = 1,
-              panel.border = element_rect(colour = "black",
-                                          fill=NA, size=0.5)) +
-        theme(plot.title = element_text(hjust = 0.5))
+        theme_PEPPRO()
 
     # inset zoom plot
     zoom_theme <- theme(legend.position = "none",
@@ -441,6 +453,7 @@ plotComplexityCurves <- function(ccurves,
     return(fig)
 }
 
+
 #' Compute the axis value limit
 #'
 #' This function returns the index of ccurve_TOTAL_READS containing the
@@ -479,6 +492,7 @@ computeLimit <- function(value, ccurve_TOTAL_READS) {
     }
     return(first_point)
 }
+
 
 #' Calculate the Fraction of Reads in Features (FRiF)
 #'
@@ -635,17 +649,15 @@ plotFRiF <- function(sample_name, num_reads, output_name, bedFile) {
                                group=feature, color=feature)) +
             geom_line() +
             labs(x="log(number of bases)", y="FRiF") +
-            theme_classic() +
-            theme(panel.border = element_rect(colour = "black",
-                                              fill=NA,
-                                              size=0.5))
+            theme_PEPPRO()
 
         # Recolor and reposition legend
         p <- p + scale_color_manual(labels=paste0(labels$name, ": ",
                                                   labels$val),
                                     values=labels$color) +
             theme(legend.position=c(0.05,0.95),
-                  legend.justification=c(0.1,0.9))
+                  legend.justification=c(0.1,0.9),
+                  axis.text.x = element_text(angle = 0, hjust = 1, vjust=0.5))
     } else {
         write("Unable to produce FRiF plot!\n", stdout())
     }
@@ -939,7 +951,7 @@ plotFLD <- function(fragL,
                      angle=90) +
             xlab("Fragment length") + 
             ylab("Number of reads") +
-            t1
+            theme_PEPPRO()
 
     summ <- data.table(Min=min(summary_table$V1),
                        Max=max(summary_table$V1),
@@ -1162,17 +1174,6 @@ mRNAcontamination <- function(rpkm,
 
     finite_rpkm <- RPKM[is.finite(RPKM$ratio),]
 
-    plot_theme <- theme_classic(base_size=14) +
-                  theme(axis.line = element_line(size = 0.5),
-                        axis.text.x = element_text(angle = 90,
-                                                   hjust = 1,
-                                                   vjust=0.5),
-                        panel.grid.major = element_blank(),
-                        panel.grid.minor = element_blank(),
-                        aspect.ratio = 1,
-                        panel.border = element_rect(colour = "black",
-                                                    fill=NA, size=0.5))
-
     if (raw) {
         div <- calcDivisions(finite_rpkm$ratio,
                              calcQuantileCutoff(finite_rpkm$ratio))
@@ -1361,9 +1362,9 @@ mRNAcontamination <- function(rpkm,
             annotate("text", x = floor(max_x), y = floor(max_y),
                      hjust="right", vjust=2.05,
                      label = label2, parse=TRUE) +
-            plot_theme
+            theme_PEPPRO()
     } else {
-        q <- plot + plot_theme
+        q <- plot + theme_PEPPRO()
     }
     
 
@@ -1395,6 +1396,7 @@ plotPI <- function(pi, name='pause indicies') {
     }
     colnames(PI) <- c("chr", "start", "end", "name", "pi", "strand")
 
+
     q <- ggplot(data = PI, aes(x="", y=pi)) +
             stat_boxplot(geom ='errorbar', width = 0.25) +
             geom_boxplot(width = 0.25,
@@ -1421,13 +1423,7 @@ plotPI <- function(pi, name='pause indicies') {
                                     limits=c(0, max(PI$pi)))
     }
     q <- q + coord_cartesian(ylim=c(0, ceiling(boxplot(PI$pi)$stats[5]))) +
-            theme_classic(base_size=14) +
-            theme(axis.line = element_line(size = 0.5),
-                  panel.grid.major = element_blank(),
-                  panel.grid.minor = element_blank(),
-                  aspect.ratio = 1,
-                  panel.border = element_rect(colour = "black",
-                                              fill=NA, size=0.5))
+            theme_PEPPRO()
     max_y  <- ceiling(boxplot(PI$pi)$stats[5])
     label1 <- c(paste("'median'", ":", round(median(PI$pi), 2)),
                 paste("'mean'", ":", round(mean(PI$pi), 2)))
@@ -1471,14 +1467,7 @@ plotCutadapt <- function(input, name='cutadapt') {
             geom_vline(xintercept = 20, linetype = "dotted", alpha=0.25) +
             geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
             labs(title=name, x="Size of insertion", y="Number of reads") +
-            theme_classic(base_size=14) +
-            theme(axis.line = element_line(size = 0.5),
-                  plot.title = element_text(hjust = 0.5),
-                  panel.grid.major = element_blank(),
-                  panel.grid.minor = element_blank(),
-                  aspect.ratio = 1,
-                  panel.border = element_rect(colour = "black",
-                                              fill=NA, size=0.5))
+            theme_PEPPRO()
 
     return(q)
 }
