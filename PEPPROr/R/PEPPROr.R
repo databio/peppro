@@ -1016,6 +1016,118 @@ fancyNumbers <- function(n){
     return(textReturn)
 }
 
+
+#' Determine which quantile to use as cutoff.
+#'
+#' Modified from: GenomicDistributions (Tessa Danehy)
+#'
+#' @param vec A vector of numbers.
+#' @keywords cutoff quantiles
+#' @examples
+#' calcQuantileCutoff()
+calcQuantileCutoff = function(vec){
+  n <- length(vec) # number of observations
+  if (n > 1000) {n = 1000}
+  if (n < 100) {n = 100}
+  q <- max(1, (11 - round(n/100))) # finding quantiles for flanking bins
+  return(q)
+}
+
+
+#' Calculate histogram binning by quantile.
+#'
+#' Modified from: GenomicDistributions (Tessa Danehy)
+#'
+#' @param vec A vector of numbers.
+#' @param q The quantile to use for cutoffs.
+#' @param bins The number of bins to use for a histogram.
+#' @param transformed Adjust divisions if transformed
+#' @keywords quantiles
+#' @examples
+#' calcDivisions()
+calcDivisions = function(vec, q, bins=NULL, transformed=FALSE){
+  q = as.numeric(q)
+  if(q > 50){
+    message("Quantile should not be larger than 50. Optimal size is under 10.")
+    q <- 50
+  }
+  if(!is.null(bins)){
+    b <- bins + 1
+  }
+  else {
+    b <- abs((30-(2*q))/q) # finding the number of bins based on the quantiles
+  }
+  quant  <- unname(quantile(vec, probs = c((q/100), (1-(q/100)))))
+  seq_10 <- seq(quant[1], quant[2], length = b)
+  if (transformed) {
+    div  <- c(-Inf, round(seq_10, 2), Inf)
+  } else {
+    div  <- c(-Inf, round(seq_10), Inf)
+  }
+  
+  return(div)
+}
+
+
+#' Create a character vector of bin labels.
+#'
+#' From: GenomicDistributions (Tessa Danehy)
+#'
+#' @param breakPoints A vector of numbers.
+#' @param digits The number of digits to round to.
+#' @param collapse The character to separate paste values by.
+#' @param infBins Whether to use infinite bins.
+#' @keywords labels
+#' @examples
+#' labelCuts()
+labelCuts = function(breakPoints, digits=1, collapse="-", infBins=FALSE) {
+    labels <- 
+        apply(round(cbind(breakPoints[-length(breakPoints)],   
+                          breakPoints[-1]),digits), 1, paste0,
+                          collapse=collapse) 
+    
+    if (infBins) {
+        labels[1] <- paste0("<", breakPoints[2])
+        labels[length(labels)] <- paste0(">", breakPoints[length(breakPoints)-1])
+    }
+    return(labels)
+}
+
+
+#' Create a character vector of bin labels.
+#'
+#' Modified from: GenomicDistributions (Tessa Danehy)
+#'
+#' @param vec A vector (or list of vectors) of numbers.
+#' @param divisions The break points of the distribution
+#' @keywords quantiles
+#' @examples
+#' cutDists()
+cutDists = function(vec, divisions = c(-Inf, -1e6, -1e4, -1000, -100, 0,
+                                         100, 1000, 10000, 1e6, Inf)) {
+    if (is.list(vec)) {
+        x = lapply(vec, cutDists)
+        
+        # To accommodate multiple lists, we'll need to introduce a new 'name'
+        # column to distinguish them.
+        nameList = names(vec)
+        if(is.null(nameList)) {
+            nameList = 1:length(query) # Fallback to sequential numbers
+        }
+        
+        # Append names
+        xb = rbindlist(x)
+        xb$name = rep(nameList, sapply(x, nrow))
+        
+        return(xb)
+    }
+    
+    labels <- labelCuts(signif(divisions, 3), collapse=" to ", infBins=TRUE)
+    cuts   <- cut(vec, divisions, labels)
+    return(as.data.frame(table(cuts)))
+}
+
+
 #' Plot the distribution of genic exonRPKM/intronRPKM ratios
 #'
 #' This function plots the distribution of by gene exon RPKM divided by
@@ -1026,6 +1138,7 @@ fancyNumbers <- function(n){
 #'             "gene", "intron RPKM", "exon RPKM" columns.
 #' @param name X-axis label, typically a sample name
 #' @param raw Plot raw distribution
+#' @param annotate Display mean and median values on plot
 #' @keywords mRNA contamination
 #' @export
 #' @examples
@@ -1035,7 +1148,8 @@ fancyNumbers <- function(n){
 mRNAcontamination <- function(rpkm,
                               name='mRNA contamination ratios',
                               raw=TRUE,
-                              type=c("histogram", "boxplot", "violin")) {
+                              type=c("histogram", "boxplot", "violin"),
+                              annotate=TRUE) {
     if (exists(rpkm)) {
         RPKM <- data.table(get(rpkm))
     } else if (file.exists(rpkm)) {
@@ -1050,6 +1164,9 @@ mRNAcontamination <- function(rpkm,
 
     plot_theme <- theme_classic(base_size=14) +
                   theme(axis.line = element_line(size = 0.5),
+                        axis.text.x = element_text(angle = 90,
+                                                   hjust = 1,
+                                                   vjust=0.5),
                         panel.grid.major = element_blank(),
                         panel.grid.minor = element_blank(),
                         aspect.ratio = 1,
@@ -1057,47 +1174,83 @@ mRNAcontamination <- function(rpkm,
                                                     fill=NA, size=0.5))
 
     if (raw) {
+        div <- calcDivisions(finite_rpkm$ratio,
+                             calcQuantileCutoff(finite_rpkm$ratio))
+    } else {
+        div <- calcDivisions(log10(finite_rpkm$ratio),
+                             calcQuantileCutoff(log10(finite_rpkm$ratio)),
+                             transformed=TRUE)
+    }
+
+    quantLabel <- paste(calcQuantileCutoff(finite_rpkm$ratio),"%", sep='')
+
+    if (raw) {
         if (type == "histogram") {
-            base_plot <- ggplot(data = finite_rpkm,  aes(ratio))
+            # calculate a frequency table with the specified divisions
+            rpkm_table <- cutDists(finite_rpkm$ratio, divisions = div)
+            base_plot  <- ggplot(data = rpkm_table,  aes(x=cuts, y=Freq))
         } else {
-            base_plot <- ggplot(data = finite_rpkm,  aes(x="", y=(ratio)))
+            base_plot  <- ggplot(data = finite_rpkm,  aes(x="", y=(ratio)))
         }
     } else {
         if (type == "histogram") {
-            base_plot <- ggplot(data = finite_rpkm, aes(log10(ratio)))
+            # calculate a frequency table with the specified divisions
+            rpkm_table <- cutDists(log10(finite_rpkm$ratio), divisions = div)
+            base_plot  <- ggplot(data = rpkm_table,  aes(x=cuts, y=Freq))
         } else {
-            base_plot <- ggplot(data = finite_rpkm, aes(x="", y=log10(ratio)))
+            base_plot  <- ggplot(data = finite_rpkm, aes(x="", y=log10(ratio)))
         }
     }
 
     if (type == "histogram") {
         if (raw) {
-            plot = base_plot +
-                geom_histogram(col="black", fill=I("transparent")) +
-                geom_vline(aes(xintercept=median(ratio)),
-                           color="gray", linetype="dashed", size=1) +
-                annotate("text", x=median(finite_rpkm$ratio), y=(max(finite_rpkm$ratio)/2), label="median",
-             angle=90, color="gray", vjust=1) +
-                geom_vline(aes(xintercept=mean(ratio)),
-                           color="light gray", linetype="dotted", size=1) +
-                annotate("text", x=mean(finite_rpkm$ratio), y=(max(finite_rpkm$ratio)/2), label="mean",
-             angle=90, color="light gray", vjust=1) +
-                labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                #coord_cartesian(xlim=c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
-                xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
+            # plot <- base_plot +
+            #     geom_histogram(col="black", fill=I("transparent")) +
+            #     geom_vline(aes(xintercept=median(ratio)),
+            #                color="gray", linetype="dashed", size=1) +
+            #     annotate("text", x=median(finite_rpkm$ratio),
+            #              y=(max(finite_rpkm$ratio)/2), label="median",
+            #              angle=90, color="gray", vjust=-0.5) +
+            #     geom_vline(aes(xintercept=mean(ratio)),
+            #                color="light gray", linetype="dotted", size=1) +
+            #     annotate("text", x=mean(finite_rpkm$ratio),\
+            #              y=(max(finite_rpkm$ratio)/2), label="mean",
+            #              angle=90, color="light gray", vjust=-0.5) +
+            #     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+            #     xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
+            plot <- base_plot +
+                geom_bar(stat="identity",
+                         fill = c("maroon",
+                                  rep("gray", (length(div)-3)),
+                                  "maroon")) + 
+                labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
+                     y="Frequency") +
+                geom_text(aes(label= quantLabel),
+                          data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                          vjust=-1)
         } else {
-            plot = base_plot +
-                geom_histogram(col="black", fill=I("transparent")) +
-                geom_vline(aes(xintercept=median(log10(ratio))),
-                           color="gray", linetype="dashed", size=1) +
-                geom_vline(aes(xintercept=mean(log10(ratio))),
-                           color="light gray", linetype="dotted", size=1) +
-                labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                scale_x_log10(limits = c(0.001, 50),
-                              expand = expand_scale(mult = c(0, 0)),
-                              labels=fancyNumbers,
-                              breaks=prettyLogs) +
-                annotation_logticks(sides = c("rl"))
+            # plot = base_plot +
+            #     geom_histogram(col="black", fill=I("transparent")) +
+            #     geom_vline(aes(xintercept=median(log10(ratio))),
+            #                color="gray", linetype="dashed", size=1) +
+            #     geom_vline(aes(xintercept=mean(log10(ratio))),
+            #                color="light gray", linetype="dotted", size=1) +
+            #     labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+            #     scale_x_log10(limits = c(0.001, 50),
+            #                   expand = expand_scale(mult = c(0, 0)),
+            #                   labels=fancyNumbers,
+            #                   breaks=prettyLogs) +
+            #     annotation_logticks(sides = c("rl"))
+            plot <- base_plot +
+                geom_bar(stat="identity",
+                         fill = c("maroon",
+                                  rep("gray", (length(div)-3)),
+                                  "maroon")) + 
+                labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
+                     y="Frequency") +
+                geom_text(aes(label= quantLabel),
+                          data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                          vjust=-1)
         }
     } else if (type == "boxplot") {
         if (raw) {
@@ -1131,7 +1284,7 @@ mRNAcontamination <- function(rpkm,
     } else if (type == "violin") {
         if (raw) {
             plot = base_plot +
-                stat_boxplot(geom ='errorbar', width = 0.25) +
+                #stat_boxplot(geom ='errorbar', width = 0.25) +
                 geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
                             linetype="dashed") +
                 geom_violin(width=0.25, fill="transparent",
@@ -1143,7 +1296,7 @@ mRNAcontamination <- function(rpkm,
                 ylim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
         } else {
             plot <- base_plot +
-                stat_boxplot(geom ='errorbar', width = 0.25) +
+                #stat_boxplot(geom ='errorbar', width = 0.25) +
                 geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
                             linetype="dashed") +
                 geom_violin(width=0.25, fill="transparent",
@@ -1162,32 +1315,27 @@ mRNAcontamination <- function(rpkm,
     } else {
         # Default to histogram
         if (raw) {
-            plot = base_plot +
-                geom_histogram(col="black", fill=I("transparent")) +
-                geom_vline(aes(xintercept=median(ratio)),
-                           color="gray", linetype="dashed", size=1) +
-                annotate("text", x=median(finite_rpkm$ratio), y=(max(finite_rpkm$ratio)/2), label="median",
-             angle=90, color="gray", vjust=1) +
-                geom_vline(aes(xintercept=mean(ratio)),
-                           color="light gray", linetype="dotted", size=1) +
-                annotate("text", x=mean(finite_rpkm$ratio), y=(max(finite_rpkm$ratio)/2), label="mean",
-             angle=90, color="light gray", vjust=1) +
-                labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                #coord_cartesian(xlim=c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
-                xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
+            plot <- base_plot +
+                geom_bar(stat="identity",
+                         fill = c("maroon",
+                                  rep("gray", (length(div)-3)),
+                                  "maroon")) + 
+                labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
+                     y="Frequency") +
+                geom_text(aes(label= quantLabel),
+                          data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                          vjust=-1)
         } else {
-            plot = base_plot +
-                geom_histogram(col="black", fill=I("transparent")) +
-                geom_vline(aes(xintercept=median(log10(ratio))),
-                           color="gray", linetype="dashed", size=1) +
-                geom_vline(aes(xintercept=mean(log10(ratio))),
-                           color="light gray", linetype="dotted", size=1) +
-                labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                scale_x_log10(limits = c(0.001, 50),
-                              expand = expand_scale(mult = c(0, 0)),
-                              labels=fancyNumbers,
-                              breaks=prettyLogs) +
-                annotation_logticks(sides = c("rl"))
+            plot <- base_plot +
+                geom_bar(stat="identity",
+                         fill = c("maroon",
+                                  rep("gray", (length(div)-3)),
+                                  "maroon")) + 
+                labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
+                     y="Frequency") +
+                geom_text(aes(label= quantLabel),
+                          data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                          vjust=-1)
         }
     }
 
@@ -1195,22 +1343,29 @@ mRNAcontamination <- function(rpkm,
                     round(median(log10((finite_rpkm$ratio))), 2))
     label2 <- paste("'median'[raw]", ":", round(median(finite_rpkm$ratio), 2))
 
-    max_x <- suppressMessages(
-        suppressWarnings(layer_scales(plot)$x$range$range[2]))
+    if (type == "histogram") {
+        max_x <- length(layer_scales(plot)$x$range$range)
+    } else {
+        max_x <- suppressMessages(
+            suppressWarnings(layer_scales(plot)$x$range$range[2]))
+    }
+    if (is.na(max_x)) {max_x <- Inf}
     max_y <- suppressMessages(
         suppressWarnings(layer_scales(plot)$y$range$range[2]))
 
-    # TODO: shift label to top right (more likely to be empty)
-    # TODO: look at Tessa's method to flex bins
     # TODO: make summary plot of these that IS boxplots
-    # TODO: adjust font sizes to coincide with smaller canvas
-    q <- plot + annotate("text", x = floor(max_x), y = floor(max_y),
+    if (annotate) {
+        q <- plot + annotate("text", x = floor(max_x), y = floor(max_y),
                          hjust="right", vjust=1.05, 
                          label = label1, parse=TRUE) +
             annotate("text", x = floor(max_x), y = floor(max_y),
                      hjust="right", vjust=2.05,
                      label = label2, parse=TRUE) +
             plot_theme
+    } else {
+        q <- plot + plot_theme
+    }
+    
 
     return(q)
 }
