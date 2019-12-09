@@ -358,7 +358,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Command: mrna \t plot mRNA contamination distribution\n\n",
         " -i, --rpkm\t Three column TSV of intron and exon RPKM by gene.\n",
         " -w, --raw\t Plot raw exon/intron ratios instead of log10.\n",
-        " -y, --type\t Choose plot type from: histogram, boxplot, or violin.\n"
+        " -y, --type\t Choose plot type from: histogram, boxplot, or violin.\n",
+        " -a, --annotate\t Display raw and log10-transformed median values on plot.\n"
     )
 
     help <- opt_get(name = c("help", "?", "h"), required=FALSE,
@@ -378,10 +379,13 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                         description="Plot raw ratios (Default = FALSE).")
         type <- opt_get(name = c("type", "y"), required=FALSE, default="histogram",
                         description="Choose plot type from: histogram, boxplot, or violin (Default = histogram).")
+        annotate <- opt_get(name = c("annotate", "a"), required=FALSE, default=FALSE,
+                            description="Display raw and log10-transformed median values on plot.")
 
         sample_name        <- sampleName(rpkm, 3)
         name               <- basename(sample_name)
-        suppressWarnings(p <- mRNAcontamination(rpkm=rpkm, name=name, raw=raw, type=type))
+        suppressWarnings(p <- mRNAcontamination(rpkm=rpkm, name=name, raw=raw,
+                                                type=type, annotate=annotate))
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
@@ -407,7 +411,9 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Usage:   PEPPRO.R [command] {args}\n",
         "Version: ", version, "\n\n",
         "Command: pi \t plot pause indicies distribution\n\n",
-        " -i, --input\t Pause density/gene body density ratios.\n"
+        " -i, --input\t Pause density/gene body density ratios.\n",
+        " -y, --type\t Choose plot type from: histogram, boxplot, or violin.\n",
+        " -a, --annotate\t Display median and mean values on plot.\n"
     )
 
     help <- opt_get(name = c("help", "?", "h"), required=FALSE,
@@ -423,10 +429,15 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
     } else {
         input <- opt_get(name = c("input", "i"), required=TRUE,
                          description="Pause density/gene body density ratios.")
+        type <- opt_get(name = c("type", "y"), required=FALSE, default="histogram",
+                        description="Choose plot type from: histogram, boxplot, or violin (Default = histogram).")
+        annotate <- opt_get(name = c("annotate", "a"), required=FALSE, default=FALSE,
+                            description="Display median and mean values on plot.")
 
         sample_name        <- sampleName(input)
         name               <- basename(sample_name)
-        suppressWarnings(p <- plotPI(pi=input, name=name))
+        suppressWarnings(p <- plotPI(pi=input, name=name,
+                                     type=type, annotate=annotate))
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_pause_index.pdf"),
