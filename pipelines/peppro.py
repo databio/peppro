@@ -2834,7 +2834,7 @@ def main():
         mRNApng = os.path.join(QC_folder,
             args.sample_name + "_mRNA_contamination.png")
         mRNAplot = [tools.Rscript, tool_path("PEPPRO.R"), "mrna",
-                    "-i", intron_exon, "--raw"]
+                    "-i", intron_exon, "--raw", "--annotate"]
         cmd = build_command(mRNAplot)
         pm.run(cmd, mRNApdf, nofail=False)
         pm.report_object("mRNA contamination", mRNApdf, anchor_image=mRNApng)
