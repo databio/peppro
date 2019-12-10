@@ -2453,7 +2453,7 @@ def main():
                 ("awk '{sum += $2} END {print sum}' " + chr_order)))
             pm.report_result("Genome_size", genome_size)
     else:
-        genome_size = int(pm.get_stat("genome_size"))
+        genome_size = int(pm.get_stat("Genome_size"))
 
     if not os.path.exists(res.ensembl_tss):
         if not os.path.exists(res.ensembl_gene_body):
