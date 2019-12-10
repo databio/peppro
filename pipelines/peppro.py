@@ -419,6 +419,7 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
 
     if args.adapter == "fastp":
         # Remove UMI by specifying location of UMI
+        # Location is still read1 because it's being treated as SE data
         trim_cmd_chunks = [
             tools.fastp,
             ("--thread", str(pm.cores)),
@@ -756,21 +757,27 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 tools.fastp,
                 ("--thread", str(pm.cores)),
                 ("--stdin", "--stdout"),
-                "--umi"
-            ]
-
-            if read2:
-                trim_cmd_chunks.extend([("--umi_loc", "paired_end")])
-            else:
-                trim_cmd_chunks.extend([("--umi_loc", "read1")])
-
-            trim_cmd_chunks.extend([
+                "--umi",
+                ("--umi_loc", "read1"),
                 ("--umi_len", args.umi_len),
                 ("--html", umi_report),
                 ("--json", umi_json),
                 "|",
                 (tools.seqtk, "trimfq")
-            ])
+            ]
+
+            # if read2:
+            #     trim_cmd_chunks.extend([("--umi_loc", "read1")])
+            # else:
+            #     trim_cmd_chunks.extend([("--umi_loc", "read1")])
+
+            # trim_cmd_chunks.extend([
+            #     ("--umi_len", args.umi_len),
+            #     ("--html", umi_report),
+            #     ("--json", umi_json),
+            #     "|",
+            #     (tools.seqtk, "trimfq")
+            # ])
 
             # Trim to max length if specified
             if args.max_len != -1:
@@ -1012,7 +1019,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         # a -o and the actual reads are directed to stdout.
         process_fastq_cmd2 = build_command([
             "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
-        pm.debug("process_fastq_cmd2: {}".format(process_fastq_cmd2))
+        pm.info("process_fastq_cmd2: {}".format(process_fastq_cmd2))
         pm.run(process_fastq_cmd2, trimmed_fastq_R2)
         cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
         pm.run(cp_cmd, trimmed_dups_fastq_R2)
@@ -1020,13 +1027,15 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     else:
         if not args.complexity and args.umi_len > 0:
             # This trim command DOES need the adapter file...
-            pm.debug("\ntrim_command1: {} + {}\n".format(adapter_command, trim_command))
+            pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
             pm.run([adapter_command, trim_command], processed_fastq,
                    follow=ngstk.check_trim(processed_fastq, False, None,
                                            fastqc_folder=fastqc_folder))
             # This needs to produce the trimmed_fastq file
-            pm.debug("\ntrim_command2: {} + {} + {}\n".format(adapter_command, deduplicate_command, trim_command2))
-            pm.run([adapter_command, deduplicate_command, trim_command2],
+            # TODO: trim_command2 doesn't need to produce fastp html files and json files...
+            # TODO: if I'm using seqkit rmdup here, I DON'T NEED the other fastp!!! umi command
+            pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
+            pm.run([deduplicate_command, trim_command2],
                    trimmed_fastq, follow=report_fastq)
             pm.clean_add(noadap_fastq)
             pm.clean_add(dedup_fastq)
