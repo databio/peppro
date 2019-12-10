@@ -450,8 +450,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
     } else {
         input <- opt_get(name = c("input", "i"), required=TRUE,
                          description="Pause density/gene body density ratios.")
-        type <- opt_get(name = c("type", "y"), required=FALSE, default="histogram",
-                        description="Choose plot type from: histogram, boxplot, or violin (Default = histogram).")
+        type  <- opt_get(name = c("type", "y"), required=FALSE, default="histogram",
+                         description="Choose plot type from: histogram, boxplot, or violin (Default = histogram).")
         annotate <- opt_get(name = c("annotate", "a"), required=FALSE, default=FALSE,
                             description="Display median and mean values on plot.")
 
