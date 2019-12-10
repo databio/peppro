@@ -584,10 +584,10 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                               as.numeric((sum(abs(bed$V3-bed$V2))/genome_size)))
         bedCov$feature <- name
     } else if (file.exists(file.path(bedFile[1])) && info$size != 0) {
+        bed <- read.table(file.path(bedFile[1]))
         if (nrow(bed[which(bed$V4 != 0),]) == 0) {
             message(paste0(name, "  has no covered features"))
         } else {
-            bed        <- read.table(file.path(bedFile[1]))
             bedCov     <- calcFRiF(bed, num_reads)
             name       <- basename(tools::file_path_sans_ext(bedFile[1]))
             name       <- gsub(sample_name, "", name)
