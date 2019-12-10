@@ -2446,6 +2446,15 @@ def main():
             pm.clean_add(chr_order)
             pm.clean_add(chr_keep)
 
+    # Calculate size of genome
+    if not pm.get_stat("Genome_size") or args.new_start:
+        if os.path.exists(chr_order):
+            genome_size = int(pm.checkprint(
+                ("awk '{sum += $2} END {print sum}' " + chr_order)))
+            pm.report_result("Genome_size", genome_size)
+    else:
+        genome_size = int(pm.get_stat("genome_size"))
+
     if not os.path.exists(res.ensembl_tss):
         if not os.path.exists(res.ensembl_gene_body):
             print("Skipping PI -- Pause index requires 'TSS' and 'gene body' annotation files: {} and {}"
@@ -2521,7 +2530,7 @@ def main():
         pi_png = os.path.join(QC_folder, args.sample_name +
                               "_pause_index.png")
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
-               " pi -i " + pause_index)
+               " pi --annotate -i " + pause_index)
         pm.run(cmd, pi_pdf, nofail=True)
         pm.report_object("Pause index", pi_pdf, anchor_image=pi_png)
 
@@ -2628,6 +2637,13 @@ def main():
     frif_minus_PNG = os.path.join(QC_folder,
                                   args.sample_name + "_minus_frif.png")
 
+    logOE_plus_PDF = os.path.join(QC_folder, args.sample_name + "_plus_logOE.pdf")
+    logOE_plus_PNG = os.path.join(QC_folder, args.sample_name + "_plus_logOE.png")
+    logOE_minus_PDF = os.path.join(QC_folder,
+                                  args.sample_name + "_minus_logOE.pdf")
+    logOE_minus_PNG = os.path.join(QC_folder,
+                                  args.sample_name + "_minus_logOE.png")
+
     if not os.path.exists(frif_plus_PDF) or args.new_start:
         anno_list_plus = list()
         anno_list_minus = list()
@@ -2696,6 +2712,7 @@ def main():
     #                                 Plot FRiF                                #
     ############################################################################
     pm.timestamp("### Plot FRiF")
+    logOE_plus_PDF
     # Plus
     if not os.path.exists(frif_plus_PDF) or args.new_start:
         count_cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
@@ -2704,15 +2721,27 @@ def main():
         plus_read_count = str(plus_read_count).rstrip()
 
         frif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-                   "-n", args.sample_name, "-r", plus_read_count,
-                   "-o", frif_plus_PDF, "--bed"]
+                    "-n", args.sample_name, "-s", str(genome_size).rstrip(),
+                    "-r", plus_read_count, "-y", "frif",
+                    "-o", frif_plus_PDF, "--bed"]
+
+        logOE_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+                     "-n", args.sample_name, "-s", str(genome_size).rstrip(),
+                     "-r", plus_read_count, "-y", "ratio",
+                     "-o", logOE_plus_PDF, "--bed"]
+
         if anno_list_plus:
             for cov in anno_list_plus:
                 frif_cmd.append(cov)
+                logOE_cmd.append(cov)
             cmd = build_command(frif_cmd)
             pm.run(cmd, frif_plus_PDF, nofail=False)
             pm.report_object("Plus FRiF", frif_plus_PDF,
                              anchor_image=frif_plus_PNG)
+            cmd = build_command(logOE_cmd)
+            pm.run(cmd, logOE_plus_PDF, nofail=False)
+            pm.report_object("Plus logOE", logOE_plus_PDF,
+                             anchor_image=logOE_plus_PNG)
 
     # Minus
     if not os.path.exists(frif_minus_PDF) or args.new_start:
@@ -2722,15 +2751,27 @@ def main():
         minus_read_count = str(minus_read_count).rstrip()
 
         frif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-                   "-n", args.sample_name, "-r", minus_read_count,
+                   "-n", args.sample_name, "-s", str(genome_size).rstrip(),
+                   "-r", minus_read_count, "-y", "frif",
                    "-o", frif_minus_PDF, "--bed"]
+
+        logOE_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+                     "-n", args.sample_name, "-s", str(genome_size).rstrip(),
+                     "-r", minus_read_count, "-y", "ratio",
+                     "-o", logOE_minus_PDF, "--bed"]
+
         if anno_list_minus:
             for cov in anno_list_minus:
                 frif_cmd.append(cov)
+                logOE_cmd.append(cov)
             cmd = build_command(frif_cmd)
             pm.run(cmd, frif_minus_PDF, nofail=False)
             pm.report_object("Minus FRiF", frif_minus_PDF,
                              anchor_image=frif_minus_PNG)
+            cmd = build_command(logOE_cmd)
+            pm.run(cmd, logOE_minus_PDF, nofail=False)
+            pm.report_object("Minus logOE", logOE_minus_PDF,
+                             anchor_image=logOE_minus_PNG)
 
     ############################################################################
     #                         Report mRNA contamination                        #
