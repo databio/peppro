@@ -1082,8 +1082,8 @@ plotFLD <- function(fragL,
             geom_line(alpha=0.5) +
             annotate("rect", xmin=-Inf, xmax=30, ymin=-Inf, ymax=Inf,
                      alpha=0.15, fill="maroon") +
-            annotate("text", x=15, y=(max(dat1$V1)/2), label="Degraded sample",
-                     angle=90) +
+            annotate("text", x=15, y=(max(dat1$V1)/2),
+                     label="zone of degradation", angle=90) +
             xlab("fragment length") + 
             ylab("number of reads") +
             theme_PEPPRO()
