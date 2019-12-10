@@ -189,6 +189,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Command: frif \t plot fraction of reads in features\n\n",
         " -n, --sample_name\t   Sample name.\n",
         " -r, --reads\t\t   Number of mapped reads.\n",
+        " -s, --size\t\t   Size of genome (bp).\n",
+        " -y, --type\t Choose plot type: FRiF, log(O/E), or Both.\n",
         " -o, --output_name\t   Output file name.\n",
         " -b, --bed\t\t   Coverage file(s).\n"
     )
@@ -208,31 +210,49 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                description="Sample name.")
         reads       <- opt_get(name = c("reads", "r"), required=TRUE,
                                description="Number of mapped reads.")
+        genome_size <- opt_get(name = c("size", "s"), required=TRUE,
+                               description="Size of genome (bp).")
+        type        <- opt_get(name = c("type", "y"), required=FALSE, default="frif",
+                               description="Choose plot type: FRiF, log(O/E), or Both (Default = frif).")
         output_name <- opt_get(name = c("output_name", "o"), required=TRUE,
                                description="Output file name.")
         numArgs     <- length(opt_get_args())
         bed         <- opt_get(name = c("bed", "b"), required=TRUE,
-                               n=(numArgs - 8),
+                               n=(numArgs - 12),
                                description="Coverage file(s).")
 
         p <- plotFRiF(sample_name = sample_name,
-                      num_reads = reads,
+                      num_reads = as.numeric(reads),
+                      genome_size = as.numeric(genome_size),
+                      type = tolower(type),
                       output_name = output_name,
                       bedFile = bed)
 
-        pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-            width = 4, height = 4, useDingbats=F)
-        suppressWarnings(print(p))
-        invisible(dev.off())
-        png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-            width = 275, height = 275)
-        suppressWarnings(print(p))
-        invisible(dev.off())
+        if (tolower(type) == "both") {
+            pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+                height = 5.45, width = 8.39, useDingbats=F)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+            png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+                height = 550, width=850)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+        } else {
+            pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+                height = 4, width = 4, useDingbats=F)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+            png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+                height = 275, width=275)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+        }
+        
 
         if (exists("p")) {
-            write("Cumulative FRiF plot completed!\n", stdout())
+            write(paste0("Cumulative ", type, " plot completed!\n"), stdout())
         } else {
-            write("Unable to produce FRiF plot!\n", stdout())
+            write(paste0("Unable to produce ", type, " plot!\n"), stdout())
         }
     }
 } else if (!is.na(subcmd) && tolower(subcmd) == "tss") {
@@ -385,7 +405,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         sample_name        <- sampleName(rpkm, 3)
         name               <- basename(sample_name)
         suppressWarnings(p <- mRNAcontamination(rpkm=rpkm, name=name, raw=raw,
-                                                type=type, annotate=annotate))
+                                                type=tolower(type),
+                                                annotate=annotate))
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
@@ -437,7 +458,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         sample_name        <- sampleName(input)
         name               <- basename(sample_name)
         suppressWarnings(p <- plotPI(pi=input, name=name,
-                                     type=type, annotate=annotate))
+                                     type=tolower(type), annotate=annotate))
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_pause_index.pdf"),
