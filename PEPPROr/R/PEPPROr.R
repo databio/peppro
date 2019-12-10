@@ -584,19 +584,23 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                               as.numeric((sum(abs(bed$V3-bed$V2))/genome_size)))
         bedCov$feature <- name
     } else if (file.exists(file.path(bedFile[1])) && info$size != 0) {
-        bed        <- read.table(file.path(bedFile[1]))
-        bedCov     <- calcFRiF(bed, num_reads)
-        name       <- basename(tools::file_path_sans_ext(bedFile[1]))
-        name       <- gsub(sample_name, "", name)
-        name       <- gsub("^.*?_", "", name)
-        numFields  <- 2
-        for(i in 1:numFields) name <- gsub("_[^_]*$", "", name)
-        labels[1,] <- c(0.95*max(log10(bedCov$cumSize)), max(bedCov$frip)+0.001,
-                        name, round(max(bedCov$frip),2), "#FF0703")
-        feature_dist[1,] <- c(name, nrow(bed),
-                              as.numeric(sum(abs(bed$V3-bed$V2))),
-                              as.numeric((sum(abs(bed$V3-bed$V2))/genome_size)))
-        bedCov$feature <- name
+        if (nrow(bed[which(bed$V4 != 0),]) == 0) {
+            message(paste0(name, "  has no covered features"))
+        } else {
+            bed        <- read.table(file.path(bedFile[1]))
+            bedCov     <- calcFRiF(bed, num_reads)
+            name       <- basename(tools::file_path_sans_ext(bedFile[1]))
+            name       <- gsub(sample_name, "", name)
+            name       <- gsub("^.*?_", "", name)
+            numFields  <- 2
+            for(i in 1:numFields) name <- gsub("_[^_]*$", "", name)
+            labels[1,] <- c(0.95*max(log10(bedCov$cumSize)), max(bedCov$frip)+0.001,
+                            name, round(max(bedCov$frip),2), "#FF0703")
+            feature_dist[1,] <- c(name, nrow(bed),
+                                  as.numeric(sum(abs(bed$V3-bed$V2))),
+                                  as.numeric((sum(abs(bed$V3-bed$V2))/genome_size)))
+            bedCov$feature <- name
+        }
     }  else {
         if (is.na(info[1])) {
             message(paste0(name, " coverage file is missing"))
@@ -609,6 +613,8 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
 
     if (exists("bedCov")) {
         covDF <- bedCov
+    } else {
+        return(ggplot())
     }
 
     if (length(bedFile) > 1) {
