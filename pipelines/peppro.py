@@ -1210,7 +1210,10 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             # align_exact = pm.checkprint(cmd)
 
             if align_exact:
-                ar = float(align_exact)*2
+                if paired:
+                    ar = float(align_exact)*2
+                else:
+                    ar = float(align_exact)
             else:
                 ar = 0
 
