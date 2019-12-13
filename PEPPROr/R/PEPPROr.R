@@ -1321,11 +1321,11 @@ mRNAcontamination <- function(rpkm,
     if (raw) {
         div <- calcDivisions(finite_rpkm$ratio,
                              calcQuantileCutoff(finite_rpkm$ratio,
-                                                baseline = 1))
+                                                baseline = 3))
     } else {
         div <- calcDivisions(log10(finite_rpkm$ratio),
                              calcQuantileCutoff(log10(finite_rpkm$ratio),
-                                                baseline = 1),
+                                                baseline = 3),
                              transformed=TRUE)
     }
 
@@ -1335,17 +1335,27 @@ mRNAcontamination <- function(rpkm,
 
     if (raw) {
         if (type == "histogram") {
-            # calculate a frequency table with the specified divisions
-            rpkm_table <- cutDists(finite_rpkm$ratio, divisions = div)
-            base_plot  <- ggplot(data = rpkm_table,  aes(x=cuts, y=Freq))
+            if (length(div) <= 3) {
+                base_plot  <- ggplot(data = finite_rpkm, aes(x=ratio))  
+            } else {
+                # calculate a frequency table with the specified divisions
+                rpkm_table <- cutDists(finite_rpkm$ratio, divisions = div)
+                base_plot  <- ggplot(data = rpkm_table,  aes(x=cuts, y=Freq))
+            }
+            
         } else {
             base_plot  <- ggplot(data = finite_rpkm,  aes(x="", y=(ratio)))
         }
     } else {
         if (type == "histogram") {
-            # calculate a frequency table with the specified divisions
-            rpkm_table <- cutDists(log10(finite_rpkm$ratio), divisions = div)
-            base_plot  <- ggplot(data = rpkm_table,  aes(x=cuts, y=Freq))
+            if (length(div) <= 3) {
+                base_plot  <- ggplot(data = finite_rpkm, aes(x=log10(ratio)))  
+            } else {
+                # calculate a frequency table with the specified divisions
+                rpkm_table <- cutDists(log10(finite_rpkm$ratio),
+                                       divisions = div)
+                base_plot  <- ggplot(data = rpkm_table,  aes(x=cuts, y=Freq))
+            }
         } else {
             base_plot  <- ggplot(data = finite_rpkm, aes(x="", y=log10(ratio)))
         }
@@ -1353,53 +1363,63 @@ mRNAcontamination <- function(rpkm,
 
     if (type == "histogram") {
         if (raw) {
-            # plot <- base_plot +
-            #     geom_histogram(col="black", fill=I("transparent")) +
-            #     geom_vline(aes(xintercept=median(ratio)),
-            #                color="gray", linetype="dashed", size=1) +
-            #     annotate("text", x=median(finite_rpkm$ratio),
-            #              y=(max(finite_rpkm$ratio)/2), label="median",
-            #              angle=90, color="gray", vjust=-0.5) +
-            #     geom_vline(aes(xintercept=mean(ratio)),
-            #                color="light gray", linetype="dotted", size=1) +
-            #     annotate("text", x=mean(finite_rpkm$ratio),\
-            #              y=(max(finite_rpkm$ratio)/2), label="mean",
-            #              angle=90, color="light gray", vjust=-0.5) +
-            #     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-            #     xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
-            plot <- base_plot +
-                geom_bar(stat="identity",
-                         fill = c("maroon",
-                                  rep("gray", (length(div)-3)),
-                                  "maroon")) + 
-                labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
-                     y="frequency") +
-                geom_text(aes(label= quantLabel),
-                          data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                          vjust=-1)
+            if (length(div) <= 3) {
+                plot <- base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(ratio)),
+                               color="gray", linetype="dashed", size=1) +
+                    annotate("text", x=median(finite_rpkm$ratio),
+                             y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
+                                label="median", angle=90,
+                                color="gray", vjust=-0.5) +
+                    geom_vline(aes(xintercept=mean(ratio)),
+                               color="light gray", linetype="dotted", size=1) +
+                    annotate("text", x=mean(finite_rpkm$ratio),
+                             y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
+                                label="mean", angle=90,
+                                color="light gray", vjust=-0.5) +
+                    labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90)))) +
+                    theme_PEPPRO()
+            } else {
+                plot <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("maroon",
+                                      rep("gray", (length(div)-3)),
+                                      "maroon")) + 
+                    labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    geom_text(aes(label= quantLabel),
+                              data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                              vjust=-1)
+            }
         } else {
-            # plot = base_plot +
-            #     geom_histogram(col="black", fill=I("transparent")) +
-            #     geom_vline(aes(xintercept=median(log10(ratio))),
-            #                color="gray", linetype="dashed", size=1) +
-            #     geom_vline(aes(xintercept=mean(log10(ratio))),
-            #                color="light gray", linetype="dotted", size=1) +
-            #     labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-            #     scale_x_log10(limits = c(0.001, 50),
-            #                   expand = expand_scale(mult = c(0, 0)),
-            #                   labels=fancyNumbers,
-            #                   breaks=prettyLogs) +
-            #     annotation_logticks(sides = c("rl"))
-            plot <- base_plot +
-                geom_bar(stat="identity",
-                         fill = c("maroon",
-                                  rep("gray", (length(div)-3)),
-                                  "maroon")) + 
-                labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
-                     y="frequency") +
-                geom_text(aes(label= quantLabel),
-                          data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                          vjust=-1)
+            if (length(div) <= 3) {
+                plot = base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(log10(ratio))),
+                               color="gray", linetype="dashed", size=1) +
+                    geom_vline(aes(xintercept=mean(log10(ratio))),
+                               color="light gray", linetype="dotted", size=1) +
+                    labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                    scale_x_log10(limits = c(0.001, 50),
+                                  expand = expand_scale(mult = c(0, 0)),
+                                  labels=fancyNumbers,
+                                  breaks=prettyLogs) +
+                    annotation_logticks(sides = c("rl"))
+            } else {
+                plot <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("maroon",
+                                      rep("gray", (length(div)-3)),
+                                      "maroon")) + 
+                    labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    geom_text(aes(label= quantLabel),
+                              data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                              vjust=-1)
+            }
         }
     } else if (type == "boxplot") {
         if (raw) {
@@ -1464,27 +1484,63 @@ mRNAcontamination <- function(rpkm,
     } else {
         # Default to histogram
         if (raw) {
-            plot <- base_plot +
-                geom_bar(stat="identity",
-                         fill = c("maroon",
-                                  rep("gray", (length(div)-3)),
-                                  "maroon")) + 
-                labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
-                     y="frequency") +
-                geom_text(aes(label= quantLabel),
-                          data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                          vjust=-1)
+            if (length(div) <= 3) {
+                plot <- base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(ratio)),
+                               color="gray", linetype="dashed", size=1) +
+                    annotate("text", x=median(finite_rpkm$ratio),
+                             y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
+                                label="median", angle=90,
+                                color="gray", vjust=-0.5) +
+                    geom_vline(aes(xintercept=mean(ratio)),
+                               color="light gray", linetype="dotted", size=1) +
+                    annotate("text", x=mean(finite_rpkm$ratio),
+                             y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
+                                label="mean", angle=90,
+                                color="light gray", vjust=-0.5) +
+                    labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90)))) +
+                    theme_PEPPRO()
+            } else {
+                plot <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("maroon",
+                                      rep("gray", (length(div)-3)),
+                                      "maroon")) + 
+                    labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    geom_text(aes(label= quantLabel),
+                              data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                              vjust=-1)
+            }
         } else {
-            plot <- base_plot +
-                geom_bar(stat="identity",
-                         fill = c("maroon",
-                                  rep("gray", (length(div)-3)),
-                                  "maroon")) + 
-                labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
-                     y="frequency") +
-                geom_text(aes(label= quantLabel),
-                          data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                          vjust=-1)
+            if (length(div) <= 3) {
+                plot = base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(log10(ratio))),
+                               color="gray", linetype="dashed", size=1) +
+                    geom_vline(aes(xintercept=mean(log10(ratio))),
+                               color="light gray", linetype="dotted", size=1) +
+                    labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                    scale_x_log10(limits = c(0.001, 50),
+                                  expand = expand_scale(mult = c(0, 0)),
+                                  labels=fancyNumbers,
+                                  breaks=prettyLogs) +
+                    annotation_logticks(sides = c("rl"))
+            } else {
+                plot <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("maroon",
+                                      rep("gray", (length(div)-3)),
+                                      "maroon")) + 
+                    labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    geom_text(aes(label= quantLabel),
+                              data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                              vjust=-1)
+            }
         }
     }
 
@@ -1547,19 +1603,43 @@ plotPI <- function(pi, name='pause indicies',
     }
     colnames(PI) <- c("chr", "start", "end", "name", "pi", "strand")
 
-    div <- calcDivisions(PI$pi, calcQuantileCutoff(PI$pi, baseline=1))
-    quantLabel <- paste(calcQuantileCutoff(PI$pi, baseline=1),"%", sep='')
+    div <- calcDivisions(PI$pi, calcQuantileCutoff(PI$pi, baseline = 3))
+    quantLabel <- paste(calcQuantileCutoff(PI$pi, baseline = 3),"%", sep='')
 
     if (type == "histogram") {
-        # calculate a frequency table with the specified divisions
-        pi_table  <- cutDists(PI$pi, divisions = div)
-        base_plot <- ggplot(data = pi_table,  aes(x=cuts, y=Freq))
+        if (length(div) <= 3) {
+            base_plot <- ggplot(data = PI, aes(x=pi))
+        } else {
+            # calculate a frequency table with the specified divisions
+            pi_table  <- cutDists(PI$pi, divisions = div)
+            base_plot <- ggplot(data = pi_table,  aes(x=cuts, y=Freq))
+        }
+        
     } else {
         base_plot <- ggplot(data = PI,  aes(x="", y=pi))
     }
 
     if (type == "histogram") {
-        q <- base_plot +
+        if (length(div) <= 3) {
+            q <- base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(PI$pi)),
+                               color="gray", linetype="dashed", size=1) +
+                    annotate("text", x=median(PI$pi),
+                             y=(ceiling(quantile(PI$pi, 0.25))),
+                                label="median", angle=90,
+                                color="gray", vjust=-0.5) +
+                    geom_vline(aes(xintercept=mean(PI$pi)),
+                               color="light gray", linetype="dotted", size=1) +
+                    annotate("text", x=mean(PI$pi),
+                             y=(ceiling(quantile(PI$pi, 0.25))),
+                                label="mean", angle=90,
+                                color="light gray", vjust=-0.5) +
+                    labs(x="pause indicies", y="frequency") +
+                    xlim(c(0, ceiling(quantile(PI$pi, 0.90)))) +
+                    theme_PEPPRO()
+        } else {
+            q <- base_plot +
                 geom_bar(stat="identity",
                          fill = c("maroon",
                                   rep("gray", (length(div)-3)),
@@ -1568,6 +1648,7 @@ plotPI <- function(pi, name='pause indicies',
                 geom_text(aes(label= quantLabel),
                           data=pi_table[c(1,length(pi_table$Freq)),],
                           vjust=-1)
+        }
     } else if (type == "boxplot") {
         plot <- base_plot +
                 stat_boxplot(geom ='errorbar', width = 0.25) +
@@ -1588,7 +1669,26 @@ plotPI <- function(pi, name='pause indicies',
                 labs(x=name, y="each gene's pause index")
     } else {
         # default to histogram
-        q <- base_plot +
+         if (length(div) <= 3) {
+            q <- base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(PI$pi)),
+                               color="gray", linetype="dashed", size=1) +
+                    annotate("text", x=median(PI$pi),
+                             y=(ceiling(quantile(PI$pi, 0.25))),
+                                label="median", angle=90,
+                                color="gray", vjust=-0.5) +
+                    geom_vline(aes(xintercept=mean(PI$pi)),
+                               color="light gray", linetype="dotted", size=1) +
+                    annotate("text", x=mean(PI$pi),
+                             y=(ceiling(quantile(PI$pi, 0.25))),
+                                label="mean", angle=90,
+                                color="light gray", vjust=-0.5) +
+                    labs(x="pause indicies", y="frequency") +
+                    xlim(c(0, ceiling(quantile(PI$pi, 0.90)))) +
+                    theme_PEPPRO()
+        } else {
+            q <- base_plot +
                 geom_bar(stat="identity",
                          fill = c("maroon",
                                   rep("gray", (length(div)-3)),
@@ -1597,6 +1697,7 @@ plotPI <- function(pi, name='pause indicies',
                 geom_text(aes(label= quantLabel),
                           data=pi_table[c(1,length(pi_table$Freq)),],
                           vjust=-1)
+        }
     }  
 
     if (type != "histogram") {
