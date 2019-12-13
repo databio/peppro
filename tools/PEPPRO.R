@@ -504,9 +504,11 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         output <- opt_get(name = c("output", "o"), required=TRUE,
                           description="output destination directory.")
 
-        name               <- basename(sampleName(input))
+        name               <- basename(sampleName(input, num_fields=1))
+        #message(name)
         suppressWarnings(p <- plotCutadapt(input=input, name=name))
         sample_name        <- paste(output, name, sep="/")
+        #message(sample_name)
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_adapter_insertion_distribution.pdf"),
