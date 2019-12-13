@@ -2579,12 +2579,12 @@ def main():
         plus_frip = calc_frip(plus_bam, res.refgene_pre_mRNA,
                               frip_func=ngstk.simple_frip,
                               pipeline_manager=pm)
-        pm.report_result("Plus FRiP", round(plus_frip, 2))
+        pm.report_result("Plus_FRiP", round(plus_frip, 2))
         # Minus
         minus_frip = calc_frip(minus_bam, res.refgene_pre_mRNA,
                                frip_func=ngstk.simple_frip,
                                pipeline_manager=pm)
-        pm.report_result("Minus FRiP", round(minus_frip, 2))
+        pm.report_result("Minus_FRiP", round(minus_frip, 2))
 
     ############################################################################
     #             Plot fragment distribution (for SE data)                     #
