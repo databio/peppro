@@ -1707,7 +1707,11 @@ def main():
 
             # Gut check
             # Processing fastq should have trimmed the reads.
-            tr = float(pm.get_stat("Trimmed_reads"))
+            tmp = pm.get_stat("Trimmed_reads")
+            if tmp:
+                tr = float(tmp)
+            else:
+                tr = 0
             if (tr < 1):
                 pm.fail_pipeline(RuntimeError("No reads left after trimming. Check trimmer settings"))
 
@@ -1722,7 +1726,14 @@ def main():
             r2_repair_single = os.path.join(
                 fastq_folder, args.sample_name + "_R2_trimmed.fastq.single.fq")
 
-            rr = float(pm.get_stat("Raw_reads"))
+            tmp = float(pm.get_stat("Raw_reads"))
+            if tmp:
+                rr = float(tmp)
+            else:
+                rr = 0
+            if (rr < 1):
+                pm.fail_pipeline(RuntimeError("Raw_reads were not reported. Check output ({})".format(param.outfolder)))
+
             cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
                    unmap_fq1 + " " + unmap_fq2)
             pm.run(cmd, [r1_repair, r2_repair])
@@ -1978,13 +1989,25 @@ def main():
         def check_alignment_genome(temp_bam, bam):
             mr = ngstk.count_mapped_reads(temp_bam, args.paired_end)
             ar = ngstk.count_mapped_reads(bam, args.paired_end)
+
             if float(ar) < 1:
                 err_msg = "No aligned reads. Check alignment settings."
                 pm.fail_pipeline(RuntimeError(err_msg))
             if args.paired_end:
                 ar = float(ar)/2
-            rr = float(pm.get_stat("Raw_reads"))
-            tr = float(pm.get_stat("Trimmed_reads"))
+
+            tmp = pm.get_stat("Raw_reads")
+            if tmp:
+                rr = float(tmp)
+            else:
+                rr = 0
+
+            tmp = pm.get_stat("Trimmed_reads")
+            if tmp:
+                tr = float(tmp)
+            else:
+                tr = 0
+
             if os.path.exists(res.refgene_pre_mRNA):
                 cmd = (tools.samtools + " depth -b " +
                        res.refgene_pre_mRNA + " " + bam +
@@ -1994,6 +2017,7 @@ def main():
                 cmd = (tools.samtools + " depth " + bam +
                        " | awk '{counter++;sum+=$3}END{print sum/counter}'")
                 rd = pm.checkprint(cmd)
+
             pm.report_result("Mapped_reads", mr)
             pm.report_result("QC_filtered_reads",
                              round(float(mr)) - round(float(ar)))
