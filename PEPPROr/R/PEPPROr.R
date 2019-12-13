@@ -385,7 +385,7 @@ plotComplexityCurves <- function(ccurves,
     fig <- fig +
         labs(col = "") +
         scale_color_discrete(labels=c(clist$SAMPLE_NAME)) +
-        theme_PEPPRO()
+        theme_PEPPRO() + theme(legend.position = "right")
 
     # inset zoom plot
     zoom_theme <- theme(legend.position = "none",
@@ -1275,8 +1275,9 @@ cutDists = function(vec, divisions = c(-Inf, -1e6, -1e4, -1000, -100, 0,
         
         return(xb)
     }
-    
+    divisions <- unique(divisions)
     labels <- labelCuts(signif(divisions, 3), collapse=" to ", infBins=TRUE)
+    #message(paste0("breaks: ", paste0(divisions, collapse=" ")))
     cuts   <- cut(vec, divisions, labels)
     return(as.data.frame(table(cuts)))
 }
@@ -1319,13 +1320,17 @@ mRNAcontamination <- function(rpkm,
 
     if (raw) {
         div <- calcDivisions(finite_rpkm$ratio,
-                             calcQuantileCutoff(finite_rpkm$ratio))
+                             calcQuantileCutoff(finite_rpkm$ratio,
+                                                baseline = 1))
     } else {
         div <- calcDivisions(log10(finite_rpkm$ratio),
-                             calcQuantileCutoff(log10(finite_rpkm$ratio)),
+                             calcQuantileCutoff(log10(finite_rpkm$ratio),
+                                                baseline = 1),
                              transformed=TRUE)
     }
 
+    # ensure breaks are not duplicated
+    div        <- unique(div)
     quantLabel <- paste(calcQuantileCutoff(finite_rpkm$ratio),"%", sep='')
 
     if (raw) {
@@ -1542,8 +1547,8 @@ plotPI <- function(pi, name='pause indicies',
     }
     colnames(PI) <- c("chr", "start", "end", "name", "pi", "strand")
 
-    div <- calcDivisions(PI$pi, calcQuantileCutoff(PI$pi, baseline=3))
-    quantLabel <- paste(calcQuantileCutoff(PI$pi, baseline=3),"%", sep='')
+    div <- calcDivisions(PI$pi, calcQuantileCutoff(PI$pi, baseline=1))
+    quantLabel <- paste(calcQuantileCutoff(PI$pi, baseline=1),"%", sep='')
 
     if (type == "histogram") {
         # calculate a frequency table with the specified divisions
