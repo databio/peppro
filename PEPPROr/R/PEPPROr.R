@@ -266,6 +266,15 @@ plotComplexityCurves <- function(ccurves,
         }
     }
 
+    # Plot by millions of reads
+    plottingFactor <- 1000000
+
+    df$total_reads       <- df$total_reads/plottingFactor
+    df$expected_distinct <- df$expected_distinct/plottingFactor
+    rcDT$total  <- rcDT$total/plottingFactor
+    rcDT$unique <- rcDT$unique/plottingFactor
+    x_max       <- x_max/plottingFactor
+
     # Plot the curve
     fig <- ggplot(df, aes(total_reads,
                           expected_distinct,
@@ -282,8 +291,8 @@ plotComplexityCurves <- function(ccurves,
                                 aes(total, unique, col=color),
                                 shape=23, size=3)
         message(paste0("INFO: Found real counts for ",
-                       paste(rcDT$name, sep=","), " - Total: ",
-                       rcDT$total, " Unique: ",
+                       paste(rcDT$name, sep=","), " - Total (M): ",
+                       rcDT$total, " Unique (M): ",
                        rcDT$unique, "\n"))
     } else if (any(rcDT$total > 0)) {
         if (max(rcDT$total) > max(df$total_reads)) {
@@ -296,8 +305,8 @@ plotComplexityCurves <- function(ccurves,
                                     aes(total, interp, col=color),
                                     shape=23, size=3)
             message(paste0("INFO: Found real counts for ",
-                           paste(rcDT$name, sep=","), " - Total: ",
-                           rcDT$total, " (preseq unique reads: ",
+                           paste(rcDT$name, sep=","), " - Total (M): ",
+                           rcDT$total, " (preseq unique reads (M): ",
                            interp, ")\n"))
         }
     } else {
@@ -331,6 +340,11 @@ plotComplexityCurves <- function(ccurves,
     if (coverage > 0) {
         default_ylim <- as.numeric(default_ylim) / coverage
     }
+
+    # Adjust limits by plottingFactor
+    default_ylim <- default_ylim/plottingFactor
+    preseq_ymax  <- preseq_ymax/plottingFactor
+
     fig <- fig +
         coord_cartesian(xlim=c(x_min, x_max),
                         ylim = c(default_ylim,
@@ -347,45 +361,48 @@ plotComplexityCurves <- function(ccurves,
     if (coverage > 0) {
         if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
-                xlab(paste0("Total Coverage (incl. duplicates)\n",
-                            "Points show read count versus deduplicated ",
-                            "read counts (externally calculated)"))
+                labs(x = paste0("total coverage (incl. duplicates)"),
+                     caption = paste0("Points show read count versus ",
+                                      "deduplicated read counts ",
+                                      "(externally calculated)"))
         } else if (any(rcDT$total > 0)) {
             fig <- fig +
-                xlab(paste0("Total Coverage (incl. duplicates)\n",
-                            "Points show read count versus projected unique ",
-                            "read counts on the curves"))
+                labs(x = "total coverage (incl. duplicates)",
+                     caption = paste0("Points show read count versus projected ",
+                                      "unique read counts on the curves"))
         } else {
             fig <- fig +
-                xlab(paste0("Total Coverage (incl. duplicates)"))
+                labs(x = "total coverage (incl. duplicates)")
         }
         fig <- fig +
-            ylab("Unique Coverage") +
-            ggtitle("Complexity Curve: preseq")
+            labs = (y = "unique coverage")
+            #ggtitle("Complexity Curve: preseq")
     } else {
         if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
-                xlab(paste0("Total Reads (incl. duplicates)\n",
-                            "Points show read count versus deduplicated ",
-                            "read counts (externally calculated)"))
+                labs(x = "total reads (M) (incl. duplicates)",
+                     caption = paste0("Points show read count versus deduplicated ",
+                                      "read counts (externally calculated)"))
         } else if (any(rcDT$total > 0)) {
             fig <- fig +
-                xlab(paste0("Total Reads (incl. duplicates)\n",
-                            "Points show externally calculated read ",
-                            "counts on the curves"))
+                labs(x = "total reads (M) (incl. duplicates)",
+                     caption = paste0("Points show externally calculated read ",
+                                      "counts on the curves"))
         } else {
             fig <- fig +
-                xlab(paste0("Total Reads (incl. duplicates)"))
+                labs(x = "total reads (M) (incl. duplicates)")
         }
         fig <- fig +
-            ylab("Unique Reads") +
-            ggtitle("Complexity Curve: preseq")
+            labs(y = "unique reads (M)")
+            #ggtitle("Complexity Curve: preseq")
     }
 
     fig <- fig +
         labs(col = "") +
         scale_color_discrete(labels=c(clist$SAMPLE_NAME)) +
-        theme_PEPPRO() + theme(legend.position = "right")
+        theme_PEPPRO() +
+        theme(legend.position = "right",
+              plot.caption = element_text(size = 8, face = "italic"))
 
     # inset zoom plot
     zoom_theme <- theme(legend.position = "none",
@@ -399,7 +416,7 @@ plotComplexityCurves <- function(ccurves,
                         panel.grid.major = element_blank(),
                         panel.grid.minor = element_blank(),
                         panel.background = element_rect(color='black'),
-                        plot.margin = unit(c(0,0,-6,-6),"mm"))
+                        plot.margin = unit(c(0.1,0.1,-6,-6),"mm"))
 
     if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
         zoom_fig <- ggplot(df, aes(total_reads,
@@ -424,7 +441,7 @@ plotComplexityCurves <- function(ccurves,
             annotation_custom(grob = g,
                               xmin = x_max / 2,
                               xmax = x_max,
-                              ymin = 0,
+                              ymin = 10,
                               ymax = max(preseq_ymax, max_unique)/2)
     } else if (any(rcDT$total > 0)) {
         interp <- approx(df$total_reads, df$expected_distinct, rcDT$total)$y
@@ -450,7 +467,7 @@ plotComplexityCurves <- function(ccurves,
             annotation_custom(grob = g,
                               xmin = x_max / 2,
                               xmax = x_max,
-                              ymin = 0,
+                              ymin = 10,
                               ymax = max(preseq_ymax, max_unique)/2)
     }
 
