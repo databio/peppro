@@ -553,7 +553,7 @@ calcFRiF <- function(bedFile, reads) {
 #'                      "intron", "utr3", "utr5"))
 #' @export
 plotFRiF <- function(sample_name, num_reads, genome_size,
-                     type = c("frif", "ratio", "both"),
+                     type = c("frif", "prif", "both"),
                      output_name, bedFile) {
     # TODO: Get total genome size value as an input
     #genome_size <- 3099922541
@@ -758,7 +758,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                       legend.key = element_blank(),
                       axis.text.x = element_text(angle = 0, hjust = 1,
                                                  vjust=0.5))
-        } else if (tolower(type) == "ratio") {
+        } else if (tolower(type) == "prif") {
             p <- ggplot(feature_dist, aes(x = feature, y = logOE)) +
                 geom_bar(stat="identity",
                          fill = feature_dist$color,
