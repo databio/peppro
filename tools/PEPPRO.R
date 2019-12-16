@@ -167,11 +167,12 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                   x_max = x_max)
         # now save the plot
         pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-            width = 5, height = 4, useDingbats=F)
+            height = 5, width = 6, useDingbats=F)
         suppressWarnings(print(p))
         invisible(dev.off())
+
         png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-            width = 343, height = 275)
+            height = 315, width = 425)
         suppressWarnings(print(p))
         invisible(dev.off())
 
