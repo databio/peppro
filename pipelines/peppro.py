@@ -1803,6 +1803,17 @@ def main():
         pm.report_object("Adapter insertion distribution", degradation_pdf,
                          anchor_image=degradation_png)
 
+        # Determine the peak insertion size
+        cmd = ("awk '/count/,0' " + cutadapt_report +
+               " | awk 'NR>2 {print prev} {prev=$0}'" +
+               " | awk '{if ($3/$2 < 0.01) print $1, $2}'" +
+               " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
+               " {max=$2; len=$1}; max_len=$1} END{print max_len-len}'")
+        adapter_peak = pm.checkprint(cmd)
+        if adapter_peak:
+            ap = int(adapter_peak)
+            pm.report_result("Peak_adapter_insertion_size", ap)
+
     pm.clean_add(fastq_folder, conditional=True)
 
     ############################################################################
@@ -2661,22 +2672,26 @@ def main():
     ############################################################################
     pm.timestamp("### Calculate fraction and proportion of reads in features (FRiF/PRiF)")
 
-    frif_plus_PDF = os.path.join(QC_folder, args.sample_name + "_plus_frif.pdf")
-    frif_plus_PNG = os.path.join(QC_folder, args.sample_name + "_plus_frif.png")
-    frif_minus_PDF = os.path.join(QC_folder,
-                                  args.sample_name + "_minus_frif.pdf")
-    frif_minus_PNG = os.path.join(QC_folder,
-                                  args.sample_name + "_minus_frif.png")
+    frif_PDF = os.path.join(QC_folder, args.sample_name + "_frif.pdf")
+    frif_PNG = os.path.join(QC_folder, args.sample_name + "_frif.png")
+    # frif_plus_PDF = os.path.join(QC_folder, args.sample_name + "_plus_frif.pdf")
+    # frif_plus_PNG = os.path.join(QC_folder, args.sample_name + "_plus_frif.png")
+    # frif_minus_PDF = os.path.join(QC_folder,
+    #                               args.sample_name + "_minus_frif.pdf")
+    # frif_minus_PNG = os.path.join(QC_folder,
+    #                               args.sample_name + "_minus_frif.png")
 
     # Proportion of Reads in Feature (PRiF)
-    prif_plus_PDF = os.path.join(QC_folder, args.sample_name + "_plus_prif.pdf")
-    prif_plus_PNG = os.path.join(QC_folder, args.sample_name + "_plus_prif.png")
-    prif_minus_PDF = os.path.join(QC_folder,
-                                  args.sample_name + "_minus_prif.pdf")
-    prif_minus_PNG = os.path.join(QC_folder,
-                                  args.sample_name + "_minus_prif.png")
+    prif_PDF = os.path.join(QC_folder, args.sample_name + "_prif.pdf")
+    prif_PNG = os.path.join(QC_folder, args.sample_name + "_prif.png")
+    # prif_plus_PDF = os.path.join(QC_folder, args.sample_name + "_plus_prif.pdf")
+    # prif_plus_PNG = os.path.join(QC_folder, args.sample_name + "_plus_prif.png")
+    # prif_minus_PDF = os.path.join(QC_folder,
+    #                               args.sample_name + "_minus_prif.pdf")
+    # prif_minus_PNG = os.path.join(QC_folder,
+    #                               args.sample_name + "_minus_prif.png")
 
-    if not os.path.exists(frif_plus_PDF) or args.new_start:
+    if not os.path.exists(frif_PDF) or args.new_start:
         anno_list_plus = list()
         anno_list_minus = list()
 
@@ -2716,6 +2731,9 @@ def main():
                         pm.run(cmd, file_name)
 
                     # Sort files (ensure only aligned chromosomes are kept)
+                    # Need to cut -f 1-6 if you want strand information
+                    # Not all features are stranded
+                    # TODO: check for strandedness
                     cmd3 = ("cut -f 1 " + chr_order + " | grep -wf - " +
                             file_name + " | cut -f 1-3 | " +
                             "bedtools sort -i stdin -faidx " +
@@ -2724,12 +2742,14 @@ def main():
                     
                     anno_list_plus.append(anno_cov_plus)
                     anno_list_minus.append(anno_cov_minus)
-                    cmd4 = (tools.bedtools + " coverage -sorted -counts -a " +
-                            anno_sort + " -b " + plus_bam +
+                    # Identifies unstranded coverage
+                    # Would need to use '-s' flag to be stranded
+                    cmd4 = (tools.bedtools + " coverage -sorted -counts " +
+                            " -a " + anno_sort + " -b " + plus_bam +
                             " -g " + chr_order + " > " +
                             anno_cov_plus)
-                    cmd5 = (tools.bedtools + " coverage -sorted -counts -a " +
-                            anno_sort + " -b " + minus_bam +
+                    cmd5 = (tools.bedtools + " coverage -sorted -counts " +
+                            " -a " + anno_sort + " -b " + minus_bam +
                             " -g " + chr_order + " > " +
                             anno_cov_minus)
                     pm.run(cmd4, anno_cov_plus)
@@ -2744,9 +2764,9 @@ def main():
     #                                 Plot FRiF                                #
     ############################################################################
     pm.timestamp("### Plot FRiF/PRiF")
-    prif_plus_PDF
+
     # Plus
-    if not os.path.exists(frif_plus_PDF) or args.new_start:
+    if not os.path.exists(frif_PDF) or args.new_start:
         count_cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
                      param.samtools.params + " -c -F4 " + plus_bam)
         plus_read_count = pm.checkprint(count_cmd)
@@ -2755,55 +2775,58 @@ def main():
         frif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
                     "-n", args.sample_name, "-s", str(genome_size).rstrip(),
                     "-r", plus_read_count, "-y", "frif",
-                    "-o", frif_plus_PDF, "--bed"]
+                    "-o", frif_PDF, "--bed"]
 
         prif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
                      "-n", args.sample_name, "-s", str(genome_size).rstrip(),
                      "-r", plus_read_count, "-y", "prif",
-                     "-o", prif_plus_PDF, "--bed"]
+                     "-o", prif_PDF, "--bed"]
 
         if anno_list_plus:
             for cov in anno_list_plus:
                 frif_cmd.append(cov)
                 prif_cmd.append(cov)
             cmd = build_command(frif_cmd)
-            pm.run(cmd, frif_plus_PDF, nofail=False)
-            pm.report_object("Plus FRiF", frif_plus_PDF,
-                             anchor_image=frif_plus_PNG)
+            pm.run(cmd, frif_PDF, nofail=False)
+            # pm.report_object("Plus FRiF", frif_plus_PDF,
+            #                  anchor_image=frif_plus_PNG)
+            pm.report_object("FRiF", frif_PDF, anchor_image=frif_PNG)
+
             cmd = build_command(prif_cmd)
             pm.run(cmd, prif_plus_PDF, nofail=False)
-            pm.report_object("Plus PRiF", prif_plus_PDF,
-                             anchor_image=prif_plus_PNG)
+            # pm.report_object("Plus PRiF", prif_plus_PDF,
+            #                  anchor_image=prif_plus_PNG)
+            pm.report_object("PRiF", prif_PDF, anchor_image=prif_PNG)
 
-    # Minus
-    if not os.path.exists(frif_minus_PDF) or args.new_start:
-        count_cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
-                     param.samtools.params + " -c -F4 " + minus_bam)
-        minus_read_count = pm.checkprint(count_cmd)
-        minus_read_count = str(minus_read_count).rstrip()
+    # Minus (unused as we currently use unstranded feature coverage calculation)
+    # if not os.path.exists(frif_minus_PDF) or args.new_start:
+    #     count_cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
+    #                  param.samtools.params + " -c -F4 " + minus_bam)
+    #     minus_read_count = pm.checkprint(count_cmd)
+    #     minus_read_count = str(minus_read_count).rstrip()
 
-        frif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-                   "-n", args.sample_name, "-s", str(genome_size).rstrip(),
-                   "-r", minus_read_count, "-y", "frif",
-                   "-o", frif_minus_PDF, "--bed"]
+    #     frif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+    #                "-n", args.sample_name, "-s", str(genome_size).rstrip(),
+    #                "-r", minus_read_count, "-y", "frif",
+    #                "-o", frif_minus_PDF, "--bed"]
 
-        prif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-                     "-n", args.sample_name, "-s", str(genome_size).rstrip(),
-                     "-r", minus_read_count, "-y", "prif",
-                     "-o", prif_minus_PDF, "--bed"]
+    #     prif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+    #                  "-n", args.sample_name, "-s", str(genome_size).rstrip(),
+    #                  "-r", minus_read_count, "-y", "prif",
+    #                  "-o", prif_minus_PDF, "--bed"]
 
-        if anno_list_minus:
-            for cov in anno_list_minus:
-                frif_cmd.append(cov)
-                prif_cmd.append(cov)
-            cmd = build_command(frif_cmd)
-            pm.run(cmd, frif_minus_PDF, nofail=False)
-            pm.report_object("Minus FRiF", frif_minus_PDF,
-                             anchor_image=frif_minus_PNG)
-            cmd = build_command(prif_cmd)
-            pm.run(cmd, prif_minus_PDF, nofail=False)
-            pm.report_object("Minus PRiF", prif_minus_PDF,
-                             anchor_image=prif_minus_PNG)
+    #     if anno_list_minus:
+    #         for cov in anno_list_minus:
+    #             frif_cmd.append(cov)
+    #             prif_cmd.append(cov)
+    #         cmd = build_command(frif_cmd)
+    #         pm.run(cmd, frif_minus_PDF, nofail=False)
+    #         pm.report_object("Minus FRiF", frif_minus_PDF,
+    #                          anchor_image=frif_minus_PNG)
+    #         cmd = build_command(prif_cmd)
+    #         pm.run(cmd, prif_minus_PDF, nofail=False)
+    #         pm.report_object("Minus PRiF", prif_minus_PDF,
+    #                          anchor_image=prif_minus_PNG)
 
     ############################################################################
     #                         Report mRNA contamination                        #
