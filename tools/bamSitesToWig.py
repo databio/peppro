@@ -216,6 +216,9 @@ class CutTracer(pararead.ParaReadProcessor):
 
             cutsToWigProcessSm.stdin.write(header_line.encode('utf-8'))
 
+        # if chrom == "chr1_KI270712v1_random":
+        #     _LOGGER.info("-------------------------------")
+
         try:
             for read in reads:
                 shifted_pos = get_shifted_pos(read, shift_factor)
@@ -243,7 +246,7 @@ class CutTracer(pararead.ParaReadProcessor):
             # Clean up processes
             if self.exactbw:
                 cutsToWigProcess.stdin.close()
-                _LOGGER.debug("Encoding exact bigwig for " + chrom + 
+                _LOGGER.info("Encoding exact bigwig for " + chrom + 
                               " (last read position:" + str(read.pos) + ")...")
                 wigToBigWigProcess.communicate()
 
@@ -252,7 +255,7 @@ class CutTracer(pararead.ParaReadProcessor):
 
             if self.smoothbw:
                 cutsToWigProcessSm.stdin.close()
-                _LOGGER.debug("Encoding smooth bigwig for " + chrom +
+                _LOGGER.info("Encoding smooth bigwig for " + chrom +
                               " (last read position:" + str(read.pos) + ")...")
                 wigToBigWigProcessSm.communicate()
 
@@ -283,22 +286,34 @@ class CutTracer(pararead.ParaReadProcessor):
                 _LOGGER.info("Merging {} files into output file: '{}'".
                       format(len(good_chromosomes), self.exactbw))
                 temp_files = [self._tempf(chrom) + ".bw" for chrom in good_chromosomes]
-                cmd = "bigWigCat " + self.exactbw + " " + " ".join(temp_files)
+                files_exist = []
+                for file in temp_files:
+                    if os.path.isfile(file) and os.stat(file).st_size > 0:
+                        files_exist.append(file)
+                cmd = "bigWigCat " + self.exactbw + " " + " ".join(files_exist)
                 _LOGGER.debug(cmd)
-                p = subprocess.call(['bigWigCat', self.exactbw] + temp_files)
+                p = subprocess.call(['bigWigCat', self.exactbw] + files_exist)
 
             if self.smoothbw:
                 _LOGGER.info("Merging {} files into output file: '{}'".
                       format(len(good_chromosomes), self.smoothbw))
                 temp_files = [self._tempf(chrom) + "_smooth.bw" for chrom in good_chromosomes]
-                cmd = "bigWigCat " + self.smoothbw + " " + " ".join(temp_files)
+                files_exist = []
+                for file in temp_files:
+                    if os.path.isfile(file) and os.stat(file).st_size > 0:
+                        files_exist.append(file)
+                cmd = "bigWigCat " + self.smoothbw + " " + " ".join(files_exist)
                 _LOGGER.debug(cmd)
-                p = subprocess.call(['bigWigCat', self.smoothbw] + temp_files)
+                p = subprocess.call(['bigWigCat', self.smoothbw] + files_exist)
 
             if self.bedout:
                 # root, ext = os.path.splitext(self.exactbw)
                 temp_files = [self._tempf(chrom) + ".bed" for chrom in good_chromosomes]
-                cmd = "cat " + " ".join(temp_files) + " > " + self.bedout
+                files_exist = []
+                for file in temp_files:
+                    if os.path.isfile(file) and os.stat(file).st_size > 0:
+                        files_exist.append(file)
+                cmd = "cat " + " ".join(files_exist) + " > " + self.bedout
                 _LOGGER.debug(cmd)
                 p = subprocess.call(cmd, shell=True)
 
