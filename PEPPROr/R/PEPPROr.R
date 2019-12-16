@@ -677,6 +677,14 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
     feature_dist$expected <- as.numeric(feature_dist$expected)
     feature_dist$observed <- as.numeric(labels$val)
     feature_dist$logOE <- log10(feature_dist$observed/feature_dist$expected)
+    feature_dist <- merge(feature_dist, labels, by.x="feature", by.y="name")
+    #feature_dist <- feature_dist[order(feature_dist$logOE, decreasing=TRUE),]
+    feature_dist <- feature_dist[order(feature_dist$logOE),]
+    rownames(feature_dist) <- NULL
+    feature_dist$feature <- factor(feature_dist$feature,
+                                   levels=feature_dist$feature)
+    feature_dist$color <- factor(feature_dist$color,
+                                 levels=feature_dist$color)
 
     if (!is.null(bedFile)) {
 
@@ -751,9 +759,10 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                       axis.text.x = element_text(angle = 0, hjust = 1,
                                                  vjust=0.5))
         } else if (tolower(type) == "ratio") {
-            p <- ggplot(feature_dist,
-                        aes(x = reorder(feature, logOE), y = logOE)) +
-                geom_bar(stat="identity", fill=labels$color, alpha=0.5) + 
+            p <- ggplot(feature_dist, aes(x = feature, y = logOE)) +
+                geom_bar(stat="identity",
+                         fill = feature_dist$color,
+                         alpha = 0.5) + 
                 geom_hline(aes(yintercept=0), linetype="dotted") +
                 xlab('') +
                 ylab('log10(Obs/Exp)') +
