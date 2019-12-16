@@ -528,7 +528,7 @@ computeLimit <- function(value, ccurve_TOTAL_READS) {
 #' @examples
 #' calcFRiF()
 calcFRiF <- function(bedFile, reads) {
-    colnames(bedFile) <- c("chromosome","start","end","count")
+    colnames(bedFile) <- c("chromosome", "start", "end", "count")
     grObj   <- makeGRangesFromDataFrame(bedFile)
     grObj   <- reduce(grObj)
     redBed  <- data.frame(chromosome=seqnames(grObj),

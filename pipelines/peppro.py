@@ -2793,7 +2793,7 @@ def main():
             pm.report_object("FRiF", frif_PDF, anchor_image=frif_PNG)
 
             cmd = build_command(prif_cmd)
-            pm.run(cmd, prif_plus_PDF, nofail=False)
+            pm.run(cmd, prif_PDF, nofail=False)
             # pm.report_object("Plus PRiF", prif_plus_PDF,
             #                  anchor_image=prif_plus_PNG)
             pm.report_object("PRiF", prif_PDF, anchor_image=prif_PNG)
