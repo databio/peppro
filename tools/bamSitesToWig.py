@@ -216,9 +216,6 @@ class CutTracer(pararead.ParaReadProcessor):
 
             cutsToWigProcessSm.stdin.write(header_line.encode('utf-8'))
 
-        # if chrom == "chr1_KI270712v1_random":
-        #     _LOGGER.info("-------------------------------")
-
         try:
             for read in reads:
                 shifted_pos = get_shifted_pos(read, shift_factor)
@@ -246,7 +243,7 @@ class CutTracer(pararead.ParaReadProcessor):
             # Clean up processes
             if self.exactbw:
                 cutsToWigProcess.stdin.close()
-                _LOGGER.info("Encoding exact bigwig for " + chrom + 
+                _LOGGER.debug("Encoding exact bigwig for " + chrom + 
                               " (last read position:" + str(read.pos) + ")...")
                 wigToBigWigProcess.communicate()
 
@@ -255,7 +252,7 @@ class CutTracer(pararead.ParaReadProcessor):
 
             if self.smoothbw:
                 cutsToWigProcessSm.stdin.close()
-                _LOGGER.info("Encoding smooth bigwig for " + chrom +
+                _LOGGER.debug("Encoding smooth bigwig for " + chrom +
                               " (last read position:" + str(read.pos) + ")...")
                 wigToBigWigProcessSm.communicate()
 
