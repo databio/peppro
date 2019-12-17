@@ -1002,8 +1002,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pm.report_result("Reads_with_adapter", ac)
         total_bases = float(pm.checkprint(bases).replace(',',''))
         total_adapter = float(pm.checkprint(adapter_bases).replace(',',''))
-        pm.report_result("Pct_adapter_contamination",
-                         round(float(total_adapter/total_bases), 2))
+        # pm.report_result("Pct_adapter_contamination",
+        #                  round(float(total_adapter/total_bases), 2))
 
         ts = float(pm.checkprint(ts_cmd).replace(',',''))
         pm.report_result("Reads_too_short", ts)
@@ -1012,6 +1012,9 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         dr = int(ngstk.count_lines(dedup_fastq).strip())
         dups = max(0, (float(tr)/4 - float(dr)/4))
         pm.report_result("Duplicate_reads", dups)
+
+        pr = int(ngstk.count_lines(processed_fastq).strip())
+        pm.report_result("Pct_reads_too_short", round(float(ts/pr), 2))
 
     # Put it all together
     if read2:
