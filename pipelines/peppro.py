@@ -1022,7 +1022,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         # a -o and the actual reads are directed to stdout.
         process_fastq_cmd2 = build_command([
             "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
-        pm.info("process_fastq_cmd2: {}".format(process_fastq_cmd2))
+        pm.debug("process_fastq_cmd2: {}".format(process_fastq_cmd2))
         pm.run(process_fastq_cmd2, trimmed_fastq_R2)
         cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
         pm.run(cp_cmd, trimmed_dups_fastq_R2)
@@ -2279,6 +2279,14 @@ def main():
 
                 pm.report_object("Library complexity", preseq_pdf,
                                  anchor_image=preseq_png)
+
+                # Report the expected unique at 10M reads
+                cmd = ("grep -w '10000000'" + preseq_yield +
+                       " | awk '{print $2}'")
+                expected_unique = pm.checkprint(cmd)
+                if expected_unique:
+                    fraction_unique = float(expected_unique)/float(10000000)
+                    pm.report_result("Frac_exp_unique_at_10M", fraction_unique)
             else:
                 print("Unable to calculate library complexity.")
 
