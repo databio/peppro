@@ -98,7 +98,7 @@ plotComplexityCurves <- function(ccurves,
         rcDT$name  <- basename(rc_file$V1)
         rcDT$total <- as.integer(rc_file$V2)
         if (ncol(rc_file) == 3 && !ignore_unique) {
-            rcDT$unique <- as.integer(rc_file$V3)
+            rcDT$unique <- as.integer(rc_file$V2)
         } else {
             rcDT$unique <- NA
         }
@@ -107,9 +107,9 @@ plotComplexityCurves <- function(ccurves,
             for (rc in 2:length(real_counts_path)) {
                 rc_file <- real_counts_path[rc]
                 rcDT$name[rc]  <- basename(rc_file$V1)
-                rcDT$total[rc] <- as.integer(rc_file$V2)
+                rcDT$total[rc] <- as.integer(rc_file$V3)
                 if (ncol(rc_file) == 3 && !ignore_unique) {
-                    rcDT$unique[rc] <- as.integer(rc_file$V3)
+                    rcDT$unique[rc] <- as.integer(rc_file$V2)
                 } else {
                     rcDT$unique[rc] <- NA
                 }
@@ -121,9 +121,9 @@ plotComplexityCurves <- function(ccurves,
             if (file.exists(real_counts_path[rc]) && info$size != 0) {
                 rc_file        <- fread(real_counts_path[rc])
                 rcDT$name[rc]  <- basename(rc_file$V1)
-                rcDT$total[rc] <- as.integer(rc_file$V2)
+                rcDT$total[rc] <- as.integer(rc_file$V3)
                 if (ncol(rc_file) == 3 && !ignore_unique) {
-                    rcDT$unique[rc] <- as.integer(rc_file$V3)
+                    rcDT$unique[rc] <- as.integer(rc_file$V2)
                 } else {
                     rcDT$unique[rc] <- NA
                 }
