@@ -486,7 +486,9 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Version: ", version, "\n\n",
         "Command: cutadapt \t plot adapter insertion distribution\n\n",
         " -i, --input\t cutadapt report.\n",
-        " -o, --output\t output directory.\n"
+        " -o, --output\t output directory.\n",
+        " -u, --umi_len\t UMI length (Default 0).\n",
+        " -f, --factor\t Factor to divide read count (Default 1M).\n"
     )
 
     help <- opt_get(name = c("help", "?", "h"), required=FALSE,
@@ -500,14 +502,22 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         message(usage)
         quit()
     } else {
-        input  <- opt_get(name = c("input", "i"), required=TRUE,
-                          description="cutadapt report.")
-        output <- opt_get(name = c("output", "o"), required=TRUE,
-                          description="output destination directory.")
+        input   <- opt_get(name = c("input", "i"), required=TRUE,
+                           description="cutadapt report.")
+        output  <- opt_get(name = c("output", "o"), required=TRUE,
+                           description="output destination directory.")
+        umi_len <- opt_get(name = c("umi_len", "u"), required=FALSE,
+                           default = 0,
+                           description="UMI length (Default 0).")
+        factor  <- opt_get(name = c("factor", "f"), required=FALSE,
+                           default = 1000000,
+                           description="Factor to divide read count (Default 1M).")
 
         name               <- basename(sampleName(input, num_fields=1))
         #message(name)
-        suppressWarnings(p <- plotCutadapt(input=input, name=name))
+        suppressWarnings(p <- plotCutadapt(input=input, name=name,
+                                           umi_len = umi_len,
+                                           count_factor=factor))
         sample_name        <- paste(output, name, sep="/")
         #message(sample_name)
 

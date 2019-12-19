@@ -1112,10 +1112,16 @@ plotFLD <- function(fragL,
     p <- ggplot(dat1[x_min:nrow(dat1),], aes(x=V2, y=V1)) +
             geom_point(size=1, alpha=0.25) +
             geom_line(alpha=0.5) +
+            annotate("rect", xmin=-Inf, xmax=20, ymin=-Inf, ymax=Inf,
+                 alpha=0.1, fill="#ff001e") +
+            annotate("text", x=25, y=(max(dat1$V1)/2),
+                     size=theme_get()$text[["size"]]/4,
+                     label="partial degradation", angle=90, col="#858585") +
             annotate("rect", xmin=-Inf, xmax=30, ymin=-Inf, ymax=Inf,
-                     alpha=0.15, fill="maroon") +
-            annotate("text", x=15, y=(max(dat1$V1)/2),
-                     label="zone of degradation", angle=90) +
+                     alpha=0.1, fill="#ffee00") + 
+            annotate("text", x=7.5, y=(max(dat1$V1)/2),
+                     size=theme_get()$text[["size"]]/4,
+                     label="high degradation", angle=90, col="#858585") +
             xlab("fragment length") + 
             ylab("number of reads") +
             theme_PEPPRO()
@@ -1771,6 +1777,36 @@ plotPI <- function(pi, name='pause indicies',
     return(q)
 }
 
+#' Calculate mode(s) of data
+#'
+#' From: https://stackoverflow.com/questions/2547402/is-there-a-built-in-function-for-finding-the-mode
+#' @param x A vector of numbers or characters
+#' @param return_multiple Bool to return multiple modes or first in order
+#' @param na.rm Bool Remove NAs
+#'
+#' @keywords mode
+mode <- function(x, return_multiple = TRUE, na.rm = FALSE) {
+    if(na.rm){
+        x <- na.omit(x)
+    }
+    ux       <- unique(x)
+    freq     <- tabulate(match(x, ux))
+    mode_loc <- if(return_multiple) which(freq==max(freq)) else which.max(freq)
+    return(ux[mode_loc])
+}
+
+
+#' Determine the appropriate abbreviation for large numbers
+#'
+#' Modified From: https://stackoverflow.com/questions/28159936/formatting-large-currency-or-dollar-values-to-millions-billions
+#' @param vec A vector of numbers
+#'
+#' @keywords abbreviation
+getAbbr <- function(vec) { 
+    div <- findInterval(as.numeric(gsub("\\,", "", vec)), c(0, 1e3, 1e6, 1e9, 1e12) )
+    return(paste(c("","K","M","B","T")[mode(div)]))
+}
+
 
 #' Plot the distribution of adapter insertions
 #'
@@ -1783,7 +1819,9 @@ plotPI <- function(pi, name='pause indicies',
 #' data("cutadapt")
 #' plotCutadapt(input = "cutadapt")
 #' @export
-plotCutadapt <- function(input, name='cutadapt') {
+plotCutadapt <- function(input, name='cutadapt',
+                         umi_len = 0,
+                         count_factor = 1000000) {
     if (exists(input)) {
         report <- data.table(get(input))
     } else if (file.exists(input)) {
@@ -1793,6 +1831,10 @@ plotCutadapt <- function(input, name='cutadapt') {
         quit(save = "no", status = 1, runLast = FALSE)
     }
     
+    if (umi_len > 0) {
+        report <- report[-(which(report$length == (max(report$length) - umi_len))),]
+    }
+
     # only keep sizes where the expected count represents less than 1% of 
     # the actual count
     report <- report[which(report$expect/report$count < 0.01),]
@@ -1800,12 +1842,30 @@ plotCutadapt <- function(input, name='cutadapt') {
     # don't include size 0 insertions
     report <- report[-nrow(report),]
 
-    q <- ggplot(report, aes(x=max(length)-length, y=count)) +
+    abbr <- getAbbr(report$count)
+    if (abbr == '') {
+        ylabel <- "Number of reads"
+    } else {
+        ylabel <- paste0("Number of reads (", abbr, ")")
+    }
+
+    q <- ggplot(report, aes(x=max(length)-length, y=count/count_factor)) +
             geom_point() +
             geom_vline(xintercept = 20, linetype = "dotted", alpha=0.25) +
             geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
-            labs(title=name, x="Size of insertion", y="Number of reads") +
+            labs(title=name, x="Size of insertion", y=ylabel) +
             theme_PEPPRO()
+    q <- q + 
+        annotate("rect", xmin=-Inf, xmax=20, ymin=-Inf, ymax=Inf,
+                 alpha=0.1, fill="#ff001e") +
+        annotate("text", x=25, y=(max(report$count/count_factor)/2),
+                 size=theme_get()$text[["size"]]/4,
+                 label="partial degradation", angle=90, col="#858585") +
+        annotate("rect", xmin=-Inf, xmax=30, ymin=-Inf, ymax=Inf,
+                 alpha=0.1, fill="#ffee00") + 
+        annotate("text", x=7.5, y=(max(report$count/count_factor)/2),
+                 size=theme_get()$text[["size"]]/4,
+                 label="high degradation", angle=90, col="#858585")
 
     return(q)
 }

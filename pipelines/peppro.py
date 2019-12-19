@@ -1802,6 +1802,8 @@ def main():
             args.sample_name + "_adapter_insertion_distribution.png")
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                " cutadapt -i " + cutadapt_report + " -o " + cutadapt_folder)
+        if args.umi_len > 0:
+            cmd += (" -u " + args.umi_len)
         pm.run(cmd, degradation_pdf, nofail=True)
         pm.report_object("Adapter insertion distribution", degradation_pdf,
                          anchor_image=degradation_png)
