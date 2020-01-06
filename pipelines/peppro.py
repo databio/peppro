@@ -222,7 +222,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         if read2:
             adapter_cmd_chunks.extend([
                 ("--adapter_sequence", three_prime),
-                ("--length_required", (18 + int(float(args.umi_len)))),
+                #("--length_required", (18 + int(float(args.umi_len)))),
+                ("--length_required", 5),  # For insert size plotting
                 ("--html", fastp_report_html_R2),
                 ("--json", fastp_report_json_R2),
                 ("--report_title", ("'" + sname + "'"))
@@ -230,7 +231,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         else:
             adapter_cmd_chunks.extend([
                 ("--adapter_sequence", five_prime),
-                ("--length_required", (18 + int(float(args.umi_len)))),
+                #("--length_required", (18 + int(float(args.umi_len)))),
+                ("--length_required", 5),  # For insert size plotting
                 ("--html", fastp_report_html),
                 ("--json", fastp_report_json),
                 ("--report_title", ("'" + sname + "'"))
@@ -256,7 +258,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             if cut_version >= 1.15:
                 adapter_cmd_chunks.extend([("-j", str(pm.cores))])
             adapter_cmd_chunks.extend([
-                    ("-m", (18 + int(float(args.umi_len)))),
+                    #("-m", (18 + int(float(args.umi_len)))),
+                    ("-m", 5),  # For insert size plotting
                     ("-O", 1),
                     ("-a", three_prime),
                     fq_file
@@ -268,7 +271,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
                 if cut_version >= 1.15:
                     adapter_cmd_chunks.extend([("-j", str(pm.cores))])
                 adapter_cmd_chunks.extend([
-                    ("-m", (18 + int(float(args.umi_len)))),
+                    #("-m", (18 + int(float(args.umi_len)))),
+                    ("-m", 5),  # For insert size plotting
                     ("-O", 1),
                     ("-a", five_prime),
                     fq_file,
@@ -281,7 +285,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
                 if cut_version >= 1.15:
                     adapter_cmd_chunks.extend([("-j", str(pm.cores))])
                 adapter_cmd_chunks.extend([
-                    ("-m", (18 + int(float(args.umi_len)))),
+                    #("-m", (18 + int(float(args.umi_len)))),
+                    ("-m", 5),  # For insert size plotting
                     ("-O", 1),
                     ("-a", five_prime),
                     fq_file
@@ -300,7 +305,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         if read2:
             adapter_cmd_chunks.extend([
                 ("--adapter_sequence", three_prime),
-                ("--length_required", (18 + int(float(args.umi_len)))),
+                #("--length_required", (18 + int(float(args.umi_len)))),
+                ("--length_required", 5),  # For insert size plotting
                 ("--html", fastp_report_html_R2),
                 ("--json", fastp_report_json_R2),
                 ("--report_title", ("'" + sname + "'"))
@@ -308,7 +314,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         else:
             adapter_cmd_chunks.extend([
                 ("--adapter_sequence", five_prime),
-                ("--length_required", (18 + int(float(args.umi_len)))),
+                #("--length_required", (18 + int(float(args.umi_len)))),
+                ("--length_required", 5),  # For insert size plotting
                 ("--html", fastp_report_html),
                 ("--json", fastp_report_json),
                 ("--report_title", ("'" + sname + "'"))
@@ -540,7 +547,7 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
     return trim_cmd
 
 
-def _trim_adapter_files(args, tools, fq_file, outfolder):
+def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
     """
     A helper function to build a command for read trimming using fastq files
     without deduplication.
@@ -549,6 +556,8 @@ def _trim_adapter_files(args, tools, fq_file, outfolder):
         e.g. from parsing command-line options
     :param looper.models.AttributeDict tools: binding between tool name and
         value, e.g. for tools/resources used by the pipeline
+    :param bool read2: if True, do not deduplicate and do not retain
+        intermediate files
     :param str fq_file: path to FASTQ file
     :param str outfolder: path to output directory for the pipeline
     :return str: command to trim adapter trimmed files
@@ -557,12 +566,20 @@ def _trim_adapter_files(args, tools, fq_file, outfolder):
     sname = args.sample_name  # for concise code
 
     fastq_folder = os.path.join(outfolder, "fastq")
-    noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
-    trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
+    if read2:
+        noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
+        trimmed_fastq = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
+    else:
+        noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
+        trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
 
-    fastp_folder = os.path.join(outfolder, "fastp") 
-    umi_report = os.path.join(fastp_folder, sname + "_R1_rmUmi.html")
-    umi_json = os.path.join(fastp_folder, sname + "_R1_rmUmi.json")
+    fastp_folder = os.path.join(outfolder, "fastp")
+    if read2:
+        umi_report = os.path.join(fastp_folder, sname + "_R2_rmUmi.html")
+        umi_json = os.path.join(fastp_folder, sname + "_R2_rmUmi.json")
+    else:
+        umi_report = os.path.join(fastp_folder, sname + "_R1_rmUmi.html")
+        umi_json = os.path.join(fastp_folder, sname + "_R1_rmUmi.json")
 
     # Check quality encoding for use with FastX_Tools
     if args.trimmer == "fastx":
@@ -936,7 +953,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
 
     sname = args.sample_name  # for concise code
 
-    noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
+    noadap_fq1 = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
+    noadap_fq2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
     dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
     trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
     trimmed_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
@@ -958,15 +976,25 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     pm.debug("Adapter command: {}".format(adapter_command))
     pm.debug("Read2 status: {}".format(read2))
 
-    if read2:
-        trim_command = _trim_pipes(args, tools, True, fq_file, outfolder)
-    elif not args.complexity and args.umi_len > 0:
+    # To plot fragment sizes requires keeping intermediate files
+    if not args.complexity and args.umi_len > 0:
         deduplicate_command = _deduplicate(args, tools, fq_file, outfolder)
         pm.debug("Dedup command: {}".format(deduplicate_command))
-        trim_command = _trim_adapter_files(args, tools, fq_file, outfolder)
+        trim_command = _trim_adapter_files(args, tools, read2, fq_file, outfolder)
         trim_command2 = _trim_deduplicated_files(args, tools, fq_file, outfolder)
     else:
-        trim_command = _trim_pipes(args, tools, False, fq_file, outfolder)
+        trim_command = _trim_adapter_files(args, tools, read2, fq_file, outfolder)
+
+    # original method included option to not retain intermediates
+    # if read2:
+    #     trim_command = _trim_pipes(args, tools, True, fq_file, outfolder)
+    # elif not args.complexity and args.umi_len > 0:
+    #     deduplicate_command = _deduplicate(args, tools, fq_file, outfolder)
+    #     pm.debug("Dedup command: {}".format(deduplicate_command))
+    #     trim_command = _trim_adapter_files(args, tools, fq_file, outfolder)
+    #     trim_command2 = _trim_deduplicated_files(args, tools, fq_file, outfolder)
+    # else:
+    #     trim_command = _trim_pipes(args, tools, False, fq_file, outfolder)
 
     def report_fastq():
         """
@@ -1012,7 +1040,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         ts = float(pm.checkprint(ts_cmd).replace(',',''))
         pm.report_result("Reads_too_short", ts)
 
-        tr = int(ngstk.count_lines(noadap_fastq).strip())
+        tr = int(ngstk.count_lines(noadap_fq1).strip())
         dr = int(ngstk.count_lines(dedup_fastq).strip())
         dups = max(0, (float(tr)/4 - float(dr)/4))
         pm.report_result("Duplicate_reads", dups)
@@ -1020,42 +1048,87 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pr = int(ngstk.count_lines(processed_fastq).strip())
         pm.report_result("Pct_reads_too_short", round(float(ts/pr), 2))
 
+        # merge short fragment reads
+        rep_fq1 = os.path.join(fastq_folder,
+            args.sample_name + "_R1_noadap.fastq.paired.fq")
+        rep_fq2 = os.path.join(fastq_folder,
+            args.sample_name + "_R2_noadap.fastq.paired.fq")
+        flash_hist = os.path.join(fastq_folder, args.sample_name + ".hist")
+        flash_gram = os.path.join(fastq_folder, args.sample_name + ".histogram")
+
+        cmd1 = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
+                noadap_fq1 + " " + noadap_fq2)
+        cmd2 = (tools.flash + " -q -t " + str(pm.cores) + " --compress-prog=" +
+            `   ngstk.ziptool + " --suffix=gz " + rep_fq1 + " " + rep_fq2 +
+                " -o " + args.sample_name + " -d " + fastq_folder)
+        pm.run([cmd1, cmd2], [flash_hist, flash_gram])
+
+
     # Put it all together
-    if read2:
-        # cutadapt directs its report to stderr if the command lacks
-        # a -o and the actual reads are directed to stdout.
-        process_fastq_cmd2 = build_command([
-            "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
-        pm.debug("process_fastq_cmd2: {}".format(process_fastq_cmd2))
-        pm.run(process_fastq_cmd2, trimmed_fastq_R2)
-        cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
-        pm.run(cp_cmd, trimmed_dups_fastq_R2)
-        return trimmed_fastq_R2, trimmed_dups_fastq_R2
-    else:
-        if not args.complexity and args.umi_len > 0:
-            # This trim command DOES need the adapter file...
-            pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
-            pm.run([adapter_command, trim_command], processed_fastq,
-                   follow=ngstk.check_trim(processed_fastq, False, None,
-                                           fastqc_folder=fastqc_folder))
-            # This needs to produce the trimmed_fastq file
-            # TODO: trim_command2 doesn't need to produce fastp html files and json files...
-            # TODO: if I'm using seqkit rmdup here, I DON'T NEED the other fastp!!! umi command
-            pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
-            pm.run([deduplicate_command, trim_command2],
-                   trimmed_fastq, follow=report_fastq)
-            pm.clean_add(noadap_fastq)
-            pm.clean_add(dedup_fastq)
-            pm.clean_add(trimmed_fastq)
-            return processed_fastq, trimmed_fastq
-        else:
-            pm.debug("\nELSE: trim_command: {} + {}\n".format(adapter_command, trim_command))
-            process_fastq_cmd = build_command([
-                "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
-            pm.run(process_fastq_cmd, processed_fastq,
+    if not args.complexity and args.umi_len > 0:
+        # This trim command DOES need the adapter file...
+        pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
+        pm.run([adapter_command, trim_command], processed_fastq,
                follow=ngstk.check_trim(processed_fastq, False, None,
                                        fastqc_folder=fastqc_folder))
-            return processed_fastq      
+        # This needs to produce the trimmed_fastq file
+        # TODO: trim_command2 doesn't need to produce fastp html files and json files...
+        # TODO: if I'm using seqkit rmdup here, I DON'T NEED the other fastp!!! umi command
+        pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
+        pm.run([deduplicate_command, trim_command2],
+               trimmed_fastq, follow=report_fastq)
+        pm.clean_add(noadap_fq1)
+        pm.clean_add(dedup_fastq)
+        pm.clean_add(trimmed_fastq)
+        return processed_fastq, trimmed_fastq
+    else:
+        pm.debug("\nELSE: trim_command: {} + {}\n".format(adapter_command, trim_command))
+        pm.run([adapter_command, trim_command], processed_fastq,
+               follow=ngstk.check_trim(processed_fastq, False, None,
+                                       fastqc_folder=fastqc_folder))
+        if read2:
+            cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
+            pm.run(cp_cmd, trimmed_dups_fastq_R2)
+            return trimmed_fastq_R2, trimmed_dups_fastq_R2
+        else:
+            return processed_fastq
+
+    # Put it all together (original included option to not retain intermediates)
+    # if read2:
+    #     # cutadapt directs its report to stderr if the command lacks
+    #     # a -o and the actual reads are directed to stdout.
+    #     process_fastq_cmd2 = build_command([
+    #         "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
+    #     pm.debug("process_fastq_cmd2: {}".format(process_fastq_cmd2))
+    #     pm.run(process_fastq_cmd2, trimmed_fastq_R2)
+    #     cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
+    #     pm.run(cp_cmd, trimmed_dups_fastq_R2)
+    #     return trimmed_fastq_R2, trimmed_dups_fastq_R2
+    # else:
+    #     if not args.complexity and args.umi_len > 0:
+    #         # This trim command DOES need the adapter file...
+    #         pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
+    #         pm.run([adapter_command, trim_command], processed_fastq,
+    #                follow=ngstk.check_trim(processed_fastq, False, None,
+    #                                        fastqc_folder=fastqc_folder))
+    #         # This needs to produce the trimmed_fastq file
+    #         # TODO: trim_command2 doesn't need to produce fastp html files and json files...
+    #         # TODO: if I'm using seqkit rmdup here, I DON'T NEED the other fastp!!! umi command
+    #         pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
+    #         pm.run([deduplicate_command, trim_command2],
+    #                trimmed_fastq, follow=report_fastq)
+    #         pm.clean_add(noadap_fq1)
+    #         pm.clean_add(dedup_fastq)
+    #         pm.clean_add(trimmed_fastq)
+    #         return processed_fastq, trimmed_fastq
+    #     else:
+    #         pm.debug("\nELSE: trim_command: {} + {}\n".format(adapter_command, trim_command))
+    #         process_fastq_cmd = build_command([
+    #             "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
+    #         pm.run(process_fastq_cmd, processed_fastq,
+    #            follow=ngstk.check_trim(processed_fastq, False, None,
+    #                                    fastqc_folder=fastqc_folder))
+    #         return processed_fastq
 
 
 def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
@@ -1800,6 +1873,22 @@ def main():
         pm.info("This is uninformative for paired-end data. "
                 "See fragment distribution plot instead.")
     else:
+        # TODO: don't pipe if using this method. need noadap files as input
+        # merge short fragment reads
+        rep_fq1 = os.path.join(fastq_folder,
+            args.sample_name + "_R1_noadap.fastq.paired.fq")
+        rep_fq2 = os.path.join(fastq_folder,
+            args.sample_name + "_R2_noadap.fastq.paired.fq")
+        flash_hist = os.path.join(fastq_folder, args.sample_name + ".hist")
+        flash_gram = os.path.join(fastq_folder, args.sample_name + ".histogram")
+
+        cmd1 = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
+                noadap_fq1 + " " + noadap_fq2)
+        cmd2 = (tools.flash + " -q -t " + str(pm.cores) + " --compress-prog=" +
+            `   ngstk.ziptool + " --suffix=gz " + rep_fq1 + " " + rep_fq2 +
+                " -o " + args.sample_name + " -d " + fastq_folder)
+        pm.run([cmd1, cmd2], [flash_hist, flash_gram])
+
         degradation_pdf = os.path.join(cutadapt_folder,
             args.sample_name + "_adapter_insertion_distribution.pdf")
         degradation_png = os.path.join(cutadapt_folder,
