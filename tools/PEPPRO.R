@@ -46,10 +46,11 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Command: preseq\t\t plot preseq complexity curves\n",
         "\t frif\t\t plot fraction of reads in features\n",
         "\t tss\t\t plot TSS enrichment\n",
-        "\t frag\t\t plot fragment length distribution\n",
+        "\t frag\t\t plot PE fragment length distribution\n",
         "\t mrna\t\t plot mRNA contamination distribution\n",
         "\t pi\t\t plot pause indicies distribution\n",
-        "\t cutadapt\t plot adapter insertion distribution\n"
+        "\t cutadapt\t plot cutadapt-based adapter insertion distribution\n",
+        "\t adapt\t plot generalized adapter insertion distribution\n"
     )
     message(usage)
 } else if (!is.na(subcmd) && tolower(subcmd) == "preseq") {
@@ -484,7 +485,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "\n",
         "Usage:   PEPPRO.R [command] {args}\n",
         "Version: ", version, "\n\n",
-        "Command: cutadapt \t plot adapter insertion distribution\n\n",
+        "Command: cutadapt \t plot cutadapt-based adapter insertion distribution\n\n",
         " -i, --input\t cutadapt report.\n",
         " -o, --output\t output directory.\n",
         " -u, --umi_len\t UMI length (Default 0).\n",
@@ -541,6 +542,63 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                   stdout())
         }
     }
+}  else if (!is.na(subcmd) && tolower(subcmd) == "adapt") {
+    usage <- paste0(
+        "\n",
+        "Usage:   PEPPRO.R [command] {args}\n",
+        "Version: ", version, "\n\n",
+        "Command: adapt \t plot generalized adapter insertion distribution\n\n",
+        " -i, --input\t flash histogram output.\n",
+        " -o, --output\t output directory.\n",
+        " -u, --umi_len\t UMI length (Default 0).\n"
+    )
+
+    help <- opt_get(name = c("help", "?", "h"), required=FALSE,
+                    default=FALSE, n=0)
+    if (!help) {
+        help <- suppressWarnings(
+            if(length(opt_get_args()) == 1) {TRUE} else {FALSE}
+        )
+    }
+    if (help) {
+        message(usage)
+        quit()
+    } else {
+        input   <- opt_get(name = c("input", "i"), required=TRUE,
+                           description="flash histogram output.")
+        output  <- opt_get(name = c("output", "o"), required=TRUE,
+                           description="output destination directory.")
+        umi_len <- opt_get(name = c("umi_len", "u"), required=FALSE,
+                           default = 0,
+                           description="UMI length (Default 0).")
+
+        name               <- basename(sampleName(input, num_fields=1))
+        #message(name)
+        suppressWarnings(p <- plotAdapt(input=input, name=name,
+                                        umi_len = umi_len))
+        sample_name        <- paste(output, name, sep="/")
+        #message(sample_name)
+
+        # Save plot to pdf file
+        pdf(file=paste0(sample_name, "_adapter_insertion_distribution.pdf"),
+            width = 4, height = 4, useDingbats=F)
+        suppressWarnings(print(p))
+        invisible(dev.off())
+             
+        # Save plot to png file
+        png(filename = paste0(sample_name,
+                              "_adapter_insertion_distribution.png"),
+            width = 275, height = 275)
+        suppressWarnings(print(p))
+        invisible(dev.off())
+
+        if (exists("p")) {
+            write("Adapter insertion distribution plot completed!\n", stdout())
+        } else {
+            write("Unable to produce adapter insertion distribution plot!\n",
+                  stdout())
+        }
+    }
 } else {
     usage <- paste0(
         "\n",
@@ -549,10 +607,11 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Command: preseq\t\t plot preseq complexity curves\n",
         "\t frif\t\t plot fraction of reads in features\n",
         "\t tss\t\t plot TSS enrichment\n",
-        "\t frag\t\t plot fragment length distribution\n",
+        "\t frag\t\t plot PE fragment length distribution\n",
         "\t mrna\t\t plot mRNA contamination distribution\n",
         "\t pi\t\t plot pause indicies distribution\n",
-        "\t cutadapt\t plot adapter insertion distribution\n"
+        "\t cutadapt\t plot cutadapt-based adapter insertion distribution\n",
+        "\t adapt\t plot generalized adapter insertion distribution\n"
     )
     message(usage)
     quit()

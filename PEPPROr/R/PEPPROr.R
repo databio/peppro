@@ -1808,10 +1808,23 @@ getAbbr <- function(vec) {
 }
 
 
-#' Plot the distribution of adapter insertions
+#' Determine the appropriate dividing factor for large numbers
+#'
+#' Modified From: https://stackoverflow.com/questions/28159936/formatting-large-currency-or-dollar-values-to-millions-billions
+#' @param vec A vector of numbers
+#'
+#' @keywords abbreviation
+getFactor <- function(vec) { 
+    div <- findInterval(as.numeric(gsub("\\,", "", vec)), c(0, 1e3, 1e6, 1e9, 1e12) )
+    return(as.numeric(paste(c(1, 1e3, 1e6, 1e9, 1e12)[mode(div)])))
+}
+
+
+#' Plot the cutadapt-based distribution of adapter insertions
 #'
 #' @param input A cutadapt report
 #' @param name A sample name or identifier for the plot title
+#' @param umi_len The UMI length
 #'
 #' @keywords cutadapt
 #' @export
@@ -1849,7 +1862,71 @@ plotCutadapt <- function(input, name='cutadapt',
         ylabel <- paste0("Number of reads (", abbr, ")")
     }
 
+    count_factor <- getFactor(report$count)
+
     q <- ggplot(report, aes(x=max(length)-length, y=count/count_factor)) +
+            geom_point() +
+            geom_vline(xintercept = 20, linetype = "dotted", alpha=0.25) +
+            geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
+            labs(title=name, x="Size of insertion", y=ylabel) +
+            theme_PEPPRO()
+    q <- q + 
+        annotate("rect", xmin=-Inf, xmax=20, ymin=-Inf, ymax=Inf,
+                 alpha=0.1, fill="#ff001e") +
+        annotate("text", x=25, y=(max(report$count/count_factor)/2),
+                 size=theme_get()$text[["size"]]/4,
+                 label="partial degradation", angle=90, col="#858585") +
+        annotate("rect", xmin=-Inf, xmax=30, ymin=-Inf, ymax=Inf,
+                 alpha=0.1, fill="#ffee00") + 
+        annotate("text", x=7.5, y=(max(report$count/count_factor)/2),
+                 size=theme_get()$text[["size"]]/4,
+                 label="high degradation", angle=90, col="#858585")
+
+    return(q)
+}
+
+
+#' Plot the distribution of adapter insertions
+#'
+#' @param input FLASH histogram output
+#' @param name A sample name or identifier for the plot title
+#' @param umi_len The UMI length
+#'
+#' @keywords cutadapt
+#' @export
+#' @examples
+#' data("adapt")
+#' plotAdapt(input = "adapt")
+#' @export
+plotAdapt <- function(input, name='adapt', umi_len = 0) {
+    if (exists(input)) {
+        report <- data.table(get(input))
+    } else if (file.exists(input)) {
+        report <- fread(input)
+    } else {
+        stop(paste0("FileExistsError: ", input, " could not be found."))
+        quit(save = "no", status = 1, runLast = FALSE)
+    }
+    
+    colnames(report) <- c("length", "count")
+
+    if (umi_len > 0) {
+        report$length <- report$length - umi_len
+    }
+    
+    # don't include size 0 insertions
+    report <- report[-nrow(report),]
+
+    abbr <- getAbbr(report$count)
+    if (abbr == '') {
+        ylabel <- "Number of reads"
+    } else {
+        ylabel <- paste0("Number of reads (", abbr, ")")
+    }
+
+    count_factor <- getFactor(report$count)
+
+    q <- ggplot(report, aes(x=length, y=count/count_factor)) +
             geom_point() +
             geom_vline(xintercept = 20, linetype = "dotted", alpha=0.25) +
             geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
