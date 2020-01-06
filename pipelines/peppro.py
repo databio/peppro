@@ -239,10 +239,10 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             ])
         # If calculating library complexity and this is read 1 or single-end,
         # must produce an intermediate file.
-        if not args.complexity and args.umi_len > 0 and not read2 :
-            adapter_cmd_chunks.extend([("-o", noadap_fastq)])
-        else:
-            adapter_cmd_chunks.extend([("--stdout")])
+        #if not args.complexity and args.umi_len > 0 and not read2 :
+        adapter_cmd_chunks.extend([("-o", noadap_fastq)])  # Must keep intermediates always now
+        # else:
+        #     adapter_cmd_chunks.extend([("--stdout")])
 
         adapter_cmd_chunks.extend([
             (") 2>", fastp_report_txt)
@@ -265,32 +265,33 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
                     fq_file
             ])
         else:
-            if not args.complexity and args.umi_len > 0:
-                adapter_cmd_chunks = ["(" + tools.cutadapt]
-                # old versions of cutadapt can not use multiple cores
-                if cut_version >= 1.15:
-                    adapter_cmd_chunks.extend([("-j", str(pm.cores))])
-                adapter_cmd_chunks.extend([
-                    #("-m", (18 + int(float(args.umi_len)))),
-                    ("-m", 5),  # For insert size plotting
-                    ("-O", 1),
-                    ("-a", five_prime),
-                    fq_file,
-                    ("-o", noadap_fastq + ")"),
-                    (">", cutadapt_report)
-                ])
-            else:
-                adapter_cmd_chunks = [tools.cutadapt]
-                # old versions of cutadapt can not use multiple cores
-                if cut_version >= 1.15:
-                    adapter_cmd_chunks.extend([("-j", str(pm.cores))])
-                adapter_cmd_chunks.extend([
-                    #("-m", (18 + int(float(args.umi_len)))),
-                    ("-m", 5),  # For insert size plotting
-                    ("-O", 1),
-                    ("-a", five_prime),
-                    fq_file
-                ])
+            # Must keep intermediates always now
+            #if not args.complexity and args.umi_len > 0:
+            adapter_cmd_chunks = ["(" + tools.cutadapt]
+            # old versions of cutadapt can not use multiple cores
+            if cut_version >= 1.15:
+                adapter_cmd_chunks.extend([("-j", str(pm.cores))])
+            adapter_cmd_chunks.extend([
+                #("-m", (18 + int(float(args.umi_len)))),
+                ("-m", 5),  # For insert size plotting
+                ("-O", 1),
+                ("-a", five_prime),
+                fq_file,
+                ("-o", noadap_fastq + ")"),
+                (">", cutadapt_report)
+            ])
+            # else:
+            #     adapter_cmd_chunks = [tools.cutadapt]
+            #     # old versions of cutadapt can not use multiple cores
+            #     if cut_version >= 1.15:
+            #         adapter_cmd_chunks.extend([("-j", str(pm.cores))])
+            #     adapter_cmd_chunks.extend([
+            #         #("-m", (18 + int(float(args.umi_len)))),
+            #         ("-m", 5),  # For insert size plotting
+            #         ("-O", 1),
+            #         ("-a", five_prime),
+            #         fq_file
+            #     ])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
 
@@ -322,10 +323,10 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             ])
         # If calculating library complexity and this is read 1 or single-end,
         # must produce a physical output file.
-        if not args.complexity and not read2:
-            adapter_cmd_chunks.extend([("-o", noadap_fastq)])
-        else:
-            adapter_cmd_chunks.extend([("--stdout")])
+        #if not args.complexity and not read2:
+        adapter_cmd_chunks.extend([("-o", noadap_fastq)])  # Must keep intermediates always now
+        # else:
+        #     adapter_cmd_chunks.extend([("--stdout")])
 
         adapter_cmd_chunks.extend([
             (") 2>", fastp_report_txt)
@@ -1922,7 +1923,7 @@ def main():
             cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                    " cutadapt -i " + cutadapt_report + " -o " + cutadapt_folder)
             if args.umi_len > 0:
-                cmd += (" -u " + args.umi_len)
+                cmd += (" -u " + str(args.umi_len))
             pm.run(cmd, degradation_pdf, nofail=True)
             pm.report_object("Adapter insertion distribution", degradation_pdf,
                              anchor_image=degradation_png)
