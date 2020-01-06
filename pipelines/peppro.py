@@ -629,7 +629,7 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks = [
                 (tools.seqtk, "trimfq"),
                 ("-L", args.max_len),
-                "-"
+                noadap_fastq
             ]
         else:
             trim_cmd_chunks = []
@@ -640,6 +640,7 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
                     "|",
                     (tools.seqtk, "seq"),
                     ("-L", 5),
+                    "-",
                     (">", trimmed_fastq)
                 ])
             else:
@@ -659,6 +660,14 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
                     ("-r", "-"),
                     (">", trimmed_fastq)
                 ])
+            # Otherwise just make sure to remove too short reads
+            else:
+                trim_cmd_chunks = [
+                    (tools.seqtk, "seq"),
+                    ("-L", 5),
+                    noadap_fastq,
+                    (">", trimmed_fastq)
+                ]
     elif args.trimmer == "seqtk":
         # Remove UMI blindly by position
         trim_cmd_chunks = [
@@ -679,6 +688,7 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
                 "|",
                 (tools.seqtk, "seq"),
                 ("-L", 5),
+                "-",
                 (">", trimmed_fastq)
             ])
         else:
@@ -747,6 +757,7 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
                 "|",
                 (tools.seqtk, "seq"),
                 ("-L", 5),
+                "-",
                 (">", trimmed_fastq)
             ])
         else:
@@ -843,6 +854,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                     "|",
                     (tools.seqtk, "seq"),
                     ("-L", 5),
+                    "-",
                     (">", processed_fastq)
                 ])
             else:
@@ -866,6 +878,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                     "|",
                     (tools.seqtk, "seq"),
                     ("-L", 5),
+                    "-",
                     (">", processed_fastq)
                 ])
             else:
@@ -909,6 +922,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 "|",
                 (tools.seqtk, "seq"),
                 ("-L", 5),
+                "-",
                 (">", processed_fastq)
             ])
         else:
@@ -967,6 +981,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 "|",
                 (tools.seqtk, "seq"),
                 ("-L", 5),
+                "-",
                 (">", processed_fastq)
             ])
         else:
