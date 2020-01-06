@@ -257,6 +257,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
                 adapter_cmd_chunks.extend([("-j", str(pm.cores))])
             adapter_cmd_chunks.extend([
                     ("-m", (18 + int(float(args.umi_len)))),
+                    ("-O", 1),
                     ("-a", three_prime),
                     fq_file
             ])
@@ -268,6 +269,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
                     adapter_cmd_chunks.extend([("-j", str(pm.cores))])
                 adapter_cmd_chunks.extend([
                     ("-m", (18 + int(float(args.umi_len)))),
+                    ("-O", 1),
                     ("-a", five_prime),
                     fq_file,
                     ("-o", noadap_fastq + ")"),
@@ -280,6 +282,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
                     adapter_cmd_chunks.extend([("-j", str(pm.cores))])
                 adapter_cmd_chunks.extend([
                     ("-m", (18 + int(float(args.umi_len)))),
+                    ("-O", 1),
                     ("-a", five_prime),
                     fq_file
                 ])
@@ -767,6 +770,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             ]
 
             # if read2:
+            # # still 'read1' because it's being processed as a SE file
             #     trim_cmd_chunks.extend([("--umi_loc", "read1")])
             # else:
             #     trim_cmd_chunks.extend([("--umi_loc", "read1")])
