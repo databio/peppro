@@ -446,18 +446,24 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
         ]
 
         # Trim to max length if specified
-        if args.max_len != -1:
+        if int(args.max_len) > 0:
             trim_cmd_chunks.extend([("-L", args.max_len)])
 
         trim_cmd_chunks.extend(["-"])
 
         # Do not reverse complement for GRO-seq
         if args.protocol.lower() in RUNON_SOURCE_GRO:
-            trim_cmd_chunks.extend([(">", processed_fastq)])
+            trim_cmd_chunks.extend([
+                "|",
+                (tools.seqtk, "seq"),
+                ("-L", 5),
+                (">", processed_fastq)
+            ])
         else:
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
+                ("-L", 5),
                 ("-r", "-"),
                 (">", processed_fastq)
             ])
@@ -470,21 +476,26 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
         ]
 
         # Trim to max length if specified
-        if args.max_len != -1:
+        if int(args.max_len) > 0:
             trim_cmd_chunks.extend([("-L", str(args.max_len))])
 
         trim_cmd_chunks.extend([dedup_fastq])
 
         # Do not reverse complement for GRO-seq
         if args.protocol.lower() in RUNON_SOURCE_GRO:
-            trim_cmd_chunks.extend([(">", processed_fastq)])                           
+            trim_cmd_chunks.extend([
+                "|",
+                (tools.seqtk, "seq"),
+                ("-L", 5),
+                (">", processed_fastq)
+            ])                           
         else:
             trim_cmd_chunks.extend([
                 "|",
-                tools.seqtk,
-                ("seq", "-r"),
-                ("-", ">"),
-                processed_fastq
+                (tools.seqtk, "seq"),
+                ("-L", 5),
+                ("-r", "-"),
+                (">", processed_fastq)
             ])
     elif args.trimmer == "fastx":
         trim_tool = tools.fastx + "_trimmer"
@@ -500,7 +511,7 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
         trim_cmd_chunks.extend([("-f", str(int(float(args.umi_len)) + 1))])
 
         # Trim to max length if specified
-        if args.max_len != -1:
+        if int(args.max_len) > 0:
             trim_cmd_chunks.extend([
                 ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
             ])
@@ -525,21 +536,26 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             ("-b", str(args.umi_len))
         ]
 
-        if args.max_len != -1:
+        if int(args.max_len) > 0:
             trim_cmd_chunks.extend([("-L", str(args.max_len))])
 
         trim_cmd_chunks.extend([dedup_fastq])
 
         # Do not reverse complement for GRO-seq
         if args.protocol.lower() in RUNON_SOURCE_GRO:
-            trim_cmd_chunks.extend([(">", processed_fastq)])                           
+            trim_cmd_chunks.extend([
+                "|",
+                (tools.seqtk, "seq"),
+                ("-L", 5),
+                (">", processed_fastq)
+            ])                           
         else:
             trim_cmd_chunks.extend([
                 "|",
-                tools.seqtk,
-                ("seq", "-r"),
-                ("-", ">"),
-                processed_fastq
+                (tools.seqtk, "seq"),
+                ("-L", 5),
+                ("-r", "-"),
+                (">", processed_fastq)
             ])
 
     trim_cmd = build_command(trim_cmd_chunks)
@@ -604,12 +620,12 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
                 (tools.seqtk, "trimfq")
             ]
 
-            if args.max_len != -1:
+            if int(args.max_len) > 0:
                 # Trim to max length if specified
                 trim_cmd_chunks.extend([("-L", args.max_len)])
 
             trim_cmd_chunks.extend(["-"])
-        elif args.max_len != -1:
+        elif int(args.max_len) > 0:
             trim_cmd_chunks = [
                 (tools.seqtk, "trimfq"),
                 ("-L", args.max_len),
@@ -621,12 +637,16 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
         if trim_cmd_chunks:
             if args.protocol.lower() in RUNON_SOURCE_GRO:
                 trim_cmd_chunks.extend([
+                    "|",
+                    (tools.seqtk, "seq"),
+                    ("-L", 5),
                     (">", trimmed_fastq)
                 ])
             else:
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
+                    ("-L", 5),
                     ("-r", "-"),
                     (">", trimmed_fastq)
                 ])
@@ -635,6 +655,7 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 trim_cmd_chunks.extend([
                     (tools.seqtk, "seq"),
+                    ("-L", 5),
                     ("-r", "-"),
                     (">", trimmed_fastq)
                 ])
@@ -647,7 +668,7 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
         ]
 
         # Trim tp max length if specified
-        if args.max_len != -1:
+        if int(args.max_len) > 0:
             trim_cmd_chunks.extend([
                 ("-L", str(args.max_len))
             ])
@@ -655,12 +676,16 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
         trim_cmd_chunks.extend([noadap_fastq])
         if args.protocol.lower() in RUNON_SOURCE_GRO:
             trim_cmd_chunks.extend([
+                "|",
+                (tools.seqtk, "seq"),
+                ("-L", 5),
                 (">", trimmed_fastq)
             ])
         else:
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
+                ("-L", 5),
                 ("-r", "-"),
                 (">", trimmed_fastq)
             ])
@@ -679,7 +704,7 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
         ])
 
         # Trim tp max length if specified
-        if args.max_len != -1:
+        if int(args.max_len) > 0:
             trim_cmd_chunks.extend([
                 ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
             ])
@@ -710,20 +735,25 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
         ]
 
         # Trim to max length if specified
-        if args.max_len != -1:
+        if int(args.max_len) > 0:
             trim_cmd_chunks.extend([
                 ("-L", str(args.max_len))
             ])
 
         trim_cmd_chunks.extend([noadap_fastq])
         if args.protocol.lower() in RUNON_SOURCE_GRO:
+            # Do not reverse complement
             trim_cmd_chunks.extend([
+                "|",
+                (tools.seqtk, "seq"),
+                ("-L", 5),
                 (">", trimmed_fastq)
             ])
         else:
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
+                ("-L", 5),
                 ("-r", "-"),
                 (">", trimmed_fastq)
             ])
@@ -802,22 +832,28 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             # ])
 
             # Trim to max length if specified
-            if args.max_len != -1:
+            if int(args.max_len) > 0:
                 trim_cmd_chunks.extend([("-L", args.max_len)])
 
             trim_cmd_chunks.extend(["-"])
 
             # Do not reverse complement for GRO-seq
             if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([(">", processed_fastq)])
+                trim_cmd_chunks.extend([
+                    "|",
+                    (tools.seqtk, "seq"),
+                    ("-L", 5),
+                    (">", processed_fastq)
+                ])
             else:
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
+                    ("-L", 5),
                     ("-r", "-"),
                     (">", processed_fastq)
                 ])
-        elif args.max_len != -1:
+        elif int(args.max_len) > 0:
             # No UMI, but still trim max length
             trim_cmd_chunks = [
                 (tools.seqtk, "trimfq"),
@@ -826,11 +862,17 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             ]
             # Do not reverse complement for GRO-seq
             if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([(">", processed_fastq)])
+                trim_cmd_chunks.extend([
+                    "|",
+                    (tools.seqtk, "seq"),
+                    ("-L", 5),
+                    (">", processed_fastq)
+                ])
             else:
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
+                    ("-L", 5),
                     ("-r", "-"),
                     (">", processed_fastq)
                 ])
@@ -839,6 +881,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 trim_cmd_chunks = [
                     (tools.seqtk, "seq"),
+                    ("-L", 5),
                     ("-r", "-"),
                     (">", processed_fastq)
                 ]
@@ -855,19 +898,25 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([("-e", str(args.umi_len))])
         else:
             trim_cmd_chunks.extend([("-b", str(args.umi_len))])
-            if args.max_len != -1:
+            if int(args.max_len) > 0:
                 trim_cmd_chunks.extend([("-L", str(args.max_len))])
 
         trim_cmd_chunks.extend(["-"])
 
         # Do not reverse complement for GRO-seq
         if args.protocol.lower() in RUNON_SOURCE_GRO:
-            trim_cmd_chunks.extend([(">", processed_fastq)])                           
+            trim_cmd_chunks.extend([
+                "|",
+                (tools.seqtk, "seq"),
+                ("-L", 5),
+                (">", processed_fastq)
+            ])
         else:
             trim_cmd_chunks.extend([
                 "|",
                 tools.seqtk,
                 ("seq", "-r"),
+                ("-L", 5),
                 ("-", ">"),
                 processed_fastq
             ])
@@ -883,7 +932,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([("-t", str(int(float(args.umi_len))))])
         else:
             trim_cmd_chunks.extend([("-f", str(int(float(args.umi_len)) + 1))])
-            if args.max_len != -1:
+            if int(args.max_len) > 0:
                 trim_cmd_chunks.extend([
                     ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
                 ])
@@ -907,19 +956,25 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([("-e", str(args.umi_len))])
         else:
             trim_cmd_chunks.extend([("-b", str(args.umi_len))])
-            if args.max_len != -1:
+            if int(args.max_len) > 0:
                 trim_cmd_chunks.extend([("-L", str(args.max_len))])
 
         trim_cmd_chunks.extend(["-"])
 
         # Do not reverse complement for GRO-seq
         if args.protocol.lower() in RUNON_SOURCE_GRO:
-            trim_cmd_chunks.extend([(">", processed_fastq)])                           
+            trim_cmd_chunks.extend([
+                "|",
+                (tools.seqtk, "seq"),
+                ("-L", 5),
+                (">", processed_fastq)
+            ])
         else:
             trim_cmd_chunks.extend([
                 "|",
                 tools.seqtk,
                 ("seq", "-r"),
+                ("-L", 5),
                 ("-", ">"),
                 processed_fastq
             ])
@@ -1081,7 +1136,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         degradation_png = os.path.join(outfolder,
             args.sample_name + "_adapter_insertion_distribution.png")
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
-               " cutadapt -i " + cutadapt_report + " -o " + outfolder)
+               " adapt -i " + flash_hist + " -o " + outfolder)
         if args.umi_len > 0:
             cmd += (" -u " + args.umi_len)
             umi_len = args.umi_len
@@ -2258,7 +2313,7 @@ def main():
     ############################################################################
 
     if not pm.get_stat("Maximum_read_length") or args.new_start:
-        if int(args.max_len) != -1:
+        if int(args.max_len) > 0:
             max_len = int(args.max_len)
         elif _itsa_file(mapping_genome_bam):
             cmd = (tools.samtools + " stats " + mapping_genome_bam +
