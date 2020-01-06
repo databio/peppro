@@ -1048,6 +1048,14 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pr = int(ngstk.count_lines(processed_fastq).strip())
         pm.report_result("Pct_reads_too_short", round(float(ts/pr), 2))
 
+
+    def plot_fragments(infolder, outfolder):
+        """
+        Plot adapter insertion distribution (from PE data only)
+
+        :param str infolder: path to fastq containing directory
+        :param str outfolder: path to output directory for functions
+        """
         # merge short fragment reads
         rep_fq1 = os.path.join(fastq_folder,
             args.sample_name + "_R1_noadap.fastq.paired.fq")
@@ -1058,10 +1066,39 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
 
         cmd1 = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
                 noadap_fq1 + " " + noadap_fq2)
-        cmd2 = (tools.flash + " -q -t " + str(pm.cores) + " --compress-prog=" +
-            `   ngstk.ziptool + " --suffix=gz " + rep_fq1 + " " + rep_fq2 +
-                " -o " + args.sample_name + " -d " + fastq_folder)
+        cmd2 = (tools.flash + " -q -t " + str(pm.cores) +
+                " --compress-prog=" + ngstk.ziptool + " --suffix=gz " +
+                rep_fq1 + " " + rep_fq2 + " -o " + args.sample_name +
+                " -d " + outfolder)
         pm.run([cmd1, cmd2], [flash_hist, flash_gram])
+
+        # TODO: edit these plotting commands
+        pm.timestamp("### Plot adapter insertion distribution")
+
+        degradation_pdf = os.path.join(outfolder,
+            args.sample_name + "_adapter_insertion_distribution.pdf")
+        degradation_png = os.path.join(outfolder,
+            args.sample_name + "_adapter_insertion_distribution.png")
+        cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
+               " cutadapt -i " + cutadapt_report + " -o " + outfolder)
+        if args.umi_len > 0:
+            cmd += (" -u " + args.umi_len)
+            umi_len = args.umi_len
+        else:
+            umi_len = 0
+        pm.run(cmd, degradation_pdf, nofail=True)
+        pm.report_object("Adapter insertion distribution", degradation_pdf,
+                         anchor_image=degradation_png)
+
+        # Determine the peak insertion size
+        cmd = ("awk 'NR>2 {print prev} {prev=$0}'" + flash_hist + 
+               " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
+               " {max=$2; len=$1}; max_len=$1} END{print max_len-len-" +
+               str(umi_len) + "}'")
+        adapter_peak = pm.checkprint(cmd)
+        if adapter_peak:
+            ap = int(adapter_peak)
+            pm.report_result("Peak_adapter_insertion_size", ap)
 
 
     # Put it all together
@@ -1087,8 +1124,13 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                follow=ngstk.check_trim(processed_fastq, False, None,
                                        fastqc_folder=fastqc_folder))
         if read2:
+            if args.adapter == "cutadapt":
+                output_folder = os.path.join(outfolder, "cutadapt")
+            else:
+                output_folder = os.path.join(outfolder, "fastp")
             cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
-            pm.run(cp_cmd, trimmed_dups_fastq_R2)
+            pm.run(cp_cmd, trimmed_dups_fastq_R2,
+                   follow=plot_fragments(fastq_folder, output_folder))
             return trimmed_fastq_R2, trimmed_dups_fastq_R2
         else:
             return processed_fastq
@@ -1861,56 +1903,40 @@ def main():
                     untrimmed_fastq1, outfolder=param.outfolder)
                 unmap_fq2 = ""
 
-    pm.timestamp("### Plot adapter insertion distribution")
-    if not args.adapter == "cutadapt":
-        pm.info("Skipping sample degradation plotting...")
-        pm.info("This requires using 'cutadapt' for adapter removal.")
-    elif not os.path.exists(cutadapt_report):
-        pm.info("Skipping sample degradation plotting...")
-        pm.info("Could not find {}.`".format(cutadapt_report))
-    elif args.paired_end:
-        pm.info("Skipping sample degradation plotting...")
-        pm.info("This is uninformative for paired-end data. "
-                "See fragment distribution plot instead.")
-    else:
-        # TODO: don't pipe if using this method. need noadap files as input
-        # merge short fragment reads
-        rep_fq1 = os.path.join(fastq_folder,
-            args.sample_name + "_R1_noadap.fastq.paired.fq")
-        rep_fq2 = os.path.join(fastq_folder,
-            args.sample_name + "_R2_noadap.fastq.paired.fq")
-        flash_hist = os.path.join(fastq_folder, args.sample_name + ".hist")
-        flash_gram = os.path.join(fastq_folder, args.sample_name + ".histogram")
+    # TODO: maintain this functionality for single-end data
+    #       for paired-end it has already been generated at this point
+    if not args.paired_end:
+        pm.timestamp("### Plot adapter insertion distribution")
 
-        cmd1 = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
-                noadap_fq1 + " " + noadap_fq2)
-        cmd2 = (tools.flash + " -q -t " + str(pm.cores) + " --compress-prog=" +
-            `   ngstk.ziptool + " --suffix=gz " + rep_fq1 + " " + rep_fq2 +
-                " -o " + args.sample_name + " -d " + fastq_folder)
-        pm.run([cmd1, cmd2], [flash_hist, flash_gram])
+        if not args.adapter == "cutadapt":
+            pm.info("Skipping adapter insertion distribution plotting...")
+            pm.info("This requires using 'cutadapt' for adapter removal.")
+        elif not os.path.exists(cutadapt_report):
+            pm.info("Skipping adapter insertion distribution plotting...")
+            pm.info("Could not find {}.`".format(cutadapt_report))
+        else:
+            degradation_pdf = os.path.join(cutadapt_folder,
+                args.sample_name + "_adapter_insertion_distribution.pdf")
+            degradation_png = os.path.join(cutadapt_folder,
+                args.sample_name + "_adapter_insertion_distribution.png")
+            cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
+                   " cutadapt -i " + cutadapt_report + " -o " + cutadapt_folder)
+            if args.umi_len > 0:
+                cmd += (" -u " + args.umi_len)
+            pm.run(cmd, degradation_pdf, nofail=True)
+            pm.report_object("Adapter insertion distribution", degradation_pdf,
+                             anchor_image=degradation_png)
 
-        degradation_pdf = os.path.join(cutadapt_folder,
-            args.sample_name + "_adapter_insertion_distribution.pdf")
-        degradation_png = os.path.join(cutadapt_folder,
-            args.sample_name + "_adapter_insertion_distribution.png")
-        cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
-               " cutadapt -i " + cutadapt_report + " -o " + cutadapt_folder)
-        if args.umi_len > 0:
-            cmd += (" -u " + args.umi_len)
-        pm.run(cmd, degradation_pdf, nofail=True)
-        pm.report_object("Adapter insertion distribution", degradation_pdf,
-                         anchor_image=degradation_png)
-
-        # Determine the peak insertion size
-        cmd = ("awk '/count/,0' " + cutadapt_report +
-               " | awk 'NR>2 {print prev} {prev=$0}'" +
-               " | awk '{if ($3/$2 < 0.01) print $1, $2}'" +
-               " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
-               " {max=$2; len=$1}; max_len=$1} END{print max_len-len}'")
-        adapter_peak = pm.checkprint(cmd)
-        if adapter_peak:
-            ap = int(adapter_peak)
-            pm.report_result("Peak_adapter_insertion_size", ap)
+            # Determine the peak insertion size
+            cmd = ("awk '/count/,0' " + cutadapt_report +
+                   " | awk 'NR>2 {print prev} {prev=$0}'" +
+                   " | awk '{if ($3/$2 < 0.01) print $1, $2}'" +
+                   " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
+                   " {max=$2; len=$1}; max_len=$1} END{print max_len-len}'")
+            adapter_peak = pm.checkprint(cmd)
+            if adapter_peak:
+                ap = int(adapter_peak)
+                pm.report_result("Peak_adapter_insertion_size", ap)
 
     pm.clean_add(fastq_folder, conditional=True)
 
@@ -2708,39 +2734,40 @@ def main():
         pm.report_result("Minus_FRiP", round(minus_frip, 2))
 
     ############################################################################
-    #             Plot fragment distribution (for SE data)                     #
+    #             Plot fragment distribution (for PE data)                     #
     ############################################################################
-    if args.paired_end:
-        pm.timestamp("### Plot fragment distribution")
-        frag_len = os.path.join(QC_folder, args.sample_name + "_fragLen.txt")
-        frag_dist_tool = tool_path("fragment_length_dist.pl")
-        cmd = build_command([tools.perl, frag_dist_tool,
-                             mapping_genome_bam, frag_len])
+    # DEPRECATED
+    # if args.paired_end:
+    #     pm.timestamp("### Plot fragment distribution")
+    #     frag_len = os.path.join(QC_folder, args.sample_name + "_fragLen.txt")
+    #     frag_dist_tool = tool_path("fragment_length_dist.pl")
+    #     cmd = build_command([tools.perl, frag_dist_tool,
+    #                          mapping_genome_bam, frag_len])
 
-        fragL_counts_file = args.sample_name + "_fragCount.txt"
-        fragL_count = os.path.join(QC_folder, fragL_counts_file)
-        cmd1 = "sort -n  " + frag_len + " | uniq -c  > " + fragL_count
+    #     fragL_counts_file = args.sample_name + "_fragCount.txt"
+    #     fragL_count = os.path.join(QC_folder, fragL_counts_file)
+    #     cmd1 = "sort -n  " + frag_len + " | uniq -c  > " + fragL_count
 
-        fragL_dis1 = os.path.join(QC_folder, args.sample_name +
-                                  "_fragLenDistribution.pdf")
-        fragL_dis2 = os.path.join(QC_folder, args.sample_name +
-                                  "_fragLenDistribution.txt")
+    #     fragL_dis1 = os.path.join(QC_folder, args.sample_name +
+    #                               "_fragLenDistribution.pdf")
+    #     fragL_dis2 = os.path.join(QC_folder, args.sample_name +
+    #                               "_fragLenDistribution.txt")
 
-        cmd2 = (tools.Rscript + " " + tool_path("PEPPRO.R"))
-        cmd2 += " frag -l " + frag_len + " -c " + fragL_count
-        cmd2 += " -p " + fragL_dis1 + " -t " + fragL_dis2
+    #     cmd2 = (tools.Rscript + " " + tool_path("PEPPRO.R"))
+    #     cmd2 += " frag -l " + frag_len + " -c " + fragL_count
+    #     cmd2 += " -p " + fragL_dis1 + " -t " + fragL_dis2
 
-        pm.run([cmd, cmd1, cmd2], fragL_dis1, nofail=True)
-        pm.clean_add(frag_len)
-        pm.clean_add(fragL_count)
+    #     pm.run([cmd, cmd1, cmd2], fragL_dis1, nofail=True)
+    #     pm.clean_add(frag_len)
+    #     pm.clean_add(fragL_count)
 
-        fragL_png = os.path.join(QC_folder, args.sample_name +
-                                 "_fragLenDistribution.png")
-        pm.report_object("Fragment distribution", fragL_dis1,
-                         anchor_image=fragL_png)
-    else:
-        pass
-        # Used to plot adapter distribution here, but moved to cutadapt.
+    #     fragL_png = os.path.join(QC_folder, args.sample_name +
+    #                              "_fragLenDistribution.png")
+    #     pm.report_object("Fragment distribution", fragL_dis1,
+    #                      anchor_image=fragL_png)
+    # else:
+    #     pass
+    #     # Used to plot adapter distribution here, but moved to cutadapt.
 
     ############################################################################
     #                        Extract genomic features                          #
