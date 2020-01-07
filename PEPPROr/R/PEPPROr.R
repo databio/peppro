@@ -1057,6 +1057,7 @@ plotTSS <- function(TSSfile) {
 #' @param delim A delimiter for the fields splitting a path or string
 sampleName <- function(path, num_fields=2, delim='_') {
     name <- basename(tools::file_path_sans_ext(path))
+    if(num_fields == 0) {return(name)}
     for(n in 1:num_fields) name <- gsub(paste0(delim, "[^", delim, "]*$"), "", name)
     return(paste(dirname(path), name, sep="/"))
 }
