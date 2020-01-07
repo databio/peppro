@@ -1966,7 +1966,7 @@ def main():
             pm.clean_add(r2_repair_single)
             cmd1 = ("mv " + r1_repair + " " + unmap_fq1)
             cmd2 = ("mv " + r2_repair + " " + unmap_fq2)
-            cmd3 = ("touch repaired.flag")
+            cmd3 = ("touch " + repair_target)
             pm.run([cmd1, cmd2, cmd3], repair_target)
 
             # Re-pair the duplicates (but only if we could identify duplicates)
@@ -1988,7 +1988,7 @@ def main():
                 pm.clean_add(r2_dups_repair_single)
                 cmd1 = ("mv " + r1_dups_repair + " " + unmap_fq1_dups)
                 cmd2 = ("mv " + r2_dups_repair + " " + unmap_fq2_dups)
-                cmd3 = ("touch dups_repaired.flag")
+                cmd3 = ("touch " + dups_repair_target)
                 pm.run([cmd1, cmd2, cmd3], dups_repair_target)
         else:
             if not args.complexity and args.umi_len > 0:
