@@ -1147,8 +1147,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             args.sample_name + "_R1_noadap.fastq.paired.fq")
         rep_fq2 = os.path.join(infolder,
             args.sample_name + "_R2_noadap.fastq.paired.fq")
-        flash_hist = os.path.join(infolder, args.sample_name + ".hist")
-        flash_gram = os.path.join(infolder, args.sample_name + ".histogram")
+        flash_hist = os.path.join(outfolder, args.sample_name + ".hist")
+        flash_gram = os.path.join(outfolder, args.sample_name + ".histogram")
 
         tmp = float(pm.get_stat("Raw_reads"))
         if tmp:
@@ -1187,7 +1187,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                          anchor_image=degradation_png)
 
         # Determine the peak insertion size
-        cmd = ("awk 'NR>2 {print prev} {prev=$0}'" + flash_hist + 
+        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist + 
                " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
                " {max=$2; len=$1}; max_len=$1} END{print max_len-len-" +
                str(umi_len) + "}'")
