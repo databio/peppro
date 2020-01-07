@@ -1199,22 +1199,37 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
 
         if degraded_lower:
             dl = int(degraded_lower)
+        if dl == 1:
+            dl = 10
         else:
             cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
                    " | awk 'NR==1 {print $1}'")
             degraded_lower = pm.checkprint(cmd)
             dl = int(degraded_lower) if degraded_lower else 1
-        du = int(degraded_upper) if degraded_upper else degraded_lower + 9
+
+        if degraded_upper:
+            du = int(degraded_upper)
+        if du == 1:
+            du = 20
+        else:
+            du = int(degraded_lower) + 9
 
         if intact_upper:
             iu = int(intact_upper)
+        if iu == 1:
+            iu = 40
         else:
             cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
                    " | awk 'END {print $1}'")
             intact_upper = pm.checkprint(cmd)
             dl = int(intact_upper) if intact_upper else 40
 
-        il = int(intact_lower) if intact_lower else intact_upper - 10
+        if intact_lower:
+            il = int(intact_lower)
+        if il == 1:
+            il = 30
+        else:
+            il = int(intact_upper) - 10
 
         cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
                " | awk '($1 <= " + str(du) + "&& $1 >= " + str(dl) +
