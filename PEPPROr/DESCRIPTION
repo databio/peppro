@@ -1,6 +1,6 @@
 Package: PEPPROr
 Title: Functions and libraries to analyze pro-seq (or gro-seq) data
-Version: 0.0.1.0000
+Version: 0.0.2.0000
 Authors@R: person("Jason", "Smith", email = "jasonsmith@virginia.edu", role = c("aut", "cre"))
 Maintainer: Jason Smith <jasonsmith@virginia.edu>
 Description: Installs required libraries to calculate the fraction of reads in features, to plot library complexity curves, TSS enrichments, and fragment length distributions. 
