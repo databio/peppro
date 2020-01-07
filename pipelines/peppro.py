@@ -174,20 +174,21 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
     sname = args.sample_name  # for concise code
 
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
-    cutadapt_report = os.path.join(cutadapt_folder, sname + "_cutadapt.txt")
-
     fastp_folder = os.path.join(outfolder, "fastp")
     fastq_folder = os.path.join(outfolder, "fastq")
-    noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
 
-    fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
-    fastp_pfx_R2 = os.path.join(fastp_folder, sname + "_R2_fastp_adapter")
+    if read2:
+        cutadapt_report = os.path.join(cutadapt_folder, sname + "_R2_cutadapt.txt")
+        noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
+        fastp_pfx = os.path.join(fastp_folder, sname + "_R2_fastp_adapter")
+    else:
+        cutadapt_report = os.path.join(cutadapt_folder, sname + "_R1_cutadapt.txt")
+        noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
+        fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
 
     fastp_report_txt = fastp_pfx + ".txt"
     fastp_report_html = fastp_pfx + ".html"
     fastp_report_json = fastp_pfx + ".json"
-    fastp_report_html_R2 = fastp_pfx_R2 + ".html"
-    fastp_report_json_R2 = fastp_pfx_R2 + ".json"
 
     if _itsa_file(res.adapters):
         five_prime = pm.checkprint("awk '/5prime/{getline; print}' " +
@@ -221,22 +222,20 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         ]
         if read2:
             adapter_cmd_chunks.extend([
-                ("--adapter_sequence", three_prime),
-                #("--length_required", (18 + int(float(args.umi_len)))),
-                ("--length_required", 5),  # For insert size plotting
-                ("--html", fastp_report_html_R2),
-                ("--json", fastp_report_json_R2),
-                ("--report_title", ("'" + sname + "'"))
+                ("--adapter_sequence", three_prime)
             ])
         else:
             adapter_cmd_chunks.extend([
-                ("--adapter_sequence", five_prime),
-                #("--length_required", (18 + int(float(args.umi_len)))),
-                ("--length_required", 5),  # For insert size plotting
-                ("--html", fastp_report_html),
-                ("--json", fastp_report_json),
-                ("--report_title", ("'" + sname + "'"))
+                ("--adapter_sequence", five_prime)
             ])
+
+        adapter_cmd_chunks.extend([
+            #("--length_required", (18 + int(float(args.umi_len)))),
+            ("--length_required", 5),  # For insert size plotting
+            ("--html", fastp_report_html),
+            ("--json", fastp_report_json),
+            ("--report_title", ("'" + sname + "'"))
+        ])
         # If calculating library complexity and this is read 1 or single-end,
         # must produce an intermediate file.
         #if not args.complexity and args.umi_len > 0 and not read2 :
@@ -251,6 +250,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         adapter_cmd = build_command(adapter_cmd_chunks)
 
     elif args.adapter == "cutadapt":
+        # Must keep intermediates always now
         cut_version = float(pm.checkprint("cutadapt --version"))
         if read2:
             adapter_cmd_chunks = [tools.cutadapt]
@@ -262,10 +262,10 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
                     ("-m", 5),  # For insert size plotting
                     ("-O", 1),
                     ("-a", three_prime),
-                    fq_file
+                    fq_file,
+                    ("-o", noadap_fastq)
             ])
         else:
-            # Must keep intermediates always now
             #if not args.complexity and args.umi_len > 0:
             adapter_cmd_chunks = ["(" + tools.cutadapt]
             # old versions of cutadapt can not use multiple cores
@@ -305,25 +305,23 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         ]
         if read2:
             adapter_cmd_chunks.extend([
-                ("--adapter_sequence", three_prime),
-                #("--length_required", (18 + int(float(args.umi_len)))),
-                ("--length_required", 5),  # For insert size plotting
-                ("--html", fastp_report_html_R2),
-                ("--json", fastp_report_json_R2),
-                ("--report_title", ("'" + sname + "'"))
+                ("--adapter_sequence", three_prime)
             ])
         else:
             adapter_cmd_chunks.extend([
-                ("--adapter_sequence", five_prime),
-                #("--length_required", (18 + int(float(args.umi_len)))),
-                ("--length_required", 5),  # For insert size plotting
-                ("--html", fastp_report_html),
-                ("--json", fastp_report_json),
-                ("--report_title", ("'" + sname + "'"))
+                ("--adapter_sequence", five_prime)
             ])
+
+        adapter_cmd_chunks.extend([
+            #("--length_required", (18 + int(float(args.umi_len)))),
+            ("--length_required", 5),  # For insert size plotting
+            ("--html", fastp_report_html),
+            ("--json", fastp_report_json),
+            ("--report_title", ("'" + sname + "'"))
+        ])
         # If calculating library complexity and this is read 1 or single-end,
-        # must produce a physical output file.
-        #if not args.complexity and not read2:
+        # must produce an intermediate file.
+        #if not args.complexity and args.umi_len > 0 and not read2 :
         adapter_cmd_chunks.extend([("-o", noadap_fastq)])  # Must keep intermediates always now
         # else:
         #     adapter_cmd_chunks.extend([("--stdout")])
@@ -457,6 +455,7 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
                 "|",
                 (tools.seqtk, "seq"),
                 ("-L", 5),
+                "-",
                 (">", processed_fastq)
             ])
         else:
@@ -487,6 +486,7 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
                 "|",
                 (tools.seqtk, "seq"),
                 ("-L", 5),
+                "-",
                 (">", processed_fastq)
             ])                           
         else:
@@ -547,6 +547,7 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
                 "|",
                 (tools.seqtk, "seq"),
                 ("-L", 5),
+                "-",
                 (">", processed_fastq)
             ])                           
         else:
@@ -657,7 +658,7 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks.extend([
                     (tools.seqtk, "seq"),
                     ("-L", 5),
-                    ("-r", "-"),
+                    ("-r", noadap_fastq),
                     (">", trimmed_fastq)
                 ])
             # Otherwise just make sure to remove too short reads
@@ -795,8 +796,10 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
 
     fastq_folder = os.path.join(outfolder, "fastq")
     if read2:
+        noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
         processed_fastq = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
     else:
+        noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
         processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
 
     fastp_folder = os.path.join(outfolder, "fastp")
@@ -895,7 +898,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks = [
                     (tools.seqtk, "seq"),
                     ("-L", 5),
-                    ("-r", "-"),
+                    ("-r", noadap_fastq),
                     (">", processed_fastq)
                 ]
             else:
@@ -1026,18 +1029,20 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
 
     noadap_fq1 = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     noadap_fq2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
-    dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
-    trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
-    trimmed_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
-    trimmed_dups_fastq_R2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
+    dedup_fq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
+    trimmed_fq1 = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
+    trimmed_fq2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
+    trimmed_dups_fq2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
     processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
 
     if args.adapter == "cutadapt":
         cutadapt_folder = os.path.join(outfolder, "cutadapt")
-        cutadapt_report = os.path.join(cutadapt_folder, sname + "_cutadapt.txt")
+        cutadapt_report = os.path.join(cutadapt_folder,
+                                       sname + "_R1_cutadapt.txt")
         adapter_report = cutadapt_report
     else:
-        adapter_report = os.path.join(fastqc_folder, sname + "_R1_rmAdapter.txt")
+        adapter_report = os.path.join(fastqc_folder,
+                                      sname + "_R1_rmAdapter.txt")
 
     fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
     fastp_report_txt = fastp_pfx + ".txt"
@@ -1072,52 +1077,58 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         Report QC metrics on intermediate steps of fastq file preparation
         """
         if args.adapter == "cutadapt":
+            report = cutadapt_report
             adapter_term = "Reads with adapters:"
             too_short_term = "Reads that were too short:"
             total_bases_term = "Total basepairs processed:"
 
             ac_cmd = ("grep '" + adapter_term + "' " +
-                      cutadapt_report + " | awk '{print $(NF-1)}'")
+                      report + " | awk '{print $(NF-1)}'")
             ts_cmd = ("grep '" + too_short_term + "' " +
-                      cutadapt_report + " | awk '{print $(NF-1)}'")
+                      report + " | awk '{print $(NF-1)}'")
             bases = ("grep '" + total_bases_term + "' " +
-                     cutadapt_report + " | awk '{print $(NF-1)}'")
+                     report + " | awk '{print $(NF-1)}'")
             adapter_bases = ("awk '{sum+=$1*$2} END {printf \"%.0f\", sum}' " +
-                             cutadapt_report)
+                             report)
 
         else:  # default to fastp
+            report = fastp_report_txt
             adapter_term = "reads with adapter trimmed:"
             too_short_term = "reads failed due to too short:"
             total_bases_term = "total bases:"
 
             ac_cmd = ("grep '" + adapter_term + "' " +
-                       fastp_report_txt + " | head -n 1 | awk '{print $NF}'")
+                       report + " | head -n 1 | awk '{print $NF}'")
             ts_cmd = ("grep '" + too_short_term + "' " +
-                       fastp_report_txt + " | head -n 1 | awk '{print $NF}'")
+                       report + " | head -n 1 | awk '{print $NF}'")
             bases = ("grep '" + total_bases_term + "' " +
-                     fastp_report_txt + " | head -n 1 | awk '{print $NF}'")
+                     report + " | head -n 1 | awk '{print $NF}'")
             adapter_bases = ("grep 'bases trimmed due to adapters:' " +
-                             fastp_report_txt + " | awk '{print $NF}'")
+                             report + " | awk '{print $NF}'")
 
             pm.report_object("FastP_report", fastp_report_html)
 
-        ac = float(pm.checkprint(ac_cmd).replace(',',''))
-        pm.report_result("Reads_with_adapter", ac)
-        total_bases = float(pm.checkprint(bases).replace(',',''))
-        total_adapter = float(pm.checkprint(adapter_bases).replace(',',''))
-        # pm.report_result("Pct_adapter_contamination",
-        #                  round(float(total_adapter/total_bases), 2))
+        if _itsa_file(report):
+            ac = float(pm.checkprint(ac_cmd).replace(',',''))
+            pm.report_result("Reads_with_adapter", ac)
+            total_bases = float(pm.checkprint(bases).replace(',',''))
+            total_adapter = float(pm.checkprint(adapter_bases).replace(',',''))
+            # pm.report_result("Pct_adapter_contamination",
+            #                  round(float(total_adapter/total_bases), 2))
 
-        ts = float(pm.checkprint(ts_cmd).replace(',',''))
-        pm.report_result("Reads_too_short", ts)
+            ts = float(pm.checkprint(ts_cmd).replace(',',''))
+            pm.report_result("Reads_too_short", ts)
 
-        tr = int(ngstk.count_lines(noadap_fq1).strip())
-        dr = int(ngstk.count_lines(dedup_fastq).strip())
-        dups = max(0, (float(tr)/4 - float(dr)/4))
-        pm.report_result("Duplicate_reads", dups)
+            tr = int(ngstk.count_lines(noadap_fq1).strip())
+            dr = int(ngstk.count_lines(dedup_fq).strip())
+            dups = max(0, (float(tr)/4 - float(dr)/4))
+            pm.report_result("Duplicate_reads", dups)
 
-        pr = int(ngstk.count_lines(processed_fastq).strip())
-        pm.report_result("Pct_reads_too_short", round(float(ts/pr), 2))
+            pr = int(ngstk.count_lines(processed_fastq).strip())
+            pm.report_result("Pct_reads_too_short", round(float(ts/pr), 2))
+        else:
+            pm.fail_pipeline("Could not find '{}' to report adapter "
+                             "removal statistics.".format(report))
 
 
     def plot_fragments(infolder, outfolder):
@@ -1128,17 +1139,31 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         :param str outfolder: path to output directory for functions
         """
         # merge short fragment reads
-        rep_fq1 = os.path.join(fastq_folder,
+        noadap_fq1 = os.path.join(infolder,
+            args.sample_name + "_R1_noadap.fastq")
+        noadap_fq2 = os.path.join(infolder,
+            args.sample_name + "_R2_noadap.fastq")
+        rep_fq1 = os.path.join(infolder,
             args.sample_name + "_R1_noadap.fastq.paired.fq")
-        rep_fq2 = os.path.join(fastq_folder,
+        rep_fq2 = os.path.join(infolder,
             args.sample_name + "_R2_noadap.fastq.paired.fq")
-        flash_hist = os.path.join(fastq_folder, args.sample_name + ".hist")
-        flash_gram = os.path.join(fastq_folder, args.sample_name + ".histogram")
+        flash_hist = os.path.join(infolder, args.sample_name + ".hist")
+        flash_gram = os.path.join(infolder, args.sample_name + ".histogram")
+
+        tmp = float(pm.get_stat("Raw_reads"))
+        if tmp:
+            rr = float(tmp)
+        else:
+            rr = 0
+        if (rr < 1):
+            pm.fail_pipeline(RuntimeError("Raw_reads were not reported. "
+                "Check output ({})".format(param.outfolder)))
 
         cmd1 = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
                 noadap_fq1 + " " + noadap_fq2)
+        ziptool = "pigz" if ngstk.check_command("pigz") else "gzip"
         cmd2 = (tools.flash + " -q -t " + str(pm.cores) +
-                " --compress-prog=" + ngstk.ziptool + " --suffix=gz " +
+                " --compress-prog=" + ziptool + " --suffix=gz " +
                 rep_fq1 + " " + rep_fq2 + " -o " + args.sample_name +
                 " -d " + outfolder)
         pm.run([cmd1, cmd2], [flash_hist, flash_gram])
@@ -1153,7 +1178,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                " adapt -i " + flash_hist + " -o " + outfolder)
         if args.umi_len > 0:
-            cmd += (" -u " + args.umi_len)
+            cmd += (" -u " + str(args.umi_len))
             umi_len = args.umi_len
         else:
             umi_len = 0
@@ -1173,7 +1198,19 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
 
 
     # Put it all together
-    if not args.complexity and args.umi_len > 0:
+    if read2:
+        pm.run([adapter_command, trim_command], trimmed_fq2,
+               follow=ngstk.check_trim(trimmed_fq2, False, None,
+                                       fastqc_folder=fastqc_folder))
+        if args.adapter == "cutadapt":
+            output_folder = os.path.join(outfolder, "cutadapt")
+        else:
+            output_folder = os.path.join(outfolder, "fastp")
+        cp_cmd = ("cp " + trimmed_fq2 + " " + trimmed_dups_fq2)
+        pm.run(cp_cmd, trimmed_dups_fq2,
+               follow=plot_fragments(fastq_folder, output_folder))
+        return trimmed_fq2, trimmed_dups_fq2
+    elif not args.complexity and args.umi_len > 0:
         # This trim command DOES need the adapter file...
         pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
         pm.run([adapter_command, trim_command], processed_fastq,
@@ -1184,27 +1221,17 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         # TODO: if I'm using seqkit rmdup here, I DON'T NEED the other fastp!!! umi command
         pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
         pm.run([deduplicate_command, trim_command2],
-               trimmed_fastq, follow=report_fastq)
+               trimmed_fq1, follow=report_fastq)
         pm.clean_add(noadap_fq1)
-        pm.clean_add(dedup_fastq)
-        pm.clean_add(trimmed_fastq)
-        return processed_fastq, trimmed_fastq
+        pm.clean_add(dedup_fq)
+        pm.clean_add(trimmed_fq1)
+        return processed_fastq, trimmed_fq1
     else:
         pm.debug("\nELSE: trim_command: {} + {}\n".format(adapter_command, trim_command))
         pm.run([adapter_command, trim_command], processed_fastq,
                follow=ngstk.check_trim(processed_fastq, False, None,
                                        fastqc_folder=fastqc_folder))
-        if read2:
-            if args.adapter == "cutadapt":
-                output_folder = os.path.join(outfolder, "cutadapt")
-            else:
-                output_folder = os.path.join(outfolder, "fastp")
-            cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
-            pm.run(cp_cmd, trimmed_dups_fastq_R2,
-                   follow=plot_fragments(fastq_folder, output_folder))
-            return trimmed_fastq_R2, trimmed_dups_fastq_R2
-        else:
-            return processed_fastq
+        return processed_fastq
 
     # Put it all together (original included option to not retain intermediates)
     # if read2:
@@ -1214,8 +1241,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     #         "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
     #     pm.debug("process_fastq_cmd2: {}".format(process_fastq_cmd2))
     #     pm.run(process_fastq_cmd2, trimmed_fastq_R2)
-    #     cp_cmd = ("cp " + trimmed_fastq_R2 + " " + trimmed_dups_fastq_R2)
-    #     pm.run(cp_cmd, trimmed_dups_fastq_R2)
+    #     cp_cmd = ("cp " + trimmed_fq2 + " " + trimmed_dups_fq2)
+    #     pm.run(cp_cmd, trimmed_dups_faq2)
     #     return trimmed_fastq_R2, trimmed_dups_fastq_R2
     # else:
     #     if not args.complexity and args.umi_len > 0:
@@ -1231,9 +1258,9 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     #         pm.run([deduplicate_command, trim_command2],
     #                trimmed_fastq, follow=report_fastq)
     #         pm.clean_add(noadap_fq1)
-    #         pm.clean_add(dedup_fastq)
-    #         pm.clean_add(trimmed_fastq)
-    #         return processed_fastq, trimmed_fastq
+    #         pm.clean_add(dedup_fq)
+    #         pm.clean_add(trimmed_fq1)
+    #         return processed_fastq, trimmed_fq1
     #     else:
     #         pm.debug("\nELSE: trim_command: {} + {}\n".format(adapter_command, trim_command))
     #         process_fastq_cmd = build_command([
@@ -1901,6 +1928,8 @@ def main():
                 args, tools, res, True,
                 untrimmed_fastq2, outfolder=param.outfolder)
 
+            pm.debug("\n\nunmap_fq1: {}\nunmap_fq2: {}\n\n".format(unmap_fq1, unmap_fq2))
+
             # Gut check
             # Processing fastq should have trimmed the reads.
             tmp = pm.get_stat("Trimmed_reads")
@@ -1974,7 +2003,7 @@ def main():
                     untrimmed_fastq1, outfolder=param.outfolder)
                 unmap_fq2 = ""
 
-    # TODO: maintain this functionality for single-end data
+    # NOTE: maintain this functionality for single-end data
     #       for paired-end it has already been generated at this point
     if not args.paired_end:
         pm.timestamp("### Plot adapter insertion distribution")
