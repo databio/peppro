@@ -252,46 +252,24 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
     elif args.adapter == "cutadapt":
         # Must keep intermediates always now
         cut_version = float(pm.checkprint("cutadapt --version"))
+        adapter_cmd_chunks = ["(" + tools.cutadapt]
+        # old versions of cutadapt can not use multiple cores
+        if cut_version >= 1.15:
+            adapter_cmd_chunks.extend([("-j", str(pm.cores))])
+        adapter_cmd_chunks.extend([
+            #("-m", (18 + int(float(args.umi_len)))),
+            ("-m", 5),  # For insert size plotting
+            ("-O", 1)
+        ])
         if read2:
-            adapter_cmd_chunks = [tools.cutadapt]
-            # old versions of cutadapt can not use multiple cores
-            if cut_version >= 1.15:
-                adapter_cmd_chunks.extend([("-j", str(pm.cores))])
-            adapter_cmd_chunks.extend([
-                    #("-m", (18 + int(float(args.umi_len)))),
-                    ("-m", 5),  # For insert size plotting
-                    ("-O", 1),
-                    ("-a", three_prime),
-                    fq_file,
-                    ("-o", noadap_fastq)
-            ])
+            adapter_cmd_chunks.extend([("-a", three_prime)])
         else:
-            #if not args.complexity and args.umi_len > 0:
-            adapter_cmd_chunks = ["(" + tools.cutadapt]
-            # old versions of cutadapt can not use multiple cores
-            if cut_version >= 1.15:
-                adapter_cmd_chunks.extend([("-j", str(pm.cores))])
-            adapter_cmd_chunks.extend([
-                #("-m", (18 + int(float(args.umi_len)))),
-                ("-m", 5),  # For insert size plotting
-                ("-O", 1),
-                ("-a", five_prime),
-                fq_file,
-                ("-o", noadap_fastq + ")"),
-                (">", cutadapt_report)
-            ])
-            # else:
-            #     adapter_cmd_chunks = [tools.cutadapt]
-            #     # old versions of cutadapt can not use multiple cores
-            #     if cut_version >= 1.15:
-            #         adapter_cmd_chunks.extend([("-j", str(pm.cores))])
-            #     adapter_cmd_chunks.extend([
-            #         #("-m", (18 + int(float(args.umi_len)))),
-            #         ("-m", 5),  # For insert size plotting
-            #         ("-O", 1),
-            #         ("-a", five_prime),
-            #         fq_file
-            #     ])
+            adapter_cmd_chunks.extend([("-a", five_prime)])
+        adapter_cmd_chunks.extend([
+            fq_file,
+            ("-o", noadap_fastq + ")"),
+            (">", cutadapt_report)
+        ])
 
         adapter_cmd = build_command(adapter_cmd_chunks)
 
@@ -1037,8 +1015,12 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
 
     if args.adapter == "cutadapt":
         cutadapt_folder = os.path.join(outfolder, "cutadapt")
-        cutadapt_report = os.path.join(cutadapt_folder,
-                                       sname + "_R1_cutadapt.txt")
+        if read2:
+            cutadapt_report = os.path.join(cutadapt_folder,
+                                         sname + "_R2_cutadapt.txt")
+        else:
+            cutadapt_report = os.path.join(cutadapt_folder,
+                                           sname + "_R1_cutadapt.txt")
         adapter_report = cutadapt_report
     else:
         adapter_report = os.path.join(fastqc_folder,
@@ -1900,7 +1882,7 @@ def main():
     pm.timestamp("### FASTQ processing: ")
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
     cutadapt_report = os.path.join(cutadapt_folder,
-                                   args.sample_name + "_cutadapt.txt")
+                                   args.sample_name + "_R1_cutadapt.txt")
     repair_target = os.path.join(fastq_folder, "repaired.flag")
     dups_repair_target = os.path.join(fastq_folder, "dups_repaired.flag")
 
