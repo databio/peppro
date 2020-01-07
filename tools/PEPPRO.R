@@ -572,7 +572,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                            default = 0,
                            description="UMI length (Default 0).")
 
-        name               <- basename(sampleName(input, num_fields=1))
+        name               <- basename(sampleName(input, num_fields=0))
         #message(name)
         suppressWarnings(p <- plotAdapt(input=input, name=name,
                                         umi_len = umi_len))
