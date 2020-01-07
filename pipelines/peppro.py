@@ -416,34 +416,33 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             ("--umi_loc", "read1"),
             ("--umi_len", args.umi_len),
             ("--html", umi_report),
-            ("--json", umi_json),
-            "|",
-            (tools.seqtk, "trimfq")
+            ("--json", umi_json)
         ]
 
         # Trim to max length if specified
         if int(args.max_len) > 0:
-            trim_cmd_chunks.extend([("-L", args.max_len)])
-
-        trim_cmd_chunks.extend(["-"])
-
-        # Do not reverse complement for GRO-seq
-        if args.protocol.lower() in RUNON_SOURCE_GRO:
             trim_cmd_chunks.extend([
                 "|",
-                (tools.seqtk, "seq"),
-                ("-L", 5),
-                "-",
-                (">", processed_fastq)
+                (tools.seqtk, "trimfq")
+                ("-L", args.max_len),
+                "-"
             ])
+
+        # Remove too short reads
+        trim_cmd_chunks.extend([
+            "|",
+            (tools.seqtk, "seq"),
+            ("-L", 5)
+        ])
+
+        # Reverse complement for PRO-seq
+        if args.protocol.lower() in RUNON_SOURCE_PRO:
+            trim_cmd_chunks.extend([("-r", "-")])
         else:
-            trim_cmd_chunks.extend([
-                "|",
-                (tools.seqtk, "seq"),
-                ("-L", 5),
-                ("-r", "-"),
-                (">", processed_fastq)
-            ])
+            trim_cmd_chunks.extend(["-"])
+
+        trim_cmd_chunks.extend([(">", processed_fastq)])
+
     elif args.trimmer == "seqtk":
         # Remove UMI by blind trimming
         trim_cmd_chunks = [
@@ -584,7 +583,7 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
     if args.adapter == "fastp":
         # Remove UMI and specify location of UMI
         # Still requires seqtk for reverse complementation
-        if args.umi_len > 0:
+        if int(args.umi_len) > 0:
             trim_cmd_chunks = [
                 tools.fastp,
                 ("--thread", str(pm.cores)),
@@ -594,16 +593,18 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
                 ("--umi_loc", "read1"),
                 ("--umi_len", args.umi_len),
                 ("--html", umi_report),
-                ("--json", umi_json),
-                "|",
-                (tools.seqtk, "trimfq")
+                ("--json", umi_json)
             ]
 
             if int(args.max_len) > 0:
                 # Trim to max length if specified
-                trim_cmd_chunks.extend([("-L", args.max_len)])
+                trim_cmd_chunks.extend([
+                    "|",
+                    (tools.seqtk, "trimfq")
+                    ("-L", args.max_len),
+                    "-"
+                ])
 
-            trim_cmd_chunks.extend(["-"])
         elif int(args.max_len) > 0:
             trim_cmd_chunks = [
                 (tools.seqtk, "trimfq"),
@@ -614,22 +615,19 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks = []
 
         if trim_cmd_chunks:
-            if args.protocol.lower() in RUNON_SOURCE_GRO:
-                trim_cmd_chunks.extend([
-                    "|",
-                    (tools.seqtk, "seq"),
-                    ("-L", 5),
-                    "-",
-                    (">", trimmed_fastq)
-                ])
+            # Reverse complement for PRO-seq
+            trim_cmd_chunks.extend([
+                "|",
+                (tools.seqtk, "seq"),
+                ("-L", 5)
+            ])
+            if args.protocol.lower() in RUNON_SOURCE_PRO:
+                trim_cmd_chunks.extend([("-r", "-")])
             else:
-                trim_cmd_chunks.extend([
-                    "|",
-                    (tools.seqtk, "seq"),
-                    ("-L", 5),
-                    ("-r", "-"),
-                    (">", trimmed_fastq)
-                ])
+                trim_cmd_chunks.extend(["-"])
+
+            trim_cmd_chunks.extend([(">", trimmed_fastq)])
+
         else:
             # If no UMI removal or read trimming, just reverse complement
             if args.protocol.lower() in RUNON_SOURCE_PRO:
@@ -1170,8 +1168,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         # Report the peak insertion size
         cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist + 
                " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
-               " {max=$2; len=$1}; max_len=$1} END{print max_len-len-" +
-               str(umi_len) + "}'")
+               " {max=$2; len=$1}; max_len=$1} END{print len}'")
         adapter_peak = pm.checkprint(cmd)
         if adapter_peak:
             ap = int(adapter_peak)
