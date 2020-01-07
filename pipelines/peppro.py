@@ -1150,7 +1150,6 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 " -d " + outfolder)
         pm.run([cmd1, cmd2], [flash_hist, flash_gram])
 
-        # TODO: edit these plotting commands
         pm.timestamp("### Plot adapter insertion distribution")
 
         degradation_pdf = os.path.join(outfolder,
@@ -1168,7 +1167,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pm.report_object("Adapter insertion distribution", degradation_pdf,
                          anchor_image=degradation_png)
 
-        # Determine the peak insertion size
+        # Report the peak insertion size
         cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist + 
                " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
                " {max=$2; len=$1}; max_len=$1} END{print max_len-len-" +
@@ -1177,6 +1176,55 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if adapter_peak:
             ap = int(adapter_peak)
             pm.report_result("Peak_adapter_insertion_size", ap)
+
+        # Report the degradation ratio
+        pm.timestamp("###  Calculating degradation ratio")
+
+        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
+               " | awk '{ if ($1 == 10) {status = 1}} END {if (status) " + 
+               "{print status} else {print 0}}'")
+        degraded_lower = pm.checkprint(cmd)
+        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
+               " | awk '{ if ($1 == 20) {status = 1}} END {if (status) " + 
+               "{print status} else {print 0}}'")
+        degraded_upper = pm.checkprint(cmd)
+        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
+               " | awk '{ if ($1 == 30) {status = 1}} END {if (status) " + 
+               "{print status} else {print 0}}'")
+        intact_lower = pm.checkprint(cmd)
+        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
+               " | awk '{ if ($1 == 40) {status = 1}} END {if (status) " + 
+               "{print status} else {print 0}}'")
+        intact_upper = pm.checkprint(cmd)
+
+        if degraded_lower:
+            dl = int(degraded_lower)
+        else:
+            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
+                   " | awk 'NR==1 {print $1}'")
+            degraded_lower = pm.checkprint(cmd)
+            dl = int(degraded_lower) if degraded_lower else 1
+        du = int(degraded_upper) if degraded_upper else degraded_lower + 9
+
+        if intact_upper:
+            iu = int(intact_upper)
+        else:
+            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
+                   " | awk 'END {print $1}'")
+            intact_upper = pm.checkprint(cmd)
+            dl = int(intact_upper) if intact_upper else 40
+
+        il = int(intact_lower) if intact_lower else intact_upper - 10
+
+        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
+               " | awk '($1 <= " + str(du) + "&& $1 >= " + str(dl) +
+               "){degradedSum += $2}; " +  "($1 >= " + str(il) + "&& $1 <= " +
+               str(iu) + "){intactSum += $2} " +  "END {if (intactSum < 1) " +
+               "{intactSum = 1} print degradedSum/intactSum}'")
+        degradation_ratio = pm.checkprint(cmd)
+        if degradation_ratio:
+            dr = float(degradation_ratio)
+            pm.report_result("Degradation_ratio", round(dr, 2))
 
 
     # Put it all together
