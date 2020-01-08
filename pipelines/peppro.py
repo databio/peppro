@@ -1168,7 +1168,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         # Report the peak insertion size
         cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist + 
                " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
-               " {max=$2; len=$1}; max_len=$1} END{print len}'")
+               " {max=$2; len=$1}; max_len=$1} END{print len-" +
+               str(umi_len) + "}'")
         adapter_peak = pm.checkprint(cmd)
         if adapter_peak:
             ap = int(adapter_peak)
@@ -2112,6 +2113,10 @@ def main():
                 ap = int(adapter_peak)
                 pm.report_result("Peak_adapter_insertion_size", ap)
 
+            # Calculate the degradation ratio
+            # TODO
+            # awk '/count/,0' /project/shefflab/processed/peppro/paper/cutadapt/01_06_2020/results_pipeline/Jurkat_ChRO_2/cutadapt/Jurkat_ChRO_2_cutadapt.txt | awk 'NR>2 {print prev} {prev=$0}' | awk '{if ($3/$2 < 0.01) print $1, $2}' | awk '($1 <= 20&& $1 >= 11){degradedSum += $2}; ($1 >= 30&& $1 <= 40){intactSum += $2} END {if (degradedSum < 1) {degradedSum = 1} print intactSum/degradedSum}'
+
     pm.clean_add(fastq_folder, conditional=True)
 
     ############################################################################
@@ -2576,7 +2581,7 @@ def main():
                                  anchor_image=preseq_png)
 
                 # Report the expected unique at 10M reads
-                cmd = ("grep -w '10000000'" + preseq_yield +
+                cmd = ("grep -w '10000000' " + preseq_yield +
                        " | awk '{print $2}'")
                 expected_unique = pm.checkprint(cmd)
                 if expected_unique:
