@@ -1943,6 +1943,7 @@ def main():
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
     cutadapt_report = os.path.join(cutadapt_folder,
                                    args.sample_name + "_R1_cutadapt.txt")
+    rmUMI_target = os.path.join(fastq_folder, "readname_repaired.flag")
     repair_target = os.path.join(fastq_folder, "repaired.flag")
     dups_repair_target = os.path.join(fastq_folder, "dups_repaired.flag")
 
@@ -2000,6 +2001,21 @@ def main():
                 rr = 0
             if (rr < 1):
                 pm.fail_pipeline(RuntimeError("Raw_reads were not reported. Check output ({})".format(param.outfolder)))
+
+            if args.adapter == "fastp" and int(args.umi_len) > 0:
+                noUMI_fq1 = os.path.join(fastq_folder,
+                    args.sample_name + "_R1_processed_noUMI.fastq")
+                noUMI_fq2 = os.path.join(fastq_folder,
+                    args.sample_name + "_R2_trimmed_noUMI.fastq")
+                cmd1 = ("sed 's/\:[^:]*\([[:space:]].*\)[[:space:]]/\1 /g'" +
+                        unmap_fq1 + " > " + noUMI_fq1)
+                cmd2 = ("sed 's/\:[^:]*\([[:space:]].*\)[[:space:]]/\1 /g'" +
+                        unmap_fq2 + " > " + noUMI_fq2)
+                pm.run([cmd1, cmd2], [noUMI_fq1, noUMI_fq2])
+                cmd1 = ("mv " + noUMI_fq1 + " " + unmap_fq1)
+                cmd2 = ("mv " + noUMI_fq2 + " " + unmap_fq2)
+                cmd3 = ("touch " + rmUMI_target)
+                pm.run([cmd1, cmd2, cmd3], rmUMI_target)
 
             cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
                    unmap_fq1 + " " + unmap_fq2)
