@@ -1151,9 +1151,9 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pm.timestamp("### Plot adapter insertion distribution")
 
         degradation_pdf = os.path.join(outfolder,
-            args.sample_name + "_adapter_insertion_distribution.pdf")
+            args.sample_name + "_R1_adapter_insertion_distribution.pdf")
         degradation_png = os.path.join(outfolder,
-            args.sample_name + "_adapter_insertion_distribution.png")
+            args.sample_name + "_R1_adapter_insertion_distribution.png")
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                " adapt -i " + flash_hist + " -o " + outfolder)
         if args.umi_len > 0:
@@ -1944,6 +1944,7 @@ def main():
     cutadapt_report = os.path.join(cutadapt_folder,
                                    args.sample_name + "_R1_cutadapt.txt")
     rmUMI_target = os.path.join(fastq_folder, "readname_repaired.flag")
+    rmUMI_dups_target = os.path.join(fastq_folder, "readname_dups_repaired.flag")
     repair_target = os.path.join(fastq_folder, "repaired.flag")
     dups_repair_target = os.path.join(fastq_folder, "dups_repaired.flag")
 
@@ -2007,11 +2008,11 @@ def main():
                     args.sample_name + "_R1_processed_noUMI.fastq")
                 noUMI_fq2 = os.path.join(fastq_folder,
                     args.sample_name + "_R2_trimmed_noUMI.fastq")
-                cmd1 = ("sed 's/\:[^:]*\([[:space:]].*\)[[:space:]]/\1 /g'" +
-                        unmap_fq1 + " > " + noUMI_fq1)
-                cmd2 = ("sed 's/\:[^:]*\([[:space:]].*\)[[:space:]]/\1 /g'" +
-                        unmap_fq2 + " > " + noUMI_fq2)
-                pm.run([cmd1, cmd2], [noUMI_fq1, noUMI_fq2])
+                cmd1 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
+                        " " + unmap_fq1 + " > " + noUMI_fq1)
+                cmd2 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
+                        " " + unmap_fq2 + " > " + noUMI_fq2)
+                pm.run([cmd1, cmd2], [noUMI_fq1, noUMI_fq2], shell=True)
                 cmd1 = ("mv " + noUMI_fq1 + " " + unmap_fq1)
                 cmd2 = ("mv " + noUMI_fq2 + " " + unmap_fq2)
                 cmd3 = ("touch " + rmUMI_target)
@@ -2038,6 +2039,21 @@ def main():
                     fastq_folder, args.sample_name + "_R1_trimmed.fastq.single.fq")
                 r2_dups_repair_single = os.path.join(
                     fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.single.fq")
+
+                if args.adapter == "fastp" and int(args.umi_len) > 0:
+                    noUMI_fq1_dups = os.path.join(fastq_folder,
+                        args.sample_name + "_R1_trimmed_dups_noUMI.fastq")
+                    noUMI_fq2_dups = os.path.join(fastq_folder,
+                        args.sample_name + "_R2_trimmed_dups_noUMI.fastq")
+                    cmd1 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
+                            " " + unmap_fq1_dups + " > " + noUMI_fq1_dups)
+                    cmd2 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
+                            " " + unmap_fq2_dups + " > " + noUMI_fq2_dups)
+                    pm.run([cmd1, cmd2], [noUMI_fq1_dups, noUMI_fq2_dups], shell=True)
+                    cmd1 = ("mv " + noUMI_fq1_dups + " " + unmap_fq1_dups)
+                    cmd2 = ("mv " + noUMI_fq2_dups + " " + unmap_fq2_dups)
+                    cmd3 = ("touch " + rmUMI_dups_target)
+                    pm.run([cmd1, cmd2, cmd3], rmUMI_dups_target)
 
                 cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " +
                        unmap_fq1_dups + " " + unmap_fq2_dups)
@@ -2074,9 +2090,9 @@ def main():
             pm.info("Could not find {}.`".format(cutadapt_report))
         else:
             degradation_pdf = os.path.join(cutadapt_folder,
-                args.sample_name + "_adapter_insertion_distribution.pdf")
+                args.sample_name + "_R1_adapter_insertion_distribution.pdf")
             degradation_png = os.path.join(cutadapt_folder,
-                args.sample_name + "_adapter_insertion_distribution.png")
+                args.sample_name + "_R1_adapter_insertion_distribution.png")
             cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                    " cutadapt -i " + cutadapt_report + " -o " + cutadapt_folder)
             if args.umi_len > 0:
