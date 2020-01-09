@@ -1178,21 +1178,17 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         # Report the degradation ratio
         pm.timestamp("###  Calculating degradation ratio")
 
-        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
-               " | awk '{ if ($1 == 10) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}'")
+        cmd = ("awk '{ if ($1 == 10) {status = 1}} END {if (status) " + 
+               "{print status} else {print 0}}'" + flash_hist)
         degraded_lower = pm.checkprint(cmd)
-        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
-               " | awk '{ if ($1 == 20) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}'")
+        cmd = ("awk '{ if ($1 == 20) {status = 1}} END {if (status) " + 
+               "{print status} else {print 0}}'" + flash_hist)
         degraded_upper = pm.checkprint(cmd)
-        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
-               " | awk '{ if ($1 == 30) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}'")
+        cmd = ("awk '{ if ($1 == 30) {status = 1}} END {if (status) " + 
+               "{print status} else {print 0}}'" + flash_hist)
         intact_lower = pm.checkprint(cmd)
-        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
-               " | awk '{ if ($1 == 40) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}'")
+        cmd = ("awk '{ if ($1 == 40) {status = 1}} END {if (status) " + 
+               "{print status} else {print 0}}'" + flash_hist)
         intact_upper = pm.checkprint(cmd)
 
         if degraded_lower:
@@ -1200,8 +1196,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if dl == 1:
             dl = 10
         else:
-            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
-                   " | awk 'NR==1 {print $1}'")
+            cmd = ("awk 'NR==1 {print $1}'" + flash_hist)
             degraded_lower = pm.checkprint(cmd)
             dl = int(degraded_lower) if degraded_lower else 1
 
@@ -1210,15 +1205,14 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if du == 1:
             du = 20
         else:
-            du = int(degraded_lower) + 9
+            du = int(degraded_lower) + 10
 
         if intact_upper:
             iu = int(intact_upper)
         if iu == 1:
             iu = 40
         else:
-            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
-                   " | awk 'END {print $1}'")
+            cmd = ("awk 'END {print $1}'" + flash_hist)
             intact_upper = pm.checkprint(cmd)
             dl = int(intact_upper) if intact_upper else 40
 
@@ -1229,15 +1223,14 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         else:
             il = int(intact_upper) - 10
 
-        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist +
-               " | awk '($1 <= " + str(du) + "&& $1 >= " + str(dl) +
-               "){degradedSum += $2}; " +  "($1 >= " + str(il) + "&& $1 <= " +
+        cmd = ("awk '($1 <= " + str(du) + " && $1 >= " + str(dl) +
+               "){degradedSum += $2}; " +  "($1 >= " + str(il) + " && $1 <= " +
                str(iu) + "){intactSum += $2} " +  "END {if (intactSum < 1) " +
-               "{intactSum = 1} print degradedSum/intactSum}'")
+               "{intactSum = 1} print degradedSum/intactSum}'"  + flash_hist)
         degradation_ratio = pm.checkprint(cmd)
         if degradation_ratio:
             dr = float(degradation_ratio)
-            pm.report_result("Degradation_ratio", round(dr, 2))
+            pm.report_result("Degradation_ratio", round(dr, 4))
 
 
     # Put it all together
@@ -2173,15 +2166,15 @@ def main():
                    " | awk '{a[NR]=$1; b[NR]=$2; max_len=$1}" +
                    "{if ($1 > max_len) {max_len=$1}} " +
                    "END{ for (i in a) print max_len-a[i], b[i]}'" +
-                   " | sort -nk1 | awk '($1 <= " + str(du) + "&& $1 >= " +
+                   " | sort -nk1 | awk '($1 <= " + str(du) + " && $1 >= " +
                    str(dl) + "){degradedSum += $2}; " +  "($1 >= " + str(il) +
-                   "&& $1 <= " + str(iu) + "){intactSum += $2} " + 
+                   " && $1 <= " + str(iu) + "){intactSum += $2} " + 
                    "END {if (intactSum < 1) {intactSum = 1} " +
                    "print degradedSum/intactSum}'")
             degradation_ratio = pm.checkprint(cmd)
             if degradation_ratio:
                 dr = float(degradation_ratio)
-                pm.report_result("Degradation_ratio", round(dr, 2))
+                pm.report_result("Degradation_ratio", round(dr, 4))
 
     pm.clean_add(fastq_folder, conditional=True)
 
