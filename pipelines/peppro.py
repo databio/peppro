@@ -23,11 +23,11 @@ RUNON_SOURCE_PRO = ["PRO", "pro", "PRO-SEQ", "PRO-seq", "proseq", "PROSEQ"]
 RUNON_SOURCE_GRO = ["GRO", "gro", "groseq", "GROSEQ", "GRO-SEQ", "GRO-seq"]
 RUNON_SOURCE = RUNON_SOURCE_PRO + RUNON_SOURCE_GRO
 
-ADAPTER_REMOVERS = ["fastp", "cutadapt"]
+ADAPTER_REMOVERS = ["cutadapt", "fastp"]
 DEDUPLICATORS = ["seqkit", "fqdedup"]
 TRIMMERS = ["seqtk", "fastx"]
 
-DEFAULT_REMOVER = "fastp"
+DEFAULT_REMOVER = "cutadapt"
 DEFAULT_DEDUPLICATOR = "seqkit"
 DEFAULT_TRIMMER = "seqtk"
 
@@ -2114,8 +2114,74 @@ def main():
                 pm.report_result("Peak_adapter_insertion_size", ap)
 
             # Calculate the degradation ratio
-            # TODO
-            # awk '/count/,0' /project/shefflab/processed/peppro/paper/cutadapt/01_06_2020/results_pipeline/Jurkat_ChRO_2/cutadapt/Jurkat_ChRO_2_cutadapt.txt | awk 'NR>2 {print prev} {prev=$0}' | awk '{if ($3/$2 < 0.01) print $1, $2}' | awk '($1 <= 20&& $1 >= 11){degradedSum += $2}; ($1 >= 30&& $1 <= 40){intactSum += $2} END {if (degradedSum < 1) {degradedSum = 1} print intactSum/degradedSum}'
+            pm.timestamp("###  Calculating degradation ratio")
+
+            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
+                   " | awk '{ if ($1 == 10) {status = 1}} END {if (status) " + 
+                   "{print status} else {print 0}}'")
+            degraded_lower = pm.checkprint(cmd)
+            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
+                   " | awk '{ if ($1 == 20) {status = 1}} END {if (status) " + 
+                   "{print status} else {print 0}}'")
+            degraded_upper = pm.checkprint(cmd)
+            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
+                   " | awk '{ if ($1 == 30) {status = 1}} END {if (status) " + 
+                   "{print status} else {print 0}}'")
+            intact_lower = pm.checkprint(cmd)
+            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
+                   " | awk '{ if ($1 == 40) {status = 1}} END {if (status) " + 
+                   "{print status} else {print 0}}'")
+            intact_upper = pm.checkprint(cmd)
+
+            if degraded_lower:
+                dl = int(degraded_lower)
+            if dl == 1:
+                dl = 10
+            else:
+                cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
+                       " | awk 'NR==1 {print $1}'")
+                degraded_lower = pm.checkprint(cmd)
+                dl = int(degraded_lower) if degraded_lower else 1
+
+            if degraded_upper:
+                du = int(degraded_upper)
+            if du == 1:
+                du = 20
+            else:
+                du = int(degraded_lower) + 9
+
+            if intact_upper:
+                iu = int(intact_upper)
+            if iu == 1:
+                iu = 40
+            else:
+                cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
+                       " | awk 'END {print $1}'")
+                intact_upper = pm.checkprint(cmd)
+                dl = int(intact_upper) if intact_upper else 40
+
+            if intact_lower:
+                il = int(intact_lower)
+            if il == 1:
+                il = 30
+            else:
+                il = int(intact_upper) - 10
+
+            cmd = ("awk '/count/,0' " + cutadapt_report +
+                   " | awk 'NR>2 {print prev} {prev=$0}'" +
+                   " | awk '{if ($3/$2 < 0.01) print $1, $2}'" +
+                   " | awk '{a[NR]=$1; b[NR]=$2; max_len=$1}" +
+                   "{if ($1 > max_len) {max_len=$1}} " +
+                   "END{ for (i in a) print max_len-a[i], b[i]}'" +
+                   " | sort -nk1 | awk '($1 <= " + str(du) + "&& $1 >= " +
+                   str(dl) + "){degradedSum += $2}; " +  "($1 >= " + str(il) +
+                   "&& $1 <= " + str(iu) + "){intactSum += $2} " + 
+                   "END {if (intactSum < 1) {intactSum = 1} " +
+                   "print degradedSum/intactSum}'")
+            degradation_ratio = pm.checkprint(cmd)
+            if degradation_ratio:
+                dr = float(degradation_ratio)
+                pm.report_result("Degradation_ratio", round(dr, 2))
 
     pm.clean_add(fastq_folder, conditional=True)
 
@@ -2900,7 +2966,7 @@ def main():
     ngstk.make_dir(signal_folder)
 
     if not os.path.exists(res.refgene_pre_mRNA):
-        print("Skipping FRiP -- Fraction of reads in pre-mRNA requires "
+        print("Skipping FRiP and gene coverage calculation which require the "
               "pre-mRNA annotation file: {}"
               .format(res.refgene_pre_mRNA))
     else:
