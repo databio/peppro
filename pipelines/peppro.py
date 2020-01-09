@@ -1151,9 +1151,9 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pm.timestamp("### Plot adapter insertion distribution")
 
         degradation_pdf = os.path.join(outfolder,
-            args.sample_name + "_R1_adapter_insertion_distribution.pdf")
+            args.sample_name + "_adapter_insertion_distribution.pdf")
         degradation_png = os.path.join(outfolder,
-            args.sample_name + "_R1_adapter_insertion_distribution.png")
+            args.sample_name + "_adapter_insertion_distribution.png")
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                " adapt -i " + flash_hist + " -o " + outfolder)
         if args.umi_len > 0:
