@@ -1179,16 +1179,16 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pm.timestamp("###  Calculating degradation ratio")
 
         cmd = ("awk '{ if ($1 == 10) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}'" + flash_hist)
+               "{print status} else {print 0}}' " + flash_hist)
         degraded_lower = pm.checkprint(cmd)
         cmd = ("awk '{ if ($1 == 20) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}'" + flash_hist)
+               "{print status} else {print 0}}' " + flash_hist)
         degraded_upper = pm.checkprint(cmd)
         cmd = ("awk '{ if ($1 == 30) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}'" + flash_hist)
+               "{print status} else {print 0}}' " + flash_hist)
         intact_lower = pm.checkprint(cmd)
         cmd = ("awk '{ if ($1 == 40) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}'" + flash_hist)
+               "{print status} else {print 0}}' " + flash_hist)
         intact_upper = pm.checkprint(cmd)
 
         if degraded_lower:
@@ -1196,7 +1196,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if dl == 1:
             dl = 10
         else:
-            cmd = ("awk 'NR==1 {print $1}'" + flash_hist)
+            cmd = ("awk 'NR==1 {print $1}' " + flash_hist)
             degraded_lower = pm.checkprint(cmd)
             dl = int(degraded_lower) if degraded_lower else 1
 
@@ -1212,7 +1212,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if iu == 1:
             iu = 40
         else:
-            cmd = ("awk 'END {print $1}'" + flash_hist)
+            cmd = ("awk 'END {print $1}' " + flash_hist)
             intact_upper = pm.checkprint(cmd)
             dl = int(intact_upper) if intact_upper else 40
 
@@ -1226,7 +1226,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         cmd = ("awk '($1 <= " + str(du) + " && $1 >= " + str(dl) +
                "){degradedSum += $2}; " +  "($1 >= " + str(il) + " && $1 <= " +
                str(iu) + "){intactSum += $2} " +  "END {if (intactSum < 1) " +
-               "{intactSum = 1} print degradedSum/intactSum}'"  + flash_hist)
+               "{intactSum = 1} print degradedSum/intactSum}' "  + flash_hist)
         degradation_ratio = pm.checkprint(cmd)
         if degradation_ratio:
             dr = float(degradation_ratio)
