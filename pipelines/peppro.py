@@ -2895,22 +2895,41 @@ def main():
     ############################################################################
     #           Calculate Fraction of Reads in Pre-mRNA (FRiP)                 #
     ############################################################################
+    signal_folder = os.path.join(
+        param.outfolder, "signal_" + args.genome_assembly)
+    ngstk.make_dir(signal_folder)
+
     if not os.path.exists(res.refgene_pre_mRNA):
         print("Skipping FRiP -- Fraction of reads in pre-mRNA requires "
               "pre-mRNA annotation file: {}"
               .format(res.refgene_pre_mRNA))
     else:
-        pm.timestamp("### Calculate FRiP")
+        pm.timestamp("### Calculate Fraction of Reads in pre-mature mRNA")
         # Plus
         plus_frip = calc_frip(plus_bam, res.refgene_pre_mRNA,
                               frip_func=ngstk.simple_frip,
                               pipeline_manager=pm)
         pm.report_result("Plus_FRiP", round(plus_frip, 2))
+
         # Minus
         minus_frip = calc_frip(minus_bam, res.refgene_pre_mRNA,
                                frip_func=ngstk.simple_frip,
                                pipeline_manager=pm)
         pm.report_result("Minus_FRiP", round(minus_frip, 2))
+
+        # Calculate gene coverage
+        gene_cov = os.path.join(signal_folder,
+                                args.sample_name + "_gene_coverage.bed")
+        gene_sort = os.path.join(QC_folder, args.genome_assembly +
+                                 "_gene_sort.bed")
+        cmd1 = ("grep -wf " + chr_keep + " " + res.refgene_pre_mRNA +
+                " | " + tools.bedtools + " sort -i stdin -faidx " +
+                chr_order + " > " + gene_sort)
+        cmd2 = (tools.bedtools + " coverage -sorted -counts -s -a " +
+                gene_sort + " -b " + mapping_genome_bam +
+                " -g " + chr_order + " > " + gene_cov)
+        pm.run([cmd1, cmd2], [gene_sort, gene_cov])
+        pm.clean_add(gene_sort)
 
     ############################################################################
     #             Plot fragment distribution (for PE data)                     #
@@ -3268,14 +3287,11 @@ def main():
             pm.run(cmd, intron_exon)
 
     ############################################################################
-    #                        Shift and produce BigWigs                         #
+    #                             Produce BigWigs                              #
     ############################################################################
     genome_fq = rgc.get_asset(args.genome_assembly,
                               asset_name="fasta",
                               seek_key="fasta")
-    signal_folder = os.path.join(
-        param.outfolder, "signal_" + args.genome_assembly)
-    ngstk.make_dir(signal_folder)
     plus_bw = os.path.join(
         signal_folder, args.sample_name + "_plus_body_0-mer.bw")
     minus_bw = os.path.join(
