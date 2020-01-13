@@ -1148,6 +1148,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 " -d " + outfolder)
         pm.run([cmd1, cmd2], [flash_hist, flash_gram])
 
+
         pm.timestamp("### Plot adapter insertion distribution")
 
         degradation_pdf = os.path.join(outfolder,
@@ -1165,72 +1166,76 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pm.report_object("Adapter insertion distribution", degradation_pdf,
                          anchor_image=degradation_png)
 
-        # Report the peak insertion size
-        cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist + 
-               " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
-               " {max=$2; len=$1}; max_len=$1} END{print len-" +
-               str(umi_len) + "}'")
-        adapter_peak = pm.checkprint(cmd)
-        if adapter_peak:
-            ap = int(adapter_peak)
-            pm.report_result("Peak_adapter_insertion_size", ap)
+        if not pm.get_stat('Peak_adapter_insertion_size') or args.new_start:
+            # Report the peak insertion size
+            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist + 
+                   " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
+                   " {max=$2; len=$1}; max_len=$1} END{print len-" +
+                   str(umi_len) + "}'")
+            adapter_peak = pm.checkprint(cmd)
+            if adapter_peak:
+                ap = int(adapter_peak)
+                pm.report_result("Peak_adapter_insertion_size", ap)
 
         # Report the degradation ratio
-        pm.timestamp("###  Calculating degradation ratio")
+        if not pm.get_stat('Degradation_ratio') or args.new_start:
+            pm.timestamp("###  Calculating degradation ratio")
 
-        cmd = ("awk '{ if ($1 == 10) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}' " + flash_hist)
-        degraded_lower = pm.checkprint(cmd)
-        cmd = ("awk '{ if ($1 == 20) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}' " + flash_hist)
-        degraded_upper = pm.checkprint(cmd)
-        cmd = ("awk '{ if ($1 == 30) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}' " + flash_hist)
-        intact_lower = pm.checkprint(cmd)
-        cmd = ("awk '{ if ($1 == 40) {status = 1}} END {if (status) " + 
-               "{print status} else {print 0}}' " + flash_hist)
-        intact_upper = pm.checkprint(cmd)
-
-        if degraded_lower:
-            dl = int(degraded_lower)
-        if dl == 1:
-            dl = 10
-        else:
-            cmd = ("awk 'NR==1 {print $1}' " + flash_hist)
+            cmd = ("awk '{ if ($1 == 10) {status = 1}} END {if (status) " + 
+                   "{print status} else {print 0}}' " + flash_hist)
             degraded_lower = pm.checkprint(cmd)
-            dl = int(degraded_lower) if degraded_lower else 1
-
-        if degraded_upper:
-            du = int(degraded_upper)
-        if du == 1:
-            du = 20
-        else:
-            du = int(degraded_lower) + 10
-
-        if intact_upper:
-            iu = int(intact_upper)
-        if iu == 1:
-            iu = 40
-        else:
-            cmd = ("awk 'END {print $1}' " + flash_hist)
+            cmd = ("awk '{ if ($1 == 20) {status = 1}} END {if (status) " + 
+                   "{print status} else {print 0}}' " + flash_hist)
+            degraded_upper = pm.checkprint(cmd)
+            cmd = ("awk '{ if ($1 == 30) {status = 1}} END {if (status) " + 
+                   "{print status} else {print 0}}' " + flash_hist)
+            intact_lower = pm.checkprint(cmd)
+            cmd = ("awk '{ if ($1 == 40) {status = 1}} END {if (status) " + 
+                   "{print status} else {print 0}}' " + flash_hist)
             intact_upper = pm.checkprint(cmd)
-            dl = int(intact_upper) if intact_upper else 40
 
-        if intact_lower:
-            il = int(intact_lower)
-        if il == 1:
-            il = 30
-        else:
-            il = int(intact_upper) - 10
+            if degraded_lower:
+                dl = int(degraded_lower)
+            if dl == 1:
+                dl = 10
+            else:
+                cmd = ("awk 'NR==1 {print $1}' " + flash_hist)
+                degraded_lower = pm.checkprint(cmd)
+                dl = int(degraded_lower) if degraded_lower else 1
 
-        cmd = ("awk '($1 <= " + str(du) + " && $1 >= " + str(dl) +
-               "){degradedSum += $2}; " +  "($1 >= " + str(il) + " && $1 <= " +
-               str(iu) + "){intactSum += $2} " +  "END {if (intactSum < 1) " +
-               "{intactSum = 1} print degradedSum/intactSum}' "  + flash_hist)
-        degradation_ratio = pm.checkprint(cmd)
-        if degradation_ratio:
-            dr = float(degradation_ratio)
-            pm.report_result("Degradation_ratio", round(dr, 4))
+            if degraded_upper:
+                du = int(degraded_upper)
+            if du == 1:
+                du = 20
+            else:
+                du = int(degraded_lower) + 10
+
+            if intact_upper:
+                iu = int(intact_upper)
+            if iu == 1:
+                iu = 40
+            else:
+                cmd = ("awk 'END {print $1}' " + flash_hist)
+                intact_upper = pm.checkprint(cmd)
+                dl = int(intact_upper) if intact_upper else 40
+
+            if intact_lower:
+                il = int(intact_lower)
+            if il == 1:
+                il = 30
+            else:
+                il = int(intact_upper) - 10
+
+            cmd = ("awk '($1 <= " + str(du) + " && $1 >= " + str(dl) +
+                   "){degradedSum += $2}; " +  "($1 >= " + str(il) +
+                   " && $1 <= " + str(iu) + "){intactSum += $2} " +
+                   "END {if (intactSum < 1) " +
+                   "{intactSum = 1} print degradedSum/intactSum}' "
+                   + flash_hist)
+            degradation_ratio = pm.checkprint(cmd)
+            if degradation_ratio:
+                dr = float(degradation_ratio)
+                pm.report_result("Degradation_ratio", round(dr, 4))
 
 
     # Put it all together
@@ -1445,49 +1450,53 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 # TODO: switch to this once filter_paired_fq works with SE
                 #pm.run(cmd2, summary_file)
                 #pm.run(cmd1, out_fastq_r1)
-                aln_stats = pm.checkprint(cmd, out_fastq_tmp_gz)
+                if not _itsa_file(out_fastq_tmp_gz) or args.new_start:
+                    aln_stats = pm.checkprint(cmd, out_fastq_tmp_gz)
+                else:
+                    aln_stats = None
 
         pm.clean_add(out_fastq_tmp)
 
         if not dups:
-            if aln_stats:
-                pm.info(aln_stats)  # Log alignment statistics
-                try:
-                    align_exact = re.search(r".*aligned exactly 1 time", aln_stats).group().split()[0]
-                except AttributeError:
+            if not pm.get_stat("Aligned_reads_" + assembly_identifier) or args.new_start:
+                if aln_stats:
+                    pm.info(aln_stats)  # Log alignment statistics
+                    try:
+                        align_exact = re.search(r".*aligned exactly 1 time", aln_stats).group().split()[0]
+                    except AttributeError:
+                        align_exact = None
+                    except:
+                        err_msg = "Unable to determine alignment statistics for {}."
+                        pm.fail_pipeline(RuntimeError(err_msg.format(args.genome_assembly)))
+                else:
                     align_exact = None
+                # cmd = ("grep 'aligned exactly 1 time' " + summary_file +
+                #        " | awk '{print $1}'")
+                # align_exact = pm.checkprint(cmd)
+
+                if align_exact:
+                    if paired:
+                        ar = float(align_exact)*2
+                    else:
+                        ar = float(align_exact)
+                else:
+                    ar = 0
+
+                # report aligned reads
+                pm.report_result("Aligned_reads_" + assembly_identifier, ar)
+                try:
+                    # wrapped in try block in case Trimmed_reads is not reported 
+                    # in this pipeline.
+                    tr = float(pm.get_stat("Trimmed_reads"))
                 except:
-                    err_msg = "Unable to determine alignment statistics for {}."
-                    pm.fail_pipeline(RuntimeError(err_msg.format(args.genome_assembly)))
-            else:
-                align_exact = None
-            # cmd = ("grep 'aligned exactly 1 time' " + summary_file +
-            #        " | awk '{print $1}'")
-            # align_exact = pm.checkprint(cmd)
-
-            if align_exact:
-                if paired:
-                    ar = float(align_exact)*2
+                    print("Trimmed reads is not reported.")
                 else:
-                    ar = float(align_exact)
-            else:
-                ar = 0
-
-            # report aligned reads
-            pm.report_result("Aligned_reads_" + assembly_identifier, ar)
-            try:
-                # wrapped in try block in case Trimmed_reads is not reported 
-                # in this pipeline.
-                tr = float(pm.get_stat("Trimmed_reads"))
-            except:
-                print("Trimmed reads is not reported.")
-            else:
-                res_key = "Alignment_rate_" + assembly_identifier
-                if float(ar) > 0:
-                    pm.report_result(res_key,
-                        round(float(ar) * 100 / float(tr), 2))
-                else:
-                    pm.report_result(res_key, 0)
+                    res_key = "Alignment_rate_" + assembly_identifier
+                    if float(ar) > 0:
+                        pm.report_result(res_key,
+                            round(float(ar) * 100 / float(tr), 2))
+                    else:
+                        pm.report_result(res_key, 0)
         
         if paired:
             unmap_fq1 = out_fastq_r1
@@ -1952,124 +1961,124 @@ def main():
 
     # If we've already aligned to the primary genome, skip these steps unless
     # it's a --new-start
-    if not pm.get_stat("Aligned_reads") or args.new_start:
-        if args.paired_end:
-            if not args.complexity and args.umi_len > 0:
-                unmap_fq1, unmap_fq1_dups = _process_fastq(
-                    args, tools, res, False,
-                    untrimmed_fastq1, outfolder=param.outfolder)
-            else:
-                unmap_fq1 = _process_fastq(
-                    args, tools, res, False,
-                    untrimmed_fastq1, outfolder=param.outfolder)
-            unmap_fq2, unmap_fq2_dups = _process_fastq(
-                args, tools, res, True,
-                untrimmed_fastq2, outfolder=param.outfolder)
+    #if not pm.get_stat("Aligned_reads") or args.new_start:
+    if args.paired_end:
+        if not args.complexity and args.umi_len > 0:
+            unmap_fq1, unmap_fq1_dups = _process_fastq(
+                args, tools, res, False,
+                untrimmed_fastq1, outfolder=param.outfolder)
+        else:
+            unmap_fq1 = _process_fastq(
+                args, tools, res, False,
+                untrimmed_fastq1, outfolder=param.outfolder)
+        unmap_fq2, unmap_fq2_dups = _process_fastq(
+            args, tools, res, True,
+            untrimmed_fastq2, outfolder=param.outfolder)
 
-            pm.debug("\n\nunmap_fq1: {}\nunmap_fq2: {}\n\n".format(unmap_fq1, unmap_fq2))
+        pm.debug("\n\nunmap_fq1: {}\nunmap_fq2: {}\n\n".format(unmap_fq1, unmap_fq2))
 
-            # Gut check
-            # Processing fastq should have trimmed the reads.
-            tmp = pm.get_stat("Trimmed_reads")
-            if tmp:
-                tr = float(tmp)
-            else:
-                tr = 0
-            if (tr < 1):
-                pm.fail_pipeline(RuntimeError("No reads left after trimming. Check trimmer settings"))
+        # Gut check
+        # Processing fastq should have trimmed the reads.
+        tmp = pm.get_stat("Trimmed_reads")
+        if tmp:
+            tr = float(tmp)
+        else:
+            tr = 0
+        if (tr < 1):
+            pm.fail_pipeline(RuntimeError("No reads left after trimming. Check trimmer settings"))
 
-            # Re-pair fastq files
-            r1_repair = os.path.join(
-                fastq_folder, args.sample_name + "_R1_processed.fastq.paired.fq")
-            r2_repair = os.path.join(
-                fastq_folder, args.sample_name + "_R2_trimmed.fastq.paired.fq")
+        # Re-pair fastq files
+        r1_repair = os.path.join(
+            fastq_folder, args.sample_name + "_R1_processed.fastq.paired.fq")
+        r2_repair = os.path.join(
+            fastq_folder, args.sample_name + "_R2_trimmed.fastq.paired.fq")
 
-            r1_repair_single = os.path.join(
-                fastq_folder, args.sample_name + "_R1_processed.fastq.single.fq")
-            r2_repair_single = os.path.join(
-                fastq_folder, args.sample_name + "_R2_trimmed.fastq.single.fq")
+        r1_repair_single = os.path.join(
+            fastq_folder, args.sample_name + "_R1_processed.fastq.single.fq")
+        r2_repair_single = os.path.join(
+            fastq_folder, args.sample_name + "_R2_trimmed.fastq.single.fq")
 
-            tmp = float(pm.get_stat("Raw_reads"))
-            if tmp:
-                rr = float(tmp)
-            else:
-                rr = 0
-            if (rr < 1):
-                pm.fail_pipeline(RuntimeError("Raw_reads were not reported. Check output ({})".format(param.outfolder)))
+        tmp = float(pm.get_stat("Raw_reads"))
+        if tmp:
+            rr = float(tmp)
+        else:
+            rr = 0
+        if (rr < 1):
+            pm.fail_pipeline(RuntimeError("Raw_reads were not reported. Check output ({})".format(param.outfolder)))
+
+        if args.adapter == "fastp" and int(args.umi_len) > 0:
+            noUMI_fq1 = os.path.join(fastq_folder,
+                args.sample_name + "_R1_processed_noUMI.fastq")
+            noUMI_fq2 = os.path.join(fastq_folder,
+                args.sample_name + "_R2_trimmed_noUMI.fastq")
+            cmd1 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
+                    " " + unmap_fq1 + " > " + noUMI_fq1)
+            cmd2 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
+                    " " + unmap_fq2 + " > " + noUMI_fq2)
+            pm.run([cmd1, cmd2], [noUMI_fq1, noUMI_fq2], shell=True)
+            cmd1 = ("mv " + noUMI_fq1 + " " + unmap_fq1)
+            cmd2 = ("mv " + noUMI_fq2 + " " + unmap_fq2)
+            cmd3 = ("touch " + rmUMI_target)
+            pm.run([cmd1, cmd2, cmd3], rmUMI_target)
+
+        cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
+               unmap_fq1 + " " + unmap_fq2)
+        pm.run(cmd, [r1_repair, r2_repair])
+        pm.clean_add(r1_repair_single)
+        pm.clean_add(r2_repair_single)
+        cmd1 = ("mv " + r1_repair + " " + unmap_fq1)
+        cmd2 = ("mv " + r2_repair + " " + unmap_fq2)
+        cmd3 = ("touch " + repair_target)
+        pm.run([cmd1, cmd2, cmd3], repair_target)
+
+        # Re-pair the duplicates (but only if we could identify duplicates)
+        if args.umi_len > 0:
+            r1_dups_repair = os.path.join(
+                fastq_folder, args.sample_name + "_R1_trimmed.fastq.paired.fq")
+            r2_dups_repair = os.path.join(
+                fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.paired.fq")
+
+            r1_dups_repair_single = os.path.join(
+                fastq_folder, args.sample_name + "_R1_trimmed.fastq.single.fq")
+            r2_dups_repair_single = os.path.join(
+                fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.single.fq")
 
             if args.adapter == "fastp" and int(args.umi_len) > 0:
-                noUMI_fq1 = os.path.join(fastq_folder,
-                    args.sample_name + "_R1_processed_noUMI.fastq")
-                noUMI_fq2 = os.path.join(fastq_folder,
-                    args.sample_name + "_R2_trimmed_noUMI.fastq")
+                noUMI_fq1_dups = os.path.join(fastq_folder,
+                    args.sample_name + "_R1_trimmed_dups_noUMI.fastq")
+                noUMI_fq2_dups = os.path.join(fastq_folder,
+                    args.sample_name + "_R2_trimmed_dups_noUMI.fastq")
                 cmd1 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
-                        " " + unmap_fq1 + " > " + noUMI_fq1)
+                        " " + unmap_fq1_dups + " > " + noUMI_fq1_dups)
                 cmd2 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
-                        " " + unmap_fq2 + " > " + noUMI_fq2)
-                pm.run([cmd1, cmd2], [noUMI_fq1, noUMI_fq2], shell=True)
-                cmd1 = ("mv " + noUMI_fq1 + " " + unmap_fq1)
-                cmd2 = ("mv " + noUMI_fq2 + " " + unmap_fq2)
-                cmd3 = ("touch " + rmUMI_target)
-                pm.run([cmd1, cmd2, cmd3], rmUMI_target)
+                        " " + unmap_fq2_dups + " > " + noUMI_fq2_dups)
+                pm.run([cmd1, cmd2], [noUMI_fq1_dups, noUMI_fq2_dups], shell=True)
+                cmd1 = ("mv " + noUMI_fq1_dups + " " + unmap_fq1_dups)
+                cmd2 = ("mv " + noUMI_fq2_dups + " " + unmap_fq2_dups)
+                cmd3 = ("touch " + rmUMI_dups_target)
+                pm.run([cmd1, cmd2, cmd3], rmUMI_dups_target)
 
-            cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
-                   unmap_fq1 + " " + unmap_fq2)
-            pm.run(cmd, [r1_repair, r2_repair])
-            pm.clean_add(r1_repair_single)
-            pm.clean_add(r2_repair_single)
-            cmd1 = ("mv " + r1_repair + " " + unmap_fq1)
-            cmd2 = ("mv " + r2_repair + " " + unmap_fq2)
-            cmd3 = ("touch " + repair_target)
-            pm.run([cmd1, cmd2, cmd3], repair_target)
-
-            # Re-pair the duplicates (but only if we could identify duplicates)
-            if args.umi_len > 0:
-                r1_dups_repair = os.path.join(
-                    fastq_folder, args.sample_name + "_R1_trimmed.fastq.paired.fq")
-                r2_dups_repair = os.path.join(
-                    fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.paired.fq")
-
-                r1_dups_repair_single = os.path.join(
-                    fastq_folder, args.sample_name + "_R1_trimmed.fastq.single.fq")
-                r2_dups_repair_single = os.path.join(
-                    fastq_folder, args.sample_name + "_R2_trimmed_dups.fastq.single.fq")
-
-                if args.adapter == "fastp" and int(args.umi_len) > 0:
-                    noUMI_fq1_dups = os.path.join(fastq_folder,
-                        args.sample_name + "_R1_trimmed_dups_noUMI.fastq")
-                    noUMI_fq2_dups = os.path.join(fastq_folder,
-                        args.sample_name + "_R2_trimmed_dups_noUMI.fastq")
-                    cmd1 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
-                            " " + unmap_fq1_dups + " > " + noUMI_fq1_dups)
-                    cmd2 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
-                            " " + unmap_fq2_dups + " > " + noUMI_fq2_dups)
-                    pm.run([cmd1, cmd2], [noUMI_fq1_dups, noUMI_fq2_dups], shell=True)
-                    cmd1 = ("mv " + noUMI_fq1_dups + " " + unmap_fq1_dups)
-                    cmd2 = ("mv " + noUMI_fq2_dups + " " + unmap_fq2_dups)
-                    cmd3 = ("touch " + rmUMI_dups_target)
-                    pm.run([cmd1, cmd2, cmd3], rmUMI_dups_target)
-
-                cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " +
-                       unmap_fq1_dups + " " + unmap_fq2_dups)
-                pm.run(cmd, [r1_dups_repair, r2_dups_repair])
-                pm.clean_add(r1_dups_repair_single)
-                pm.clean_add(r2_dups_repair_single)
-                cmd1 = ("mv " + r1_dups_repair + " " + unmap_fq1_dups)
-                cmd2 = ("mv " + r2_dups_repair + " " + unmap_fq2_dups)
-                cmd3 = ("touch " + dups_repair_target)
-                pm.run([cmd1, cmd2, cmd3], dups_repair_target)
+            cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " +
+                   unmap_fq1_dups + " " + unmap_fq2_dups)
+            pm.run(cmd, [r1_dups_repair, r2_dups_repair])
+            pm.clean_add(r1_dups_repair_single)
+            pm.clean_add(r2_dups_repair_single)
+            cmd1 = ("mv " + r1_dups_repair + " " + unmap_fq1_dups)
+            cmd2 = ("mv " + r2_dups_repair + " " + unmap_fq2_dups)
+            cmd3 = ("touch " + dups_repair_target)
+            pm.run([cmd1, cmd2, cmd3], dups_repair_target)
+    else:
+        if not args.complexity and args.umi_len > 0:
+            unmap_fq1, unmap_fq1_dups = _process_fastq(
+                args, tools, res, False,
+                untrimmed_fastq1, outfolder=param.outfolder)
+            unmap_fq2 = ""
+            unmap_fq2_dups = ""
         else:
-            if not args.complexity and args.umi_len > 0:
-                unmap_fq1, unmap_fq1_dups = _process_fastq(
-                    args, tools, res, False,
-                    untrimmed_fastq1, outfolder=param.outfolder)
-                unmap_fq2 = ""
-                unmap_fq2_dups = ""
-            else:
-                unmap_fq1 = _process_fastq(
-                    args, tools, res, False,
-                    untrimmed_fastq1, outfolder=param.outfolder)
-                unmap_fq2 = ""
+            unmap_fq1 = _process_fastq(
+                args, tools, res, False,
+                untrimmed_fastq1, outfolder=param.outfolder)
+            unmap_fq2 = ""
 
     # NOTE: maintain this functionality for single-end data
     #       for paired-end it has already been generated at this point
@@ -2095,86 +2104,89 @@ def main():
             pm.report_object("Adapter insertion distribution", degradation_pdf,
                              anchor_image=degradation_png)
 
-            # Determine the peak insertion size
-            cmd = ("awk '/count/,0' " + cutadapt_report +
-                   " | awk 'NR>2 {print prev} {prev=$0}'" +
-                   " | awk '{if ($3/$2 < 0.01) print $1, $2}'" +
-                   " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
-                   " {max=$2; len=$1}; max_len=$1} END{print max_len-len}'")
-            adapter_peak = pm.checkprint(cmd)
-            if adapter_peak:
-                ap = int(adapter_peak)
-                pm.report_result("Peak_adapter_insertion_size", ap)
+            if not pm.get_stat('Peak_adapter_insertion_size') or args.new_start:
+                # Determine the peak insertion size
+                cmd = ("awk '/count/,0' " + cutadapt_report +
+                       " | awk 'NR>2 {print prev} {prev=$0}'" +
+                       " | awk '{if ($3/$2 < 0.01) print $1, $2}'" +
+                       " | awk 'BEGIN{max=   0; max_len=0; len=0}" +
+                       "{if ($2>0+max) {max=$2; len=$1}; max_len=$1} " +
+                       "END{print max_len-len}'")
+                adapter_peak = pm.checkprint(cmd)
+                if adapter_peak:
+                    ap = int(adapter_peak)
+                    pm.report_result("Peak_adapter_insertion_size", ap)
 
             # Calculate the degradation ratio
-            pm.timestamp("###  Calculating degradation ratio")
+            if not pm.get_stat('Degradation_ratio') or args.new_start:
+                pm.timestamp("###  Calculating degradation ratio")
 
-            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
-                   " | awk '{ if ($1 == 10) {status = 1}} END {if (status) " + 
-                   "{print status} else {print 0}}'")
-            degraded_lower = pm.checkprint(cmd)
-            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
-                   " | awk '{ if ($1 == 20) {status = 1}} END {if (status) " + 
-                   "{print status} else {print 0}}'")
-            degraded_upper = pm.checkprint(cmd)
-            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
-                   " | awk '{ if ($1 == 30) {status = 1}} END {if (status) " + 
-                   "{print status} else {print 0}}'")
-            intact_lower = pm.checkprint(cmd)
-            cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
-                   " | awk '{ if ($1 == 40) {status = 1}} END {if (status) " + 
-                   "{print status} else {print 0}}'")
-            intact_upper = pm.checkprint(cmd)
-
-            if degraded_lower:
-                dl = int(degraded_lower)
-            if dl == 1:
-                dl = 10
-            else:
                 cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
-                       " | awk 'NR==1 {print $1}'")
+                       " | awk '{ if ($1 == 10) {status = 1}} END " + 
+                       "{if (status) {print status} else {print 0}}'")
                 degraded_lower = pm.checkprint(cmd)
-                dl = int(degraded_lower) if degraded_lower else 1
-
-            if degraded_upper:
-                du = int(degraded_upper)
-            if du == 1:
-                du = 20
-            else:
-                du = int(degraded_lower) + 9
-
-            if intact_upper:
-                iu = int(intact_upper)
-            if iu == 1:
-                iu = 40
-            else:
                 cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
-                       " | awk 'END {print $1}'")
+                       " | awk '{ if ($1 == 20) {status = 1}} END " + 
+                       "{if (status) {print status} else {print 0}}'")
+                degraded_upper = pm.checkprint(cmd)
+                cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
+                       " | awk '{ if ($1 == 30) {status = 1}} END " + 
+                       "{if (status) {print status} else {print 0}}'")
+                intact_lower = pm.checkprint(cmd)
+                cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
+                       " | awk '{ if ($1 == 40) {status = 1}} END " + 
+                       "{if (status) {print status} else {print 0}}'")
                 intact_upper = pm.checkprint(cmd)
-                dl = int(intact_upper) if intact_upper else 40
 
-            if intact_lower:
-                il = int(intact_lower)
-            if il == 1:
-                il = 30
-            else:
-                il = int(intact_upper) - 10
+                if degraded_lower:
+                    dl = int(degraded_lower)
+                if dl == 1:
+                    dl = 10
+                else:
+                    cmd = ("awk 'NR>2 {print prev} {prev=$0}' " +
+                           cutadapt_report + " | awk 'NR==1 {print $1}'")
+                    degraded_lower = pm.checkprint(cmd)
+                    dl = int(degraded_lower) if degraded_lower else 1
 
-            cmd = ("awk '/count/,0' " + cutadapt_report +
-                   " | awk 'NR>2 {print prev} {prev=$0}'" +
-                   " | awk '{if ($3/$2 < 0.01) print $1, $2}'" +
-                   " | awk '{a[NR]=$1; b[NR]=$2; max_len=$1}" +
-                   "{if ($1 > max_len) {max_len=$1}} " +
-                   "END{ for (i in a) print max_len-a[i], b[i]}'" +
-                   " | sort -nk1 | awk '($1 <= " + str(du) + " && $1 >= " +
-                   str(dl) + "){degradedSum += $2}; " +  "($1 >= " + str(il) +
-                   " && $1 <= " + str(iu) + "){intactSum += $2} " + 
-                   "END {if (intactSum < 1) {intactSum = 1} " +
-                   "print degradedSum/intactSum}'")
-            degradation_ratio = pm.checkprint(cmd)
-            if degradation_ratio:
-                dr = float(degradation_ratio)
-                pm.report_result("Degradation_ratio", round(dr, 4))
+                if degraded_upper:
+                    du = int(degraded_upper)
+                if du == 1:
+                    du = 20
+                else:
+                    du = int(degraded_lower) + 9
+
+                if intact_upper:
+                    iu = int(intact_upper)
+                if iu == 1:
+                    iu = 40
+                else:
+                    cmd = ("awk 'NR>2 {print prev} {prev=$0}' " +
+                           cutadapt_report + " | awk 'END {print $1}'")
+                    intact_upper = pm.checkprint(cmd)
+                    dl = int(intact_upper) if intact_upper else 40
+
+                if intact_lower:
+                    il = int(intact_lower)
+                if il == 1:
+                    il = 30
+                else:
+                    il = int(intact_upper) - 10
+
+                cmd = ("awk '/count/,0' " + cutadapt_report +
+                       " | awk 'NR>2 {print prev} {prev=$0}'" +
+                       " | awk '{if ($3/$2 < 0.01) print $1, $2}'" +
+                       " | awk '{a[NR]=$1; b[NR]=$2; max_len=$1}" +
+                       "{if ($1 > max_len) {max_len=$1}} " +
+                       "END{ for (i in a) print max_len-a[i], b[i]}'" +
+                       " | sort -nk1 | awk '($1 <= " + str(du) + " && $1 >= " +
+                       str(dl) + "){degradedSum += $2}; " +  "($1 >= " +
+                       str(il) + " && $1 <= " + str(iu) +
+                       "){intactSum += $2} END {if (intactSum < 1) " +
+                       "{intactSum = 1} print degradedSum/intactSum}'")
+                degradation_ratio = pm.checkprint(cmd)
+                if degradation_ratio:
+                    dr = float(degradation_ratio)
+                    pm.report_result("Degradation_ratio", round(dr, 4))
 
     pm.clean_add(fastq_folder, conditional=True)
 
@@ -2185,80 +2197,80 @@ def main():
     pm.timestamp("### Prealignments")
 
     to_compress = []
-    if not pm.get_stat("Aligned_reads") or args.new_start:
-        if len(args.prealignments) == 0:
-            print("You may use `--prealignments` to align to references before "
-                  "the genome alignment step. See docs.")
-        else:
-            print("Prealignment assemblies: " + str(args.prealignments))
-            # Loop through any prealignment references and map to them sequentially
-            for reference in args.prealignments:
-                if not args.complexity and args.umi_len > 0:
-                    if args.no_fifo:
-                        unmap_fq1, unmap_fq2 = _align_with_bt2(
-                            args, tools, args.paired_end, False, unmap_fq1,
-                            unmap_fq2, reference,
-                            assembly_bt2=os.path.join(
-                                rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                            outfolder=param.outfolder,
-                            aligndir="prealignments")
+    #if not pm.get_stat("Aligned_reads") or args.new_start:
+    if len(args.prealignments) == 0:
+        print("You may use `--prealignments` to align to references before "
+              "the genome alignment step. See docs.")
+    else:
+        print("Prealignment assemblies: " + str(args.prealignments))
+        # Loop through any prealignment references and map to them sequentially
+        for reference in args.prealignments:
+            if not args.complexity and args.umi_len > 0:
+                if args.no_fifo:
+                    unmap_fq1, unmap_fq2 = _align_with_bt2(
+                        args, tools, args.paired_end, False, unmap_fq1,
+                        unmap_fq2, reference,
+                        assembly_bt2=os.path.join(
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments")
 
-                        unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
-                            args, tools, args.paired_end, False, unmap_fq1_dups,
-                            unmap_fq2_dups, reference,
-                            assembly_bt2=os.path.join(
-                                rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                            outfolder=param.outfolder,
-                            aligndir="prealignments",
-                            dups=True)
-                        
-                    else:
-                        unmap_fq1, unmap_fq2 = _align_with_bt2(
-                            args, tools, args.paired_end, True, unmap_fq1,
-                            unmap_fq2, reference,
-                            assembly_bt2=os.path.join(
-                                rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                            outfolder=param.outfolder,
-                            aligndir="prealignments")
-
-                        unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
-                            args, tools, args.paired_end, True, unmap_fq1_dups,
-                            unmap_fq2_dups, reference,
-                            assembly_bt2=os.path.join(
-                                rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                            outfolder=param.outfolder,
-                            aligndir="prealignments",
-                            dups=True)
-                    if args.paired_end:
-                        to_compress.append(unmap_fq1_dups)
-                        to_compress.append(unmap_fq2_dups)
-                        to_compress.append(unmap_fq1)
-                        to_compress.append(unmap_fq2)
-                    else:
-                        to_compress.append(unmap_fq1_dups)
-                        to_compress.append(unmap_fq1)
+                    unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
+                        args, tools, args.paired_end, False, unmap_fq1_dups,
+                        unmap_fq2_dups, reference,
+                        assembly_bt2=os.path.join(
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments",
+                        dups=True)
+                    
                 else:
-                    if args.no_fifo:
-                        unmap_fq1, unmap_fq2 = _align_with_bt2(
-                            args, tools, args.paired_end, False,
-                            unmap_fq1, unmap_fq2, reference,
-                            assembly_bt2=os.path.join(
-                                rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                            outfolder=param.outfolder,
-                            aligndir="prealignments")
-                    else:
-                        unmap_fq1, unmap_fq2 = _align_with_bt2(
-                            args, tools, args.paired_end, True,
-                            unmap_fq1, unmap_fq2, reference,
-                            assembly_bt2=os.path.join(
-                                rgc.get_asset(reference, BT2_IDX_KEY), reference),
-                            outfolder=param.outfolder,
-                            aligndir="prealignments")
-                    if args.paired_end:
-                        to_compress.append(unmap_fq1)
-                        to_compress.append(unmap_fq2)
-                    else:
-                        to_compress.append(unmap_fq1)
+                    unmap_fq1, unmap_fq2 = _align_with_bt2(
+                        args, tools, args.paired_end, True, unmap_fq1,
+                        unmap_fq2, reference,
+                        assembly_bt2=os.path.join(
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments")
+
+                    unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
+                        args, tools, args.paired_end, True, unmap_fq1_dups,
+                        unmap_fq2_dups, reference,
+                        assembly_bt2=os.path.join(
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments",
+                        dups=True)
+                if args.paired_end:
+                    to_compress.append(unmap_fq1_dups)
+                    to_compress.append(unmap_fq2_dups)
+                    to_compress.append(unmap_fq1)
+                    to_compress.append(unmap_fq2)
+                else:
+                    to_compress.append(unmap_fq1_dups)
+                    to_compress.append(unmap_fq1)
+            else:
+                if args.no_fifo:
+                    unmap_fq1, unmap_fq2 = _align_with_bt2(
+                        args, tools, args.paired_end, False,
+                        unmap_fq1, unmap_fq2, reference,
+                        assembly_bt2=os.path.join(
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments")
+                else:
+                    unmap_fq1, unmap_fq2 = _align_with_bt2(
+                        args, tools, args.paired_end, True,
+                        unmap_fq1, unmap_fq2, reference,
+                        assembly_bt2=os.path.join(
+                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        outfolder=param.outfolder,
+                        aligndir="prealignments")
+                if args.paired_end:
+                    to_compress.append(unmap_fq1)
+                    to_compress.append(unmap_fq2)
+                else:
+                    to_compress.append(unmap_fq1)
 
     ############################################################################
     #                           Map to primary genome                          #
@@ -2302,143 +2314,144 @@ def main():
     pm.clean_add(tempdir)
 
     # Skip if this is a recovery and the following has already occurred
-    if not pm.get_stat("Aligned_reads") or args.new_start:
+    #if not pm.get_stat("Aligned_reads") or args.new_start:  # fails to reproduce the dups file if it fails midrun...
+    # check input for zipped or not
+    if pypiper.is_gzipped_fastq(unmap_fq1):
+        cmd = (ngstk.ziptool + " -d " + (unmap_fq1 + ".gz"))
+        pm.run(cmd, mapping_genome_bam)
+    if args.paired_end:
+        if pypiper.is_gzipped_fastq(unmap_fq2):
+            cmd = (ngstk.ziptool + " -d " + (unmap_fq2 + ".gz"))
+            pm.run(cmd, mapping_genome_bam)
+
+    cmd = tools.bowtie2 + " -p " + str(pm.cores)
+    cmd += bt2_options
+    cmd += " --rg-id " + args.sample_name
+    cmd += " -x " + os.path.join(
+        rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
+        args.genome_assembly)
+    if args.paired_end:
+        cmd += " --rf -1 " + unmap_fq1 + " -2 " + unmap_fq2
+    else:
+        cmd += " -U " + unmap_fq1
+    cmd += " | " + tools.samtools + " view -bS - -@ 1 "
+    cmd += " | " + tools.samtools + " sort - -@ 1"
+    cmd += " -T " + tempdir
+    cmd += " -o " + mapping_genome_bam_temp
+
+    if not args.complexity and args.umi_len > 0:
         # check input for zipped or not
-        if pypiper.is_gzipped_fastq(unmap_fq1):
-            cmd = (ngstk.ziptool + " -d " + (unmap_fq1 + ".gz"))
+        if pypiper.is_gzipped_fastq(unmap_fq1_dups):
+            cmd = (ngstk.ziptool + " -d " + (unmap_fq1_dups + ".gz"))
             pm.run(cmd, mapping_genome_bam)
         if args.paired_end:
-            if pypiper.is_gzipped_fastq(unmap_fq2):
-                cmd = (ngstk.ziptool + " -d " + (unmap_fq2 + ".gz"))
+            if pypiper.is_gzipped_fastq(unmap_fq2_dups):
+                cmd = (ngstk.ziptool + " -d " + (unmap_fq2_dups + ".gz"))
                 pm.run(cmd, mapping_genome_bam)
 
-        cmd = tools.bowtie2 + " -p " + str(pm.cores)
-        cmd += bt2_options
-        cmd += " --rg-id " + args.sample_name
-        cmd += " -x " + os.path.join(
+        cmd_dups = tools.bowtie2 + " -p " + str(pm.cores)
+        cmd_dups += bt2_options
+        cmd_dups += " --rg-id " + args.sample_name
+        cmd_dups += " -x " + os.path.join(
             rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
             args.genome_assembly)
         if args.paired_end:
-            cmd += " --rf -1 " + unmap_fq1 + " -2 " + unmap_fq2
+            cmd_dups += " --rf -1 " + unmap_fq1_dups + " -2 " + unmap_fq2_dups
         else:
-            cmd += " -U " + unmap_fq1
-        cmd += " | " + tools.samtools + " view -bS - -@ 1 "
-        cmd += " | " + tools.samtools + " sort - -@ 1"
-        cmd += " -T " + tempdir
-        cmd += " -o " + mapping_genome_bam_temp
+            cmd_dups += " -U " + unmap_fq1_dups
+        cmd_dups += " | " + tools.samtools + " view -bS - -@ 1 "
+        cmd_dups += " | " + tools.samtools + " sort - -@ 1"
+        cmd_dups += " -T " + tempdir
+        cmd_dups += " -o " + mapping_genome_bam_temp_dups
+
+    # Split genome mapping result bamfile into two: high-quality aligned
+    # reads (keepers) and unmapped reads (in case we want to analyze the
+    # altogether unmapped reads)
+    # -q 10: skip alignments with MAPQ less than 10
+    cmd2 = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
+            " -U " + failQC_genome_bam + " ")
+    cmd2 += mapping_genome_bam_temp + " > " + mapping_genome_bam
+
+    if not args.complexity and args.umi_len > 0:
+        cmd2_dups = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
+            " -U " + failQC_genome_bam_dups + " ")
+        cmd2_dups += mapping_genome_bam_temp_dups + " > " + mapping_genome_bam_dups
+        pm.clean_add(failQC_genome_bam_dups)
+
+    def check_alignment_genome(temp_bam, bam):
+        mr = ngstk.count_mapped_reads(temp_bam, args.paired_end)
+        ar = ngstk.count_mapped_reads(bam, args.paired_end)
+
+        if float(ar) < 1:
+            err_msg = "No aligned reads. Check alignment settings."
+            pm.fail_pipeline(RuntimeError(err_msg))
+        if args.paired_end:
+            ar = float(ar)/2
+
+        tmp = pm.get_stat("Raw_reads")
+        if tmp:
+            rr = float(tmp)
+        else:
+            rr = 0
+
+        tmp = pm.get_stat("Trimmed_reads")
+        if tmp:
+            tr = float(tmp)
+        else:
+            tr = 0
+
+        if os.path.exists(res.refgene_pre_mRNA):
+            cmd = (tools.samtools + " depth -b " +
+                   res.refgene_pre_mRNA + " " + bam +
+                   " | awk '{counter++;sum+=$3}END{print sum/counter}'")
+            rd = pm.checkprint(cmd)
+        else:
+            cmd = (tools.samtools + " depth " + bam +
+                   " | awk '{counter++;sum+=$3}END{print sum/counter}'")
+            rd = pm.checkprint(cmd)
+
+        pm.report_result("Mapped_reads", mr)
+        pm.report_result("QC_filtered_reads",
+                         round(float(mr)) - round(float(ar)))
+        pm.report_result("Aligned_reads", ar)
+        pm.report_result("Alignment_rate", round(float(ar) * 100 /
+                         float(tr), 2))
+        pm.report_result("Total_efficiency", round(float(ar) * 100 /
+                         float(rr), 2))
+        if rd and rd.strip():
+            pm.report_result("Read_depth", round(float(rd), 2))
+
+    pm.run([cmd, cmd2], mapping_genome_bam,
+           follow=lambda: check_alignment_genome(mapping_genome_bam_temp,
+                                                 mapping_genome_bam))
+
+    if not args.complexity and args.umi_len > 0:
+        pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups)
+
+    pm.timestamp("### Compress all unmapped read files")
+    for unmapped_fq in to_compress:
+        # Compress unmapped fastq reads
+        if not pypiper.is_gzipped_fastq(unmapped_fq) and not unmapped_fq == '':
+            if 'unmap_dups' in unmapped_fq:
+                pm.clean_add(unmapped_fq)
+            else:
+                cmd = (ngstk.ziptool + " " + unmapped_fq)
+                unmapped_fq = unmapped_fq + ".gz"
+                pm.run(cmd, unmapped_fq)
+
+    if not args.prealignments and os.path.exists(mapping_genome_bam_temp):
+        # Index the temporary bam file
+        cmd = tools.samtools + " index " + mapping_genome_bam_temp
+        pm.run(cmd, temp_mapping_index)
+        pm.clean_add(temp_mapping_index)
 
         if not args.complexity and args.umi_len > 0:
-            # check input for zipped or not
-            if pypiper.is_gzipped_fastq(unmap_fq1_dups):
-                cmd = (ngstk.ziptool + " -d " + (unmap_fq1_dups + ".gz"))
-                pm.run(cmd, mapping_genome_bam)
-            if args.paired_end:
-                if pypiper.is_gzipped_fastq(unmap_fq2_dups):
-                    cmd = (ngstk.ziptool + " -d " + (unmap_fq2_dups + ".gz"))
-                    pm.run(cmd, mapping_genome_bam)
+            cmd_dups = tools.samtools + " index " + mapping_genome_bam_temp_dups
+            pm.run(cmd_dups, temp_mapping_index_dups)
+            pm.clean_add(temp_mapping_index_dups)
+            pm.clean_add(mapping_genome_bam_temp_dups)
 
-            cmd_dups = tools.bowtie2 + " -p " + str(pm.cores)
-            cmd_dups += bt2_options
-            cmd_dups += " --rg-id " + args.sample_name
-            cmd_dups += " -x " + os.path.join(
-                rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
-                args.genome_assembly)
-            if args.paired_end:
-                cmd_dups += " --rf -1 " + unmap_fq1_dups + " -2 " + unmap_fq2_dups
-            else:
-                cmd_dups += " -U " + unmap_fq1_dups
-            cmd_dups += " | " + tools.samtools + " view -bS - -@ 1 "
-            cmd_dups += " | " + tools.samtools + " sort - -@ 1"
-            cmd_dups += " -T " + tempdir
-            cmd_dups += " -o " + mapping_genome_bam_temp_dups
-
-        # Split genome mapping result bamfile into two: high-quality aligned
-        # reads (keepers) and unmapped reads (in case we want to analyze the
-        # altogether unmapped reads)
-        # -q 10: skip alignments with MAPQ less than 10
-        cmd2 = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
-                " -U " + failQC_genome_bam + " ")
-        cmd2 += mapping_genome_bam_temp + " > " + mapping_genome_bam
-
-        if not args.complexity and args.umi_len > 0:
-            cmd2_dups = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
-                " -U " + failQC_genome_bam_dups + " ")
-            cmd2_dups += mapping_genome_bam_temp_dups + " > " + mapping_genome_bam_dups
-            pm.clean_add(failQC_genome_bam_dups)
-
-        def check_alignment_genome(temp_bam, bam):
-            mr = ngstk.count_mapped_reads(temp_bam, args.paired_end)
-            ar = ngstk.count_mapped_reads(bam, args.paired_end)
-
-            if float(ar) < 1:
-                err_msg = "No aligned reads. Check alignment settings."
-                pm.fail_pipeline(RuntimeError(err_msg))
-            if args.paired_end:
-                ar = float(ar)/2
-
-            tmp = pm.get_stat("Raw_reads")
-            if tmp:
-                rr = float(tmp)
-            else:
-                rr = 0
-
-            tmp = pm.get_stat("Trimmed_reads")
-            if tmp:
-                tr = float(tmp)
-            else:
-                tr = 0
-
-            if os.path.exists(res.refgene_pre_mRNA):
-                cmd = (tools.samtools + " depth -b " +
-                       res.refgene_pre_mRNA + " " + bam +
-                       " | awk '{counter++;sum+=$3}END{print sum/counter}'")
-                rd = pm.checkprint(cmd)
-            else:
-                cmd = (tools.samtools + " depth " + bam +
-                       " | awk '{counter++;sum+=$3}END{print sum/counter}'")
-                rd = pm.checkprint(cmd)
-
-            pm.report_result("Mapped_reads", mr)
-            pm.report_result("QC_filtered_reads",
-                             round(float(mr)) - round(float(ar)))
-            pm.report_result("Aligned_reads", ar)
-            pm.report_result("Alignment_rate", round(float(ar) * 100 /
-                             float(tr), 2))
-            pm.report_result("Total_efficiency", round(float(ar) * 100 /
-                             float(rr), 2))
-            if rd and rd.strip():
-                pm.report_result("Read_depth", round(float(rd), 2))
-
-        pm.run([cmd, cmd2], mapping_genome_bam,
-               follow=lambda: check_alignment_genome(mapping_genome_bam_temp,
-                                                     mapping_genome_bam))
-
-        if not args.complexity and args.umi_len > 0:
-            pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups)
-
-        pm.timestamp("### Compress all unmapped read files")
-        for unmapped_fq in to_compress:
-            # Compress unmapped fastq reads
-            if not pypiper.is_gzipped_fastq(unmapped_fq) and not unmapped_fq == '':
-                if 'unmap_dups' in unmapped_fq:
-                    pm.clean_add(unmapped_fq)
-                else:
-                    cmd = (ngstk.ziptool + " " + unmapped_fq)
-                    unmapped_fq = unmapped_fq + ".gz"
-                    pm.run(cmd, unmapped_fq)
-
-        if not args.prealignments and os.path.exists(mapping_genome_bam_temp):
-            # Index the temporary bam file
-            cmd = tools.samtools + " index " + mapping_genome_bam_temp
-            pm.run(cmd, temp_mapping_index)
-            pm.clean_add(temp_mapping_index)
-
-            if not args.complexity and args.umi_len > 0:
-                cmd_dups = tools.samtools + " index " + mapping_genome_bam_temp_dups
-                pm.run(cmd_dups, temp_mapping_index_dups)
-                pm.clean_add(temp_mapping_index_dups)
-                pm.clean_add(mapping_genome_bam_temp_dups)
-
+    if not pm.get_stat("Mitochondrial_reads") or args.new_start:
         # Determine mitochondrial read counts
         if os.path.exists(mapping_genome_bam_temp):
             if not os.path.exists(temp_mapping_index):
@@ -2469,26 +2482,27 @@ def main():
                 cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
                          str(pm.cores) + " " + mapping_genome_bam + " > " +
                          noMT_mapping_genome_bam)
-                cmd3 = ("mv " + noMT_mapping_genome_bam + " " + mapping_genome_bam)
+                cmd3 = ("mv " + noMT_mapping_genome_bam +
+                        " " + mapping_genome_bam)
                 cmd4 = tools.samtools + " index " + mapping_genome_bam
                 pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam)
                 pm.clean_add(mapping_genome_index)
 
-        # Remove PE2 reads
-        if args.paired_end:
-            pm.timestamp("### Split BAM file")
-            mapping_pe1_bam = os.path.join(
-                map_genome_folder, args.sample_name + "_PE1.bam")
-            mapping_pe2_bam = os.path.join(
-                map_genome_folder, args.sample_name + "_PE2.bam")
-            cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam +
-                    " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
-                    " > " + mapping_pe1_bam)
-            cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam +
-                    " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
-                    " > " + mapping_pe2_bam)
-            pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
-            mapping_genome_bam = mapping_pe1_bam
+    # Remove PE2 reads
+    if args.paired_end:
+        pm.timestamp("### Split BAM file")
+        mapping_pe1_bam = os.path.join(
+            map_genome_folder, args.sample_name + "_PE1.bam")
+        mapping_pe2_bam = os.path.join(
+            map_genome_folder, args.sample_name + "_PE2.bam")
+        cmd1 = (tools.samtools + " view -b -f 64 " + mapping_genome_bam +
+                " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
+                " > " + mapping_pe1_bam)
+        cmd2 = (tools.samtools + " view -b -f 128 " + mapping_genome_bam +
+                " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
+                " > " + mapping_pe2_bam)
+        pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
+        mapping_genome_bam = mapping_pe1_bam
 
     ############################################################################
     #       Determine maximum read length and add seqOutBias resource          #
@@ -2964,17 +2978,19 @@ def main():
               .format(res.refgene_pre_mRNA))
     else:
         pm.timestamp("### Calculate Fraction of Reads in pre-mature mRNA")
-        # Plus
-        plus_frip = calc_frip(plus_bam, res.refgene_pre_mRNA,
-                              frip_func=ngstk.simple_frip,
-                              pipeline_manager=pm)
-        pm.report_result("Plus_FRiP", round(plus_frip, 2))
+        if not pm.get_stat('Plus_FRiP') or args.new_start:
+            # Plus
+            plus_frip = calc_frip(plus_bam, res.refgene_pre_mRNA,
+                                  frip_func=ngstk.simple_frip,
+                                  pipeline_manager=pm)
+            pm.report_result("Plus_FRiP", round(plus_frip, 2))
 
-        # Minus
-        minus_frip = calc_frip(minus_bam, res.refgene_pre_mRNA,
-                               frip_func=ngstk.simple_frip,
-                               pipeline_manager=pm)
-        pm.report_result("Minus_FRiP", round(minus_frip, 2))
+        if not pm.get_stat('Minus_FRiP') or args.new_start:
+            # Minus
+            minus_frip = calc_frip(minus_bam, res.refgene_pre_mRNA,
+                                   frip_func=ngstk.simple_frip,
+                                   pipeline_manager=pm)
+            pm.report_result("Minus_FRiP", round(minus_frip, 2))
 
         # Calculate gene coverage
         gene_cov = os.path.join(signal_folder,
