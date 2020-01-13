@@ -1889,12 +1889,13 @@ plotCutadapt <- function(input, name='cutadapt',
                     max(1, sum(report[which(report$length >= intact_lower &
                                report$length <= intact_upper),]$count))
 
-    q <- ggplot(report, aes(x=max(length)-length, y=count/count_factor)) +
+    q <- ggplot(report, aes(x=length, y=count/count_factor)) +
             geom_point() +
             geom_vline(xintercept = 20, linetype = "dotted", alpha=0.25) +
             geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
-            labs(title=name, x="Size of insertion", y=ylabel) +
-            theme_PEPPRO()
+            labs(x="Size of insertion", y=ylabel) +
+            theme_PEPPRO() +
+            theme(axis.text.x = element_text(angle = 0, hjust = 0.5))
     q <- q + 
         annotate("rect", xmin=-Inf, xmax=20, ymin=-Inf, ymax=Inf,
                  alpha=0.1, fill="#ff001e") +
@@ -1979,8 +1980,9 @@ plotAdapt <- function(input, name='adapt', umi_len = 0) {
             geom_point() +
             geom_vline(xintercept = 20, linetype = "dotted", alpha=0.25) +
             geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
-            labs(title=name, x="Size of insertion", y=ylabel) +
-            theme_PEPPRO()
+            labs(x="Size of insertion", y=ylabel) +
+            theme_PEPPRO() +
+            theme(axis.text.x = element_text(angle = 0, hjust = 0.5))
     q <- q + 
         annotate("rect", xmin=-Inf, xmax=20, ymin=-Inf, ymax=Inf,
                  alpha=0.1, fill="#ff001e") +
@@ -1994,7 +1996,7 @@ plotAdapt <- function(input, name='adapt', umi_len = 0) {
                  label="high degradation", angle=90, col="#858585") +
         annotate("text", x=Inf, y=(max(report$count/count_factor)*0.99),
                  size=theme_get()$text[["size"]]/3, hjust=1.1,
-                 label=paste0("degradation ratio: ", round(degradation, 2))) 
+                 label=paste0("degradation ratio: ", round(degradation, 2)))
 
     return(q)
 }
