@@ -1853,6 +1853,9 @@ plotCutadapt <- function(input, name='cutadapt',
     # the actual count
     report <- report[which(report$expect/report$count < 0.01),]
     
+    # inverse length to get ascending order
+    report$length <- max(report$length)-report$length
+
     # don't include size 0 insertions
     report <- report[-nrow(report),]
 
@@ -1864,6 +1867,27 @@ plotCutadapt <- function(input, name='cutadapt',
     }
 
     count_factor <- getFactor(report$count)
+
+    if (20 %in% report$length) {
+        degraded_upper <- 20
+        degraded_lower <- 10
+    } else {
+        degraded_upper <- min(report$length) + 10
+        degraded_lower <- max(1, degraded_upper - 10)
+    }
+
+    if (40 %in% report$length) {
+        intact_upper <- 40
+        intact_lower <- 30
+    } else {
+        intact_upper <- max(report$length)
+        intact_lower <- max(1, intact_upper - 10)
+    }
+    
+    degradation  <- sum(report[which(report$length >= degraded_lower &
+                                     report$length <= degraded_upper),]$count) /
+                    max(1, sum(report[which(report$length >= intact_lower &
+                               report$length <= intact_upper),]$count))
 
     q <- ggplot(report, aes(x=max(length)-length, y=count/count_factor)) +
             geom_point() +
@@ -1881,7 +1905,10 @@ plotCutadapt <- function(input, name='cutadapt',
                  alpha=0.1, fill="#ffee00") + 
         annotate("text", x=7.5, y=(max(report$count/count_factor)/2),
                  size=theme_get()$text[["size"]]/4,
-                 label="high degradation", angle=90, col="#858585")
+                 label="high degradation", angle=90, col="#858585") +
+        annotate("text", x=Inf, y=(max(report$count/count_factor)*0.99),
+                 size=theme_get()$text[["size"]]/3, hjust=1.1,
+                 label=paste0("degradation ratio: ", round(degradation, 2)))
 
     return(q)
 }
@@ -1916,7 +1943,7 @@ plotAdapt <- function(input, name='adapt', umi_len = 0) {
     }
     
     # don't include size 0 insertions
-    report <- report[-nrow(report),]
+    report <- report[which(report$length > 0),]
 
     abbr <- getAbbr(report$count)
     if (abbr == '') {
