@@ -471,6 +471,11 @@ plotComplexityCurves <- function(ccurves,
                               ymax = max(preseq_ymax, max_unique)/2)
     }
 
+    # Don't include legend for single sample plots
+    if (length(ccurves) == 1) {
+        fig <- fig + theme(legend.position = "none")
+    }
+
     return(fig)
 }
 
