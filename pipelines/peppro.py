@@ -1236,7 +1236,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
 
             cmd = ("awk '(($1-" + str(umi_len) + ") <= " + str(du) +
                    " && ($1-" + str(umi_len) + ") >= " + str(dl) +
-                   "){degradedSum += $2}; " +  "(($1- " + str(umi_len) + ") >= " +
+                   "){degradedSum += $2}; " +  "(($1-" + str(umi_len) + ") >= " +
                    str(il) + " && ($1-" + str(umi_len) + ") <= " + str(iu) +
                    "){intactSum += $2}  END {if (intactSum < 1) " +
                    "{intactSum = 1} print degradedSum/intactSum}' "
@@ -1454,7 +1454,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 pm.wait = False
                 pm.run(filter_pair, out_fastq_r2_gz)
                 pm.wait = True
-                if not _itsa_file(mapped_bam) or args.new_start:
+                if not _itsa_file(out_fastq_r2_gz) or args.new_start:
                     aln_stats = pm.checkprint(cmd)
         else:
             if args.keep:
