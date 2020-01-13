@@ -1181,17 +1181,21 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if not pm.get_stat('Degradation_ratio') or args.new_start:
             pm.timestamp("###  Calculating degradation ratio")
 
-            cmd = ("awk '{ if ($1 == 10) {status = 1}} END {if (status) " + 
-                   "{print status} else {print 0}}' " + flash_hist)
+            cmd = ("awk '{ if (($1-" + str(umi_len) + ") == 10) {status = 1}} " + 
+                   "END {if (status) {print status} else {print 0}}' " +
+                   flash_hist)
             degraded_lower = pm.checkprint(cmd)
-            cmd = ("awk '{ if ($1 == 20) {status = 1}} END {if (status) " + 
-                   "{print status} else {print 0}}' " + flash_hist)
+            cmd = ("awk '{ if (($1-" + str(umi_len) + ") == 20) {status = 1}} " + 
+                   "END {if (status) {print status} else {print 0}}' " +
+                   flash_hist)
             degraded_upper = pm.checkprint(cmd)
-            cmd = ("awk '{ if ($1 == 30) {status = 1}} END {if (status) " + 
-                   "{print status} else {print 0}}' " + flash_hist)
+            cmd = ("awk '{ if (($1-" + str(umi_len) + ") == 30) {status = 1}} " + 
+                   "END {if (status) {print status} else {print 0}}' " +
+                   flash_hist)
             intact_lower = pm.checkprint(cmd)
-            cmd = ("awk '{ if ($1 == 40) {status = 1}} END {if (status) " + 
-                   "{print status} else {print 0}}' " + flash_hist)
+            cmd = ("awk '{ if (($1-" + str(umi_len) + ") == 40) {status = 1}} " + 
+                   "END {if (status) {print status} else {print 0}}' " +
+                   flash_hist)
             intact_upper = pm.checkprint(cmd)
 
             if degraded_lower:
@@ -1199,9 +1203,11 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             if dl == 1:
                 dl = 10
             else:
-                cmd = ("awk 'NR==1 {print $1}' " + flash_hist)
+                cmd = ("awk 'NR==1 {print ($1-" + str(umi_len) + ")}' " + flash_hist)
                 degraded_lower = pm.checkprint(cmd)
                 dl = int(degraded_lower) if degraded_lower else 1
+                if dl < 1:
+                    dl = 1
 
             if degraded_upper:
                 du = int(degraded_upper)
@@ -1215,7 +1221,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             if iu == 1:
                 iu = 40
             else:
-                cmd = ("awk 'END {print $1}' " + flash_hist)
+                cmd = ("awk 'END {print ($1-" + str(umi_len) + ")}' " + flash_hist)
                 intact_upper = pm.checkprint(cmd)
                 dl = int(intact_upper) if intact_upper else 40
 
@@ -1225,11 +1231,14 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 il = 30
             else:
                 il = int(intact_upper) - 10
+                if il < 1:
+                    il = 30
 
-            cmd = ("awk '($1 <= " + str(du) + " && $1 >= " + str(dl) +
-                   "){degradedSum += $2}; " +  "($1 >= " + str(il) +
-                   " && $1 <= " + str(iu) + "){intactSum += $2} " +
-                   "END {if (intactSum < 1) " +
+            cmd = ("awk '(($1-" + str(umi_len) + ") <= " + str(du) +
+                   " && ($1-" + str(umi_len) + ") >= " + str(dl) +
+                   "){degradedSum += $2}; " +  "(($1- " + str(umi_len) + ") >= " +
+                   str(il) + " && ($1-" + str(umi_len) + ") <= " + str(iu) +
+                   "){intactSum += $2}  END {if (intactSum < 1) " +
                    "{intactSum = 1} print degradedSum/intactSum}' "
                    + flash_hist)
             degradation_ratio = pm.checkprint(cmd)
@@ -1436,22 +1445,27 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
 
         if paired:
             if args.keep or not useFIFO:
-                aln_stats = pm.checkprint(cmd, mapped_bam)
+                # checkprint() doesn't know how to handle targets
+                # must recreate that effect ourselves
+                if not _itsa_file(mapped_bam) or args.new_start:
+                    aln_stats = pm.checkprint(cmd)
                 pm.run(filter_pair, mapped_bam)
             else:
                 pm.wait = False
-                pm.run(filter_pair, [summary_file, out_fastq_r2_gz])
+                pm.run(filter_pair, out_fastq_r2_gz)
                 pm.wait = True
-                aln_stats = pm.checkprint(cmd, [summary_file, out_fastq_r2_gz])
+                if not _itsa_file(mapped_bam) or args.new_start:
+                    aln_stats = pm.checkprint(cmd)
         else:
             if args.keep:
-                aln_stats = pm.checkprint(cmd, mapped_bam)
+                if not _itsa_file(mapped_bam) or args.new_start:
+                    aln_stats = pm.checkprint(cmd)
             else:
                 # TODO: switch to this once filter_paired_fq works with SE
                 #pm.run(cmd2, summary_file)
                 #pm.run(cmd1, out_fastq_r1)
                 if not _itsa_file(out_fastq_tmp_gz) or args.new_start:
-                    aln_stats = pm.checkprint(cmd, out_fastq_tmp_gz)
+                    aln_stats = pm.checkprint(cmd)
                 else:
                     aln_stats = None
 
@@ -2177,7 +2191,7 @@ def main():
                        " | awk '{if ($3/$2 < 0.01) print $1, $2}'" +
                        " | awk '{a[NR]=$1; b[NR]=$2; max_len=$1}" +
                        "{if ($1 > max_len) {max_len=$1}} " +
-                       "END{ for (i in a) print max_len-a[i], b[i]}'" +
+                       "END{ for (i in a) print 1+max_len-a[i], b[i]}'" +
                        " | sort -nk1 | awk '($1 <= " + str(du) + " && $1 >= " +
                        str(dl) + "){degradedSum += $2}; " +  "($1 >= " +
                        str(il) + " && $1 <= " + str(iu) +
@@ -2459,12 +2473,13 @@ def main():
                 pm.run(cmd, temp_mapping_index)
                 pm.clean_add(temp_mapping_index)
 
-            cmd = (tools.samtools + " idxstats " + mapping_genome_bam_temp +
-                   " | grep")
-            for name in mito_name:
-                cmd += " -we '" + name + "'"
-            cmd += "| cut -f 3"
-            mr = pm.checkprint(cmd)
+            if not _itsa_file(mapping_genome_bam_temp) or args.new_start:
+                cmd = (tools.samtools + " idxstats " +
+                       mapping_genome_bam_temp + " | grep")
+                for name in mito_name:
+                    cmd += " -we '" + name + "'"
+                cmd += "| cut -f 3"
+                mr = pm.checkprint(cmd)
         
             # If there are mitochondrial reads, report and remove them
             if mr and mr.strip():
@@ -2593,7 +2608,7 @@ def main():
                     cmd3 = ("mv " + noMT_mapping_genome_bam_dups + " " +
                             mapping_genome_bam_dups)
                     cmd4 = tools.samtools + " index " + mapping_genome_bam_dups
-                    pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam_dups)
+                    pm.run([cmd1, cmd2, cmd3, cmd4], mapping_genome_bam_dups)
                     pm.clean_add(mapping_genome_index_dups)
 
             # Remove PE2 reads
@@ -2610,6 +2625,15 @@ def main():
                     " sort - -@ " + str(pm.cores) + " > " + dups_pe2_bam)
                 pm.run([cmd1, cmd2], [dups_pe1_bam, dups_pe2_bam])
                 mapping_genome_bam_dups = dups_pe1_bam
+
+            # Calculate size of genome
+            if not pm.get_stat("Genome_size") or args.new_start:
+                genome_size = int(pm.checkprint(
+                    ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " +
+                     res.chrom_sizes)))
+                pm.report_result("Genome_size", genome_size)
+            else:
+                genome_size = int(pm.get_stat("Genome_size"))
 
             pm.timestamp("### Calculate library complexity")
 
@@ -2639,9 +2663,6 @@ def main():
                 pm.clean_add(mapping_genome_bam_dups)
                 pm.clean_add(mapping_genome_bam_temp_dups)
 
-                cmd = ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " + res.chrom_sizes)
-                genome_size = int(pm.checkprint(cmd))
-
                 cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") +
                        " preseq " + "-i " + preseq_yield)
                 if args.coverage:
@@ -2653,13 +2674,15 @@ def main():
                 pm.report_object("Library complexity", preseq_pdf,
                                  anchor_image=preseq_png)
 
-                # Report the expected unique at 10M reads
-                cmd = ("grep -w '10000000' " + preseq_yield +
-                       " | awk '{print $2}'")
-                expected_unique = pm.checkprint(cmd)
-                if expected_unique:
-                    fraction_unique = float(expected_unique)/float(10000000)
-                    pm.report_result("Frac_exp_unique_at_10M", fraction_unique)
+                if not pm.get_stat('Frac_exp_unique_at_10M') or args.new_start:
+                    # Report the expected unique at 10M reads
+                    cmd = ("grep -w '10000000' " + preseq_yield +
+                           " | awk '{print $2}'")
+                    expected_unique = pm.checkprint(cmd)
+                    if expected_unique:
+                        fraction_unique = float(expected_unique)/float(10000000)
+                        pm.report_result("Frac_exp_unique_at_10M",
+                                         round(fraction_unique, 4))
             else:
                 print("Unable to calculate library complexity.")
 
@@ -2871,15 +2894,6 @@ def main():
             pm.run([cmd1, cmd2], [chr_order, chr_keep])
             pm.clean_add(chr_order)
             pm.clean_add(chr_keep)
-
-    # Calculate size of genome
-    if not pm.get_stat("Genome_size") or args.new_start:
-        if os.path.exists(chr_order):
-            genome_size = int(pm.checkprint(
-                ("awk '{sum += $2} END {print sum}' " + chr_order)))
-            pm.report_result("Genome_size", genome_size)
-    else:
-        genome_size = int(pm.get_stat("Genome_size"))
 
     if not os.path.exists(res.ensembl_tss):
         if not os.path.exists(res.ensembl_gene_body):
