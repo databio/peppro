@@ -1157,7 +1157,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             args.sample_name + "_adapter_insertion_distribution.png")
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                " adapt -i " + flash_hist + " -o " + outfolder)
-        if args.umi_len > 0:
+        if int(args.umi_len) > 0:
             cmd += (" -u " + str(args.umi_len))
             umi_len = args.umi_len
         else:
@@ -1234,10 +1234,9 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 if il < 1:
                     il = 30
 
-            cmd = ("awk '(($1-" + str(umi_len) + ") <= " + str(du) +
-                   " && ($1-" + str(umi_len) + ") >= " + str(dl) +
-                   "){degradedSum += $2}; " +  "(($1-" + str(umi_len) + ") >= " +
-                   str(il) + " && ($1-" + str(umi_len) + ") <= " + str(iu) +
+            cmd = ("awk '($1 <= " + str(du) + " && $1 >= " + str(dl) +
+                   "){degradedSum += $2}; " +  "($1 >= " +
+                   str(il) + " && $1 <= " + str(iu) +
                    "){intactSum += $2}  END {if (intactSum < 1) " +
                    "{intactSum = 1} print degradedSum/intactSum}' "
                    + flash_hist)
@@ -2025,9 +2024,9 @@ def main():
                 args.sample_name + "_R1_processed_noUMI.fastq")
             noUMI_fq2 = os.path.join(fastq_folder,
                 args.sample_name + "_R2_trimmed_noUMI.fastq")
-            cmd1 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
+            cmd1 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)|\\1 |g'" +
                     " " + unmap_fq1 + " > " + noUMI_fq1)
-            cmd2 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
+            cmd2 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)|\\1 |g'" +
                     " " + unmap_fq2 + " > " + noUMI_fq2)
             pm.run([cmd1, cmd2], [noUMI_fq1, noUMI_fq2], shell=True)
             cmd1 = ("mv " + noUMI_fq1 + " " + unmap_fq1)
@@ -2112,7 +2111,7 @@ def main():
                 args.sample_name + "_R1_adapter_insertion_distribution.png")
             cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                    " cutadapt -i " + cutadapt_report + " -o " + cutadapt_folder)
-            if args.umi_len > 0:
+            if int(args.umi_len) > 0:
                 cmd += (" -u " + str(args.umi_len))
                 umi_len = args.umi_len
             else:
