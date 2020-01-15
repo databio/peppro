@@ -2061,9 +2061,9 @@ def main():
                     args.sample_name + "_R1_trimmed_dups_noUMI.fastq")
                 noUMI_fq2_dups = os.path.join(fastq_folder,
                     args.sample_name + "_R2_trimmed_dups_noUMI.fastq")
-                cmd1 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
+                cmd1 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)|\\1 |g'" +
                         " " + unmap_fq1_dups + " > " + noUMI_fq1_dups)
-                cmd2 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)[[:space:]]|\\1 |g'" +
+                cmd2 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)|\\1 |g'" +
                         " " + unmap_fq2_dups + " > " + noUMI_fq2_dups)
                 pm.run([cmd1, cmd2], [noUMI_fq1_dups, noUMI_fq2_dups], shell=True)
                 cmd1 = ("mv " + noUMI_fq1_dups + " " + unmap_fq1_dups)
@@ -2478,13 +2478,12 @@ def main():
                 pm.run(cmd, temp_mapping_index)
                 pm.clean_add(temp_mapping_index)
 
-            if not _itsa_file(mapping_genome_bam_temp) or args.new_start:
-                cmd = (tools.samtools + " idxstats " +
-                       mapping_genome_bam_temp + " | grep")
-                for name in mito_name:
-                    cmd += " -we '" + name + "'"
-                cmd += "| cut -f 3"
-                mr = pm.checkprint(cmd)
+            cmd = (tools.samtools + " idxstats " +
+                   mapping_genome_bam_temp + " | grep")
+            for name in mito_name:
+                cmd += " -we '" + name + "'"
+            cmd += "| cut -f 3"
+            mr = pm.checkprint(cmd)
         
             # If there are mitochondrial reads, report and remove them
             if mr and mr.strip():
@@ -2562,6 +2561,15 @@ def main():
                              "required":True}]
         res, rgc = _add_resources(args, res, search_asset)
 
+    # Calculate size of genome
+    if not pm.get_stat("Genome_size") or args.new_start:
+        genome_size = int(pm.checkprint(
+            ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " +
+             res.chrom_sizes)))
+        pm.report_result("Genome_size", genome_size)
+    else:
+        genome_size = int(pm.get_stat("Genome_size"))
+
     ############################################################################
     #                     Calculate library complexity                         #
     ############################################################################
@@ -2630,15 +2638,6 @@ def main():
                     " sort - -@ " + str(pm.cores) + " > " + dups_pe2_bam)
                 pm.run([cmd1, cmd2], [dups_pe1_bam, dups_pe2_bam])
                 mapping_genome_bam_dups = dups_pe1_bam
-
-            # Calculate size of genome
-            if not pm.get_stat("Genome_size") or args.new_start:
-                genome_size = int(pm.checkprint(
-                    ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " +
-                     res.chrom_sizes)))
-                pm.report_result("Genome_size", genome_size)
-            else:
-                genome_size = int(pm.get_stat("Genome_size"))
 
             pm.timestamp("### Calculate library complexity")
 
