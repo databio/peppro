@@ -166,16 +166,30 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                   ignore_unique = ign_unique,
                                   x_min = x_min,
                                   x_max = x_max)
-        # now save the plot
-        pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-            height = 5, width = 6, useDingbats=F)
-        suppressWarnings(print(p))
-        invisible(dev.off())
 
-        png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-            height = 315, width = 425)
-        suppressWarnings(print(p))
-        invisible(dev.off())
+        if (length(input) == 1) {
+            # now save the plot
+            pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+                height = 4, width = 4, useDingbats=F)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+
+            png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+                height = 275, width = 275)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+        } else {
+            # now save the plot
+            pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+                height = 5, width = 6, useDingbats=F)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+
+            png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+                height = 315, width = 425)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+        }
 
         if (exists("p")) {
             write("Library complexity plot completed!\n", stdout())
