@@ -1862,7 +1862,7 @@ plotCutadapt <- function(input, name='cutadapt',
     report$length <- max(report$length)-report$length
 
     # don't include size 0 insertions
-    report <- report[-nrow(report),]
+    report <- report[which(report$length > 0),]
 
     abbr <- getAbbr(report$count)
     if (abbr == '') {
