@@ -170,12 +170,12 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         if (length(input) == 1) {
             # now save the plot
             pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-                height = 4, width = 4, useDingbats=F)
+                height = 4, width = 4.25, useDingbats=F)
             suppressWarnings(print(p))
             invisible(dev.off())
 
             png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-                height = 275, width = 275)
+                height = 275, width = 300)
             suppressWarnings(print(p))
             invisible(dev.off())
         } else {
