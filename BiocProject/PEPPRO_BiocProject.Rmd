@@ -1,0 +1,55 @@
+---
+title: "PEPPRO BiocProject"
+author: "Jason Smith"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PEPPRO BiocProject}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+Before you start see the [Getting started with `BiocProject` vignette](http://code.databio.org/BiocProject/articles/vignette1getStarted.html) for the basic `BiocProject` information and installation instructions and [`PEPPRO` website](http://peppro.databio.org) for information regarding this nascent RNA profiling pipeline.
+
+`BiocProject` provides a straigtforward method to read in pipeline outputs as listed in the `outputs` section of its [pipeline interface](http://code.databio.org/looper/pipeline-interface/). 
+
+__With a single line of code you can read all the indicated results and your project metadata.__
+
+# Read the results of `PEPPRO` run
+
+The function shown below reads in the gene count `BED` files from the `output` section specified in the [`PEPPRO` pipeline interface](https://github.com/databio/peppro/blob/master/pipeline_interface.yaml).
+
+The way the output files are read is defined in a [function](https://github.com/databio/peppro/blob/master/BiocProject/readPepproGeneCounts.R) supplied by the `PEPPRO` developers. The function listed in `bioconductor` section of `PEPPRO` pipeline interface file is identified by `BiocProject` function, sourced and automatically executed on samples matching the protocols bound to the pipeline specified as an argument in [`outputsByPipeline`](http://code.databio.org/BiocProject/reference/outputsByPipeline.html) function.
+
+## Get the project config
+
+```{r echo=T, message=FALSE}
+library(BiocProject)
+ProjectConfig = "peppro_da.yaml"
+```
+
+## Run the `BiocProject` function
+
+```{r}
+bp = BiocProject(ProjectConfig)
+```
+
+As you can see in the message above, the `readPepproGeneCounts` function was sourced from the file indicated in the `PEPPRO` pipeline interface.
+
+## Browse the results
+
+The read data is conveninetly stored in a `List` object with ([`pepr::Project`](http://code.databio.org/pepr/reference/Project-class.html) object in its metadata slot:
+
+```{r}
+bp
+```

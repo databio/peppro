@@ -1,0 +1,27 @@
+# Run PEPPRO paper differential analysis samples through PEPPRO
+name: PEPPRO
+
+metadata:
+  sample_table: "peppro_da.csv"
+  output_dir: "$PROCESSED/peppro/paper/da"
+  pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
+bioconductor:
+  readFunName: readPepproGeneCounts
+  readFunPath: readPepproGeneCounts.R
+  
+derived_columns: [read1, read2]
+
+data_sources:
+  PE1: "${SRAFQ}/{srr}_1.fastq.gz"
+  PE2: "${SRAFQ}/{srr}_2.fastq.gz"
+  
+implied_columns:
+  organism:
+    human:
+      genome: hg38
+      prealignments: human_rDNA
+      max_len: -1
+  umi_status:
+    true_8:
+      umi_len: 8
+

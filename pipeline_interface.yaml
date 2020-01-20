@@ -49,9 +49,20 @@ pipelines:
       docker_image: databio/peppro
       bulker_crate: peppro
     outputs:
-      cutadapt_report: "cutadapt_folder/{sample.sample_name}_cutadapt.txt"
+      cutadapt_report: "cutadapt/{sample.sample_name}_cutadapt.txt"
+      plus_bw: "signal_{sample.genome}/{sample.sample_name}_plus_body_0-mer.bw"
+      minus_bw: "signal_{sample.genome}/{sample.sample_name}_minus_body_0-mer.bw"
+      plus_bam: "aligned_{sample.genome}/{sample.sample_name}_plus.bam"
+      minus_bam: "aligned_{sample.genome}/{sample.sample_name}_minus.bam"
+      gene_counts_bed: "signal_{sample.genome}/{sample.sample_name}_gene_coverage.bed"
+      pause_indicies_bed: "QC_{sample.genome}/{sample.sample_name}_pause_index.bed.gz"
+      mrna_contamination_bed: "QC_{sample.genome}/{sample.sample_name}_exon_intron_ratios.bed.gz"
     summarizers:
-      - tools/PEPPRO_summarizer.R
+      - tools/PEPPRO_complexity_curves.R
+      - tools/PEPPRO_counts.R
+    bioconductor:
+      readFunName: readPepproGeneCounts
+      readFunPath: BiocProject/readPepproGeneCounts.R
     summary_results:
       - library_complexity_file:
         caption: "Library complexity file"
