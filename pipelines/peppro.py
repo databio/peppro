@@ -2332,16 +2332,18 @@ def main():
     os.chmod(tempdir, 0o771)
     pm.clean_add(tempdir)
 
-    # Skip if this is a recovery and the following has already occurred
-    #if not pm.get_stat("Aligned_reads") or args.new_start:  # fails to reproduce the dups file if it fails midrun...
     # check input for zipped or not
-    if pypiper.is_gzipped_fastq(unmap_fq1):
-        cmd = (ngstk.ziptool + " -d " + (unmap_fq1 + ".gz"))
+    unmap_fq1_gz = unmap_fq1 + ".gz"
+    unmap_fq2_gz = unmap_fq2 + ".gz"
+    if _itsa_file(unmap_fq1_gz) and not _itsa_file(unmap_fq1):
+        cmd = (ngstk.ziptool + " -d " + unmap_fq1_gz)
         pm.run(cmd, mapping_genome_bam)
+        to_compress.append(unmap_fq1)
     if args.paired_end:
-        if pypiper.is_gzipped_fastq(unmap_fq2):
-            cmd = (ngstk.ziptool + " -d " + (unmap_fq2 + ".gz"))
+        if _itsa_file(unmap_fq2_gz) and not _itsa_file(unmap_fq2):
+            cmd = (ngstk.ziptool + " -d " + unmap_fq2_gz)
             pm.run(cmd, mapping_genome_bam)
+        to_compress.append(unmap_fq2)
 
     cmd = tools.bowtie2 + " -p " + str(pm.cores)
     cmd += bt2_options
@@ -2448,7 +2450,7 @@ def main():
         pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups)
 
     pm.timestamp("### Compress all unmapped read files")
-    for unmapped_fq in to_compress:
+    for unmapped_fq in list(set(to_compress)):
         # Compress unmapped fastq reads
         if not pypiper.is_gzipped_fastq(unmapped_fq) and not unmapped_fq == '':
             if 'unmap_dups' in unmapped_fq:
