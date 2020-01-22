@@ -203,9 +203,9 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Usage:   PEPPRO.R [command] {args}\n",
         "Version: ", version, "\n\n",
         "Command: frif \t plot fraction of reads in features\n\n",
-        " -n, --sample_name\t   Sample name.\n",
-        " -r, --reads\t\t   Number of mapped reads.\n",
-        " -s, --size\t\t   Size of genome (bp).\n",
+        " -s, --sample_name\t   Sample name.\n",
+        " -n, --num_reads\t\t   Number of mapped reads.\n",
+        " -z, --size\t\t   Size of genome (bp).\n",
         " -y, --type\t Choose plot type: FRiF, PRiF, or Both.\n",
         " -o, --output_name\t   Output file name.\n",
         " -b, --bed\t\t   Coverage file(s).\n"
@@ -222,25 +222,32 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         message(usage)
         quit()
     } else {
-        sample_name <- opt_get(name = c("sample_name", "n"), required=TRUE,
+        sample_name <- opt_get(name = c("sample_name", "s"), required=TRUE,
                                description="Sample name.")
-        reads       <- opt_get(name = c("reads", "r"), required=TRUE,
-                               description="Number of mapped reads.")
-        genome_size <- opt_get(name = c("size", "s"), required=TRUE,
+        num_reads   <- opt_get(name = c("num_reads", "n"), required=TRUE,
+                               description="Number of mapped reads (or bases).")
+        genome_size <- opt_get(name = c("size", "z"), required=TRUE,
                                description="Size of genome (bp).")
         type        <- opt_get(name = c("type", "y"), required=FALSE, default="frif",
                                description="Choose plot type: FRiF, PRiF, or Both (Default = frif).")
+        reads       <- opt_get(name = c("reads", "r"), required=FALSE, default=FALSE,
+                               description="Calculate using reads (TRUE) or bases (FALSE) (Default = FALSE).")
         output_name <- opt_get(name = c("output_name", "o"), required=TRUE,
                                description="Output file name.")
         numArgs     <- length(opt_get_args())
+        #message(numArgs)
+        argGap      <- ifelse(reads, 13, 12)
+        #message(argGap)
         bed         <- opt_get(name = c("bed", "b"), required=TRUE,
-                               n=(numArgs - 12),
+                               n=(numArgs - argGap),
                                description="Coverage file(s).")
+        #message(paste0("\nbed: ", bed))
 
         p <- plotFRiF(sample_name = sample_name,
-                      num_reads = as.numeric(reads),
+                      num_reads = as.numeric(num_reads),
                       genome_size = as.numeric(genome_size),
                       type = tolower(type),
+                      reads = reads,
                       output_name = output_name,
                       bedFile = bed)
 

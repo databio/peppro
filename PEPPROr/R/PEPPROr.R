@@ -528,23 +528,38 @@ computeLimit <- function(value, ccurve_TOTAL_READS) {
 #' number of total features.
 #'
 #' @param bedFile A BED format file
-#' @param reads Number of aligned reads
+#' @param total Number of aligned reads (or number of aligned bases)
+#' @param reads If TRUE, we're working with read counts.
+#'              If FALSE, we're working with absolute number of bases
 #' @keywords FRiF
 #' @examples
 #' calcFRiF()
-calcFRiF <- function(bedFile, reads) {
-    colnames(bedFile) <- c("chromosome", "start", "end", "count")
+calcFRiF <- function(bedFile, total, reads) {
+    colnames(bedFile) <- c("chromosome", "start", "end",
+                           "count", "bases", "width", "fraction")
     grObj   <- makeGRangesFromDataFrame(bedFile)
     grObj   <- reduce(grObj)
     redBed  <- data.frame(chromosome=seqnames(grObj),
                           start=start(grObj), end=end(grObj))
     bedFile <- merge(redBed, bedFile, by=c("chromosome","start","end"))
     bedFile <- cbind(bedFile, size=(bedFile$end-bedFile$start))
-    bedFile <- bedFile[order(-bedFile$count),]
+
+    if (reads) {
+        bedFile <- bedFile[order(-bedFile$count),]
+    } else {
+        bedFile <- bedFile[order(-bedFile$bases),]
+    }
+
     bedFile <- bedFile[apply(bedFile != 0, 1, all),]
-    bedFile <- cbind(bedFile, cumsum=cumsum(bedFile$count))
+
+    if (reads) {
+        bedFile <- cbind(bedFile, cumsum=cumsum(bedFile$count))
+    } else {
+        bedFile <- cbind(bedFile, cumsum=cumsum(bedFile$bases))
+    }
+
     bedFile <- cbind(bedFile, cumSize=cumsum(bedFile$size))
-    bedFile <- cbind(bedFile, frip=bedFile$cumsum/as.numeric(reads))
+    bedFile <- cbind(bedFile, frip=bedFile$cumsum/as.numeric(total))
     bedFile <- cbind(bedFile, numfeats=as.numeric(1:nrow(bedFile)))
     return(bedFile)
 }
@@ -576,9 +591,7 @@ calcFRiF <- function(bedFile, reads) {
 #' @export
 plotFRiF <- function(sample_name, num_reads, genome_size,
                      type = c("frif", "prif", "both"),
-                     output_name, bedFile) {
-    # TODO: Get total genome size value as an input
-    #genome_size <- 3099922541
+                     reads=TRUE, output_name, bedFile) {
     labels  <- data.frame(xPos=numeric(), yPos=numeric(), name=character(),
                           val=numeric(), color=character(),
                           stringsAsFactors=FALSE)
@@ -597,7 +610,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
 
     if (exists(bedFile[1])) {
         bed        <- get(bedFile[1])
-        bedCov     <- calcFRiF(bed, num_reads)
+        bedCov     <- calcFRiF(bed, num_reads, reads)
         name       <- bedFile[1]
         labels[1,] <- c(0.95*max(log10(bedCov$cumSize)), max(bedCov$frip)+0.001,
                         name, round(max(bedCov$frip),2), "#FF0703")
@@ -607,10 +620,10 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
         bedCov$feature <- name
     } else if (file.exists(file.path(bedFile[1])) && info$size != 0) {
         bed <- read.table(file.path(bedFile[1]))
-        if (nrow(bed[which(bed$V4 != 0),]) == 0) {
+        if (nrow(bed[which(bed$V5 != 0),]) == 0) {
             message(paste0(name, "  has no covered features"))
         } else {
-            bedCov     <- calcFRiF(bed, num_reads)
+            bedCov     <- calcFRiF(bed, num_reads, reads)
             name       <- basename(tools::file_path_sans_ext(bedFile[1]))
             name       <- gsub(sample_name, "", name)
             name       <- gsub("^.*?_", "", name)
@@ -664,7 +677,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
 
             if (max(bed[,4] > 0)) {
                 if (exists("covDF")) {
-                    covFile <- calcFRiF(bed, num_reads)
+                    covFile <- calcFRiF(bed, num_reads, reads)
                     covFile$feature <- name
                     covDF   <- rbind(covDF, covFile)
                     labels  <- rbind(labels, c(0.95*max(log10(covFile$cumSize)),
@@ -675,7 +688,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                         c(name, nrow(bed), as.numeric(sum(abs(bed$V3-bed$V2))),
                           as.numeric((sum(abs(bed$V3-bed$V2))/genome_size))))
                 } else {
-                    covDF         <- calcFRiF(bed, num_reads)
+                    covDF         <- calcFRiF(bed, num_reads, reads)
                     covDF$feature <- name
                     labels        <- rbind(labels,
                                            c(0.95*max(log10(covDF$cumSize)),
@@ -690,7 +703,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
         }
     }
 
-    # Reorder by labels
+    # Reorder by labels (ensures plotting matches up labels and colors)
     if (exists("covDF")) {
         covDF$feature <- factor(covDF$feature, levels=(labels$name))
     }
@@ -699,6 +712,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
     feature_dist$expected <- as.numeric(feature_dist$expected)
     feature_dist$observed <- as.numeric(labels$val)
     feature_dist$logOE <- log10(feature_dist$observed/feature_dist$expected)
+    feature_dist$logOE <- ifelse(feature_dist$logOE < 0, 0, feature_dist$logOE)
     feature_dist <- merge(feature_dist, labels, by.x="feature", by.y="name")
     #feature_dist <- feature_dist[order(feature_dist$logOE, decreasing=TRUE),]
     feature_dist <- feature_dist[order(feature_dist$logOE),]
@@ -712,9 +726,12 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
 
         if (tolower(type) == "both") {
             # Produce plot with bed files
-            p <- ggplot(covDF[which(covDF$frip > min(density(covDF$frip)$y)),],
-                        aes(x=log10(cumSize), y=frip,
-                            group=feature, color=feature)) +
+            # take minimum quantile (only works if everything is above that value)
+            #p <- ggplot(covDF[which(covDF$frip > min(density(covDF$frip)$y)),],
+            #           aes(x=log10(cumSize), y=frip,
+            #               group=feature, color=feature)) +
+            p <- ggplot(covDF, aes(x=log10(cumSize), y=frip,
+                        group=feature, color=feature)) +
                 #geom_line(aes(linetype=feature), size=2, alpha=0.5) +
                 geom_line(size=2, alpha=0.5) +
                 guides(linetype = FALSE) +
@@ -758,9 +775,12 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                                        xmax=min_x*2.05, ymin=max_y/2,
                                        ymax=max_y)
         } else if (tolower(type) == "frif") {
-            p <- ggplot(covDF[which(covDF$frip > min(density(covDF$frip)$y)),],
-                        aes(x=log10(cumSize), y=frip,
-                            group=feature, color=feature)) +
+            # take minimum quantile (only works if everything is above that value)
+            #p <- ggplot(covDF[which(covDF$frip > min(density(covDF$frip)$y)),],
+            #           aes(x=log10(cumSize), y=frip,
+            #               group=feature, color=feature)) +
+            p <- ggplot(covDF, aes(x=log10(cumSize), y=frip,
+                        group=feature, color=feature)) +
                 #geom_line(aes(linetype=feature), size=2, alpha=0.5) +
                 geom_line(size=2, alpha=0.5) +
                 guides(linetype = FALSE) +
@@ -793,7 +813,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
         } else {
             #default to both
             # Produce plot with bed files
-            p <- ggplot(covDF[which(covDF$frip > min(density(covDF$frip)$y)),],
+            p <- ggplot(covDF,
                         aes(x=log10(cumSize), y=frip,
                             group=feature, color=feature)) +
                 geom_line(aes(linetype=feature), size=2, alpha=0.5) +
