@@ -1949,12 +1949,18 @@ def main():
         [args.input, args.input2], raw_folder, args.sample_name)
     cmd, out_fastq_pre, unaligned_fastq = ngstk.input_to_fastq(
         local_input_files, args.sample_name, args.paired_end, fastq_folder)
-    if not pm.get_stat("Raw_reads") or args.new_start:
-        pm.run(cmd, unaligned_fastq,
-               follow=ngstk.check_fastq(
-                   local_input_files, unaligned_fastq, args.paired_end))
-        pm.clean_add(out_fastq_pre + "*.fastq", conditional=True)
+
+    #if not pm.get_stat("Raw_reads") or args.new_start:
+    # TODO: improve the skipping of these steps on recovery runs
+    #       issue here is that process_fastq is still trying to run
+    #       if we skip this step
+    pm.run(cmd, unaligned_fastq,
+           follow=ngstk.check_fastq(
+               local_input_files, unaligned_fastq, args.paired_end))
+    pm.clean_add(out_fastq_pre + "*.fastq", conditional=True)
+
     pm.info(local_input_files)
+
     untrimmed_fastq1 = out_fastq_pre + "_R1.fastq"
     untrimmed_fastq2 = out_fastq_pre + "_R2.fastq" if args.paired_end else None
 
