@@ -16,7 +16,7 @@ readPepproGeneCounts = function(project) {
     result <- lapply(paths, function(x){
         #message(paste0("x: ", x))
         if (file.exists(x)) {
-            df <- read.table(x)
+            df <- fread(x)
             colnames(df) <- c('chr', 'start', 'end', 'geneName',
                               'score', 'strand', 'count')
             gr <- GenomicRanges::GRanges(df) 
@@ -29,5 +29,3 @@ readPepproGeneCounts = function(project) {
     #names(result) <- sample_names
     return(GenomicRanges::GRangesList(Filter(length, result)))
 }
-
-

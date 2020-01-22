@@ -44,6 +44,7 @@ pipelines:
       "--keep": keep
       "--noFIFO": no_fifo
       "--complexity": complexity
+      "--prioritize": prioritize
     compute:
       singularity_image: ${SIMAGES}peppro
       docker_image: databio/peppro
