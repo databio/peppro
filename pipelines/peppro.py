@@ -3104,6 +3104,11 @@ def main():
                   .format(args.genome_assembly))
             print("Could not find {}.`"
                   .format(str(os.path.dirname(res.feat_annotation))))
+    elif os.path.exists(anno_zip) or args.new_start:
+        cmd = (ngstk.ziptool + " -d -c " + anno_zip +
+               " > " + anno_local)
+        pm.run(cmd, anno_local)
+        pm.clean_add(anno_local)
 
     ############################################################################ 
     #                  Determine genomic feature coverage                      #
