@@ -5,31 +5,8 @@
 ```
 git clone https://github.com/databio/peppro.git
 ```
-## 2: Download `refgenie` assets
 
-PEPPRO uses [`refgenie`](http://refgenie.databio.org/) assets for alignment. If you haven't already, initialize a refgenie config file like this:
-
-```console
-pip install --user refgenie
-export REFGENIE=your_genome_folder/genome_config.yaml
-refgenie init -c $REFGENIE
-```
-
-Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it persists. 
-
-Next, pull the assets you need. Replace `hg38` in the example below if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md). Download these required assets with this command:
-
-```console
-refgenie pull -g hg38 -a bowtie2_index ensembl_gtf ensembl_rb refgene_anno feat_annotation 
-```
-PEPPRO also requires `bowtie2_index` for any pre-alignment genomes:
-
-```console
-refgenie pull -g human_rDNA -a bowtie2_index
-refgenie pull -g rCRSd -a bowtie2_index
-```
-
-## 3: Install required software
+## 2: Install required software
 
 PEPPRO requires a set of Python and R packages to run.
 
@@ -49,9 +26,33 @@ pip install --user -r requirements.txt
 Rscript -e 'install.packages("PEPPROr", repos=NULL, type="source")'
 ```
 
+### Tools
+
 The pipeline also relies on a set of publicly available bioinformatic tools, but if you don't want to install the prerequisite software used by PEPPRO natively, you can follow our tutorial on [running PEPPRO directly in a container](container.md) and skip this step.
 
-Otherwise, you'll need to install the following: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/). If you need help, we have [detailed installation instructions](detailed_install.md) for installing these.
+Otherwise, you'll need to install the following: [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [flash](https://ccb.jhu.edu/software/FLASH/), [picard](https://broadinstitute.github.io/picard/), [preseq](http://smithlabresearch.org/software/preseq/), [seqkit](https://bioinf.shenwei.me/seqkit/), [samtools](http://www.htslib.org/), [seqtk](https://github.com/lh3/seqtk), and [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/). If you need help, we have [detailed installation instructions](detailed_install.md) for installing these.
+
+## 3: Download `refgenie` assets
+
+PEPPRO uses [`refgenie`](http://refgenie.databio.org/) assets for alignment. If you haven't already, initialize a refgenie config file like this:
+
+```console
+export REFGENIE=your_genome_folder/genome_config.yaml
+refgenie init -c $REFGENIE
+```
+
+Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it persists. 
+
+Next, pull the assets you need. Replace `hg38` in the example below if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md). Download these required assets with this command:
+
+```console
+refgenie pull -g hg38 -a bowtie2_index ensembl_gtf ensembl_rb refgene_anno feat_annotation 
+```
+PEPPRO also requires `bowtie2_index` for any pre-alignment genomes:
+
+```console
+refgenie pull -g human_rDNA -a bowtie2_index
+```
 
 ### Optional software
 
@@ -59,6 +60,7 @@ Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming,
 
 *Optional tools:*
 
+* [fastp](https://github.com/OpenGene/fastp)
 * [fqdedup](https://github.com/guertinlab/fqdedup)
 * [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
 * [seqOutBias](https://github.com/guertinlab/seqOutBias)
@@ -103,11 +105,11 @@ To run your own samples, you'll need to organize them in **PEP format**, which i
 The sample annotation file must specify these columns:
 
 - sample_name
-- library ('PRO' or 'PROSEQ' or 'PRO-seq')
-- organism (e.g. 'human' or 'mouse')
+- library (*e.g.* 'PRO', 'PROSEQ', 'PRO-seq', 'GRO', 'GROSEQ', 'GRO-seq')
+- organism (*e.g.* 'human' or 'mouse')
 - read1
 - read2 (if paired)
-- whatever else you want
+- anything else you wish to include
 
 ## Next steps
 

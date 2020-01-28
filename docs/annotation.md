@@ -2,116 +2,48 @@
 
 The pipeline uses reference data at various stages, such as for alignment, calculating TSS enrichments, and other QC scores. If you're using a common genome assembly, these resources are pre-built and can be easily downloaded using `refgenie pull`, as described in the setup instructions. If the resources are not available, you'll have to build them. This document outlines how we created the reference data, so you can recreate it if you need to. The easiest way to do this is use `refgenie build`. All you need to do is:
 
-
 ## 1: Build the fasta asset
+
 You need a FASTA file for your genome. You can insert this file into refgenie like this:
 ```console
-refgenie build -g GENOME -a fasta --fasta path/to/file.fa
+refgenie build -g GENOME -a fasta --files fasta=/path/to/file.fa
 ```
-## 2: Build the ensembl_gtf asset
 
-You also need an Ensembl GTF file (or equivalent) for your genome. You can insert this file into refgenie like this:
+## 2. Build the bowtie2_index
+
+To build a bowtie2_index and have it managed by `refgenie` you'll, of course, need [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) already installed.  You will also need the requisite FASTA file, which you just added in step 1.
+```console
+refgenie build -g GENOME -a bowtie2_index
+```
+
+## 3: Build the ensembl_gtf asset
+
+The ensembl_gtf asset includes several related assets (*e.g.* pause index gene bodies and TSS's) the pipeline will employ.  To build an ensembl_gtf asset, you need an Ensembl GTF file (or equivalent) for your genome. You can have refgenie build and manage this file as follows:
 
 ```console
-refgenie build -g GENOME -a ensembl_gtf --gtf path/to/file.gtf
+refgenie build -g GENOME -a ensembl-gtf --files ensembl_gtf=/path/to/Homo_sapiens.GRCh38.97.gtf.gz
 ```
 
-## 3: Build the refgene_anno asset
+## 4: Build the refgene_anno asset
 
-You will need a refGene annotation. For hg38, we obtain this from [ucsc](http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz). Build it for a custom genome like this:
+The refgene_anno asset actually includes several related assets that we'll need (*e.g.* TSS and premature mRNA annotations).  To build these, for example for hg38, you will need to [download a refGene annotation](http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz). Build it for a any genome like so:
 
 ```console
-refgenie build -g GENOME -a refgene_anno --refgene path/to/file.txt.gz
+refgenie build -g GENOME -a refgene_anno --files refgene=/path/to/refGene.txt.gz
 ```
 
-
-## 4: Build the feat_annotation and bowtie2_index assets
-The `feat_annotation` asset includes feature annotations used to calculate various QC metrics. The `bowtie2_index` is used for alignment. `Refgenie` can automatically build these after you have the above assets installed:
+## 5: Build the feat_annotation asset
+The `feat_annotation` asset includes feature annotations used to calculate the [FRiF](glossary.md) and [PRiF](glossary.md). `Refgenie` can automatically build this after you have the above assets installed:
 
 ```console
-refgenie build -g GENOME -a feat_annotation bowtie2_index
+refgenie build -g GENOME -a feat_annotation
 ```
 
-That's it! These assets will be automatically detected by PEPPRO if you build them like this with refgenie. If you want to know what we're doing, or customize these, more details follow:
+That's it! These assets will be automatically detected by PEPPRO if you build them like this with `refgenie`. 
 
-### TSS
+### Create a custom feature annotation file
 
-To calculate [TSS enrichments](../glossary.md), you will need a [TSS annotation file](http://big.databio.org/refgenomes/).  We build these using these commands, in this example for `hg38`:
-```console
-wget -O hg38_TSS_full.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz \
-zcat hg38_TSS_full.txt.gz | \
-  awk  '{if($4=="+"){print $3"\t"$5"\t"$5"\t"$13"\t.\t"$4}else{print $3"\t"$6"\t"$6"\t"$13"\t.\t"$4}}' | \
-  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_TSS.bed
-```
-You can pass the `--TSS-name` pipeline option to provide a path directly to this file.
-
-### Pause index annotation (PI)
-
-To calculate [pause indicies](../glossary.md), you will need two files in your reference genome directory: a PI TSS annotation file and a PI gene body annotation file. Here are example commands for `hg38`:
-```console
-wget ftp://ftp.ensembl.org/pub/release-97/gtf/homo_sapiens/Homo_sapiens.GRCh38.97.gtf.gz \
-zcat Homo_sapiens.GRCh38.97.gtf.gz | \
-  grep 'exon_number "1"' | \
-  sed 's/^/chr/' | \
-  awk '{OFS="\t";} {print $1,$4,$5,$20,$14,$7}' | \
-  sed 's/";//g' | \
-  sed 's/"//g' | \
-  awk '{if($6=="+"){print $1"\t"$2+20"\t"$2+120"\t"$4"\t"$5"\t"$6}else{print $1"\t"$3-120"\t"$3-20"\t"$4"\t"$5"\t"$6}}' | \
-  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_PI_TSS.bed
-
-zcat Homo_sapiens.GRCh38.97.gtf.gz | \
-  awk '$3 == "gene"' | \
-  sed 's/^/chr/' | \
-  awk '{OFS="\t";} {print $1,$4,$5,$14,$6,$7}' | \
-  sed 's/";//g' | \
-  sed 's/"//g' |
-  awk '$4!="Metazoa_SRP"' | \
-  awk '$4!="U3"' | \
-  awk '$4!="7SK"'  | \
-  awk '($3-$2)>200' | \
-  awk '{if($6=="+"){print $1"\t"$2+500"\t"$3"\t"$4"\t"$5"\t"$6}else{print $1"\t"$2"\t"$3-500"\t"$4"\t"$5"\t"$6}}' | \
-  awk '$3>$2' | \
-  LC_COLLATE=C sort -k4 -u > hg38_PI_gene_body.bed
-```
-You can use the `--pi-tss` and `--pi-body` pipeline options to provide paths directly to each file.
-
-### mRNA contamination
-
-To determine the amount of [mRNA contamination](../glossary.md), you will need two files in your reference genome directory: an [exon annotation file](http://big.databio.org/refgenomes/) and an [intron annotation file](http://big.databio.org/refgenomes/). Here are example commands for `hg38`:
-
-```console
-wget -O hg38_TSS_full.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz \
-zcat hg38_TSS_full.txt.gz | \
-  awk -v OFS="\t" '$9>1' | \
-  awk -v OFS="\t" '{ n = split($10, a, ","); split($11, b, ","); for(i=1; i<n; ++i) print $3, a[i], b[i], $13, i, $4 }' | awk -v OFS="\t" '$6=="+" && $5!=1 {print $0} $6=="-" {print $0}' | \
-  awk '$4!=prev4 && prev6=="-" {prev4=$4; prev6=$6; delete line[NR-1]; idx-=1} {line[++idx]=$0; prev4=$4; prev6=$6} END {for (x=1; x<=idx; x++) print line[x]}' | \
-  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_exons.bed
-
-zcat hg38_TSS_full.txt.gz | \
-  awk -v OFS="\t" '$9>1' | \
-  awk -F"\t" '{ exonCount=int($9);split($10,exonStarts,"[,]"); split($11,exonEnds,"[,]"); for(i=1;i<exonCount;i++) {printf("%s\t%s\t%s\t%s\t%d\t%s\n",$3,exonEnds[i],exonStarts[i+1],$13,($3=="+"?i:exonCount-i),$4);}}' | \
-  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_introns.bed
-```
-You can use the `--exon-name` and `--intron-name` pipeline options to provide paths directly to each file.
-
-### Premature mRNA
-
-To determine the [*F*raction of *R*eads *i*n *P*re-mature mRNA (*FRiP*)](../glossary.md), you will need a [pre-mature mRNA annotation file](http://big.databio.org/peppro/). If a pre-built version for your genome of interest isn't present, you can create that file yourself. In the reference genome directory, execute the following (for `hg38`):
-```console
-wget -O hg38_refGene.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz
-zcat hg38_refGene.txt.gz | grep 'cmpl' | \
-  awk  '{print $3"\t"$5"\t"$6"\t"$13"\t.\t"$4}' | \
-  LC_COLLATE=C sort -k1,1 -k2,2n -u > hg38_pre-mRNA.bed
-```
-You can use the `--pre-name` pipeline option to provide a path directly to this file.
-
-### Features
-
-We also have [downloadable genome feature annotation files](http://big.databio.org/peppro/) for both `hg38` and `hg19` that you can use.  These files annotate 3' and 5' UTR, Exons, Introns, Promoters, and Promoter Flanking Regions.  You can use the `--anno-name` pipeline option to directly point to this file.
-
-#### Create a custom feature annotation file
-
-The pipeline will calculate the fraction of reads in genomic features using one of our [provided annotation files](http://big.databio.org/peppro/), but you can also specify this file yourself.
+The pipeline will calculate the fraction (and proportion) of reads in genomic features using the feat_annotation asset, but you can also construct this file yourself.
 
 This annotation file is really just a modified `BED` file, with the chromosomal coordinates and type of feature included.  For example, the [downloadable `hg38_annotations.bed.gz` file](http://big.databio.org/peppro/hg38_annotations.bed.gz) looks like so:
 

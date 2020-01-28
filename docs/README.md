@@ -12,7 +12,7 @@
 
 - **HTML report**: an easily-navigable HTML report with pretty plots: [HTML summary report demo](files/examples/tutorial/tutorial_summary.html).
 - **Stats**: An easily parsable stats file: [Summary statistics demo file](files/examples/tutorial/results_pipeline/tutorial/stats.tsv).
-- **Processed data**: Several bigWig signal tracks (plus and minus stranded), including: smoothed signal; exact (nucleotide-resolution) RNA polymerase position signal; and nucleotide-resolution signal corrected for enzymatic sequence bias.
+- **Processed data**: Several bigWig signal tracks (plus and minus stranded), with options to produce: smoothed signal; exact (nucleotide-resolution) RNA polymerase position signal; or nucleotide-resolution signal corrected for enzymatic sequence bias.
 
 ## User interface
 
