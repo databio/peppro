@@ -3,8 +3,8 @@ name: test
 
 metadata:
   sample_annotation: "peppro_test.csv"
-  output_dir: "$HOME/peppro_test/"
-  pipeline_interfaces: "$HOME/peppro/pipeline_interface.yaml" 
+  output_dir: "$PROCESSED/peppro/peppro_test/"
+  pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
   
 derived_columns: [read1]
 
@@ -15,23 +15,19 @@ implied_columns:
   organism:
     human:
       genome: hg38
-      prealignments: human_rDNA rCRSd
-      adapter: fastp  # Default
-      dedup: seqkit   # Default
-      trimmer: seqtk  # Default
-      runon: pro      # Default
-      umi_len: 8      # Default
-      max_len: 30     # Default
-      TSS_name: $HOME/genomes/hg38/hg38_TSS.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
-      CpA_name: $HOME/genomes/hg38/hg38_CpA.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
-      pre_name: $HOME/genomes/hg38/hg38_pre-mRNA.tsv         # Default. Pipeline checks corresponding genome folder without specifying.
-      anno_name: $HOME/genomes/hg38/hg38_annotations.bed.gz  # Default. Pipeline checks corresponding genome folder without specifying.
+      prealignments: human_rDNA
+      adapter: cutadapt  # Default
+      dedup: seqkit      # Default
+      trimmer: seqtk     # Default
+      protocol: pro      # Default
+      umi_len: 0         # Default
+      max_len: -1        # Disable length trimming 
 
 pipeline_args:
 #  peppro.py:
+#    "--prioritize": null # Default is FALSE. Pass flag to prioritize features by the order they appear in the feat_annotation asset when calculating FRiF/PRiF
 #    "--sob": null        # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
 #    "--scale": null      # Default is FALSE. Pass flag to scale seqOutBias signal tracks
-#    "--parts": 4         # Default. Split suffix tree generation into <4> parts. Higher number == less memory use.
 #    "--coverage": null   # Default is FALSE. Pass flag to use coverage when producing library complexity plots.
 #    "--keep": null       # Default is FALSE. Pass flag to keep prealignment BAM files.
 #    "--noFIFO": null     # Default is FALSE. Pass flag to NOT use named pipes during prealignments.

@@ -1,0 +1,7 @@
+FastQC report r1	fastqc/tutorial_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO
+TSS enrichment	QC_hg38/tutorial_TSSenrichment.pdf	TSS enrichment	QC_hg38/tutorial_TSSenrichment.png	PEPPRO
+Pause index	QC_hg38/tutorial_pause_index.pdf	Pause index	QC_hg38/tutorial_pause_index.png	PEPPRO
+Fragment distribution	QC_hg38/tutorial_fragLenDistribution.pdf	Fragment distribution	QC_hg38/tutorial_fragLenDistribution.png	PEPPRO
+Plus FRiF	QC_hg38/tutorial_plus_frif.pdf	Plus FRiF	QC_hg38/tutorial_plus_frif.png	PEPPRO
+Minus FRiF	QC_hg38/tutorial_minus_frif.pdf	Minus FRiF	QC_hg38/tutorial_minus_frif.png	PEPPRO
+mRNA contamination	QC_hg38/tutorial_mRNA_contamination.pdf	mRNA contamination	QC_hg38/tutorial_mRNA_contamination.png	PEPPRO

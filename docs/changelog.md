@@ -1,6 +1,27 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.8.6] -- 2020-01-28
+
+### Changed
+- Update FRiF calculation to optionally follow a priority ranked method
+- Update how adapter insertion distributions are plotted to be the same for SE or PE data
+- Make cutadapt the default for adapter removal
+- Streamline the use of Refgenie assets
+    - Refgenie manages pause indicies
+    - Refgenie manages feature annotations
+    - Refgenie manages assets for mRNA contamination
+    - Refgenie manages seqOutBias required suffixerator indicies
+- Change pause index and mRNA contamination plots to histograms
+
+### Added
+- Add PRiF plot
+- Require FLASH tool
+- Produce sample level gene counts file as output
+- Generate project level counts table including all samples X gene counts
+- Report degradation metric for library quality
+- Add BiocProject integration
+
 ## [0.8.1] -- 2019-07-15
 
 ### Changed

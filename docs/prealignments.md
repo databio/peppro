@@ -14,7 +14,7 @@ In this example, we'll align sequentially to human mitochondrial sequence (e.g. 
 /pipelines/peppro.py \
   --sample-name test \
   --genome hg38 \
-  --prealignments rCRSd human_repeats \
+  --prealignments human_rDNA rCRSd \
   --input examples/data/test_r1.fq.gz \
   --single-or-paired single \
   -O $HOME/peppro_example/

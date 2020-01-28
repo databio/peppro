@@ -13,9 +13,8 @@ import os
 import sys
 
 import pararead
-#from pararead.processor import _LOGGER
-from pararead import add_logging_options, ParaReadProcessor
-from pararead import logger_via_cli
+import logmuse
+from pararead import  ParaReadProcessor
 
 import pandas as _pd
 import numpy as np
@@ -231,7 +230,7 @@ def parse_args(cmdl):
     parser.add_argument('-c', '--cores', dest='cores', default=20, type=int,
                         help="Number of processors to use. Default=20")
 
-    parser = add_logging_options(parser)
+    parser = logmuse.add_logging_options(parser)
     return parser.parse_args(cmdl)
 
 
@@ -239,7 +238,7 @@ def parse_args(cmdl):
 if __name__ == "__main__":
 
     args = parse_args(sys.argv[1:])
-    _LOGGER = logger_via_cli(args)
+    _LOGGER = logmuse.logger_via_cli(args)
 
     qc = bamQC(reads_filename=args.infile,
                out_filename=args.outfile,

@@ -14,6 +14,29 @@ NULL
 
 ################################################################################
 # FUNCTIONS
+#' A standardized ggplot theme for PEPPRO plots
+#'
+#' @keywords ggplot2 theme
+#' @examples
+#' theme_PEPPRO()
+theme_PEPPRO <- function(base_family = "sans", ...){
+  theme_classic(base_family = base_family, base_size = 14, ...) +
+  theme(
+    axis.line = element_line(size = 0.5),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.5),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "transparent"),
+    plot.background = element_rect(fill = "transparent", color = NA),
+    legend.background = element_rect(fill = "transparent", color = NA),
+    legend.box.background = element_rect(fill = "transparent", color = NA),
+    aspect.ratio = 1,
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5),
+    panel.border = element_rect(colour = "black", fill=NA, size=0.5)
+  )
+}
+
 
 #' Plot library complexity curves
 #'
@@ -75,7 +98,7 @@ plotComplexityCurves <- function(ccurves,
         rcDT$name  <- basename(rc_file$V1)
         rcDT$total <- as.integer(rc_file$V2)
         if (ncol(rc_file) == 3 && !ignore_unique) {
-            rcDT$unique <- as.integer(rc_file$V3)
+            rcDT$unique <- as.integer(rc_file$V2)
         } else {
             rcDT$unique <- NA
         }
@@ -84,9 +107,9 @@ plotComplexityCurves <- function(ccurves,
             for (rc in 2:length(real_counts_path)) {
                 rc_file <- real_counts_path[rc]
                 rcDT$name[rc]  <- basename(rc_file$V1)
-                rcDT$total[rc] <- as.integer(rc_file$V2)
+                rcDT$total[rc] <- as.integer(rc_file$V3)
                 if (ncol(rc_file) == 3 && !ignore_unique) {
-                    rcDT$unique[rc] <- as.integer(rc_file$V3)
+                    rcDT$unique[rc] <- as.integer(rc_file$V2)
                 } else {
                     rcDT$unique[rc] <- NA
                 }
@@ -98,9 +121,9 @@ plotComplexityCurves <- function(ccurves,
             if (file.exists(real_counts_path[rc]) && info$size != 0) {
                 rc_file        <- fread(real_counts_path[rc])
                 rcDT$name[rc]  <- basename(rc_file$V1)
-                rcDT$total[rc] <- as.integer(rc_file$V2)
+                rcDT$total[rc] <- as.integer(rc_file$V3)
                 if (ncol(rc_file) == 3 && !ignore_unique) {
-                    rcDT$unique[rc] <- as.integer(rc_file$V3)
+                    rcDT$unique[rc] <- as.integer(rc_file$V2)
                 } else {
                     rcDT$unique[rc] <- NA
                 }
@@ -243,6 +266,15 @@ plotComplexityCurves <- function(ccurves,
         }
     }
 
+    # Plot by millions of reads
+    plottingFactor <- 1000000
+
+    df$total_reads       <- df$total_reads/plottingFactor
+    df$expected_distinct <- df$expected_distinct/plottingFactor
+    rcDT$total  <- rcDT$total/plottingFactor
+    rcDT$unique <- rcDT$unique/plottingFactor
+    x_max       <- x_max/plottingFactor
+
     # Plot the curve
     fig <- ggplot(df, aes(total_reads,
                           expected_distinct,
@@ -259,8 +291,8 @@ plotComplexityCurves <- function(ccurves,
                                 aes(total, unique, col=color),
                                 shape=23, size=3)
         message(paste0("INFO: Found real counts for ",
-                       paste(rcDT$name, sep=","), " - Total: ",
-                       rcDT$total, " Unique: ",
+                       paste(rcDT$name, sep=","), " - Total (M): ",
+                       rcDT$total, " Unique (M): ",
                        rcDT$unique, "\n"))
     } else if (any(rcDT$total > 0)) {
         if (max(rcDT$total) > max(df$total_reads)) {
@@ -273,8 +305,8 @@ plotComplexityCurves <- function(ccurves,
                                     aes(total, interp, col=color),
                                     shape=23, size=3)
             message(paste0("INFO: Found real counts for ",
-                           paste(rcDT$name, sep=","), " - Total: ",
-                           rcDT$total, " (preseq unique reads: ",
+                           paste(rcDT$name, sep=","), " - Total (M): ",
+                           rcDT$total, " (preseq unique reads (M): ",
                            interp, ")\n"))
         }
     } else {
@@ -308,6 +340,11 @@ plotComplexityCurves <- function(ccurves,
     if (coverage > 0) {
         default_ylim <- as.numeric(default_ylim) / coverage
     }
+
+    # Adjust limits by plottingFactor
+    default_ylim <- default_ylim/plottingFactor
+    preseq_ymax  <- preseq_ymax/plottingFactor
+
     fig <- fig +
         coord_cartesian(xlim=c(x_min, x_max),
                         ylim = c(default_ylim,
@@ -324,52 +361,48 @@ plotComplexityCurves <- function(ccurves,
     if (coverage > 0) {
         if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
-                xlab(paste0("Total Coverage (incl. duplicates)\n",
-                            "Points show read count versus deduplicated ",
-                            "read counts (externally calculated)"))
+                labs(x = paste0("total coverage (incl. duplicates)"),
+                     caption = paste0("Points show read count versus ",
+                                      "deduplicated read counts ",
+                                      "(externally calculated)"))
         } else if (any(rcDT$total > 0)) {
             fig <- fig +
-                xlab(paste0("Total Coverage (incl. duplicates)\n",
-                            "Points show read count versus projected unique ",
-                            "read counts on the curves"))
+                labs(x = "total coverage (incl. duplicates)",
+                     caption = paste0("Points show read count versus projected ",
+                                      "unique read counts on the curves"))
         } else {
             fig <- fig +
-                xlab(paste0("Total Coverage (incl. duplicates)"))
+                labs(x = "total coverage (incl. duplicates)")
         }
         fig <- fig +
-            ylab("Unique Coverage") +
-            ggtitle("Complexity Curve: preseq")
+            labs = (y = "unique coverage")
+            #ggtitle("Complexity Curve: preseq")
     } else {
         if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
-                xlab(paste0("Total Reads (incl. duplicates)\n",
-                            "Points show read count versus deduplicated ",
-                            "read counts (externally calculated)"))
+                labs(x = "total reads (M) (incl. duplicates)",
+                     caption = paste0("Points show read count versus deduplicated ",
+                                      "read counts (externally calculated)"))
         } else if (any(rcDT$total > 0)) {
             fig <- fig +
-                xlab(paste0("Total Reads (incl. duplicates)\n",
-                            "Points show externally calculated read ",
-                            "counts on the curves"))
+                labs(x = "total reads (M) (incl. duplicates)",
+                     caption = paste0("Points show externally calculated read ",
+                                      "counts on the curves"))
         } else {
             fig <- fig +
-                xlab(paste0("Total Reads (incl. duplicates)"))
+                labs(x = "total reads (M) (incl. duplicates)")
         }
         fig <- fig +
-            ylab("Unique Reads") +
-            ggtitle("Complexity Curve: preseq")
+            labs(y = "unique reads (M)")
+            #ggtitle("Complexity Curve: preseq")
     }
 
     fig <- fig +
         labs(col = "") +
         scale_color_discrete(labels=c(clist$SAMPLE_NAME)) +
-        theme_classic(base_size=14) +
-        theme(axis.line = element_line(size = 0.5)) +
-        theme(panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(),
-              aspect.ratio = 1,
-              panel.border = element_rect(colour = "black",
-                                          fill=NA, size=0.5)) +
-        theme(plot.title = element_text(hjust = 0.5))
+        theme_PEPPRO() +
+        theme(legend.position = "right",
+              plot.caption = element_text(size = 8, face = "italic"))
 
     # inset zoom plot
     zoom_theme <- theme(legend.position = "none",
@@ -383,7 +416,7 @@ plotComplexityCurves <- function(ccurves,
                         panel.grid.major = element_blank(),
                         panel.grid.minor = element_blank(),
                         panel.background = element_rect(color='black'),
-                        plot.margin = unit(c(0,0,-6,-6),"mm"))
+                        plot.margin = unit(c(0.1,0.1,-6,-6),"mm"))
 
     if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
         zoom_fig <- ggplot(df, aes(total_reads,
@@ -408,7 +441,7 @@ plotComplexityCurves <- function(ccurves,
             annotation_custom(grob = g,
                               xmin = x_max / 2,
                               xmax = x_max,
-                              ymin = 0,
+                              ymin = 10,
                               ymax = max(preseq_ymax, max_unique)/2)
     } else if (any(rcDT$total > 0)) {
         interp <- approx(df$total_reads, df$expected_distinct, rcDT$total)$y
@@ -434,12 +467,18 @@ plotComplexityCurves <- function(ccurves,
             annotation_custom(grob = g,
                               xmin = x_max / 2,
                               xmax = x_max,
-                              ymin = 0,
+                              ymin = 10,
                               ymax = max(preseq_ymax, max_unique)/2)
     }
 
-    return(p)
+    # Don't include legend for single sample plots
+    if (length(ccurves) == 1) {
+        fig <- fig + theme(legend.position = "none")
+    }
+
+    return(fig)
 }
+
 
 #' Compute the axis value limit
 #'
@@ -480,6 +519,7 @@ computeLimit <- function(value, ccurve_TOTAL_READS) {
     return(first_point)
 }
 
+
 #' Calculate the Fraction of Reads in Features (FRiF)
 #'
 #' This function calculates the fraction of reads in a feature and returns
@@ -488,23 +528,38 @@ computeLimit <- function(value, ccurve_TOTAL_READS) {
 #' number of total features.
 #'
 #' @param bedFile A BED format file
-#' @param reads Number of aligned reads
+#' @param total Number of aligned reads (or number of aligned bases)
+#' @param reads If TRUE, we're working with read counts.
+#'              If FALSE, we're working with absolute number of bases
 #' @keywords FRiF
 #' @examples
 #' calcFRiF()
-calcFRiF <- function(bedFile, reads) {
-    colnames(bedFile) <- c("chromosome","start","end","count")
+calcFRiF <- function(bedFile, total, reads) {
+    colnames(bedFile) <- c("chromosome", "start", "end",
+                           "count", "bases", "width", "fraction")
     grObj   <- makeGRangesFromDataFrame(bedFile)
     grObj   <- reduce(grObj)
     redBed  <- data.frame(chromosome=seqnames(grObj),
                           start=start(grObj), end=end(grObj))
     bedFile <- merge(redBed, bedFile, by=c("chromosome","start","end"))
     bedFile <- cbind(bedFile, size=(bedFile$end-bedFile$start))
-    bedFile <- bedFile[order(-bedFile$count),]
+
+    if (reads) {
+        bedFile <- bedFile[order(-bedFile$count),]
+    } else {
+        bedFile <- bedFile[order(-bedFile$bases),]
+    }
+
     bedFile <- bedFile[apply(bedFile != 0, 1, all),]
-    bedFile <- cbind(bedFile, cumsum=cumsum(bedFile$count))
+
+    if (reads) {
+        bedFile <- cbind(bedFile, cumsum=cumsum(bedFile$count))
+    } else {
+        bedFile <- cbind(bedFile, cumsum=cumsum(bedFile$bases))
+    }
+
     bedFile <- cbind(bedFile, cumSize=cumsum(bedFile$size))
-    bedFile <- cbind(bedFile, frip=bedFile$cumsum/as.numeric(reads))
+    bedFile <- cbind(bedFile, frip=bedFile$cumsum/as.numeric(total))
     bedFile <- cbind(bedFile, numfeats=as.numeric(1:nrow(bedFile)))
     return(bedFile)
 }
@@ -517,6 +572,7 @@ calcFRiF <- function(bedFile, reads) {
 #'
 #' @param sample_name Name of sample
 #' @param num_reads Number of aligned reads in sample
+#' @param genome_size Size of genome in bp
 #' @param output_name Output file name
 #' @param bedFile A BED format file
 #' @keywords FRiP FRiF BED
@@ -533,10 +589,15 @@ calcFRiF <- function(bedFile, reads) {
 #'          bedFile = c("promoter", "promoter_flanking", "exon",
 #'                      "intron", "utr3", "utr5"))
 #' @export
-plotFRiF <- function(sample_name, num_reads, output_name, bedFile) {
+plotFRiF <- function(sample_name, num_reads, genome_size,
+                     type = c("frif", "prif", "both"),
+                     reads=TRUE, output_name, bedFile) {
     labels  <- data.frame(xPos=numeric(), yPos=numeric(), name=character(),
                           val=numeric(), color=character(),
                           stringsAsFactors=FALSE)
+    feature_dist  <- data.frame(feature=character(), numfeats=numeric(),
+                                numbases=numeric(), expected=numeric(),
+                                stringsAsFactors=FALSE)
     palette <- colorRampPalette(c("#999999", "#FFC107", "#27C6AB", "#004D40",
                                   "#B97BC8", "#009E73", "#C92404", "#E3E550",
                                   "#372B4C", "#E3DAC7", "#27CAE6", "#B361BC",
@@ -549,22 +610,32 @@ plotFRiF <- function(sample_name, num_reads, output_name, bedFile) {
 
     if (exists(bedFile[1])) {
         bed        <- get(bedFile[1])
-        bedCov     <- calcFRiF(bed, num_reads)
+        bedCov     <- calcFRiF(bed, num_reads, reads)
         name       <- bedFile[1]
         labels[1,] <- c(0.95*max(log10(bedCov$cumSize)), max(bedCov$frip)+0.001,
                         name, round(max(bedCov$frip),2), "#FF0703")
+        feature_dist[1,] <- c(name, nrow(bed),
+                              as.numeric(sum(abs(bed$V3-bed$V2))),
+                              as.numeric((sum(abs(bed$V3-bed$V2))/genome_size)))
         bedCov$feature <- name
     } else if (file.exists(file.path(bedFile[1])) && info$size != 0) {
-        bed        <- read.table(file.path(bedFile[1]))
-        bedCov     <- calcFRiF(bed, num_reads)
-        name       <- basename(tools::file_path_sans_ext(bedFile[1]))
-        name       <- gsub(sample_name, "", name)
-        name       <- gsub("^.*?_", "", name)
-        numFields  <- 2
-        for(i in 1:numFields) name <- gsub("_[^_]*$", "", name)
-        labels[1,] <- c(0.95*max(log10(bedCov$cumSize)), max(bedCov$frip)+0.001,
-                        name, round(max(bedCov$frip),2), "#FF0703")
-        bedCov$feature <- name
+        bed <- read.table(file.path(bedFile[1]))
+        if (nrow(bed[which(bed$V5 != 0),]) == 0) {
+            message(paste0(name, "  has no covered features"))
+        } else {
+            bedCov     <- calcFRiF(bed, num_reads, reads)
+            name       <- basename(tools::file_path_sans_ext(bedFile[1]))
+            name       <- gsub(sample_name, "", name)
+            name       <- gsub("^.*?_", "", name)
+            numFields  <- 2
+            for(i in 1:numFields) name <- gsub("_[^_]*$", "", name)
+            labels[1,] <- c(0.95*max(log10(bedCov$cumSize)), max(bedCov$frip)+0.001,
+                            name, round(max(bedCov$frip),2), "#FF0703")
+            feature_dist[1,] <- c(name, nrow(bed),
+                                  as.numeric(sum(abs(bed$V3-bed$V2))),
+                                  as.numeric((sum(abs(bed$V3-bed$V2))/genome_size)))
+            bedCov$feature <- name
+        }
     }  else {
         if (is.na(info[1])) {
             message(paste0(name, " coverage file is missing"))
@@ -577,6 +648,8 @@ plotFRiF <- function(sample_name, num_reads, output_name, bedFile) {
 
     if (exists("bedCov")) {
         covDF <- bedCov
+    } else {
+        return(ggplot())
     }
 
     if (length(bedFile) > 1) {
@@ -604,48 +677,188 @@ plotFRiF <- function(sample_name, num_reads, output_name, bedFile) {
 
             if (max(bed[,4] > 0)) {
                 if (exists("covDF")) {
-                    covFile <- calcFRiF(bed, num_reads)
+                    covFile <- calcFRiF(bed, num_reads, reads)
                     covFile$feature <- name
                     covDF   <- rbind(covDF, covFile)
                     labels  <- rbind(labels, c(0.95*max(log10(covFile$cumSize)),
                                                max(covFile$frip)+0.001,
                                                name, round(max(covFile$frip),2),
                                                plotColors[i]))
+                    feature_dist <- rbind(feature_dist,
+                        c(name, nrow(bed), as.numeric(sum(abs(bed$V3-bed$V2))),
+                          as.numeric((sum(abs(bed$V3-bed$V2))/genome_size))))
                 } else {
-                    covDF         <- calcFRiF(bed, num_reads)
+                    covDF         <- calcFRiF(bed, num_reads, reads)
                     covDF$feature <- name
                     labels        <- rbind(labels,
                                            c(0.95*max(log10(covDF$cumSize)),
                                              max(covDF$frip)+0.001,
                                              name, round(max(covDF$frip),2),
                                              plotColors[i]))
+                    feature_dist <- rbind(feature_dist,
+                        c(name, nrow(bed), as.numeric(sum(abs(bed$V3-bed$V2))),
+                          as.numeric((sum(abs(bed$V3-bed$V2))/genome_size))))
                 }
             }
         }
     }
 
-    # Reorder by labels
+    # Reorder by labels (ensures plotting matches up labels and colors)
     if (exists("covDF")) {
         covDF$feature <- factor(covDF$feature, levels=(labels$name))
     }
 
-    if (!is.null(bedFile)) {
-        # Produce plot with bed files
-        p <- ggplot(covDF, aes(x=log10(cumSize), y=frip,
-                               group=feature, color=feature)) +
-            geom_line() +
-            labs(x="log(number of bases)", y="FRiF") +
-            theme_classic() +
-            theme(panel.border = element_rect(colour = "black",
-                                              fill=NA,
-                                              size=0.5))
+    feature_dist$numbases <- as.numeric(feature_dist$numbases)
+    feature_dist$expected <- as.numeric(feature_dist$expected)
+    feature_dist$observed <- as.numeric(labels$val)
+    feature_dist$logOE <- log10(feature_dist$observed/feature_dist$expected)
+    feature_dist$logOE <- ifelse(feature_dist$logOE < 0, 0, feature_dist$logOE)
+    feature_dist <- merge(feature_dist, labels, by.x="feature", by.y="name")
+    #feature_dist <- feature_dist[order(feature_dist$logOE, decreasing=TRUE),]
+    feature_dist <- feature_dist[order(feature_dist$logOE),]
+    rownames(feature_dist) <- NULL
+    feature_dist$feature <- factor(feature_dist$feature,
+                                   levels=feature_dist$feature)
+    feature_dist$color <- factor(feature_dist$color,
+                                 levels=feature_dist$color)
 
-        # Recolor and reposition legend
-        p <- p + scale_color_manual(labels=paste0(labels$name, ": ",
-                                                  labels$val),
-                                    values=labels$color) +
-            theme(legend.position=c(0.05,0.95),
-                  legend.justification=c(0.1,0.9))
+    if (!is.null(bedFile)) {
+
+        if (tolower(type) == "both") {
+            # Produce plot with bed files
+            # take minimum quantile (only works if everything is above that value)
+            #p <- ggplot(covDF[which(covDF$frip > min(density(covDF$frip)$y)),],
+            #           aes(x=log10(cumSize), y=frip,
+            #               group=feature, color=feature)) +
+            p <- ggplot(covDF, aes(x=log10(cumSize), y=frip,
+                        group=feature, color=feature)) +
+                #geom_line(aes(linetype=feature), size=2, alpha=0.5) +
+                geom_line(size=2, alpha=0.5) +
+                guides(linetype = FALSE) +
+                labs(x="log10(number of bases)", y="FRiF") +
+                theme_PEPPRO()
+
+            # Recolor and reposition legend
+            p <- p + scale_color_manual(labels=paste0(labels$name, ": ",
+                                                      labels$val),
+                                        values=labels$color) +
+                labs(color="FRiF") +
+                theme(legend.position="right",
+                      legend.justification=c(0.1,0.9),
+                      legend.background=element_blank(),
+                      legend.text = element_text(size = rel(0.65)),
+                      legend.key = element_blank(),
+                      axis.text.x = element_text(angle = 0, hjust = 1,
+                                                 vjust=0.5))
+
+            p2 <- ggplot(feature_dist, aes(x = feature, y = logOE)) +
+                geom_bar(stat="identity", fill=labels$color, alpha=0.5) + 
+                geom_hline(aes(yintercept=0), linetype="dotted") +
+                xlab('') +
+                ylab('log10(Obs/Exp)') +
+                coord_flip() +
+                scale_x_discrete(position="top") +
+                theme_PEPPRO() +
+                theme(plot.background = element_rect(fill = "transparent",
+                                                     color = NA,),
+                      panel.background = element_rect(fill = "transparent"),
+                      rect = element_rect(fill = "transparent"),
+                      plot.margin = unit(c(0,0,-6.5,-6.5),"mm"))
+
+            g   <- ggplotGrob(p2)
+            min_x <- min(layer_scales(p)$x$range$range)
+            max_x <- max(layer_scales(p)$x$range$range)
+            min_y <- min(layer_scales(p)$y$range$range)
+            max_y <- max(layer_scales(p)$y$range$range)
+
+            p <- p + annotation_custom(grob = g, xmin = 1.05*min_x,
+                                       xmax=min_x*2.05, ymin=max_y/2,
+                                       ymax=max_y)
+        } else if (tolower(type) == "frif") {
+            # take minimum quantile (only works if everything is above that value)
+            #p <- ggplot(covDF[which(covDF$frip > min(density(covDF$frip)$y)),],
+            #           aes(x=log10(cumSize), y=frip,
+            #               group=feature, color=feature)) +
+            p <- ggplot(covDF, aes(x=log10(cumSize), y=frip,
+                        group=feature, color=feature)) +
+                #geom_line(aes(linetype=feature), size=2, alpha=0.5) +
+                geom_line(size=2, alpha=0.5) +
+                guides(linetype = FALSE) +
+                labs(x="log10(number of bases)", y="FRiF") +
+                theme_PEPPRO()
+
+            # Recolor and reposition legend
+            p <- p + scale_color_manual(labels=paste0(labels$name, ": ",
+                                                      labels$val),
+                                        values=labels$color) +
+                labs(color="FRiF") +
+                theme(legend.position=c(0.075,0.975),
+                      legend.justification=c(0.1,0.9),
+                      legend.title = element_blank(),
+                      legend.text = element_text(size = rel(0.65)), 
+                      legend.background=element_blank(),
+                      legend.key = element_blank(),
+                      axis.text.x = element_text(angle = 0, hjust = 1,
+                                                 vjust=0.5))
+        } else if (tolower(type) == "prif") {
+            p <- ggplot(feature_dist, aes(x = feature, y = logOE)) +
+                geom_bar(stat="identity",
+                         fill = feature_dist$color,
+                         alpha = 0.5) + 
+                geom_hline(aes(yintercept=0), linetype="dotted") +
+                xlab('') +
+                ylab('log10(Obs/Exp)') +
+                coord_flip() +
+                theme_PEPPRO()
+        } else {
+            #default to both
+            # Produce plot with bed files
+            p <- ggplot(covDF,
+                        aes(x=log10(cumSize), y=frip,
+                            group=feature, color=feature)) +
+                geom_line(aes(linetype=feature), size=2, alpha=0.5) +
+                guides(linetype = FALSE) +
+                labs(x="log10(number of bases)", y="FRiF") +
+                theme_PEPPRO()
+
+            # Recolor and reposition legend
+            p <- p + scale_color_manual(labels=paste0(labels$name, ": ",
+                                                      labels$val),
+                                        values=labels$color) +
+                labs(color="FRiF") +
+                theme(legend.position="right",
+                      legend.justification=c(0.1,0.9),
+                      legend.background=element_blank(),
+                      legend.key = element_blank(),
+                      axis.text.x = element_text(angle = 0, hjust = 1,
+                                                 vjust=0.5))
+
+            p2 <- ggplot(feature_dist, aes(x = feature, y = logOE)) +
+                geom_bar(stat="identity", fill=labels$color, alpha=0.5) + 
+                geom_hline(aes(yintercept=0), linetype="dotted") +
+                xlab('') +
+                ylab('log10(Obs/Exp)') +
+                coord_flip() +
+                scale_x_discrete(position="top") +
+                theme_PEPPRO() +
+                theme(plot.background = element_rect(fill = "transparent",
+                                                     color = NA,),
+                      panel.background = element_rect(fill = "transparent"),
+                      rect = element_rect(fill = "transparent"),
+                      plot.margin = unit(c(0,0,-6.5,-6.5),"mm"))
+
+            g   <- ggplotGrob(p2)
+            min_x <- min(layer_scales(p)$x$range$range)
+            max_x <- max(layer_scales(p)$x$range$range)
+            min_y <- min(layer_scales(p)$y$range$range)
+            max_y <- max(layer_scales(p)$y$range$range)
+
+            p <- p + annotation_custom(grob = g, xmin = 1.05*min_x,
+                                       xmax=min_x*2.05, ymin=max_y/2,
+                                       ymax=max_y)
+        }
+
+        
     } else {
         write("Unable to produce FRiF plot!\n", stdout())
     }
@@ -670,7 +883,7 @@ roundUpNice <- function(x, nice=c(1,2,3,4,5,6,7,8,9,10)) {
 
 #' Plot TSS enrichment
 #'
-#' This function plots the global TSS enrichment and produces pdf/png files.
+#' This function plots the global TSS enrichment.
 #'
 #' @param TSSfile TSS enrichment file
 #' @keywords TSS enrichment
@@ -696,26 +909,17 @@ plotTSS <- function(TSSfile) {
         }
     }
 
-    t1 <- theme(
-        plot.background  = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border     = element_rect(colour = "black", fill=NA, size=0.5),
-        panel.background = element_blank(),
-        axis.line    = element_blank(),
-        axis.text.x  = element_text(face = "plain", color = "black",
-                                    size = 20, hjust = 0.5),
-        axis.text.y  = element_text(face = "plain", color = "black",
-                                    size = 20, hjust = 0.5),
-        axis.title.x = element_text(face = "plain", color = "black", size = 22,
-                                    hjust = 0.5, vjust=0.5),
-        axis.title.y = element_text(face = "plain", color = "black", size = 22,
-                                    hjust = 0.5),
-        plot.title   = element_text(face="bold", color = "black", size=12,
-                                    hjust=0.5),
-        legend.position="none",
-        axis.ticks.length = unit(2, "mm")
-    )
+    t1 <- theme_classic(base_size=14) + 
+            theme(plot.background  = element_blank(),
+                  panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank(),
+                  panel.border     = element_rect(colour = "black",
+                                                  fill=NA, size=0.5),
+                  panel.background = element_blank(),
+                  axis.line    = element_blank(),
+                  legend.position="none",
+                  aspect.ratio = 1,
+                  axis.ticks.length = unit(2, "mm"))
 
     iMat <- data.table(V1 = numeric())
     if (length(TSSfile) == 1) {
@@ -809,16 +1013,16 @@ plotTSS <- function(TSSfile) {
     pre <- ggplot(normTSS, aes(x=(as.numeric(rownames(normTSS))-
                                  (nrow(normTSS)/2)),
                                y=score, group=1, colour="black")) +
-        geom_hline(yintercept = 6, linetype = 2,
-                   color = "grey", size = 0.25) +
+        # geom_hline(yintercept = 6, linetype = 2,
+        #            color = "grey", size = 0.25) +
         geom_smooth(method="loess", span=0.02,
                     se=FALSE, colour=lineColor) +
         labs(x = "Distance from TSS (bp)", y = "TSS Enrichment Score")
-    y_max <- max(30, roundUpNice(TSSscore))
+    y_max <- roundUpNice(TSSscore)
     p <- pre + t1 +
          scale_x_continuous(expand=c(0,0)) +
          scale_y_continuous(expand=c(0,0)) +
-         coord_cartesian(xlim=c(-2300, 2300), ylim=c(0, y_max+2))
+         coord_cartesian(xlim=c(-2300, 2300), ylim=c(0, 1.1*y_max))
     if (exists("minus")) {
         val      <- 0.025*nrow(minus)
         # normTSS  <- (minus / mean(minus[c(1:val,
@@ -846,25 +1050,25 @@ plotTSS <- function(TSSfile) {
                                  y=score, group=1, colour="black"),
                              method="loess", span=0.02,
                              se=FALSE, colour="blue") +
-                 annotate("rect", xmin=1200, xmax=2300, ymin=y_max-8,
-                          ymax=y_max+2, fill="gray95", size = 0.5) +
-                 annotate("text", x=1750, y=y_max, label="TSS Score",
-                          fontface = 1, size=6, hjust=0.5) +
-                 annotate("text", x=1500, y=y_max-2, label="+", fontface = 2,
-                          size=8, hjust=0.5, color=lineColor) +
-                 annotate("text", x=1500, y=y_max-5, label=TSSscore,
-                          fontface = 2, size=8, hjust=0.5, color=lineColor) +
-                 annotate("text", x=2000, y=y_max-2, label="-",
-                          fontface = 2, size=8, hjust=0.5, color="blue") +
-                 annotate("text", x=2000, y=y_max-5, label=minusTSSscore,
-                          fontface = 2, size=8, hjust=0.5, color="blue")
+                annotate("rect", xmin=1200, xmax=2300, ymin=0.9*y_max,
+                         ymax=1.1*y_max, fill="gray95") +
+                annotate("text", x=1750, y=1.05*y_max, label="TSS Score",
+                         fontface = 1, hjust=0.5) +
+                annotate("text", x=1500, y=y_max, label="+", fontface = 2,
+                          hjust=0.5, color=lineColor) +
+                annotate("text", x=1500, y=0.95*y_max, label=TSSscore,
+                         fontface = 2,  hjust=0.5, color=lineColor) +
+                annotate("text", x=2000, y=y_max, label="-",
+                         fontface = 2,  hjust=0.5, color="blue") +
+                annotate("text", x=2000, y=0.95*y_max, label=minusTSSscore,
+                         fontface = 2,  hjust=0.5, color="blue")
     } else {
-        p <- p + annotate("rect", xmin=1200, xmax=2300, ymin=y_max-4,
-                          ymax=y_max+2, fill="gray95", size = 0.5) +
-                 annotate("text", x=1750, y=y_max+1, label="TSS Score",
-                          fontface = 1, size=6, hjust=0.5) +
-                 annotate("text", x=1750, y=y_max-1, label=TSSscore,
-                          fontface = 2, size=10, hjust=0.5)
+        p <- p + annotate("rect", xmin=1200, xmax=2300, ymin=0.9*y_max,
+                          ymax=1.1*y_max, fill="gray95") +
+                 annotate("text", x=1750, y=1.05*y_max, label="TSS Score",
+                          fontface = 1, hjust=0.5) +
+                 annotate("text", x=1750, y=0.95*y_max, label=TSSscore,
+                          fontface = 2, hjust=0.5)
     }
 
     return(p)
@@ -878,6 +1082,7 @@ plotTSS <- function(TSSfile) {
 #' @param delim A delimiter for the fields splitting a path or string
 sampleName <- function(path, num_fields=2, delim='_') {
     name <- basename(tools::file_path_sans_ext(path))
+    if(num_fields == 0) {return(name)}
     for(n in 1:num_fields) name <- gsub(paste0(delim, "[^", delim, "]*$"), "", name)
     return(paste(dirname(path), name, sep="/"))
 }
@@ -898,11 +1103,12 @@ sampleName <- function(path, num_fields=2, delim='_') {
 #' data("frag_len")
 #' data("frag_len_count")
 #' plotFLD(fragL = "frag_len", fragL_count = "frag_len_count",
-#'         fragL_txt = "fragLenDistribution_example.txt")
+#'         fragL_txt = "fragLenDistribution_example.txt", max_fragment=200)
 #' @export
 plotFLD <- function(fragL,
                     fragL_count,
-                    fragL_txt="fragLenDistribution.txt") {
+                    fragL_txt="fragLenDistribution.txt",
+                    max_fragment = 200) {
 
     if (exists(fragL_count)) {
         dat <- data.table(get(fragL_count))
@@ -922,28 +1128,29 @@ plotFLD <- function(fragL,
         quit(save = "no", status = 1, runLast = FALSE)
     }
 
-    dat1 <- dat[dat$V2<=600,]
+    dat1 <- dat[dat$V2<=max_fragment,]
     tmp  <- seq(1:as.numeric(dat1[1,2]-1))
     dat0 <- data.table(V1=rep(0,length(tmp)),V2=tmp)
     dat2 <- rbind(dat0, dat1)
 
-    t1 = theme_classic(base_size=14) +
-         theme(axis.line = element_line(size = 0.5), 
-               panel.grid.major = element_blank(),
-               panel.grid.minor = element_blank(),
-               legend.position = "none",
-               aspect.ratio = 1,
-               panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-               plot.title = element_text(hjust = 0.5))
+    x_min = which.min(dat1$V1[1:which.max(dat1$V1)])
 
-    p <- ggplot(dat1, aes(x=V2, y=V1)) +
+    p <- ggplot(dat1[x_min:nrow(dat1),], aes(x=V2, y=V1)) +
             geom_point(size=1, alpha=0.25) +
             geom_line(alpha=0.5) +
-            geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
-            xlab("Fragment length") + 
-            ylab("Number of reads") +
-            ggtitle("Insert size distribution") +
-            t1
+            annotate("rect", xmin=-Inf, xmax=20, ymin=-Inf, ymax=Inf,
+                 alpha=0.1, fill="#ff001e") +
+            annotate("text", x=25, y=(max(dat1$V1)/2),
+                     size=theme_get()$text[["size"]]/4,
+                     label="partial degradation", angle=90, col="#858585") +
+            annotate("rect", xmin=-Inf, xmax=30, ymin=-Inf, ymax=Inf,
+                     alpha=0.1, fill="#ffee00") + 
+            annotate("text", x=7.5, y=(max(dat1$V1)/2),
+                     size=theme_get()$text[["size"]]/4,
+                     label="high degradation", angle=90, col="#858585") +
+            xlab("fragment length") + 
+            ylab("number of reads") +
+            theme_PEPPRO()
 
     summ <- data.table(Min=min(summary_table$V1),
                        Max=max(summary_table$V1),
@@ -1020,6 +1227,120 @@ fancyNumbers <- function(n){
     return(textReturn)
 }
 
+
+#' Determine which quantile to use as cutoff.
+#'
+#' Modified from: GenomicDistributions (Tessa Danehy)
+#'
+#' @param vec A vector of numbers.
+#' @param baseline A minimum quantile cutoff.
+#' @keywords cutoff quantiles
+#' @examples
+#' calcQuantileCutoff()
+calcQuantileCutoff = function(vec, baseline=1){
+  n <- length(vec) # number of observations
+  if (n > 1000) {n = 1000}
+  if (n < 100) {n = 100}
+  q <- max(baseline, (11 - round(n/100))) # finding quantiles for flanking bins
+  return(q)
+}
+
+
+#' Calculate histogram binning by quantile.
+#'
+#' Modified from: GenomicDistributions (Tessa Danehy)
+#'
+#' @param vec A vector of numbers.
+#' @param q The quantile to use for cutoffs.
+#' @param bins The number of bins to use for a histogram.
+#' @param transformed Adjust divisions if transformed
+#' @keywords quantiles
+#' @examples
+#' calcDivisions()
+calcDivisions = function(vec, q, bins=NULL, transformed=FALSE){
+  q = as.numeric(q)
+  if(q > 50){
+    message("Quantile should not be larger than 50. Optimal size is under 10.")
+    q <- 50
+  }
+  if(!is.null(bins)){
+    b <- bins + 1
+  }
+  else {
+    b <- abs((30-(2*q))/q) # finding the number of bins based on the quantiles
+  }
+  quant  <- unname(quantile(vec, probs = c((q/100), (1-(q/100)))))
+  seq_10 <- seq(quant[1], quant[2], length = b)
+  if (transformed) {
+    div  <- c(-Inf, round(seq_10, 2), Inf)
+  } else {
+    div  <- c(-Inf, round(seq_10), Inf)
+  }
+  
+  return(div)
+}
+
+
+#' Create a character vector of bin labels.
+#'
+#' From: GenomicDistributions (Tessa Danehy)
+#'
+#' @param breakPoints A vector of numbers.
+#' @param digits The number of digits to round to.
+#' @param collapse The character to separate paste values by.
+#' @param infBins Whether to use infinite bins.
+#' @keywords labels
+#' @examples
+#' labelCuts()
+labelCuts = function(breakPoints, digits=1, collapse="-", infBins=FALSE) {
+    labels <- 
+        apply(round(cbind(breakPoints[-length(breakPoints)],   
+                          breakPoints[-1]),digits), 1, paste0,
+                          collapse=collapse) 
+    
+    if (infBins) {
+        labels[1] <- paste0("<", breakPoints[2])
+        labels[length(labels)] <- paste0(">", breakPoints[length(breakPoints)-1])
+    }
+    return(labels)
+}
+
+
+#' Create a character vector of bin labels.
+#'
+#' Modified from: GenomicDistributions (Tessa Danehy)
+#'
+#' @param vec A vector (or list of vectors) of numbers.
+#' @param divisions The break points of the distribution
+#' @keywords quantiles
+#' @examples
+#' cutDists()
+cutDists = function(vec, divisions = c(-Inf, -1e6, -1e4, -1000, -100, 0,
+                                         100, 1000, 10000, 1e6, Inf)) {
+    if (is.list(vec)) {
+        x = lapply(vec, cutDists)
+        
+        # To accommodate multiple lists, we'll need to introduce a new 'name'
+        # column to distinguish them.
+        nameList = names(vec)
+        if(is.null(nameList)) {
+            nameList = 1:length(query) # Fallback to sequential numbers
+        }
+        
+        # Append names
+        xb = rbindlist(x)
+        xb$name = rep(nameList, sapply(x, nrow))
+        
+        return(xb)
+    }
+    divisions <- unique(divisions)
+    labels <- labelCuts(signif(divisions, 3), collapse=" to ", infBins=TRUE)
+    #message(paste0("breaks: ", paste0(divisions, collapse=" ")))
+    cuts   <- cut(vec, divisions, labels)
+    return(as.data.frame(table(cuts)))
+}
+
+
 #' Plot the distribution of genic exonRPKM/intronRPKM ratios
 #'
 #' This function plots the distribution of by gene exon RPKM divided by
@@ -1028,14 +1349,21 @@ fancyNumbers <- function(n){
 #'
 #' @param rpkm A three column TSV format file containing
 #'             "gene", "intron RPKM", "exon RPKM" columns.
+#' @param name X-axis label, typically a sample name
 #' @param raw Plot raw distribution
+#' @param type Plot format
+#' @param annotate Display mean and median values on plot
 #' @keywords mRNA contamination
 #' @export
 #' @examples
 #' data("rpkm_ratios")
 #' mRNAcontamination(rpkm = "rpkm_ratios")
 #' @export
-mRNAcontamination <- function(rpkm, raw=FALSE) {
+mRNAcontamination <- function(rpkm,
+                              name='mRNA contamination ratios',
+                              raw=TRUE,
+                              type=c("histogram", "boxplot", "violin"),
+                              annotate=TRUE) {
     if (exists(rpkm)) {
         RPKM <- data.table(get(rpkm))
     } else if (file.exists(rpkm)) {
@@ -1044,32 +1372,127 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
         stop(paste0("FileExistsError: ", rpkm, " could not be found."))
         quit(save = "no", status = 1, runLast = FALSE)
     }
-    colnames(RPKM) <- c("gene","intron","exon")
+    colnames(RPKM) <- c("chr", "start", "end", "gene","ratio","strand")
 
-    finite_rpkm <- RPKM[is.finite(RPKM$exon/RPKM$intron),]
+    finite_rpkm <- RPKM[is.finite(RPKM$ratio),]
 
     if (raw) {
-        q <- ggplot(data = finite_rpkm, 
-                    aes(x="", y=(exon/intron))) +
-                stat_boxplot(geom ='errorbar', width = 0.25) +
-                geom_boxplot(width = 0.25,
-                             outlier.color='red',
-                             outlier.shape=1) +
-                stat_summary(fun.y = "mean", geom = "point",
-                             shape = 1, size = 2) +
-                labs(x=name,
-                     y=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                ylim(c(0, ceiling(summary(finite_rpkm$exon/finite_rpkm$intron)[5]))) +
-                theme_classic(base_size=14) +
-                theme(axis.line = element_line(size = 0.5)) +
-                theme(panel.grid.major = element_blank(),
-                      panel.grid.minor = element_blank(),
-                      aspect.ratio = 1,
-                      panel.border = element_rect(colour = "black",
-                                                  fill=NA, size=0.5))
+        div <- calcDivisions(finite_rpkm$ratio,
+                             calcQuantileCutoff(finite_rpkm$ratio,
+                                                baseline = 3))
     } else {
-        q <- ggplot(data = finite_rpkm, 
-                    aes(x="", y=log10(exon/intron))) +
+        div <- calcDivisions(log10(finite_rpkm$ratio),
+                             calcQuantileCutoff(log10(finite_rpkm$ratio),
+                                                baseline = 3),
+                             transformed=TRUE)
+    }
+
+    # ensure breaks are not duplicated
+    div        <- unique(div)
+    quantLabel <- paste(calcQuantileCutoff(finite_rpkm$ratio),"%", sep='')
+
+    if (raw) {
+        if (type == "histogram") {
+            if (length(div) <= 3) {
+                base_plot  <- ggplot(data = finite_rpkm, aes(x=ratio))  
+            } else {
+                # calculate a frequency table with the specified divisions
+                rpkm_table <- cutDists(finite_rpkm$ratio, divisions = div)
+                base_plot  <- ggplot(data = rpkm_table,  aes(x=cuts, y=Freq))
+            }
+            
+        } else {
+            base_plot  <- ggplot(data = finite_rpkm,  aes(x="", y=(ratio)))
+        }
+    } else {
+        if (type == "histogram") {
+            if (length(div) <= 3) {
+                base_plot  <- ggplot(data = finite_rpkm, aes(x=log10(ratio)))  
+            } else {
+                # calculate a frequency table with the specified divisions
+                rpkm_table <- cutDists(log10(finite_rpkm$ratio),
+                                       divisions = div)
+                base_plot  <- ggplot(data = rpkm_table,  aes(x=cuts, y=Freq))
+            }
+        } else {
+            base_plot  <- ggplot(data = finite_rpkm, aes(x="", y=log10(ratio)))
+        }
+    }
+
+    if (type == "histogram") {
+        if (raw) {
+            if (length(div) <= 3) {
+                plot <- base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(ratio)),
+                               color="gray", linetype="dashed", size=1) +
+                    annotate("text", x=median(finite_rpkm$ratio),
+                             y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
+                                label="median", angle=90,
+                                color="gray", vjust=-0.5) +
+                    geom_vline(aes(xintercept=mean(ratio)),
+                               color="light gray", linetype="dotted", size=1) +
+                    annotate("text", x=mean(finite_rpkm$ratio),
+                             y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
+                                label="mean", angle=90,
+                                color="light gray", vjust=-0.5) +
+                    labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90)))) +
+                    theme_PEPPRO()
+            } else {
+                plot <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("maroon",
+                                      rep("gray", (length(div)-3)),
+                                      "maroon")) + 
+                    labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    geom_text(aes(label= quantLabel),
+                              data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                              vjust=-1)
+            }
+        } else {
+            if (length(div) <= 3) {
+                plot = base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(log10(ratio))),
+                               color="gray", linetype="dashed", size=1) +
+                    geom_vline(aes(xintercept=mean(log10(ratio))),
+                               color="light gray", linetype="dotted", size=1) +
+                    labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                    scale_x_log10(limits = c(0.001, 50),
+                                  expand = expand_scale(mult = c(0, 0)),
+                                  labels=fancyNumbers,
+                                  breaks=prettyLogs) +
+                    annotation_logticks(sides = c("rl"))
+            } else {
+                plot <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("maroon",
+                                      rep("gray", (length(div)-3)),
+                                      "maroon")) + 
+                    labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    geom_text(aes(label= quantLabel),
+                              data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                              vjust=-1)
+            }
+        }
+    } else if (type == "boxplot") {
+        if (raw) {
+            plot = base_plot +
+                    stat_boxplot(geom ='errorbar', width = 0.25) +
+                    geom_boxplot(width = 0.25,
+                                 outlier.color='red',
+                                 outlier.shape=1) +
+                    stat_summary(fun.y = "mean", geom = "point",
+                                 shape = 1, size = 2) +
+                    labs(x=name,
+                         y=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                    ylim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
+        } else {
+            plot <- base_plot +
                 stat_boxplot(geom ='errorbar', width = 0.25) +
                 geom_boxplot(width = 0.25,
                              outlier.color='red',
@@ -1083,32 +1506,131 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
                               breaks=prettyLogs) +
                 annotation_logticks(sides = c("rl")) +
                 labs(x=name,
-                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
-                theme_classic(base_size=14) +
-                theme(axis.line = element_line(size = 0.5)) +
-                theme(panel.grid.major = element_blank(),
-                      panel.grid.minor = element_blank(),
-                      aspect.ratio = 1,
-                      panel.border = element_rect(colour = "black",
-                                                  fill=NA, size=0.5))
-    }
-
-    label1 <- c(paste("'median'[log[10]]", ":~",
-                round(median(log10((finite_rpkm$exon/finite_rpkm$intron))), 2)),
-                paste("'median'[raw]", ":",
-                round(median(finite_rpkm$exon/finite_rpkm$intron), 2)))
-
-    max_y  <- layer_scales(q)$y$range$range[2]
-
-    if (raw) {
-        q <- q + annotate("text", x = 0.5, y = c(max_y, 0.95*max_y),
-                      hjust=0, vjust=1, label = label1, parse=TRUE)
+                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene))
+        }
+    } else if (type == "violin") {
+        if (raw) {
+            plot = base_plot +
+                #stat_boxplot(geom ='errorbar', width = 0.25) +
+                geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
+                            linetype="dashed") +
+                geom_violin(width=0.25, fill="transparent",
+                            draw_quantiles = 0.5) +
+                stat_summary(fun.y = "mean", geom = "point",
+                             shape = 1, size = 2) +
+                labs(x=name,
+                     y=expression((over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                ylim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90))))
+        } else {
+            plot <- base_plot +
+                #stat_boxplot(geom ='errorbar', width = 0.25) +
+                geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
+                            linetype="dashed") +
+                geom_violin(width=0.25, fill="transparent",
+                            draw_quantiles = 0.5) +
+                stat_summary(fun.data = n_fun, geom = "text", hjust = 0.5) +
+                stat_summary(fun.y = "mean", geom = "point",
+                             shape = 1, size = 2) +
+                scale_y_log10(limits = c(0.001, 50),
+                              expand = expand_scale(mult = c(0, 0)),
+                              labels=fancyNumbers,
+                              breaks=prettyLogs) +
+                annotation_logticks(sides = c("rl")) +
+                labs(x=name,
+                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene))
+        }
     } else {
-        q <- q + annotate("text", x = 0.5, y = c(10^max_y, 10^max_y-10),
-                      hjust=0, vjust=1, label = label1, parse=TRUE)
+        # Default to histogram
+        if (raw) {
+            if (length(div) <= 3) {
+                plot <- base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(ratio)),
+                               color="gray", linetype="dashed", size=1) +
+                    annotate("text", x=median(finite_rpkm$ratio),
+                             y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
+                                label="median", angle=90,
+                                color="gray", vjust=-0.5) +
+                    geom_vline(aes(xintercept=mean(ratio)),
+                               color="light gray", linetype="dotted", size=1) +
+                    annotate("text", x=mean(finite_rpkm$ratio),
+                             y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
+                                label="mean", angle=90,
+                                color="light gray", vjust=-0.5) +
+                    labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90)))) +
+                    theme_PEPPRO()
+            } else {
+                plot <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("maroon",
+                                      rep("gray", (length(div)-3)),
+                                      "maroon")) + 
+                    labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    geom_text(aes(label= quantLabel),
+                              data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                              vjust=-1)
+            }
+        } else {
+            if (length(div) <= 3) {
+                plot = base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(log10(ratio))),
+                               color="gray", linetype="dashed", size=1) +
+                    geom_vline(aes(xintercept=mean(log10(ratio))),
+                               color="light gray", linetype="dotted", size=1) +
+                    labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
+                    scale_x_log10(limits = c(0.001, 50),
+                                  expand = expand_scale(mult = c(0, 0)),
+                                  labels=fancyNumbers,
+                                  breaks=prettyLogs) +
+                    annotation_logticks(sides = c("rl"))
+            } else {
+                plot <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("maroon",
+                                      rep("gray", (length(div)-3)),
+                                      "maroon")) + 
+                    labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
+                         y="frequency") +
+                    geom_text(aes(label= quantLabel),
+                              data=rpkm_table[c(1,length(rpkm_table$Freq)),],
+                              vjust=-1)
+            }
+        }
     }
 
-    return(p)
+    label1 <- paste("'median'[log[10]]", ":~",
+                    round(median(log10((finite_rpkm$ratio))), 2))
+    label2 <- paste("'median'[raw]", ":", round(median(finite_rpkm$ratio), 2))
+
+    if (type == "histogram") {
+        max_x <- length(layer_scales(plot)$x$range$range)
+    } else {
+        max_x <- suppressMessages(
+            suppressWarnings(layer_scales(plot)$x$range$range[2]))
+    }
+    if (is.na(max_x)) {max_x <- Inf}
+    max_y <- suppressMessages(
+        suppressWarnings(layer_scales(plot)$y$range$range[2]))
+
+    # TODO: make summary plot of these that IS boxplots
+    if (annotate) {
+        q <- plot + annotate("text", x = floor(max_x), y = floor(max_y),
+                         hjust="right", vjust=1.05, 
+                         label = label1, parse=TRUE) +
+            annotate("text", x = floor(max_x), y = floor(max_y),
+                     hjust="right", vjust=2.05,
+                     label = label2, parse=TRUE) +
+            theme_PEPPRO()
+    } else {
+        q <- plot + theme_PEPPRO()
+    }
+    
+
+    return(q)
 }
 
 
@@ -1116,13 +1638,19 @@ mRNAcontamination <- function(rpkm, raw=FALSE) {
 #'
 #' @param pi A single column containing the ratio of TSS densities/gene body
 #'           densities for the highest scoring TSSs
+#' @param name X-axis label, typically a sample name
+#' @param type Plot format
+#' @param annotate Display mean and median values on plot
 #' @keywords pause index
 #' @export
 #' @examples
 #' data("pidx")
 #' plotPI(pi = "pidx")
 #' @export
-plotPI <- function(pi) {
+plotPI <- function(pi, name='pause indicies',
+                   type=c("histogram", "boxplot", "violin"),
+                   annotate=TRUE) {
+    # TODO: make summary plot of these that IS boxplots
     if (exists(pi)) {
         PI <- data.table(get(pi))
     } else if (file.exists(pi)) {
@@ -1131,55 +1659,198 @@ plotPI <- function(pi) {
         stop(paste0("FileExistsError: ", pi, " could not be found."))
         quit(save = "no", status = 1, runLast = FALSE)
     }
-    colnames(PI) <- c("pi")
+    colnames(PI) <- c("chr", "start", "end", "name", "pi", "strand")
 
-    q <- ggplot(data = PI, aes(x="", y=pi)) +
-            stat_boxplot(geom ='errorbar', width = 0.25) +
-            geom_boxplot(width = 0.25,
-                         outlier.color='red',
-                         outlier.shape=1) +
-            stat_summary(fun.y = "mean", geom = "point",
-                         shape = 1, size = 2) +
-            labs(x=name, y="each gene's pause index")
+    div <- calcDivisions(PI$pi, calcQuantileCutoff(PI$pi, baseline = 3))
+    quantLabel <- paste(calcQuantileCutoff(PI$pi, baseline = 3),"%", sep='')
 
-    if (max(PI$pi) > 500) {
-        q <- q + scale_y_continuous(breaks = round(seq(min(PI$pi),
-                                              max(PI$pi),
-                                              by = 50), 0),
-                                    limits=c(0, max(PI$pi)))
-    } else if (max(PI$pi) > 100 & max(PI$pi) < 500) {
-        q <- q + scale_y_continuous(breaks = round(seq(min(PI$pi),
-                                              max(PI$pi),
-                                              by = 10), 0),
-                                    limits=c(0, max(PI$pi)))
+    if (type == "histogram") {
+        if (length(div) <= 3) {
+            base_plot <- ggplot(data = PI, aes(x=pi))
+        } else {
+            # calculate a frequency table with the specified divisions
+            pi_table  <- cutDists(PI$pi, divisions = div)
+            base_plot <- ggplot(data = pi_table,  aes(x=cuts, y=Freq))
+        }
+        
     } else {
-        q <- q + scale_y_continuous(breaks = round(seq(min(PI$pi),
-                                              max(PI$pi),
-                                              by = 5), 0),
-                                    limits=c(0, max(PI$pi)))
+        base_plot <- ggplot(data = PI,  aes(x="", y=pi))
     }
-    q <- q + coord_cartesian(ylim=c(0, ceiling(boxplot(PI$pi)$stats[5]))) +
-            theme_classic(base_size=14) +
-            theme(axis.line = element_line(size = 0.5)) +
-            theme(panel.grid.major = element_blank(),
-                  panel.grid.minor = element_blank(),
-                  aspect.ratio = 1,
-                  panel.border = element_rect(colour = "black",
-                                              fill=NA, size=0.5))
-    max_y  <- ceiling(boxplot(PI$pi)$stats[5])
-    label1 <- c(paste("'median'", ":", round(median(PI$pi), 2)),
-                paste("'mean'", ":", round(mean(PI$pi), 2)))
-    q <- q + annotate("text", x = 0.5, y = c(max_y, 0.95*max_y),
-                      hjust=0, vjust=1, label = label1, parse=TRUE)
+
+    if (type == "histogram") {
+        if (length(div) <= 3) {
+            q <- base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(PI$pi)),
+                               color="gray", linetype="dashed", size=1) +
+                    annotate("text", x=median(PI$pi),
+                             y=(ceiling(quantile(PI$pi, 0.25))),
+                                label="median", angle=90,
+                                color="gray", vjust=-0.5) +
+                    geom_vline(aes(xintercept=mean(PI$pi)),
+                               color="light gray", linetype="dotted", size=1) +
+                    annotate("text", x=mean(PI$pi),
+                             y=(ceiling(quantile(PI$pi, 0.25))),
+                                label="mean", angle=90,
+                                color="light gray", vjust=-0.5) +
+                    labs(x="pause indicies", y="frequency") +
+                    xlim(c(0, ceiling(quantile(PI$pi, 0.90)))) +
+                    theme_PEPPRO()
+        } else {
+            q <- base_plot +
+                geom_bar(stat="identity",
+                         fill = c("maroon",
+                                  rep("gray", (length(div)-3)),
+                                  "maroon")) + 
+                labs(x="pause indicies", y="frequency") +
+                geom_text(aes(label= quantLabel),
+                          data=pi_table[c(1,length(pi_table$Freq)),],
+                          vjust=-1)
+        }
+    } else if (type == "boxplot") {
+        plot <- base_plot +
+                stat_boxplot(geom ='errorbar', width = 0.25) +
+                geom_boxplot(width = 0.25,
+                             outlier.color='red',
+                             outlier.shape=1) +
+                stat_summary(fun.y = "mean", geom = "point",
+                             shape = 1, size = 2) +
+                labs(x=name, y="each gene's pause index")
+    } else if (type == "violin") {
+        plot <- base_plot +
+                geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
+                            linetype="dashed") +
+                geom_violin(width=0.25, fill="transparent",
+                            draw_quantiles = 0.5) +
+                stat_summary(fun.y = "mean", geom = "point",
+                             shape = 1, size = 2) +
+                labs(x=name, y="each gene's pause index")
+    } else {
+        # default to histogram
+         if (length(div) <= 3) {
+            q <- base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(PI$pi)),
+                               color="gray", linetype="dashed", size=1) +
+                    annotate("text", x=median(PI$pi),
+                             y=(ceiling(quantile(PI$pi, 0.25))),
+                                label="median", angle=90,
+                                color="gray", vjust=-0.5) +
+                    geom_vline(aes(xintercept=mean(PI$pi)),
+                               color="light gray", linetype="dotted", size=1) +
+                    annotate("text", x=mean(PI$pi),
+                             y=(ceiling(quantile(PI$pi, 0.25))),
+                                label="mean", angle=90,
+                                color="light gray", vjust=-0.5) +
+                    labs(x="pause indicies", y="frequency") +
+                    xlim(c(0, ceiling(quantile(PI$pi, 0.90)))) +
+                    theme_PEPPRO()
+        } else {
+            q <- base_plot +
+                geom_bar(stat="identity",
+                         fill = c("maroon",
+                                  rep("gray", (length(div)-3)),
+                                  "maroon")) + 
+                labs(x="pause indicies", y="frequency") +
+                geom_text(aes(label= quantLabel),
+                          data=pi_table[c(1,length(pi_table$Freq)),],
+                          vjust=-1)
+        }
+    }  
+
+    if (type != "histogram") {
+        if (max(PI$pi) > 500) {
+            q <- plot + scale_y_continuous(breaks = round(seq(min(PI$pi),
+                                                  max(PI$pi),
+                                                  by = 50), 0),
+                                        limits=c(0, max(PI$pi)))
+        } else if (max(PI$pi) > 100 & max(PI$pi) < 500) {
+            q <- plot + scale_y_continuous(breaks = round(seq(min(PI$pi),
+                                                  max(PI$pi),
+                                                  by = 25), 0),
+                                        limits=c(0, max(PI$pi)))
+        } else {
+            q <- plot + scale_y_continuous(breaks = round(seq(min(PI$pi),
+                                                  max(PI$pi),
+                                                  by = 5), 0),
+                                        limits=c(0, max(PI$pi)))
+        }
+        q <- q + coord_cartesian(ylim=c(0, ceiling(boxplot(PI$pi)$stats[5]))) +
+            theme_PEPPRO()
+        max_x <- suppressMessages(
+            suppressWarnings(layer_scales(q)$x$range$range[2]))
+        max_y  <- ceiling(boxplot(PI$pi)$stats[5])
+    } else {
+        max_x <- length(layer_scales(q)$x$range$range)
+        max_y <- suppressMessages(
+            suppressWarnings(layer_scales(q)$y$range$range[2]))
+    }
+
+    if (is.na(max_x)) {max_x <- Inf}
+    
+    label1 <- paste("'median'", ":", round(median(PI$pi), 2))
+    label2 <- paste("'mean'", ":", round(mean(PI$pi), 2))
+    if (annotate) {
+        q <- q + annotate("text", x = floor(max_x), y = floor(max_y),
+                      hjust="right", vjust=1.05, label = label1, parse=TRUE) +
+         annotate("text", x = floor(max_x), y = floor(max_y),
+                      hjust="right", vjust=2.15, label = label2, parse=TRUE) +
+         theme_PEPPRO()
+    } else {
+        q <- q + theme_PEPPRO()   
+    }
 
     return(q)
 }
 
+#' Calculate mode(s) of data
+#'
+#' From: https://stackoverflow.com/questions/2547402/is-there-a-built-in-function-for-finding-the-mode
+#' @param x A vector of numbers or characters
+#' @param return_multiple Bool to return multiple modes or first in order
+#' @param na.rm Bool Remove NAs
+#'
+#' @keywords mode
+mode <- function(x, return_multiple = TRUE, na.rm = FALSE) {
+    if(na.rm){
+        x <- na.omit(x)
+    }
+    ux       <- unique(x)
+    freq     <- tabulate(match(x, ux))
+    mode_loc <- if(return_multiple) which(freq==max(freq)) else which.max(freq)
+    return(ux[mode_loc])
+}
 
-#' Plot the distribution of adapter insertions
+
+#' Determine the appropriate abbreviation for large numbers
+#'
+#' Modified From: https://stackoverflow.com/questions/28159936/formatting-large-currency-or-dollar-values-to-millions-billions
+#' @param vec A vector of numbers
+#'
+#' @keywords abbreviation
+getAbbr <- function(vec) { 
+    div <- findInterval(as.numeric(gsub("\\,", "", vec)), c(0, 1e3, 1e6, 1e9, 1e12) )
+    return(paste(c("","K","M","B","T")[mode(div)]))
+}
+
+
+#' Determine the appropriate dividing factor for large numbers
+#'
+#' Modified From: https://stackoverflow.com/questions/28159936/formatting-large-currency-or-dollar-values-to-millions-billions
+#' @param vec A vector of numbers
+#'
+#' @keywords abbreviation
+getFactor <- function(vec) { 
+    div <- findInterval(as.numeric(gsub("\\,", "", vec)), c(0, 1e3, 1e6, 1e9, 1e12) )
+    return(as.numeric(paste(c(1, 1e3, 1e6, 1e9, 1e12)[mode(div)])))
+}
+
+
+#' Plot the cutadapt-based distribution of adapter insertions
 #'
 #' @param input A cutadapt report
 #' @param name A sample name or identifier for the plot title
+#' @param umi_len The UMI length
 #'
 #' @keywords cutadapt
 #' @export
@@ -1187,7 +1858,9 @@ plotPI <- function(pi) {
 #' data("cutadapt")
 #' plotCutadapt(input = "cutadapt")
 #' @export
-plotCutadapt <- function(input, name='cutadapt') {
+plotCutadapt <- function(input, name='cutadapt',
+                         umi_len = 0,
+                         count_factor = 1000000) {
     if (exists(input)) {
         report <- data.table(get(input))
     } else if (file.exists(input)) {
@@ -1197,26 +1870,158 @@ plotCutadapt <- function(input, name='cutadapt') {
         quit(save = "no", status = 1, runLast = FALSE)
     }
     
+    if (umi_len > 0) {
+        report <- report[-(which(report$length == (max(report$length) - umi_len))),]
+    }
+
     # only keep sizes where the expected count represents less than 1% of 
     # the actual count
     report <- report[which(report$expect/report$count < 0.01),]
     
-    # don't include size 0 insertions
-    report <- report[-nrow(report),]
+    # inverse length to get ascending order
+    report$length <- max(report$length)-report$length
 
-    q <- ggplot(report, aes(x=max(length)-length, y=count)) +
+    # don't include size 0 insertions
+    report <- report[which(report$length > 0),]
+
+    abbr <- getAbbr(report$count)
+    if (abbr == '') {
+        ylabel <- "Number of reads"
+    } else {
+        ylabel <- paste0("Number of reads (", abbr, ")")
+    }
+
+    count_factor <- getFactor(report$count)
+
+    if (20 %in% report$length) {
+        degraded_upper <- 20
+        degraded_lower <- 10
+    } else {
+        degraded_upper <- min(report$length) + 10
+        degraded_lower <- max(1, degraded_upper - 10)
+    }
+
+    if (40 %in% report$length) {
+        intact_upper <- 40
+        intact_lower <- 30
+    } else {
+        intact_upper <- max(report$length)
+        intact_lower <- max(1, intact_upper - 10)
+    }
+    
+    degradation  <- sum(report[which(report$length >= degraded_lower &
+                                     report$length <= degraded_upper),]$count) /
+                    max(1, sum(report[which(report$length >= intact_lower &
+                               report$length <= intact_upper),]$count))
+
+    q <- ggplot(report, aes(x=length, y=count/count_factor)) +
             geom_point() +
             geom_vline(xintercept = 20, linetype = "dotted", alpha=0.25) +
             geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
-            labs(title=name, x="Size of insertion", y="Number of reads") +
-            theme_classic(base_size=14) +
-            theme(axis.line = element_line(size = 0.5),
-                  plot.title = element_text(hjust = 0.5),
-                  panel.grid.major = element_blank(),
-                  panel.grid.minor = element_blank(),
-                  aspect.ratio = 1,
-                  panel.border = element_rect(colour = "black",
-                                              fill=NA, size=0.5))
+            labs(x="Size of insertion", y=ylabel) +
+            theme_PEPPRO() +
+            theme(axis.text.x = element_text(angle = 0, hjust = 0.5))
+    q <- q + 
+        annotate("rect", xmin=-Inf, xmax=20, ymin=-Inf, ymax=Inf,
+                 alpha=0.1, fill="#ff001e") +
+        annotate("text", x=25, y=(max(report$count/count_factor)/2),
+                 size=theme_get()$text[["size"]]/4,
+                 label="partial degradation", angle=90, col="#858585") +
+        annotate("rect", xmin=-Inf, xmax=30, ymin=-Inf, ymax=Inf,
+                 alpha=0.1, fill="#ffee00") + 
+        annotate("text", x=7.5, y=(max(report$count/count_factor)/2),
+                 size=theme_get()$text[["size"]]/4,
+                 label="high degradation", angle=90, col="#858585") +
+        annotate("text", x=Inf, y=(max(report$count/count_factor)*0.99),
+                 size=theme_get()$text[["size"]]/3, hjust=1.1,
+                 label=paste0("degradation ratio: ", round(degradation, 2)))
+
+    return(q)
+}
+
+
+#' Plot the distribution of adapter insertions
+#'
+#' @param input FLASH histogram output
+#' @param name A sample name or identifier for the plot title
+#' @param umi_len The UMI length
+#'
+#' @keywords cutadapt
+#' @export
+#' @examples
+#' data("adapt")
+#' plotAdapt(input = "adapt")
+#' @export
+plotAdapt <- function(input, name='adapt', umi_len = 0) {
+    if (exists(input)) {
+        report <- data.table(get(input))
+    } else if (file.exists(input)) {
+        report <- fread(input)
+    } else {
+        stop(paste0("FileExistsError: ", input, " could not be found."))
+        quit(save = "no", status = 1, runLast = FALSE)
+    }
+    
+    colnames(report) <- c("length", "count")
+
+    if (umi_len > 0) {
+        report$length <- report$length - umi_len
+    }
+    
+    # don't include size 0 insertions
+    report <- report[which(report$length > 0),]
+
+    abbr <- getAbbr(report$count)
+    if (abbr == '') {
+        ylabel <- "Number of reads"
+    } else {
+        ylabel <- paste0("Number of reads (", abbr, ")")
+    }
+
+    count_factor <- getFactor(report$count)
+
+    if (20 %in% report$length) {
+        degraded_upper <- 20
+        degraded_lower <- 10
+    } else {
+        degraded_upper <- min(report$length) + 10
+        degraded_lower <- max(1, degraded_upper - 10)
+    }
+
+    if (40 %in% report$length) {
+        intact_upper <- 40
+        intact_lower <- 30
+    } else {
+        intact_upper <- max(report$length)
+        intact_lower <- max(1, intact_upper - 10)
+    }
+    
+    degradation  <- sum(report[which(report$length >= degraded_lower &
+                                     report$length <= degraded_upper),]$count) /
+                    max(1, sum(report[which(report$length >= intact_lower &
+                               report$length <= intact_upper),]$count))
+
+    q <- ggplot(report, aes(x=length, y=count/count_factor)) +
+            geom_point() +
+            geom_vline(xintercept = 20, linetype = "dotted", alpha=0.25) +
+            geom_vline(xintercept = 30, linetype = "longdash", alpha=0.5) +
+            labs(x="Size of insertion", y=ylabel) +
+            theme_PEPPRO() +
+            theme(axis.text.x = element_text(angle = 0, hjust = 0.5))
+    q <- q + 
+        annotate("rect", xmin=-Inf, xmax=20, ymin=-Inf, ymax=Inf,
+                 alpha=0.1, fill="#ff001e") +
+        annotate("text", x=25, y=(max(report$count/count_factor)/2),
+                 size=theme_get()$text[["size"]]/4,
+                 label="partial degradation", angle=90, col="#858585") +
+        annotate("rect", xmin=-Inf, xmax=30, ymin=-Inf, ymax=Inf,
+                 alpha=0.1, fill="#ffee00") + 
+        annotate("text", x=7.5, y=(max(report$count/count_factor)/2),
+                 size=theme_get()$text[["size"]]/4,
+                 label="high degradation", angle=90, col="#858585") +
+        annotate("text", x=Inf, y=(max(report$count/count_factor)*0.99),
+                 size=theme_get()$text[["size"]]/3, hjust=1.1,
+                 label=paste0("degradation ratio: ", round(degradation, 2)))
 
     return(q)
 }

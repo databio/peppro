@@ -1,8 +1,8 @@
 cutadapt
 loopercli
 numpy
-pararead
 pandas
+pararead
 piper
 refgenconf
 refgenie

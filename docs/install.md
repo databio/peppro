@@ -1,15 +1,14 @@
-# Getting started
+# Install and run <img src="../img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:50px; margin-top:-15px; margin-bottom:-10px">
 
 ## 1: Clone the `PEPPRO` pipeline
 
-Clone the pipeline:
 ```
 git clone https://github.com/databio/peppro.git
 ```
 
 ## 2: Install required software
 
-`PEPPRO` requires a series of publicly-available, common bioinformatics tools including: [samtools](http://www.htslib.org/), [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [seqkit](https://bioinf.shenwei.me/seqkit/), [fastp](https://github.com/OpenGene/fastp), [seqtk](https://github.com/lh3/seqtk), [preseq](http://smithlabresearch.org/software/preseq/), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [picard](http://broadinstitute.github.io/picard/), [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/), and [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/).
+PEPPRO requires a set of Python and R packages to run.
 
 ### Python packages
 
@@ -27,53 +26,91 @@ pip install --user -r requirements.txt
 Rscript -e 'install.packages("PEPPROr", repos=NULL, type="source")'
 ```
 
-### Optional software
+### Tools
 
-Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming, deduplication, and reverse complementation.  The use of `fqdedup`, in particular, is useful if you wish to minimize memory use at the expense of speed.  We suggest using the default tools simply due to the fact that `fastx toolkit` has not been supported since 2012.
+The pipeline also relies on a set of publicly available bioinformatic tools, but if you don't want to install the prerequisite software used by PEPPRO natively, you can follow our tutorial on [running PEPPRO directly in a container](container.md) and skip this step.
 
-`seqOutBias` can be used to take into account the mappability at a given read length to filter the sample signal.
+Otherwise, you'll need to install the following: [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [flash](https://ccb.jhu.edu/software/FLASH/), [picard](https://broadinstitute.github.io/picard/), [preseq](http://smithlabresearch.org/software/preseq/), [seqkit](https://bioinf.shenwei.me/seqkit/), [samtools](http://www.htslib.org/), [seqtk](https://github.com/lh3/seqtk), and [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/). If you need help, we have [detailed installation instructions](detailed_install.md) for installing these.
 
-*Optional tools:* [fqdedup](https://github.com/guertinlab/fqdedup), [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/), [seqOutBias](https://github.com/guertinlab/seqOutBias), [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc), and [pigz (v2.3.4+)](https://zlib.net/pigz/).
+## 3: Download `refgenie` assets
 
-## 3: Download `refgenie` assemblies
-
-The pipeline relies on [`refgenie` assemblies](http://refgenie.databio.org/en/dev/install/) for alignment.  First, initialize a folder for genome indexes and the `refgenie` config file.
+PEPPRO uses [`refgenie`](http://refgenie.databio.org/) assets for alignment. If you haven't already, initialize a refgenie config file like this:
 
 ```console
 export REFGENIE=your_genome_folder/genome_config.yaml
 refgenie init -c $REFGENIE
 ```
 
-Then, just pull the assets you need.
+Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it persists. 
+
+Next, pull the assets you need. Replace `hg38` in the example below if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md). Download these required assets with this command:
 
 ```console
-refgenie pull -g hg38 -a bowtie2
-refgenie pull -g rCRSd -a bowtie2
-refgenie pull -g human_repeats -a bowtie2
+refgenie pull -g hg38 -a bowtie2_index ensembl_gtf ensembl_rb refgene_anno feat_annotation 
 ```
-
-(Add `REFGENIE` to your .bashrc or .profile to ensure it persists). Alternatively, you can skip the `REFGENIE` variable and simply change the value of the `resources.genome_config` option in the [`pipeline_config.yaml`](https://github.com/databio/peppro/blob/master/pipelines/peppro.yaml) file to point to the folder where you stored the assemblies. 
-
-## 4: Run the pipeline script directly
-
-The pipeline at its core is just a python script, and you can run it on the command line for a single sample (see [command-line usage](usage)), which you can also get on the command line by running `pipelines/peppro.py --help`. You just need to pass a few command-line parameters to specify sample name, reference genome, input files, etc. Here's the basic command to run the included small test example through the pipeline:
+PEPPRO also requires `bowtie2_index` for any pre-alignment genomes:
 
 ```console
-/pipelines/peppro.py \
-  --sample-name test \
-  --genome hg38 \
-  --input examples/data/test_r1.fq.gz \
-  --single-or-paired single \
-  -O $HOME/peppro_example/
+refgenie pull -g human_rDNA -a bowtie2_index
 ```
 
-This test example takes less than 5 minutes to complete. Read more about how to [run the test sample using `Looper`](howto/use_looper.md) with the included [example `peppro_test.yaml` file](https://github.com/databio/peppro/blob/master/examples/meta/peppro_test.yaml).
+### Optional software
 
-# 5. Next steps
+Optionally, `PEPPRO` can mix and match tools for adapter removal, read trimming, deduplication, and reverse complementation.  The use of `fqdedup`, in particular, is useful if you wish to minimize memory use at the expense of speed.  We suggest using the default tools simply due to the fact that `fastx toolkit` has not been supported since 2012. `seqOutBias` can be used to take into account the mappability at a given read length to filter the sample signal.
 
-This is just the beginning. For your next step, take a look at one of these user guides:
+*Optional tools:*
 
-- [Extended tutorial for running a single sample](tutorial.md)
-- [Running on multiple samples with looper](howto/use_looper.md)
-- [Running the pipeline directly in a container](howto/use_container.md)
-- See other detailed user guide links in the side menu
+* [fastp](https://github.com/OpenGene/fastp)
+* [fqdedup](https://github.com/guertinlab/fqdedup)
+* [fastx toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
+* [seqOutBias](https://github.com/guertinlab/seqOutBias)
+* [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc)
+* [pigz (v2.3.4+)](https://zlib.net/pigz/)
+
+## 4: Run an example project through PEPPRO
+
+Start by running the example project (`peppro_test.yaml`) in the [`examples/meta/`](https://github.com/databio/peppro/tree/master/examples/meta) folder. PEPPRO uses a project management tool called [looper](https://looper.databio.org) to run the pipeline across samples in a project. Let's use the `-d` argument to do a *dry run*, which will create job scripts for every sample in a project, but will not execute them:
+
+```
+cd peppro
+looper run -d examples/meta/peppro_test.yaml
+```
+
+If the looper executable is not in your `$PATH`, add the following line to your `.bashrc` or `.profile`:
+```
+export PATH=$PATH:~/.local/bin
+```
+If that worked, let's actually run the example by taking out the `-d` flag:
+
+```console
+looper run examples/meta/peppro_test.yaml
+```
+
+Or, if you're using containers, adjust the `--compute` argument accordingly:
+
+```console
+looper run examples/meta/peppro_test.yaml --compute docker
+looper run examples/meta/peppro_test.yaml --compute singularity
+```
+
+There are lots of other cool things you can do with looper, like dry runs, summarize results, check on pipeline run status, clean intermediate files to save disk space, lump multiple samples into one job, and more. For details, consult the [`looper` docs](http://looper.databio.org/).
+
+## 5: Configure your project files
+
+To run your own samples, you'll need to organize them in **PEP format**, which is explained in [how to create a PEP](https://pepkit.github.io/docs/home/) and is universal to all pipelines that read PEPs, including `PEPPRO`. To get you started, there are examples you can adapt in the `examples/` folder (*e.g.* [example test PEP](https://github.com/databio/peppro/tree/master/examples/meta/peppro_test.yaml)). In short, you need two files for your project:
+
+  1. project config file -- describes output locations, pointers to data, etc.
+  2. sample annotation file -- comma-separated value (CSV) list of your samples.
+
+The sample annotation file must specify these columns:
+
+- sample_name
+- library (*e.g.* 'PRO', 'PROSEQ', 'PRO-seq', 'GRO', 'GROSEQ', 'GRO-seq')
+- organism (*e.g.* 'human' or 'mouse')
+- read1
+- read2 (if paired)
+- anything else you wish to include
+
+## Next steps
+
+This is just the beginning. For your next step, the [extended tutorial](tutorial.md) will walk you through a real project. Or, take a look at one of other detailed user guide links in the side menu.

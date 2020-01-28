@@ -1,20 +1,20 @@
 #! /usr/bin/env Rscript
 ###############################################################################
-#6/10/19
+#1/20/2020
 #Author: Jason Smith
-#PEPPRO_summarizer.R
+#PEPPRO_complexity_curves.R
 #
 #This program is meant to plot multiple library complexity curves on the 
 #same plot when called by looper summarize
 #
 #NOTES:
-#usage: Rscript tools/PEPPRO_summarizer.R 
+#usage: Rscript tools/PEPPRO_complexity_curves.R 
 #       /path/to/project_config.yaml
 #
 #requirements: PEPPROr
 #
 ###############################################################################
-version <- 0.1
+version <- 0.2
 ##### Load dependencies #####
 
 required_libraries <- c("PEPPROr")
@@ -54,24 +54,46 @@ dir.create(
     showWarnings = FALSE)
 
 # Plot combined library complexity curves for all samples in project
-cc <- paste(config(prj)$metadata$output_dir,
+cc <- paste(suppressMessages(config(prj)$metadata$output_dir),
             "results_pipeline",
-            samples(prj)$sample_name,
-            paste0("QC_", samples(prj)$genome),
-            paste0(samples(prj)$sample_name, "_preseq_yield.txt"),
+            suppressMessages(samples(prj)$sample_name),
+            paste0("QC_", suppressMessages(samples(prj)$genome)),
+            paste0(suppressMessages(samples(prj)$sample_name),
+                   "_preseq_yield.txt"),
             sep="/")
-rc <- paste(config(prj)$metadata$output_dir,
+rc <- paste(suppressMessages(config(prj)$metadata$output_dir),
             "results_pipeline",
-            samples(prj)$sample_name,
-            paste0("QC_", samples(prj)$genome),
-            paste0(samples(prj)$sample_name, "_preseq_counts.txt"),
+            suppressMessages(samples(prj)$sample_name),
+            paste0("QC_", suppressMessages(samples(prj)$genome)),
+            paste0(suppressMessages(samples(prj)$sample_name),
+                   "_preseq_counts.txt"),
             sep="/")
-plotComplexityCurves(ccurves = cc,
-    coverage = 0, read_length = 0,
-    real_counts_path = rc, ignore_unique = FALSE,
-    output_name = paste(config(prj)$metadata$output_dir,
-                        "summary",
-                        paste0(config(prj)$name, "_libComplexity"),
-                        sep="/"))
+
+hasBoth <- file.exists(cc) & file.exists(rc)
+
+ccSub <- cc[hasBoth]
+rcSub <- rc[hasBoth]
+#message(ccSub, rcSub)
+message(paste0(length(ccSub), " of ", length(cc), " files available"))
+
+output_name <- paste(config(prj)$metadata$output_dir, "summary",
+                     paste0(config(prj)$name, "_libComplexity"), sep="/")
+
+if (sum(hasBoth) > 0){
+
+    p <- plotComplexityCurves(ccurves = ccSub, coverage = 0, read_length = 0,
+                              real_counts_path = rcSub, ignore_unique = FALSE)
+
+    pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+        width= 10, height = 7, useDingbats=F)
+    print(p)
+    invisible(dev.off())
+    png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+        width = 686, height = 480)
+    print(p)
+    invisible(dev.off())
+} else {
+    message("No samples have available library complexity files.")
+}
 
 ###############################################################################

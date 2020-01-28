@@ -10,6 +10,7 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: [plus_frif.html](../files/examples/tutorial/reports/plus_frif.html)
     * :fa-file-code-o: [mrna_contamination.html](../files/examples/tutorial/reports/mrna_contamination.html)
     * :fa-file-code-o: [objects.html](../files/examples/tutorial/reports/objects.html)
+    * :fa-file-code-o: [pause_index.html](../files/examples/tutorial/reports/pause_index.html)
     * :fa-file-code-o: [samples.html](../files/examples/tutorial/reports/samples.html)
     * :fa-file-code-o: [status.html](../files/examples/tutorial/reports/status.html)
     * :fa-file-code-o: [tss_enrichment.html](../files/examples/tutorial/reports/tss_enrichment.html)
@@ -24,9 +25,13 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: tutorial_unmap.bam
         * ???+ danger ":fa-folder-open-o: fastq/"
         * ??? danger ":fa-folder-open-o: fastqc/"
-            * [:fa-file-code-o: tutorial_rmAdapter.html](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_rmAdapter.html)
-            * [:fa-file-code-o: tutorial_rmAdapter.json](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_rmAdapter.json)
-            * [:fa-file-text-o: tutorial_rmAdapter.txt](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_rmAdapter.txt)
+            * [:fa-file-code-o: tutorial_R1_rmAdapter.html](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R1_rmAdapter.html)
+            * [:fa-file-code-o: tutorial_R1_rmAdapter.json](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R1_rmAdapter.json)
+            * [:fa-file-text-o: tutorial_R1_rmAdapter.txt](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R1_rmAdapter.txt)
+            * [:fa-file-code-o: tutorial_R2_rmAdapter.html](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R2_rmAdapter.html)
+            * [:fa-file-code-o: tutorial_R2_rmAdapter.json](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R2_rmAdapter.json)
+            * [:fa-file-text-o: tutorial_R2_rmAdapter.txt](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R2_rmAdapter.txt)
+            * [:fa-file-text-o: tutorial_R1_processed_fastqc.html](../files/examples/tutorial/results_pipeline/tutorial/fastqc/tutorial_R1_processed_fastqc.html)
         * ??? danger ":fa-folder-open-o: prealignments/"
             * :fa-file-text-o: tutorial_rCRSd_3k_bt_aln_summary.log
             * :fa-file-archive-o: tutorial_rCRSd_3k_unmap_R1.fq.gz
@@ -76,7 +81,7 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: tutorial.yaml
     * :fa-file-text-o: peppro.py_tutorial.log
 * ??? danger ":fa-folder-open-o: summary/"
-    * :fa-file-pdf-o: [tutorial_library_complexity.pdf](../files/examples/tutorial/summary/tutorial_library_complexity.pdf)
-    * :fa-file-image-o: [tutorial_library_complexity.png](../files/examples/tutorial/summary/tutorial_library_complexity.png)
+    * :fa-file-pdf-o: tutorial_libComplexity.pdf
+    * :fa-file-image-o: tutorial_liComplexity.png
 * :fa-file-text-o: [tutorial_stats_summary.tsv](../files/examples/tutorial/tutorial_stats_summary.tsv)
 * :fa-file-code-o: [tutorial_summary.html](../files/examples/tutorial/tutorial_summary.html)
