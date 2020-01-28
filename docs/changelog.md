@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - Produce sample level gene counts file as output
 - Generate project level counts table including all samples X gene counts
 - Report degradation metric for library quality
+- Add BiocProject integration
 
 ## [0.8.1] -- 2019-07-15
 
