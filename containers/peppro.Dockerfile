@@ -115,6 +115,12 @@ RUN wget https://github.com/shenwei356/seqkit/releases/download/v0.10.1/seqkit_l
     tar -zxvf seqkit_linux_amd64.tar.gz && \
     ln -s /home/src/seqkit /usr/bin/
 
+# Install flash
+WORKDIR /home/src/
+RUN wget http://ccb.jhu.edu/software/FLASH/FLASH-1.2.11-Linux-x86_64.tar.gz && \
+    tar xvfz FLASH-1.2.11-Linux-x86_64.tar.gz && \
+    ln -s /home/src/FLASH-1.2.11-Linux-x86_64/flash /usr/bin/
+
 # Install fastp
 WORKDIR /home/src/
 RUN git clone https://github.com/OpenGene/fastp.git && \
