@@ -2207,11 +2207,9 @@ def main():
                        " | awk '{a[NR]=$1; b[NR]=$2; max_len=$1}" +
                        "{if ($1 > max_len) {max_len=$1}} " +
                        "END{ for (i in a) print 1+max_len-a[i], b[i]}'" +
-                       " | sort -nk1 | awk '(($1-" + str(umi_len) + ") <= " +
-                       str(du) + " && ($1-" + str(umi_len) + ") >= " +
-                       str(dl) + "){degradedSum += $2}; " +
-                       "(($1-" + str(umi_len) + ") >= " + str(il) +
-                       " && ($1-" + str(umi_len) + ") <= " + str(iu) +
+                       " | sort -nk1 | awk '($1 <= " + str(du) +
+                       " && $1 >= " + str(dl) + "){degradedSum += $2}; " +
+                       "($1 >= " + str(il) + " && $1 <= " + str(iu) +
                        "){intactSum += $2} END {if (intactSum < 1) " +
                        "{intactSum = 1} print degradedSum/intactSum}'")
                 degradation_ratio = pm.checkprint(cmd)
