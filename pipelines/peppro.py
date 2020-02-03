@@ -1002,12 +1002,14 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     :param str outfolder: path to output directory for the pipeline
     :return (str, str): pair (R1, R2) of paths to FASTQ files
     """
-    # Create names for processed FASTQ files.
-    fastq_folder = os.path.join(outfolder, "fastq")
-    fastqc_folder = os.path.join(outfolder, "fastqc")
-    fastp_folder = os.path.join(outfolder, "fastp")
 
     sname = args.sample_name  # for concise code
+
+    # Create names for processed FASTQ files.
+    fastq_folder = os.path.join(outfolder, "fastq")
+    fastp_folder = os.path.join(outfolder, "fastp")
+    fastqc_folder = os.path.join(outfolder, "fastqc")
+    fastqc_report = os.path.join(fastqc_folder, sname + "_fastqc.html")
 
     noadap_fq1 = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     noadap_fq2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
@@ -1284,8 +1286,10 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     else:
         pm.debug("\nELSE: trim_command: {} + {}\n".format(adapter_command, trim_command))
         pm.run([adapter_command, trim_command], processed_fastq,
-               follow=ngstk.check_trim(processed_fastq, False, None,
-                                       fastqc_folder=fastqc_folder))
+               follow=ngstk.report_fastq)
+        pm.run(ngstk.check_trim(processed_fastq, False, None,
+                                fastqc_folder=fastqc_folder),
+               fastqc_report)
         return processed_fastq
 
     # Put it all together (original included option to not retain intermediates)
