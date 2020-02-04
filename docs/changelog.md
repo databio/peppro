@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Updated degradation ratio calculation for PE data
+- Corrected Pct_reads_too_short to be percent not fraction
 
 ## [0.8.7] -- 2020-02-04
 

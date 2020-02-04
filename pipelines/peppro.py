@@ -1119,7 +1119,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             if _itsa_file(processed_fastq):
                 pr = int(ngstk.count_lines(processed_fastq).strip())
                 pm.report_result("Pct_reads_too_short", 
-                                 round(float((ts/4)/pr), 4))
+                    round(float(100*((float(ts)/4)/float(pr)/4)), 4))
         else:
             pm.fail_pipeline("Could not find '{}' to report adapter "
                              "removal statistics.".format(report))
@@ -2858,10 +2858,21 @@ def main():
                 floats = list(map(float, f))
             try:
                 # If the TSS enrichment is 0, don't report            
-                Tss_score = (
-                    (sum(floats[int(floats.index(max(floats))-49):
-                                int(floats.index(max(floats))+51)]) / 100) /
-                    (sum(floats[1:int(len(floats)*0.05)]) / int(len(floats)*0.05)))
+                list_len = 0.05*float(len(floats))
+                normTSS = [x / (sum(floats[1:int(list_len)]) /
+                           len(floats[1:int(list_len)])) for x in floats]
+                max_index = normTSS.index(max(normTSS))
+
+                if (((normTSS[max_index]/normTSS[max_index-1]) > 1.5) and
+                    ((normTSS[max_index]/normTSS[max_index+1]) > 1.5)):
+                    tmpTSS = list(normTSS)
+                    del tmpTSS[max_index]
+                    max_index = tmpTSS.index(max(tmpTSS)) + 1
+
+                Tss_score = round(
+                    (sum(normTSS[int(max_index-50):int(max_index+50)])) /
+                    (len(normTSS[int(max_index-50):int(max_index+50)])), 1)
+
                 pm.report_result("TSS_Plus_Score", round(Tss_score, 1))
             except ZeroDivisionError:
                 pass
@@ -2879,10 +2890,21 @@ def main():
                 floats = list(map(float, f))
             try:
                 # If the TSS enrichment is 0, don't report
-                Tss_score = (
-                    (sum(floats[int(floats.index(max(floats))-49):
-                                int(floats.index(max(floats))+51)]) / 100) /
-                    (sum(floats[1:int(len(floats)*0.05)]) / int(len(floats)*0.05)))
+                list_len = 0.05*float(len(floats))
+                normTSS = [x / (sum(floats[1:int(list_len)]) /
+                           len(floats[1:int(list_len)])) for x in floats]
+                max_index = normTSS.index(max(normTSS))
+
+                if (((normTSS[max_index]/normTSS[max_index-1]) > 1.5) and
+                    ((normTSS[max_index]/normTSS[max_index+1]) > 1.5)):
+                    tmpTSS = list(normTSS)
+                    del tmpTSS[max_index]
+                    max_index = tmpTSS.index(max(tmpTSS)) + 1
+
+                Tss_score = round(
+                    (sum(normTSS[int(max_index-50):int(max_index+50)])) /
+                    (len(normTSS[int(max_index-50):int(max_index+50)])), 1)
+
                 pm.report_result("TSS_Minus_Score", round(Tss_score, 1))
             except ZeroDivisionError:
                 pass
