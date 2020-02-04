@@ -1,6 +1,11 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.8.8] -- 2020-02-04
+
+### Changed
+- Updated degradation ratio calculation for PE data
+
 ## [0.8.7] -- 2020-02-04
 
 ### Changed
