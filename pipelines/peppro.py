@@ -1009,7 +1009,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     fastq_folder = os.path.join(outfolder, "fastq")
     fastp_folder = os.path.join(outfolder, "fastp")
     fastqc_folder = os.path.join(outfolder, "fastqc")
-    fastqc_report = os.path.join(fastqc_folder, sname + "_fastqc.html")
+    fastqc_report = os.path.join(fastqc_folder, sname + "_R1_processed_fastqc.html")
 
     noadap_fq1 = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     noadap_fq2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
@@ -1105,15 +1105,21 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             #                  round(float(total_adapter/total_bases), 2))
 
             ts = float(pm.checkprint(ts_cmd).replace(',',''))
-            pm.report_result("Reads_too_short", ts)
+            pm.report_result("Reads_too_short", round(ts, 2))
 
-            tr = int(ngstk.count_lines(noadap_fq1).strip())
-            dr = int(ngstk.count_lines(dedup_fq).strip())
-            dups = max(0, (float(tr)/4 - float(dr)/4))
-            pm.report_result("Duplicate_reads", dups)
+            if _itsa_file(noadap_fq1):
+                tr = int(ngstk.count_lines(noadap_fq1).strip())
+            else:
+                tr = 0
+            if _itsa_file(dedup_fq):
+                dr = int(ngstk.count_lines(dedup_fq).strip())
+                dups = max(0, (float(tr)/4 - float(dr)/4))
+                pm.report_result("Duplicate_reads", round(dups, 2))
 
-            pr = int(ngstk.count_lines(processed_fastq).strip())
-            pm.report_result("Pct_reads_too_short", round(float(ts/pr), 2))
+            if _itsa_file(processed_fastq):
+                pr = int(ngstk.count_lines(processed_fastq).strip())
+                pm.report_result("Pct_reads_too_short", 
+                                 round(float((ts/4)/pr), 4))
         else:
             pm.fail_pipeline("Could not find '{}' to report adapter "
                              "removal statistics.".format(report))
@@ -1286,10 +1292,12 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     else:
         pm.debug("\nELSE: trim_command: {} + {}\n".format(adapter_command, trim_command))
         pm.run([adapter_command, trim_command], processed_fastq,
-               follow=ngstk.report_fastq)
-        pm.run(ngstk.check_trim(processed_fastq, False, None,
-                                fastqc_folder=fastqc_folder),
-               fastqc_report)
+               follow=report_fastq)
+        if not _itsa_file(fastqc_report) or args.new_start:
+            cmd = ("echo '### Calculate the number of trimmed reads'")
+            pm.run(cmd, fastqc_report, 
+                   follow=ngstk.check_trim(processed_fastq, False, None,
+                                           fastqc_folder=fastqc_folder))
         return processed_fastq
 
     # Put it all together (original included option to not retain intermediates)
