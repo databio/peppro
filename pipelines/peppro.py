@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.8.7"
+__version__ = "0.8.8"
 
 
 from argparse import ArgumentParser
@@ -1248,9 +1248,11 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 if il < 1:
                     il = 30
 
-            cmd = ("awk '($1 <= " + str(du) + " && $1 >= " + str(dl) +
-                   "){degradedSum += $2}; " +  "($1 >= " +
-                   str(il) + " && $1 <= " + str(iu) +
+            cmd = ("awk '(($1-" + str(umi_len) + " ) <= " + str(du) +
+                   " && ($1-" + str(umi_len) + " ) >= " + str(dl) +
+                   "){degradedSum += $2}; " +  "(($1-" + str(umi_len) +
+                   " ) >= " + str(il) + " && ($1-" + str(umi_len) +
+                   ") <= " + str(iu) +
                    "){intactSum += $2}  END {if (intactSum < 1) " +
                    "{intactSum = 1} print degradedSum/intactSum}' "
                    + flash_hist)
