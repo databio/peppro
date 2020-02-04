@@ -6,7 +6,7 @@
 
 `python pipelines/peppro.py --help`
 ```{console}
-usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--verbosity V] [--silent]
+usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--silent] [--verbosity V]
                  [--logdev] [-C CONFIG_FILE] -O PARENT_OUTPUT_FOLDER
                  [-M MEMORY_LIMIT] [-P NUMBER_OF_CORES] -S SAMPLE_NAME -I
                  INPUT_FILES [INPUT_FILES ...]
@@ -25,7 +25,7 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--verbosity V] [--silent]
                  [--coverage] [--keep] [--noFIFO] [--no-complexity]
                  [--prioritize] [-V]
 
-PEPPRO version 0.8.6
+PEPPRO version 0.8.7
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -34,8 +34,8 @@ optional arguments:
   -D, --dirty           Don't auto-delete intermediate files
   -F, --force-follow    Always run 'follow' commands
   -T, --testmode        Only print commands, don't run
-  --verbosity V         Set logging level (1-5 or logging module level name)
   --silent              Silence logging. Overrides verbosity.
+  --verbosity V         Set logging level (1-5 or logging module level name)
   --logdev              Expand content of logging message format.
   -C CONFIG_FILE, --config CONFIG_FILE
                         Pipeline configuration file (YAML). Relative paths are

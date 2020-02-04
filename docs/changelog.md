@@ -1,6 +1,12 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.8.7] -- 2020-02-04
+
+### Changed
+- Updated degradation ratio calculation for SE data
+- Fixed report_fastq to properly handle SE, non UMI data
+
 ## [0.8.6] -- 2020-01-28
 
 ### Changed
