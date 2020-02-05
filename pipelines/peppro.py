@@ -236,8 +236,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             ])
 
         adapter_cmd_chunks.extend([
-            #("--length_required", (18 + int(float(args.umi_len)))),
-            ("--length_required", 5),  # For insert size plotting
+            ("--length_required", (2 + int(float(args.umi_len)))),
             ("--html", fastp_report_html),
             ("--json", fastp_report_json),
             ("--report_title", ("'" + sname + "'"))
@@ -263,8 +262,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         if cut_version >= 1.15:
             adapter_cmd_chunks.extend([("-j", str(pm.cores))])
         adapter_cmd_chunks.extend([
-            #("-m", (18 + int(float(args.umi_len)))),
-            ("-m", 5),  # For insert size plotting
+            ("-m", (2 + int(float(args.umi_len)))),
             ("-O", 1)
         ])
         if read2:
@@ -297,8 +295,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             ])
 
         adapter_cmd_chunks.extend([
-            #("--length_required", (18 + int(float(args.umi_len)))),
-            ("--length_required", 5),  # For insert size plotting
+            ("--length_required", (2 + int(float(args.umi_len)))),
             ("--html", fastp_report_html),
             ("--json", fastp_report_json),
             ("--report_title", ("'" + sname + "'"))
@@ -438,7 +435,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
         trim_cmd_chunks.extend([
             "|",
             (tools.seqtk, "seq"),
-            ("-L", 5)
+            #("-L", 5)
+            ("-L",(2 + int(float(args.umi_len))))
         ])
 
         # Reverse complement for PRO-seq
@@ -468,7 +466,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", processed_fastq)
             ])                           
@@ -476,7 +475,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-r", "-"),
                 (">", processed_fastq)
             ])
@@ -529,7 +529,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", processed_fastq)
             ])                           
@@ -537,7 +538,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-r", "-"),
                 (">", processed_fastq)
             ])
@@ -625,7 +627,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5)
+                #("-L", 5)
+                ("-L",(2 + int(float(args.umi_len))))
             ])
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 trim_cmd_chunks.extend([("-r", "-")])
@@ -639,7 +642,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 trim_cmd_chunks.extend([
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     ("-r", noadap_fastq),
                     (">", trimmed_fastq)
                 ])
@@ -647,7 +651,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             else:
                 trim_cmd_chunks = [
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     noadap_fastq,
                     (">", trimmed_fastq)
                 ]
@@ -670,7 +675,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", trimmed_fastq)
             ])
@@ -678,7 +684,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-r", "-"),
                 (">", trimmed_fastq)
             ])
@@ -739,7 +746,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", trimmed_fastq)
             ])
@@ -747,7 +755,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-r", "-"),
                 (">", trimmed_fastq)
             ])
@@ -838,7 +847,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     "-",
                     (">", processed_fastq)
                 ])
@@ -846,7 +856,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     ("-r", "-"),
                     (">", processed_fastq)
                 ])
@@ -862,7 +873,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     "-",
                     (">", processed_fastq)
                 ])
@@ -870,7 +882,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     ("-r", "-"),
                     (">", processed_fastq)
                 ])
@@ -879,7 +892,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 trim_cmd_chunks = [
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     ("-r", noadap_fastq),
                     (">", processed_fastq)
                 ]
@@ -906,7 +920,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", processed_fastq)
             ])
@@ -915,7 +930,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 "|",
                 tools.seqtk,
                 ("seq", "-r"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-", ">"),
                 processed_fastq
             ])
@@ -965,7 +981,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", processed_fastq)
             ])
@@ -974,7 +991,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 "|",
                 tools.seqtk,
                 ("seq", "-r"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-", ">"),
                 processed_fastq
             ])
