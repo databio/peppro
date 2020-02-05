@@ -1,6 +1,11 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.8.9] -- 2020-02-05
+
+### Changed
+- Corrected Pct_reads_too_short calculation
+
 ## [0.8.8] -- 2020-02-04
 
 ### Changed

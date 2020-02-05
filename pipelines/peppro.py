@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.8.8"
+__version__ = "0.8.9"
 
 
 from argparse import ArgumentParser
@@ -1119,7 +1119,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             if _itsa_file(processed_fastq):
                 pr = int(ngstk.count_lines(processed_fastq).strip())
                 pm.report_result("Pct_reads_too_short", 
-                    round(float(100*((float(ts)/4)/float(pr)/4)), 4))
+                    round(float(100*(ts/(float(pr)/4))), 4))
         else:
             pm.fail_pipeline("Could not find '{}' to report adapter "
                              "removal statistics.".format(report))
