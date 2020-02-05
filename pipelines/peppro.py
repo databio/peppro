@@ -1029,6 +1029,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     fastqc_folder = os.path.join(outfolder, "fastqc")
     fastqc_report = os.path.join(fastqc_folder, sname + "_R1_processed_fastqc.html")
 
+    preprocessed_fq1 = os.path.join(fastq_folder, sname + "_R1.fastq")
+    preprocessed_fq2 = os.path.join(fastq_folder, sname + "_R2.fastq")
     noadap_fq1 = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     noadap_fq2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
     dedup_fq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
@@ -1129,15 +1131,16 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 tr = int(ngstk.count_lines(noadap_fq1).strip())
             else:
                 tr = 0
+
             if _itsa_file(dedup_fq):
                 dr = int(ngstk.count_lines(dedup_fq).strip())
                 dups = max(0, (float(tr)/4 - float(dr)/4))
                 pm.report_result("Duplicate_reads", round(dups, 2))
 
-            if _itsa_file(processed_fastq):
-                pr = int(ngstk.count_lines(processed_fastq).strip())
+            if _itsa_file(preprocessed_fq1):
+                pre = int(ngstk.count_lines(preprocessed_fq1).strip())
                 pm.report_result("Pct_reads_too_short", 
-                    round(float(100*(ts/(float(pr)/4))), 4))
+                    round(float(100*(ts/(float(pre)/4))), 4))
         else:
             pm.fail_pipeline("Could not find '{}' to report adapter "
                              "removal statistics.".format(report))
