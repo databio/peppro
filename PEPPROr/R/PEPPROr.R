@@ -1361,7 +1361,7 @@ cutDists = function(vec, divisions = c(-Inf, -1e6, -1e4, -1000, -100, 0,
 #' @export
 mRNAcontamination <- function(rpkm,
                               name='mRNA contamination ratios',
-                              raw=TRUE,
+                              raw=FALSE,
                               type=c("histogram", "boxplot", "violin"),
                               annotate=TRUE) {
     if (exists(rpkm)) {
@@ -1377,19 +1377,39 @@ mRNAcontamination <- function(rpkm,
     finite_rpkm <- RPKM[is.finite(RPKM$ratio),]
 
     if (raw) {
-        div <- calcDivisions(finite_rpkm$ratio,
-                             calcQuantileCutoff(finite_rpkm$ratio,
-                                                baseline = 3))
+        # div <- calcDivisions(finite_rpkm$ratio,
+        #                      calcQuantileCutoff(finite_rpkm$ratio,
+        #                                         baseline = 3))
+        div <- c(-Inf, 0.25, 0.5, 0.75, 1, 1.25, 1.5,
+                 1.75, 2, 2.25, 2.5, 2.75, 3, Inf)
     } else {
-        div <- calcDivisions(log10(finite_rpkm$ratio),
-                             calcQuantileCutoff(log10(finite_rpkm$ratio),
-                                                baseline = 3),
-                             transformed=TRUE)
+        # div <- calcDivisions(log10(finite_rpkm$ratio),
+        #                      calcQuantileCutoff(log10(finite_rpkm$ratio),
+        #                                         baseline = 3),
+        #                      transformed=TRUE)
+        div <- c(-Inf, -1, -0.8, -0.6, -0.4, -0.2, 0,
+                 0.2, 0.4, 0.6, 0.8, 1.0, Inf)
     }
 
     # ensure breaks are not duplicated
     div        <- unique(div)
-    quantLabel <- paste(calcQuantileCutoff(finite_rpkm$ratio),"%", sep='')
+
+    # calculate and generate labels for upper and lower bins
+    if (raw) {
+        lowerLabel <- paste0(round(
+            (nrow(finite_rpkm[finite_rpkm$ratio < 0.25, ]) /
+             nrow(finite_rpkm)) * 100, 2), '%')
+        upperLabel <- paste0(round(
+            (nrow(finite_rpkm[finite_rpkm$ratio > 3, ]) / 
+             nrow(finite_rpkm)) * 100, 2), '%')
+    } else {
+        lowerLabel <- paste0(round(
+            (nrow(finite_rpkm[log10(finite_rpkm$ratio) < -1, ]) /
+             nrow(finite_rpkm)) * 100, 2), '%')
+        upperLabel <- paste0(round(
+            (nrow(finite_rpkm[log10(finite_rpkm$ratio) > 1, ]) / 
+             nrow(finite_rpkm)) * 100, 2), '%')
+    }
 
     if (raw) {
         if (type == "histogram") {
@@ -1424,13 +1444,13 @@ mRNAcontamination <- function(rpkm,
             if (length(div) <= 3) {
                 plot <- base_plot +
                     geom_histogram(col="black", fill=I("transparent")) +
-                    geom_vline(aes(xintercept=median(ratio)),
+                    geom_vline(aes(xintercept=median(finite_rpkm$ratio)),
                                color="gray", linetype="dashed", size=1) +
                     annotate("text", x=median(finite_rpkm$ratio),
                              y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
                                 label="median", angle=90,
                                 color="gray", vjust=-0.5) +
-                    geom_vline(aes(xintercept=mean(ratio)),
+                    geom_vline(aes(xintercept=mean(finite_rpkm$ratio)),
                                color="light gray", linetype="dotted", size=1) +
                     annotate("text", x=mean(finite_rpkm$ratio),
                              y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
@@ -1448,7 +1468,7 @@ mRNAcontamination <- function(rpkm,
                                       "maroon")) + 
                     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
                          y="frequency") +
-                    geom_text(aes(label= quantLabel),
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
                               vjust=-1)
             }
@@ -1456,9 +1476,9 @@ mRNAcontamination <- function(rpkm,
             if (length(div) <= 3) {
                 plot = base_plot +
                     geom_histogram(col="black", fill=I("transparent")) +
-                    geom_vline(aes(xintercept=median(log10(ratio))),
+                    geom_vline(aes(xintercept=median(log10(finite_rpkm$ratio))),
                                color="gray", linetype="dashed", size=1) +
-                    geom_vline(aes(xintercept=mean(log10(ratio))),
+                    geom_vline(aes(xintercept=mean(log10(finite_rpkm$ratio))),
                                color="light gray", linetype="dotted", size=1) +
                     labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
                     scale_x_log10(limits = c(0.001, 50),
@@ -1472,9 +1492,9 @@ mRNAcontamination <- function(rpkm,
                              fill = c("maroon",
                                       rep("gray", (length(div)-3)),
                                       "maroon")) + 
-                    labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
+                    labs(x=expression(log[10]((over(exon[RPKM], intron[RPKM]))~X~Gene)),
                          y="frequency") +
-                    geom_text(aes(label= quantLabel),
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
                               vjust=-1)
             }
@@ -1506,7 +1526,7 @@ mRNAcontamination <- function(rpkm,
                               breaks=prettyLogs) +
                 annotation_logticks(sides = c("rl")) +
                 labs(x=name,
-                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene))
+                     y=expression(log[10]((over(exon[RPKM], intron[RPKM]))~X~Gene)))
         }
     } else if (type == "violin") {
         if (raw) {
@@ -1537,7 +1557,7 @@ mRNAcontamination <- function(rpkm,
                               breaks=prettyLogs) +
                 annotation_logticks(sides = c("rl")) +
                 labs(x=name,
-                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene))
+                     y=expression(log[10]((over(exon[RPKM], intron[RPKM]))~X~Gene)))
         }
     } else {
         # Default to histogram
@@ -1569,7 +1589,7 @@ mRNAcontamination <- function(rpkm,
                                       "maroon")) + 
                     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
                          y="frequency") +
-                    geom_text(aes(label= quantLabel),
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
                               vjust=-1)
             }
@@ -1595,7 +1615,7 @@ mRNAcontamination <- function(rpkm,
                                       "maroon")) + 
                     labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
                          y="frequency") +
-                    geom_text(aes(label= quantLabel),
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
                               vjust=-1)
             }
@@ -1628,7 +1648,6 @@ mRNAcontamination <- function(rpkm,
     } else {
         q <- plot + theme_PEPPRO()
     }
-    
 
     return(q)
 }
