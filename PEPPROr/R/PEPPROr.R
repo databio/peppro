@@ -1680,8 +1680,14 @@ plotPI <- function(pi, name='pause indicies',
     }
     colnames(PI) <- c("chr", "start", "end", "name", "pi", "strand")
 
-    div <- calcDivisions(PI$pi, calcQuantileCutoff(PI$pi, baseline = 3))
-    quantLabel <- paste(calcQuantileCutoff(PI$pi, baseline = 3),"%", sep='')
+    div <- c(-Inf, 0.5, seq(from=2.5, to=25, by=2.5),
+             seq(from=30, to=50, by=5),
+             seq(from=60, to=100, by=10), Inf)
+
+    lowerLabel <- paste0(round(
+        (nrow(PI[PI$pi < 0.5, ]) / nrow(PI)) * 100, 2), '%')
+    upperLabel <- paste0(round(
+        (nrow(PI[PI$pi > 100, ]) / nrow(PI)) * 100, 2), '%')
 
     if (type == "histogram") {
         if (length(div) <= 3) {
@@ -1722,9 +1728,9 @@ plotPI <- function(pi, name='pause indicies',
                                   rep("gray", (length(div)-3)),
                                   "maroon")) + 
                 labs(x="pause indicies", y="frequency") +
-                geom_text(aes(label= quantLabel),
+                geom_text(aes(label=c(lowerLabel, upperLabel)),
                           data=pi_table[c(1,length(pi_table$Freq)),],
-                          vjust=-1)
+                          vjust=0.5, hjust=-0.1, angle=90)
         }
     } else if (type == "boxplot") {
         plot <- base_plot +
@@ -1771,9 +1777,9 @@ plotPI <- function(pi, name='pause indicies',
                                   rep("gray", (length(div)-3)),
                                   "maroon")) + 
                 labs(x="pause indicies", y="frequency") +
-                geom_text(aes(label= quantLabel),
+                geom_text(aes(label=c(lowerLabel, upperLabel)),
                           data=pi_table[c(1,length(pi_table$Freq)),],
-                          vjust=-1)
+                          vjust=0.5, hjust=-0.1, angle=90)
         }
     }  
 
