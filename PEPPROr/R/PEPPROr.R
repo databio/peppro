@@ -1682,12 +1682,13 @@ plotPI <- function(pi, name='pause indicies',
 
     div <- c(-Inf, 0.5, seq(from=2.5, to=25, by=2.5),
              seq(from=30, to=50, by=5),
-             seq(from=60, to=100, by=10), Inf)
+             seq(from=60, to=100, by=10),
+             seq(from=150, to=500, by=50), Inf)
 
     lowerLabel <- paste0(round(
         (nrow(PI[PI$pi < 0.5, ]) / nrow(PI)) * 100, 2), '%')
     upperLabel <- paste0(round(
-        (nrow(PI[PI$pi > 100, ]) / nrow(PI)) * 100, 2), '%')
+        (nrow(PI[PI$pi > 500, ]) / nrow(PI)) * 100, 2), '%')
 
     if (type == "histogram") {
         if (length(div) <= 3) {
@@ -1729,6 +1730,7 @@ plotPI <- function(pi, name='pause indicies',
                                   "maroon")) + 
                 labs(x="pause indicies", y="frequency") +
                 geom_text(aes(label=c(lowerLabel, upperLabel)),
+                          size=theme_get()$text[["size"]]/4,
                           data=pi_table[c(1,length(pi_table$Freq)),],
                           vjust=0.5, hjust=-0.1, angle=90)
         }
@@ -1778,6 +1780,7 @@ plotPI <- function(pi, name='pause indicies',
                                   "maroon")) + 
                 labs(x="pause indicies", y="frequency") +
                 geom_text(aes(label=c(lowerLabel, upperLabel)),
+                          size=theme_get()$text[["size"]]/4,
                           data=pi_table[c(1,length(pi_table$Freq)),],
                           vjust=0.5, hjust=-0.1, angle=90)
         }
