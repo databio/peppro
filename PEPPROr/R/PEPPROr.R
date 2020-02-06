@@ -1469,6 +1469,7 @@ mRNAcontamination <- function(rpkm,
                     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
                          y="frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
                               vjust=0.5, hjust=-0.1, angle=90)
             }
@@ -1495,6 +1496,7 @@ mRNAcontamination <- function(rpkm,
                     labs(x=expression(log[10]((over(exon[RPKM], intron[RPKM]))~X~Gene)),
                          y="frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
                               vjust=0.5, hjust=-0.1, angle=90)
             }
@@ -1590,6 +1592,7 @@ mRNAcontamination <- function(rpkm,
                     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
                          y="frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
                               vjust=0.5, hjust=-0.1, angle=90)
             }
@@ -1616,6 +1619,7 @@ mRNAcontamination <- function(rpkm,
                     labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
                          y="frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
                               vjust=0.5, hjust=-0.1, angle=90)
             }
