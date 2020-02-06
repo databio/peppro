@@ -1684,10 +1684,11 @@ plotPI <- function(pi, name='pause indicies',
     }
     colnames(PI) <- c("chr", "start", "end", "name", "pi", "strand")
 
-    div <- c(-Inf, 0.5, seq(from=2.5, to=25, by=2.5),
-             seq(from=30, to=50, by=5),
-             seq(from=60, to=100, by=10),
-             seq(from=150, to=500, by=50), Inf)
+    div <- c(-Inf, 0.5, seq(from=2.5, to=5, by=2.5),
+             seq(from=10, to=30, by=5),
+             seq(from=40, to=100, by=10),
+             seq(from=150, to=300, by=50),
+             seq(from=400, to=500, by=100), Inf)
 
     lowerLabel <- paste0(round(
         (nrow(PI[PI$pi < 0.5, ]) / nrow(PI)) * 100, 2), '%')
@@ -1700,7 +1701,8 @@ plotPI <- function(pi, name='pause indicies',
         } else {
             # calculate a frequency table with the specified divisions
             pi_table  <- cutDists(PI$pi, divisions = div)
-            base_plot <- ggplot(data = pi_table,  aes(x=cuts, y=Freq))
+            base_plot <- ggplot(data = pi_table,  aes(x=cuts, y=Freq)) +
+                theme(axis.text.x = element_text(size=theme_get()$axis.text.x[["size"]]/2))
         }
         
     } else {
