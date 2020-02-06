@@ -1470,7 +1470,7 @@ mRNAcontamination <- function(rpkm,
                          y="frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                              vjust=-1)
+                              vjust=0.5, hjust=-0.1, angle=90)
             }
         } else {
             if (length(div) <= 3) {
@@ -1496,7 +1496,7 @@ mRNAcontamination <- function(rpkm,
                          y="frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                              vjust=-1)
+                              vjust=0.5, hjust=-0.1, angle=90)
             }
         }
     } else if (type == "boxplot") {
@@ -1591,7 +1591,7 @@ mRNAcontamination <- function(rpkm,
                          y="frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                              vjust=-1)
+                              vjust=0.5, hjust=-0.1, angle=90)
             }
         } else {
             if (length(div) <= 3) {
@@ -1617,7 +1617,7 @@ mRNAcontamination <- function(rpkm,
                          y="frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                              vjust=-1)
+                              vjust=0.5, hjust=-0.1, angle=90)
             }
         }
     }
