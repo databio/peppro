@@ -3582,10 +3582,14 @@ def main():
     genome_fq = rgc.get_asset(args.genome_assembly,
                               asset_name="fasta",
                               seek_key="fasta")
-    plus_bw = os.path.join(
-        signal_folder, args.sample_name + "_plus_body_0-mer.bw")
-    minus_bw = os.path.join(
-        signal_folder, args.sample_name + "_minus_body_0-mer.bw")
+    plus_exact_bw = os.path.join(
+        signal_folder, args.sample_name + "_plus_exact_body_0-mer.bw")
+    plus_smooth_bw = os.path.join(
+        signal_folder, args.sample_name + "_plus_smooth_body_0-mer.bw")
+    minus_exact_bw = os.path.join(
+        signal_folder, args.sample_name + "_minus_exact_body_0-mer.bw")
+    minus_smooth_bw = os.path.join(
+        signal_folder, args.sample_name + "_minus_smooth_body_0-mer.bw")
     
     if not args.sob:
         # If not scaling we don't need to use seqOutBias to generate the
@@ -3600,23 +3604,25 @@ def main():
             cmd2 = tool_path("bamSitesToWig.py")
             cmd2 += " -i " + plus_bam
             cmd2 += " -c " + res.chrom_sizes
-            cmd2 += " -o " + plus_bw  # DEBUG formerly smoothed " -w " + plus_bw
+            cmd2 += " -o " + plus_exact_bw  # DEBUG formerly smoothed " -w " + plus_bw
+            cmd2 += " -w " + plus_smooth_bw  
             cmd2 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd2 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd2 += " --tail-edge"
-            pm.run([cmd1, cmd2], plus_bw)
+            pm.run([cmd1, cmd2], [plus_exact_bw, plus_smooth_bw])
 
             cmd3 = tools.samtools + " index " + minus_bam
             cmd4 = tool_path("bamSitesToWig.py")
             cmd4 += " -i " + minus_bam
             cmd4 += " -c " + res.chrom_sizes
-            cmd4 += " -o " + minus_bw # DEBUG formerly smoothed " -w " + minus_bw
+            cmd4 += " -o " + minus_exact_bw # DEBUG formerly smoothed " -w " + minus_bw
+            cmd2 += " -w " + minus_smooth_bw  
             cmd4 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd4 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd4 += " --tail-edge"
-            pm.run([cmd3, cmd4], minus_bw)
+            pm.run([cmd3, cmd4], [minus_exact_bw, minus_smooth_bw])
         else:
             print("Skipping signal track production -- Could not call \'wigToBigWig\'.")
             print("Check that you have the required UCSC tools in your PATH.")
