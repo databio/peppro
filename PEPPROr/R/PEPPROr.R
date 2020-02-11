@@ -1381,7 +1381,8 @@ mRNAcontamination <- function(rpkm,
         #                      calcQuantileCutoff(finite_rpkm$ratio,
         #                                         baseline = 3))
         div <- c(-Inf, 0.25, 0.5, 0.75, 1, 1.25, 1.5,
-                 1.75, 2, 2.25, 2.5, 2.75, 3, Inf)
+                 1.75, 2, 2.25, 2.5, 2.75, 3,
+                 seq(from=4, to=10, by=1), Inf)
     } else {
         # div <- calcDivisions(log10(finite_rpkm$ratio),
         #                      calcQuantileCutoff(log10(finite_rpkm$ratio),
