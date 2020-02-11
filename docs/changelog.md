@@ -1,6 +1,14 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.8.9] -- 2020-02-11
+
+### Changed
+- Corrected Pct_reads_too_short calculation
+- Updated mRNA and PI plots to plot on same axis across sample
+- Updated minimum acceptable read length
+- Produce both signal track types
+
 ## [0.8.8] -- 2020-02-04
 
 ### Changed

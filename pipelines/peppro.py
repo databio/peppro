@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.8.8"
+__version__ = "0.8.9"
 
 
 from argparse import ArgumentParser
@@ -236,8 +236,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             ])
 
         adapter_cmd_chunks.extend([
-            #("--length_required", (18 + int(float(args.umi_len)))),
-            ("--length_required", 5),  # For insert size plotting
+            ("--length_required", (2 + int(float(args.umi_len)))),
             ("--html", fastp_report_html),
             ("--json", fastp_report_json),
             ("--report_title", ("'" + sname + "'"))
@@ -263,8 +262,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         if cut_version >= 1.15:
             adapter_cmd_chunks.extend([("-j", str(pm.cores))])
         adapter_cmd_chunks.extend([
-            #("-m", (18 + int(float(args.umi_len)))),
-            ("-m", 5),  # For insert size plotting
+            ("-m", (2 + int(float(args.umi_len)))),
             ("-O", 1)
         ])
         if read2:
@@ -297,8 +295,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             ])
 
         adapter_cmd_chunks.extend([
-            #("--length_required", (18 + int(float(args.umi_len)))),
-            ("--length_required", 5),  # For insert size plotting
+            ("--length_required", (2 + int(float(args.umi_len)))),
             ("--html", fastp_report_html),
             ("--json", fastp_report_json),
             ("--report_title", ("'" + sname + "'"))
@@ -438,7 +435,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
         trim_cmd_chunks.extend([
             "|",
             (tools.seqtk, "seq"),
-            ("-L", 5)
+            #("-L", 5)
+            ("-L",(2 + int(float(args.umi_len))))
         ])
 
         # Reverse complement for PRO-seq
@@ -468,7 +466,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", processed_fastq)
             ])                           
@@ -476,7 +475,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-r", "-"),
                 (">", processed_fastq)
             ])
@@ -529,7 +529,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", processed_fastq)
             ])                           
@@ -537,7 +538,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-r", "-"),
                 (">", processed_fastq)
             ])
@@ -625,7 +627,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5)
+                #("-L", 5)
+                ("-L",(2 + int(float(args.umi_len))))
             ])
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 trim_cmd_chunks.extend([("-r", "-")])
@@ -639,7 +642,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 trim_cmd_chunks.extend([
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     ("-r", noadap_fastq),
                     (">", trimmed_fastq)
                 ])
@@ -647,7 +651,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             else:
                 trim_cmd_chunks = [
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     noadap_fastq,
                     (">", trimmed_fastq)
                 ]
@@ -670,7 +675,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", trimmed_fastq)
             ])
@@ -678,7 +684,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-r", "-"),
                 (">", trimmed_fastq)
             ])
@@ -739,7 +746,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", trimmed_fastq)
             ])
@@ -747,7 +755,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-r", "-"),
                 (">", trimmed_fastq)
             ])
@@ -838,7 +847,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     "-",
                     (">", processed_fastq)
                 ])
@@ -846,7 +856,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     ("-r", "-"),
                     (">", processed_fastq)
                 ])
@@ -862,7 +873,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     "-",
                     (">", processed_fastq)
                 ])
@@ -870,7 +882,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks.extend([
                     "|",
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     ("-r", "-"),
                     (">", processed_fastq)
                 ])
@@ -879,7 +892,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 trim_cmd_chunks = [
                     (tools.seqtk, "seq"),
-                    ("-L", 5),
+                    #("-L", 5),
+                    ("-L",(2 + int(float(args.umi_len)))),
                     ("-r", noadap_fastq),
                     (">", processed_fastq)
                 ]
@@ -906,7 +920,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", processed_fastq)
             ])
@@ -915,7 +930,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 "|",
                 tools.seqtk,
                 ("seq", "-r"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-", ">"),
                 processed_fastq
             ])
@@ -965,7 +981,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 "|",
                 (tools.seqtk, "seq"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 "-",
                 (">", processed_fastq)
             ])
@@ -974,7 +991,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 "|",
                 tools.seqtk,
                 ("seq", "-r"),
-                ("-L", 5),
+                #("-L", 5),
+                ("-L",(2 + int(float(args.umi_len)))),
                 ("-", ">"),
                 processed_fastq
             ])
@@ -1011,6 +1029,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     fastqc_folder = os.path.join(outfolder, "fastqc")
     fastqc_report = os.path.join(fastqc_folder, sname + "_R1_processed_fastqc.html")
 
+    preprocessed_fq1 = os.path.join(fastq_folder, sname + "_R1.fastq")
+    preprocessed_fq2 = os.path.join(fastq_folder, sname + "_R2.fastq")
     noadap_fq1 = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     noadap_fq2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
     dedup_fq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
@@ -1111,15 +1131,16 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 tr = int(ngstk.count_lines(noadap_fq1).strip())
             else:
                 tr = 0
+
             if _itsa_file(dedup_fq):
                 dr = int(ngstk.count_lines(dedup_fq).strip())
                 dups = max(0, (float(tr)/4 - float(dr)/4))
                 pm.report_result("Duplicate_reads", round(dups, 2))
 
-            if _itsa_file(processed_fastq):
-                pr = int(ngstk.count_lines(processed_fastq).strip())
+            if _itsa_file(preprocessed_fq1):
+                pre = int(ngstk.count_lines(preprocessed_fq1).strip())
                 pm.report_result("Pct_reads_too_short", 
-                    round(float(100*((float(ts)/4)/float(pr)/4)), 4))
+                    round(float(100*(ts/(float(pre)/4))), 4))
         else:
             pm.fail_pipeline("Could not find '{}' to report adapter "
                              "removal statistics.".format(report))
@@ -3545,7 +3566,7 @@ def main():
         mRNApng = os.path.join(QC_folder,
             args.sample_name + "_mRNA_contamination.png")
         mRNAplot = [tools.Rscript, tool_path("PEPPRO.R"), "mrna",
-                    "-i", intron_exon, "--raw", "--annotate"]
+                    "-i", intron_exon, "--annotate"]
         cmd = build_command(mRNAplot)
         pm.run(cmd, mRNApdf, nofail=False)
         pm.report_object("mRNA contamination", mRNApdf, anchor_image=mRNApng)
@@ -3561,10 +3582,14 @@ def main():
     genome_fq = rgc.get_asset(args.genome_assembly,
                               asset_name="fasta",
                               seek_key="fasta")
-    plus_bw = os.path.join(
-        signal_folder, args.sample_name + "_plus_body_0-mer.bw")
-    minus_bw = os.path.join(
-        signal_folder, args.sample_name + "_minus_body_0-mer.bw")
+    plus_exact_bw = os.path.join(
+        signal_folder, args.sample_name + "_plus_exact_body_0-mer.bw")
+    plus_smooth_bw = os.path.join(
+        signal_folder, args.sample_name + "_plus_smooth_body_0-mer.bw")
+    minus_exact_bw = os.path.join(
+        signal_folder, args.sample_name + "_minus_exact_body_0-mer.bw")
+    minus_smooth_bw = os.path.join(
+        signal_folder, args.sample_name + "_minus_smooth_body_0-mer.bw")
     
     if not args.sob:
         # If not scaling we don't need to use seqOutBias to generate the
@@ -3579,23 +3604,25 @@ def main():
             cmd2 = tool_path("bamSitesToWig.py")
             cmd2 += " -i " + plus_bam
             cmd2 += " -c " + res.chrom_sizes
-            cmd2 += " -o " + plus_bw  # DEBUG formerly smoothed " -w " + plus_bw
+            cmd2 += " -o " + plus_exact_bw  # DEBUG formerly smoothed " -w " + plus_bw
+            cmd2 += " -w " + plus_smooth_bw  
             cmd2 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd2 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd2 += " --tail-edge"
-            pm.run([cmd1, cmd2], plus_bw)
+            pm.run([cmd1, cmd2], [plus_exact_bw, plus_smooth_bw])
 
             cmd3 = tools.samtools + " index " + minus_bam
             cmd4 = tool_path("bamSitesToWig.py")
             cmd4 += " -i " + minus_bam
             cmd4 += " -c " + res.chrom_sizes
-            cmd4 += " -o " + minus_bw # DEBUG formerly smoothed " -w " + minus_bw
+            cmd4 += " -o " + minus_exact_bw # DEBUG formerly smoothed " -w " + minus_bw
+            cmd2 += " -w " + minus_smooth_bw  
             cmd4 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd4 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd4 += " --tail-edge"
-            pm.run([cmd3, cmd4], minus_bw)
+            pm.run([cmd3, cmd4], [minus_exact_bw, minus_smooth_bw])
         else:
             print("Skipping signal track production -- Could not call \'wigToBigWig\'.")
             print("Check that you have the required UCSC tools in your PATH.")
