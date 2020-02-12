@@ -69,7 +69,9 @@ def main():
     print("-- Copy project directory structure --")
     for (path, dirs, files) in os.walk(projectDir, topdown=True):
         if path not in exclude:
-            newDir = path.replace(projectDir, tempdir)
+            #print("path: {}".format(path))
+            newDir = path.replace(projectDir, (tempdir + "/"))
+            #print("newDir: {}".format(newDir))
             if os.path.join(tempName, tempName) not in newDir:
                 os.makedirs(newDir, exist_ok=True)
 
@@ -82,7 +84,7 @@ def main():
         path = os.path.join(tempdir, dirName)
         report = os.path.join(projectDir, item.strip('.'))
         for file in glob.glob(report):
-            if os.path.exists(file):
+            if os.path.exists(file) and 'tmp' not in str(file):
                 shutil.copy2(file, path.strip('.'))
 
     print("-- Copy sample reports --")
@@ -99,7 +101,7 @@ def main():
                 report = os.path.join(sampleDir, item.strip('.'))
                 path = os.path.join(tempdir, "results_pipeline", sample, dirName)
                 for file in glob.glob(report):
-                    if os.path.exists(file):
+                    if os.path.exists(file) and 'tmp' not in str(file):
                         shutil.copy2(file, path)
 
     print("-- Archive report --")
