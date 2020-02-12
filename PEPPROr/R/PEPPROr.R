@@ -1361,7 +1361,7 @@ cutDists = function(vec, divisions = c(-Inf, -1e6, -1e4, -1000, -100, 0,
 #' @export
 mRNAcontamination <- function(rpkm,
                               name='mRNA contamination ratios',
-                              raw=TRUE,
+                              raw=FALSE,
                               type=c("histogram", "boxplot", "violin"),
                               annotate=TRUE) {
     if (exists(rpkm)) {
@@ -1377,19 +1377,40 @@ mRNAcontamination <- function(rpkm,
     finite_rpkm <- RPKM[is.finite(RPKM$ratio),]
 
     if (raw) {
-        div <- calcDivisions(finite_rpkm$ratio,
-                             calcQuantileCutoff(finite_rpkm$ratio,
-                                                baseline = 3))
+        # div <- calcDivisions(finite_rpkm$ratio,
+        #                      calcQuantileCutoff(finite_rpkm$ratio,
+        #                                         baseline = 3))
+        div <- c(-Inf, 0.25, 0.5, 0.75, 1, 1.25, 1.5,
+                 1.75, 2, 2.25, 2.5, 2.75, 3,
+                 seq(from=4, to=10, by=1), Inf)
     } else {
-        div <- calcDivisions(log10(finite_rpkm$ratio),
-                             calcQuantileCutoff(log10(finite_rpkm$ratio),
-                                                baseline = 3),
-                             transformed=TRUE)
+        # div <- calcDivisions(log10(finite_rpkm$ratio),
+        #                      calcQuantileCutoff(log10(finite_rpkm$ratio),
+        #                                         baseline = 3),
+        #                      transformed=TRUE)
+        div <- c(-Inf, -1, -0.8, -0.6, -0.4, -0.2, 0,
+                 0.2, 0.4, 0.6, 0.8, 1.0, Inf)
     }
 
     # ensure breaks are not duplicated
     div        <- unique(div)
-    quantLabel <- paste(calcQuantileCutoff(finite_rpkm$ratio),"%", sep='')
+
+    # calculate and generate labels for upper and lower bins
+    if (raw) {
+        lowerLabel <- paste0(round(
+            (nrow(finite_rpkm[finite_rpkm$ratio < 0.25, ]) /
+             nrow(finite_rpkm)) * 100, 2), '%')
+        upperLabel <- paste0(round(
+            (nrow(finite_rpkm[finite_rpkm$ratio > 3, ]) / 
+             nrow(finite_rpkm)) * 100, 2), '%')
+    } else {
+        lowerLabel <- paste0(round(
+            (nrow(finite_rpkm[log10(finite_rpkm$ratio) < -1, ]) /
+             nrow(finite_rpkm)) * 100, 2), '%')
+        upperLabel <- paste0(round(
+            (nrow(finite_rpkm[log10(finite_rpkm$ratio) > 1, ]) / 
+             nrow(finite_rpkm)) * 100, 2), '%')
+    }
 
     if (raw) {
         if (type == "histogram") {
@@ -1424,13 +1445,13 @@ mRNAcontamination <- function(rpkm,
             if (length(div) <= 3) {
                 plot <- base_plot +
                     geom_histogram(col="black", fill=I("transparent")) +
-                    geom_vline(aes(xintercept=median(ratio)),
+                    geom_vline(aes(xintercept=median(finite_rpkm$ratio)),
                                color="gray", linetype="dashed", size=1) +
                     annotate("text", x=median(finite_rpkm$ratio),
                              y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
                                 label="median", angle=90,
                                 color="gray", vjust=-0.5) +
-                    geom_vline(aes(xintercept=mean(ratio)),
+                    geom_vline(aes(xintercept=mean(finite_rpkm$ratio)),
                                color="light gray", linetype="dotted", size=1) +
                     annotate("text", x=mean(finite_rpkm$ratio),
                              y=(ceiling(quantile(finite_rpkm$ratio, 0.25))),
@@ -1448,17 +1469,18 @@ mRNAcontamination <- function(rpkm,
                                       "maroon")) + 
                     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
                          y="frequency") +
-                    geom_text(aes(label= quantLabel),
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                              vjust=-1)
+                              vjust=0.5, hjust=-0.1, angle=90)
             }
         } else {
             if (length(div) <= 3) {
                 plot = base_plot +
                     geom_histogram(col="black", fill=I("transparent")) +
-                    geom_vline(aes(xintercept=median(log10(ratio))),
+                    geom_vline(aes(xintercept=median(log10(finite_rpkm$ratio))),
                                color="gray", linetype="dashed", size=1) +
-                    geom_vline(aes(xintercept=mean(log10(ratio))),
+                    geom_vline(aes(xintercept=mean(log10(finite_rpkm$ratio))),
                                color="light gray", linetype="dotted", size=1) +
                     labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene)) +
                     scale_x_log10(limits = c(0.001, 50),
@@ -1472,11 +1494,12 @@ mRNAcontamination <- function(rpkm,
                              fill = c("maroon",
                                       rep("gray", (length(div)-3)),
                                       "maroon")) + 
-                    labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
+                    labs(x=expression(log[10]((over(exon[RPKM], intron[RPKM]))~X~Gene)),
                          y="frequency") +
-                    geom_text(aes(label= quantLabel),
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                              vjust=-1)
+                              vjust=0.5, hjust=-0.1, angle=90)
             }
         }
     } else if (type == "boxplot") {
@@ -1506,7 +1529,7 @@ mRNAcontamination <- function(rpkm,
                               breaks=prettyLogs) +
                 annotation_logticks(sides = c("rl")) +
                 labs(x=name,
-                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene))
+                     y=expression(log[10]((over(exon[RPKM], intron[RPKM]))~X~Gene)))
         }
     } else if (type == "violin") {
         if (raw) {
@@ -1537,7 +1560,7 @@ mRNAcontamination <- function(rpkm,
                               breaks=prettyLogs) +
                 annotation_logticks(sides = c("rl")) +
                 labs(x=name,
-                     y=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene))
+                     y=expression(log[10]((over(exon[RPKM], intron[RPKM]))~X~Gene)))
         }
     } else {
         # Default to histogram
@@ -1569,9 +1592,10 @@ mRNAcontamination <- function(rpkm,
                                       "maroon")) + 
                     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
                          y="frequency") +
-                    geom_text(aes(label= quantLabel),
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                              vjust=-1)
+                              vjust=0.5, hjust=-0.1, angle=90)
             }
         } else {
             if (length(div) <= 3) {
@@ -1595,9 +1619,10 @@ mRNAcontamination <- function(rpkm,
                                       "maroon")) + 
                     labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
                          y="frequency") +
-                    geom_text(aes(label= quantLabel),
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
-                              vjust=-1)
+                              vjust=0.5, hjust=-0.1, angle=90)
             }
         }
     }
@@ -1628,7 +1653,6 @@ mRNAcontamination <- function(rpkm,
     } else {
         q <- plot + theme_PEPPRO()
     }
-    
 
     return(q)
 }
@@ -1661,8 +1685,16 @@ plotPI <- function(pi, name='pause indicies',
     }
     colnames(PI) <- c("chr", "start", "end", "name", "pi", "strand")
 
-    div <- calcDivisions(PI$pi, calcQuantileCutoff(PI$pi, baseline = 3))
-    quantLabel <- paste(calcQuantileCutoff(PI$pi, baseline = 3),"%", sep='')
+    div <- c(-Inf, 0.5, seq(from=2.5, to=5, by=2.5),
+             seq(from=10, to=30, by=5),
+             seq(from=40, to=100, by=10),
+             seq(from=150, to=300, by=50),
+             seq(from=400, to=500, by=100), Inf)
+
+    lowerLabel <- paste0(round(
+        (nrow(PI[PI$pi < 0.5, ]) / nrow(PI)) * 100, 2), '%')
+    upperLabel <- paste0(round(
+        (nrow(PI[PI$pi > 500, ]) / nrow(PI)) * 100, 2), '%')
 
     if (type == "histogram") {
         if (length(div) <= 3) {
@@ -1670,7 +1702,8 @@ plotPI <- function(pi, name='pause indicies',
         } else {
             # calculate a frequency table with the specified divisions
             pi_table  <- cutDists(PI$pi, divisions = div)
-            base_plot <- ggplot(data = pi_table,  aes(x=cuts, y=Freq))
+            base_plot <- ggplot(data = pi_table,  aes(x=cuts, y=Freq)) +
+                theme(axis.text.x = element_text(size=theme_get()$axis.text.x[["size"]]/2))
         }
         
     } else {
@@ -1703,9 +1736,10 @@ plotPI <- function(pi, name='pause indicies',
                                   rep("gray", (length(div)-3)),
                                   "maroon")) + 
                 labs(x="pause indicies", y="frequency") +
-                geom_text(aes(label= quantLabel),
+                geom_text(aes(label=c(lowerLabel, upperLabel)),
+                          size=theme_get()$text[["size"]]/4,
                           data=pi_table[c(1,length(pi_table$Freq)),],
-                          vjust=-1)
+                          vjust=0.5, hjust=-0.1, angle=90)
         }
     } else if (type == "boxplot") {
         plot <- base_plot +
@@ -1752,9 +1786,10 @@ plotPI <- function(pi, name='pause indicies',
                                   rep("gray", (length(div)-3)),
                                   "maroon")) + 
                 labs(x="pause indicies", y="frequency") +
-                geom_text(aes(label= quantLabel),
+                geom_text(aes(label=c(lowerLabel, upperLabel)),
+                          size=theme_get()$text[["size"]]/4,
                           data=pi_table[c(1,length(pi_table$Freq)),],
-                          vjust=-1)
+                          vjust=0.5, hjust=-0.1, angle=90)
         }
     }  
 
