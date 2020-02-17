@@ -1458,17 +1458,17 @@ mRNAcontamination <- function(rpkm,
                                 label="mean", angle=90,
                                 color="light gray", vjust=-0.5) +
                     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
-                         y="frequency") +
+                         y="Frequency") +
                     xlim(c(0, ceiling(quantile(finite_rpkm$ratio, 0.90)))) +
                     theme_PEPPRO()
             } else {
                 plot <- base_plot +
                     geom_bar(stat="identity",
-                             fill = c("maroon",
-                                      rep("gray", (length(div)-3)),
-                                      "maroon")) + 
+                             fill = c("gray80",
+                                      rep("gray40", (length(div)-3)),
+                                      "gray80")) + 
                     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
-                         y="frequency") +
+                         y="Frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
                               size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
@@ -1491,11 +1491,11 @@ mRNAcontamination <- function(rpkm,
             } else {
                 plot <- base_plot +
                     geom_bar(stat="identity",
-                             fill = c("maroon",
-                                      rep("gray", (length(div)-3)),
-                                      "maroon")) + 
+                             fill = c("gray80",
+                                      rep("gray40", (length(div)-3)),
+                                      "gray80")) + 
                     labs(x=expression(log[10]((over(exon[RPKM], intron[RPKM]))~X~Gene)),
-                         y="frequency") +
+                         y="Frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
                               size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
@@ -1587,11 +1587,11 @@ mRNAcontamination <- function(rpkm,
             } else {
                 plot <- base_plot +
                     geom_bar(stat="identity",
-                             fill = c("maroon",
-                                      rep("gray", (length(div)-3)),
-                                      "maroon")) + 
+                             fill = c("gray80",
+                                      rep("gray40", (length(div)-3)),
+                                      "gray80")) + 
                     labs(x=expression((over(exon[RPKM], intron[RPKM]))~X~Gene),
-                         y="frequency") +
+                         y="Frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
                               size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
@@ -1614,11 +1614,11 @@ mRNAcontamination <- function(rpkm,
             } else {
                 plot <- base_plot +
                     geom_bar(stat="identity",
-                             fill = c("maroon",
-                                      rep("gray", (length(div)-3)),
-                                      "maroon")) + 
+                             fill = c("gray80",
+                                      rep("gray40", (length(div)-3)),
+                                      "gray80")) + 
                     labs(x=expression(log[10](over(exon[RPKM], intron[RPKM]))~X~Gene),
-                         y="frequency") +
+                         y="Frequency") +
                     geom_text(aes(label=c(lowerLabel, upperLabel)),
                               size=theme_get()$text[["size"]]/4,
                               data=rpkm_table[c(1,length(rpkm_table$Freq)),],
@@ -1672,6 +1672,7 @@ mRNAcontamination <- function(rpkm,
 #' plotPI(pi = "pidx")
 #' @export
 plotPI <- function(pi, name='pause indicies',
+                   raw=FALSE,
                    type=c("histogram", "boxplot", "violin"),
                    annotate=TRUE) {
     # TODO: make summary plot of these that IS boxplots
@@ -1683,66 +1684,124 @@ plotPI <- function(pi, name='pause indicies',
         stop(paste0("FileExistsError: ", pi, " could not be found."))
         quit(save = "no", status = 1, runLast = FALSE)
     }
+
     colnames(PI) <- c("chr", "start", "end", "name", "pi", "strand")
 
-    div <- c(-Inf, 0.5, seq(from=2.5, to=5, by=2.5),
-             seq(from=10, to=30, by=5),
-             seq(from=40, to=100, by=10),
-             seq(from=150, to=300, by=50),
-             seq(from=400, to=500, by=100), Inf)
-
-    lowerLabel <- paste0(round(
-        (nrow(PI[PI$pi < 0.5, ]) / nrow(PI)) * 100, 2), '%')
-    upperLabel <- paste0(round(
-        (nrow(PI[PI$pi > 500, ]) / nrow(PI)) * 100, 2), '%')
-
-    if (type == "histogram") {
-        if (length(div) <= 3) {
-            base_plot <- ggplot(data = PI, aes(x=pi))
-        } else {
-            # calculate a frequency table with the specified divisions
-            pi_table  <- cutDists(PI$pi, divisions = div)
-            base_plot <- ggplot(data = pi_table,  aes(x=cuts, y=Freq)) +
-                theme(axis.text.x = element_text(size=theme_get()$axis.text.x[["size"]]/2))
-        }
-        
+    if (raw) {
+        div <- c(-Inf, 0.5, seq(from=2.5, to=5, by=2.5),
+                 seq(from=10, to=30, by=5),
+                 seq(from=40, to=100, by=10),
+                 seq(from=150, to=300, by=50),
+                 seq(from=400, to=500, by=100), Inf)
     } else {
-        base_plot <- ggplot(data = PI,  aes(x="", y=pi))
+        div <- c(-Inf, seq(from=-1, to=3, by=0.25), Inf)
+    }
+
+    # ensure breaks are not duplicated
+    div <- unique(div)
+
+    if (raw) {
+        lowerLabel <- paste0(round(
+            (nrow(PI[PI$pi < 0.5, ]) / nrow(PI)) * 100, 2), '%')
+        upperLabel <- paste0(round(
+            (nrow(PI[PI$pi > 500, ]) / nrow(PI)) * 100, 2), '%')
+    } else {
+        lowerLabel <- paste0(round(
+            (nrow(PI[log10(PI$pi) < -1, ]) / nrow(PI)) * 100, 2), '%')
+        upperLabel <- paste0(round(
+            (nrow(PI[log10(PI$pi) > 3, ]) / nrow(PI)) * 100, 2), '%')
+    }
+
+    if (raw) {
+        if (type == "histogram") {
+            if (length(div) <= 3) {
+                base_plot <- ggplot(data = PI, aes(x=pi))
+            } else {
+                # calculate a frequency table with the specified divisions
+                pi_table  <- cutDists(PI$pi, divisions = div)
+                base_plot <- ggplot(data = pi_table,  aes(x=cuts, y=Freq))
+            }
+            
+        } else {
+            base_plot <- ggplot(data = PI,  aes(x="", y=pi))
+        }
+    } else {
+        if (type == "histogram") {
+            if (length(div) <= 3) {
+                base_plot <- ggplot(data = PI, aes(x=log10(pi)))
+            } else {
+                # calculate a frequency table with the specified divisions
+                pi_table  <- cutDists(log10(PI$pi), divisions = div)
+                base_plot <- ggplot(data = pi_table,  aes(x=cuts, y=Freq))
+            }
+            
+        } else {
+            base_plot <- ggplot(data = PI,  aes(x="", y=log10(pi)))
+        }
     }
 
     if (type == "histogram") {
-        if (length(div) <= 3) {
-            q <- base_plot +
+        if (raw) {
+            if (length(div) <= 3) {
+                q <- base_plot +
                     geom_histogram(col="black", fill=I("transparent")) +
                     geom_vline(aes(xintercept=median(PI$pi)),
                                color="gray", linetype="dashed", size=1) +
                     annotate("text", x=median(PI$pi),
                              y=(ceiling(quantile(PI$pi, 0.25))),
-                                label="median", angle=90,
-                                color="gray", vjust=-0.5) +
+                             label="median", angle=90,
+                             color="gray", vjust=-0.5) +
                     geom_vline(aes(xintercept=mean(PI$pi)),
                                color="light gray", linetype="dotted", size=1) +
                     annotate("text", x=mean(PI$pi),
                              y=(ceiling(quantile(PI$pi, 0.25))),
-                                label="mean", angle=90,
-                                color="light gray", vjust=-0.5) +
-                    labs(x="pause indicies", y="frequency") +
+                             label="mean", angle=90,
+                             color="light gray", vjust=-0.5) +
+                    labs(x="Pause indicies", y="Frequency") +
                     xlim(c(0, ceiling(quantile(PI$pi, 0.90)))) +
                     theme_PEPPRO()
+            } else {
+                q <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("gray80",
+                                      rep("gray40", (length(div)-3)),
+                                      "gray80")) + 
+                    labs(x="Pause indicies", y="Frequency") +
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
+                              data=pi_table[c(1,length(pi_table$Freq)),],
+                              vjust=0.5, hjust=-0.1, angle=90)
+            }
         } else {
-            q <- base_plot +
-                geom_bar(stat="identity",
-                         fill = c("maroon",
-                                  rep("gray", (length(div)-3)),
-                                  "maroon")) + 
-                labs(x="pause indicies", y="frequency") +
-                geom_text(aes(label=c(lowerLabel, upperLabel)),
-                          size=theme_get()$text[["size"]]/4,
-                          data=pi_table[c(1,length(pi_table$Freq)),],
-                          vjust=0.5, hjust=-0.1, angle=90)
+            if (length(div) <= 3) {
+                q = base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(log10(PI$pi))),
+                               color="gray", linetype="dashed", size=1) +
+                    geom_vline(aes(xintercept=mean(log10(PI$pi))),
+                               color="light gray", linetype="dotted", size=1) +
+                    labs(x="Pause indicies", y="Frequency") +
+                    scale_x_log10(limits = c(0.001, 50),
+                                  expand = expand_scale(mult = c(0, 0)),
+                                  labels=fancyNumbers,
+                                  breaks=prettyLogs) +
+                    annotation_logticks(sides = c("rl"))
+            } else {
+                q <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("gray80",
+                                      rep("gray40", (length(div)-3)),
+                                      "gray80")) + 
+                    labs(x="Pause indicies", y="Frequency") +
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
+                              data=pi_table[c(1,length(pi_table$Freq)),],
+                              vjust=0.5, hjust=-0.1, angle=90)
+            }
         }
     } else if (type == "boxplot") {
-        plot <- base_plot +
+        if (raw) {
+            q <- base_plot +
                 stat_boxplot(geom ='errorbar', width = 0.25) +
                 geom_boxplot(width = 0.25,
                              outlier.color='red',
@@ -1750,71 +1809,156 @@ plotPI <- function(pi, name='pause indicies',
                 stat_summary(fun.y = "mean", geom = "point",
                              shape = 1, size = 2) +
                 labs(x=name, y="each gene's pause index")
+        } else {
+            q <- base_plot +
+                stat_boxplot(geom ='errorbar', width = 0.25) +
+                geom_boxplot(width = 0.25,
+                             outlier.color='red',
+                             outlier.shape=1) +
+                stat_summary(fun.data = n_fun, geom = "text", hjust = 0.5) +
+                stat_summary(fun.y = "mean", geom = "point",
+                             shape = 1, size = 2) +
+                scale_y_log10(limits = c(0.001, 50),
+                              expand = expand_scale(mult = c(0, 0)),
+                              labels=fancyNumbers,
+                              breaks=prettyLogs) +
+                annotation_logticks(sides = c("rl")) +
+                labs(x=name, y="Each gene's pause index")
+        }
     } else if (type == "violin") {
-        plot <- base_plot +
+        if (raw) {
+            q <- base_plot +
                 geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
                             linetype="dashed") +
                 geom_violin(width=0.25, fill="transparent",
                             draw_quantiles = 0.5) +
                 stat_summary(fun.y = "mean", geom = "point",
                              shape = 1, size = 2) +
-                labs(x=name, y="each gene's pause index")
+                labs(x=name, y="Each gene's pause index")
+        } else {
+            q <- base_plot +
+                geom_violin(width = 0.25, draw_quantiles = c(0.25,0.75),
+                            linetype="dashed") +
+                geom_violin(width=0.25, fill="transparent",
+                            draw_quantiles = 0.5) +
+                stat_summary(fun.data = n_fun, geom = "text", hjust = 0.5) +
+                stat_summary(fun.y = "mean", geom = "point",
+                             shape = 1, size = 2) +
+                scale_y_log10(limits = c(0.001, 50),
+                              expand = expand_scale(mult = c(0, 0)),
+                              labels=fancyNumbers,
+                              breaks=prettyLogs) +
+                annotation_logticks(sides = c("rl")) +
+                labs(x=name, y="Each gene's pause index")
+        }
     } else {
         # default to histogram
-         if (length(div) <= 3) {
-            q <- base_plot +
+        if (raw) {
+            if (length(div) <= 3) {
+                q <- base_plot +
                     geom_histogram(col="black", fill=I("transparent")) +
                     geom_vline(aes(xintercept=median(PI$pi)),
                                color="gray", linetype="dashed", size=1) +
                     annotate("text", x=median(PI$pi),
                              y=(ceiling(quantile(PI$pi, 0.25))),
-                                label="median", angle=90,
-                                color="gray", vjust=-0.5) +
+                             label="median", angle=90,
+                             color="gray", vjust=-0.5) +
                     geom_vline(aes(xintercept=mean(PI$pi)),
                                color="light gray", linetype="dotted", size=1) +
                     annotate("text", x=mean(PI$pi),
                              y=(ceiling(quantile(PI$pi, 0.25))),
-                                label="mean", angle=90,
-                                color="light gray", vjust=-0.5) +
-                    labs(x="pause indicies", y="frequency") +
+                             label="mean", angle=90,
+                             color="light gray", vjust=-0.5) +
+                    labs(x="Pause indicies", y="Frequency") +
                     xlim(c(0, ceiling(quantile(PI$pi, 0.90)))) +
                     theme_PEPPRO()
+            } else {
+                q <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("gray80",
+                                      rep("gray40", (length(div)-3)),
+                                      "gray80")) + 
+                    labs(x="Pause indicies", y="Frequency") +
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
+                              data=pi_table[c(1,length(pi_table$Freq)),],
+                              vjust=0.5, hjust=-0.1, angle=90)
+            }
         } else {
-            q <- base_plot +
-                geom_bar(stat="identity",
-                         fill = c("maroon",
-                                  rep("gray", (length(div)-3)),
-                                  "maroon")) + 
-                labs(x="pause indicies", y="frequency") +
-                geom_text(aes(label=c(lowerLabel, upperLabel)),
-                          size=theme_get()$text[["size"]]/4,
-                          data=pi_table[c(1,length(pi_table$Freq)),],
-                          vjust=0.5, hjust=-0.1, angle=90)
+            if (length(div) <= 3) {
+                q = base_plot +
+                    geom_histogram(col="black", fill=I("transparent")) +
+                    geom_vline(aes(xintercept=median(log10(PI$pi))),
+                               color="gray", linetype="dashed", size=1) +
+                    geom_vline(aes(xintercept=mean(log10(PI$pi))),
+                               color="light gray", linetype="dotted", size=1) +
+                    labs(x="Pause indicies", y="Frequency") +
+                    scale_x_log10(limits = c(0.001, 50),
+                                  expand = expand_scale(mult = c(0, 0)),
+                                  labels=fancyNumbers,
+                                  breaks=prettyLogs) +
+                    annotation_logticks(sides = c("rl"))
+            } else {
+                q <- base_plot +
+                    geom_bar(stat="identity",
+                             fill = c("gray80",
+                                      rep("gray40", (length(div)-3)),
+                                      "gray80")) + 
+                    labs(x="Pause indicies", y="Frequency") +
+                    geom_text(aes(label=c(lowerLabel, upperLabel)),
+                              size=theme_get()$text[["size"]]/4,
+                              data=pi_table[c(1,length(pi_table$Freq)),],
+                              vjust=0.5, hjust=-0.1, angle=90)
+            }
         }
     }  
 
     if (type != "histogram") {
-        if (max(PI$pi) > 500) {
-            q <- plot + scale_y_continuous(breaks = round(seq(min(PI$pi),
-                                                  max(PI$pi),
-                                                  by = 50), 0),
-                                        limits=c(0, max(PI$pi)))
-        } else if (max(PI$pi) > 100 & max(PI$pi) < 500) {
-            q <- plot + scale_y_continuous(breaks = round(seq(min(PI$pi),
-                                                  max(PI$pi),
-                                                  by = 25), 0),
-                                        limits=c(0, max(PI$pi)))
+        if (raw) {
+            if (max(PI$pi) > 500) {
+                q <- plot + scale_y_continuous(breaks = round(seq(min(PI$pi),
+                                                                  max(PI$pi),
+                                                                  by = 50), 0),
+                                               limits=c(0, max(PI$pi)))
+            } else if (max(PI$pi) > 100 & max(PI$pi) < 500) {
+                q <- plot + scale_y_continuous(breaks = round(seq(min(PI$pi),
+                                                                  max(PI$pi),
+                                                                  by = 25), 0),
+                                               limits=c(0, max(PI$pi)))
+            } else {
+                q <- plot + scale_y_continuous(breaks = round(seq(min(PI$pi),
+                                                                  max(PI$pi),
+                                                                  by = 5), 0),
+                                               limits=c(0, max(PI$pi)))
+            }
+            q <- q + coord_cartesian(ylim=c(0, ceiling(boxplot(PI$pi)$stats[5]))) +
+                theme_PEPPRO()
+            max_x <- suppressMessages(
+                suppressWarnings(layer_scales(q)$x$range$range[2]))
+            max_y  <- ceiling(boxplot(PI$pi)$stats[5])
         } else {
-            q <- plot + scale_y_continuous(breaks = round(seq(min(PI$pi),
-                                                  max(PI$pi),
-                                                  by = 5), 0),
-                                        limits=c(0, max(PI$pi)))
+            if (max(log10(PI$pi)) > 3) {
+                q <- plot + scale_y_continuous(breaks = round(seq(min(log10(PI$pi)),
+                                                                  max(log10(PI$pi)),
+                                                                  by = 0.5), 0),
+                                               limits=c(-1, max(log10(PI$pi))))
+            } else if (max(log10(PI$pi)) > 100 & max(log10(PI$pi)) < 500) {
+                q <- plot + scale_y_continuous(breaks = round(seq(min(log10(PI$pi)),
+                                                                  max(log10(PI$pi)),
+                                                                  by = 0.25), 0),
+                                               limits=c(-1, max(log10(PI$pi))))
+            } else {
+                q <- plot + scale_y_continuous(breaks = round(seq(min(log10(PI$pi)),
+                                                                  max(log10(PI$pi)),
+                                                                  by = 0.10), 0),
+                                               limits=c(-1, max(log10(PI$pi))))
+            }
+            q <- q + coord_cartesian(ylim=c(0, ceiling(boxplot(log10(PI$pi))$stats[5]))) +
+                theme_PEPPRO()
+            max_x <- suppressMessages(
+                suppressWarnings(layer_scales(q)$x$range$range[2]))
+            max_y  <- ceiling(boxplot(log10(PI$pi))$stats[5])
         }
-        q <- q + coord_cartesian(ylim=c(0, ceiling(boxplot(PI$pi)$stats[5]))) +
-            theme_PEPPRO()
-        max_x <- suppressMessages(
-            suppressWarnings(layer_scales(q)$x$range$range[2]))
-        max_y  <- ceiling(boxplot(PI$pi)$stats[5])
     } else {
         max_x <- length(layer_scales(q)$x$range$range)
         max_y <- suppressMessages(
@@ -1822,15 +1966,48 @@ plotPI <- function(pi, name='pause indicies',
     }
 
     if (is.na(max_x)) {max_x <- Inf}
-    
-    label1 <- paste("'median'", ":", round(median(PI$pi), 2))
-    label2 <- paste("'mean'", ":", round(mean(PI$pi), 2))
+
+    if (raw) {
+        label1 <- paste("'median'[raw]", ":", round(median(PI$pi), 2))
+        label2 <- paste("'mean'[raw]", ":", round(mean(PI$pi), 2))
+    } else {
+        label1 <- paste("'median'[raw]", ":", round(median(PI$pi), 2))
+        label2 <- paste("'mean'[raw]", ":", round(mean(PI$pi), 2))
+        label3 <- paste("'median'[log[10]]", ":",
+                        round(median(log10((PI$pi))), 2))
+        label4 <- paste("'mean'[log[10]]", ":", round(mean(log10(PI$pi)), 2))
+    }
+
     if (annotate) {
-        q <- q + annotate("text", x = floor(max_x), y = floor(max_y),
-                      hjust="right", vjust=1.05, label = label1, parse=TRUE) +
-         annotate("text", x = floor(max_x), y = floor(max_y),
-                      hjust="right", vjust=2.15, label = label2, parse=TRUE) +
-         theme_PEPPRO()
+        if (raw) {
+            q <- q + annotate("text", x = floor(max_x), y = floor(max_y),
+                              size=theme_get()$text[["size"]]/4,
+                              hjust="right", vjust=1.05,
+                              label = label1, parse=TRUE) +
+                annotate("text", x = floor(max_x), y = floor(max_y),
+                         size=theme_get()$text[["size"]]/4,
+                         hjust="right", vjust=2.25,
+                         label = label2, parse=TRUE) +
+                theme_PEPPRO()
+        } else {
+            q <- q + annotate("text", x = floor(max_x), y = floor(max_y),
+                              size=theme_get()$text[["size"]]/4,
+                              hjust="right", vjust=1.05,
+                              label = label1, parse=TRUE) +
+                annotate("text", x = floor(max_x), y = floor(max_y),
+                         size=theme_get()$text[["size"]]/4,
+                         hjust="right", vjust=2.25,
+                         label = label2, parse=TRUE) +
+                annotate("text", x = floor(max_x), y = floor(max_y),
+                        size=theme_get()$text[["size"]]/4,
+                         hjust="right", vjust=3.25,
+                         label = label3, parse=TRUE) +
+                annotate("text", x = floor(max_x), y = floor(max_y),
+                         size=theme_get()$text[["size"]]/4,
+                         hjust="right", vjust=4.30,
+                         label = label4, parse=TRUE) +
+                theme_PEPPRO()
+        }
     } else {
         q <- q + theme_PEPPRO()   
     }
