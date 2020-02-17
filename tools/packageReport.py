@@ -69,9 +69,7 @@ def main():
     print("-- Copy project directory structure --")
     for (path, dirs, files) in os.walk(projectDir, topdown=True):
         if path not in exclude:
-            #print("path: {}".format(path))
             newDir = path.replace(projectDir, (tempdir + "/"))
-            #print("newDir: {}".format(newDir))
             if os.path.join(tempName, tempName) not in newDir:
                 os.makedirs(newDir, exist_ok=True)
 
