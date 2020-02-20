@@ -48,7 +48,7 @@ pipelines:
     compute:
       singularity_image: ${SIMAGES}peppro
       docker_image: databio/peppro
-      bulker_crate: peppro
+      bulker_crate: databio/peppro
     outputs:
       cutadapt_report: "cutadapt/{sample.sample_name}_cutadapt.txt"
       plus_bw: "signal_{sample.genome}/{sample.sample_name}_plus_body_0-mer.bw"
