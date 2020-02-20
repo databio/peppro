@@ -95,11 +95,11 @@ Here's a snippet of the relevant portion of the configuration files:
 ```
 - annotation file
 ```
-umi_status, umi_length
-FALSE, 0
-FALSE, 0
-true_6, 6
-true_8, 8
-true_8, 8
+umi_status
+FALSE
+FALSE
+true_6
+true_8
+true_8
 ```
 
