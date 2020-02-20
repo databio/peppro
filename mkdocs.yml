@@ -30,7 +30,7 @@ nav:
     - Changelog: 'changelog.md'
     - Support: 'https://github.com/databio/peppro/issues'
     - Example output file structure: 'browse_output.md'
-    - "Example summary: tutorial project": 'files/examples/tutorial/tutorial_summary.html'
+    - "Example summary: PEPPRO paper": 'files/examples/paper/PEPPRO_summary.html'
 
 plugins:
   - search
