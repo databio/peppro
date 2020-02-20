@@ -1,0 +1,9 @@
+FastQC report r1	fastqc/HEK_PRO-seq_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO
+FastQC report r1	fastqc/HEK_PRO-seq_R2_trimmed_fastqc.html	FastQC report r1	None	PEPPRO
+Adapter insertion distribution	cutadapt/HEK_PRO-seq_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/HEK_PRO-seq_adapter_insertion_distribution.png	PEPPRO
+Library complexity	QC_hg38/HEK_PRO-seq_preseq_plot.pdf	Library complexity	QC_hg38/HEK_PRO-seq_preseq_plot.png	PEPPRO
+TSS enrichment	QC_hg38/HEK_PRO-seq_TSSenrichment.pdf	TSS enrichment	QC_hg38/HEK_PRO-seq_TSSenrichment.png	PEPPRO
+Pause index	QC_hg38/HEK_PRO-seq_pause_index.pdf	Pause index	QC_hg38/HEK_PRO-seq_pause_index.png	PEPPRO
+FRiF	QC_hg38/HEK_PRO-seq_frif.pdf	FRiF	QC_hg38/HEK_PRO-seq_frif.png	PEPPRO
+PRiF	QC_hg38/HEK_PRO-seq_prif.pdf	PRiF	QC_hg38/HEK_PRO-seq_prif.png	PEPPRO
+mRNA contamination	QC_hg38/HEK_PRO-seq_mRNA_contamination.pdf	mRNA contamination	QC_hg38/HEK_PRO-seq_mRNA_contamination.png	PEPPRO
