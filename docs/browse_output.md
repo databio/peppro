@@ -1624,7 +1624,7 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: peppro_K562_RNA-seq_90.sub
 * ??? danger ":fa-folder-open-o: summary/"
     * :fa-file-text-o: PEPPRO_countData.csv
-    * :fa-file-pdf-o: [PEPPRO_libComplexity.pdf](../files/examples/paper/summary/PEPPRO_libComplexity.pdf
+    * :fa-file-pdf-o: [PEPPRO_libComplexity.pdf](../files/examples/paper/summary/PEPPRO_libComplexity.pdf)
     * :fa-file-image-o: [PEPPRO_libComplexity.png](../files/examples/paper/summary/PEPPRO_libComplexity.png)
 * :fa-file-text-o: [PEPPRO_stats_summary.tsv](../files/examples/paper/PEPPRO_stats_summary.tsv)
 * :fa-file-code-o: [PEPPRO_objs_summary.tsv](../files/examples/paper/PEPPRO_objs_summary.tsv)
