@@ -52,8 +52,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: H9_PRO-seq_1_minus.bam 
             * :fa-file-o: H9_PRO-seq_1_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: H9_PRO-seq_1_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: H9_PRO-seq_1_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: H9_PRO-seq_1_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_PRO-seq_1/cutadapt/H9_PRO-seq_1_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: H9_PRO-seq_1_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_PRO-seq_1/cutadapt/H9_PRO-seq_1_adapter_insertion_distribution.png)
             * :fa-file-text-o: H9_PRO-seq_1_R1_cutadapt.txt
             * :fa-file-text-o: H9_PRO-seq_1_R2_cutadapt.txt
             * :fa-file-text-o: H9_PRO-seq_1.hist
@@ -121,8 +121,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: H9_PRO-seq_2_minus.bam 
             * :fa-file-o: H9_PRO-seq_2_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: H9_PRO-seq_2_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_PRO-seq_2/QC_hg38/H9_PRO-seq_2_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: H9_PRO-seq_2_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_PRO-seq_2/QC_hg38/H9_PRO-seq_2_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: H9_PRO-seq_2_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_PRO-seq_2/cutadapt/H9_PRO-seq_2_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: H9_PRO-seq_2_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_PRO-seq_2/cutadapt/H9_PRO-seq_2_adapter_insertion_distribution.png)
             * :fa-file-text-o: H9_PRO-seq_2_R1_cutadapt.txt
             * :fa-file-text-o: H9_PRO-seq_2_R2_cutadapt.txt
             * :fa-file-text-o: H9_PRO-seq_2.hist
@@ -190,8 +190,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: H9_PRO-seq_3_minus.bam 
             * :fa-file-o: H9_PRO-seq_3_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: H9_PRO-seq_3_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_PRO-seq_3/QC_hg38/H9_PRO-seq_3_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: H9_PRO-seq_3_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_PRO-seq_3/QC_hg38/H9_PRO-seq_3_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: H9_PRO-seq_3_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_PRO-seq_3/cutadapt/H9_PRO-seq_3_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: H9_PRO-seq_3_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_PRO-seq_3/cutadapt/H9_PRO-seq_3_adapter_insertion_distribution.png)
             * :fa-file-text-o: H9_PRO-seq_3_R1_cutadapt.txt
             * :fa-file-text-o: H9_PRO-seq_3_R2_cutadapt.txt
             * :fa-file-text-o: H9_PRO-seq_3.hist
@@ -259,8 +259,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: H9_treated_PRO-seq_1_minus.bam 
             * :fa-file-o: H9_treated_PRO-seq_1_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: H9_treated_PRO-seq_1_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_1/QC_hg38/H9_treated_PRO-seq_1_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: H9_treated_PRO-seq_1_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_1/QC_hg38/H9_treated_PRO-seq_1_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: H9_treated_PRO-seq_1_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_1/cutadapt/H9_treated_PRO-seq_1_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: H9_treated_PRO-seq_1_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_1/cutadapt/H9_treated_PRO-seq_1_adapter_insertion_distribution.png)
             * :fa-file-text-o: H9_treated_PRO-seq_1_R1_cutadapt.txt
             * :fa-file-text-o: H9_treated_PRO-seq_1_R2_cutadapt.txt
             * :fa-file-text-o: H9_treated_PRO-seq_1.hist
@@ -328,8 +328,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: H9_treated_PRO-seq_2_minus.bam 
             * :fa-file-o: H9_treated_PRO-seq_2_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: H9_treated_PRO-seq_2_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_2/QC_hg38/H9_treated_PRO-seq_2_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: H9_treated_PRO-seq_2_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_2/QC_hg38/H9_treated_PRO-seq_2_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: H9_treated_PRO-seq_2_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_2/cutadapt/H9_treated_PRO-seq_2_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: H9_treated_PRO-seq_2_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_2/cutadapt/H9_treated_PRO-seq_2_adapter_insertion_distribution.png)
             * :fa-file-text-o: H9_treated_PRO-seq_2_R1_cutadapt.txt
             * :fa-file-text-o: H9_treated_PRO-seq_2_R2_cutadapt.txt
             * :fa-file-text-o: H9_treated_PRO-seq_2.hist
@@ -397,8 +397,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: H9_treated_PRO-seq_3_minus.bam 
             * :fa-file-o: H9_treated_PRO-seq_3_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: H9_treated_PRO-seq_3_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: H9_treated_PRO-seq_3_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: H9_treated_PRO-seq_3_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: H9_treated_PRO-seq_3_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_adapter_insertion_distribution.png)
             * :fa-file-text-o: H9_treated_PRO-seq_3_R1_cutadapt.txt
             * :fa-file-text-o: H9_treated_PRO-seq_3_R2_cutadapt.txt
             * :fa-file-text-o: H9_treated_PRO-seq_3.hist
@@ -466,8 +466,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: HEK_ARF_PRO-seq_minus.bam 
             * :fa-file-o: HEK_ARF_PRO-seq_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: HEK_ARF_PRO-seq_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/HEK_ARF_PRO-seq/QC_hg38/HEK_ARF_PRO-seq_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: HEK_ARF_PRO-seq_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/HEK_ARF_PRO-seq/QC_hg38/HEK_ARF_PRO-seq_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: HEK_ARF_PRO-seq_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/HEK_ARF_PRO-seq/cutadapt/HEK_ARF_PRO-seq_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: HEK_ARF_PRO-seq_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/HEK_ARF_PRO-seq/cutadapt/HEK_ARF_PRO-seq_adapter_insertion_distribution.png)
             * :fa-file-text-o: HEK_ARF_PRO-seq_R1_cutadapt.txt
             * :fa-file-text-o: HEK_ARF_PRO-seq_R2_cutadapt.txt
             * :fa-file-text-o: HEK_ARF_PRO-seq.hist
@@ -535,8 +535,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: HEK_PRO-seq_minus.bam 
             * :fa-file-o: HEK_PRO-seq_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: HEK_PRO-seq_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/HEK_PRO-seq/QC_hg38/HEK_PRO-seq_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: HEK_PRO-seq_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/HEK_PRO-seq/QC_hg38/HEK_PRO-seq_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: HEK_PRO-seq_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/HEK_PRO-seq/cutadapt/HEK_PRO-seq_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: HEK_PRO-seq_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/HEK_PRO-seq/cutadapt/HEK_PRO-seq_adapter_insertion_distribution.png)
             * :fa-file-text-o: HEK_PRO-seq_R1_cutadapt.txt
             * :fa-file-text-o: HEK_PRO-seq_R2_cutadapt.txt
             * :fa-file-text-o: HEK_PRO-seq.hist
@@ -604,8 +604,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: HelaS3_GRO-seq_minus.bam 
             * :fa-file-o: HelaS3_GRO-seq_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: HelaS3_GRO-seq_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/HelaS3_GRO-seq/QC_hg38/HelaS3_GRO-seq_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: HelaS3_GRO-seq_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/HelaS3_GRO-seq/QC_hg38/HelaS3_GRO-seq_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: HelaS3_GRO-seq_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/HelaS3_GRO-seq/cutadapt/HelaS3_GRO-seq_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: HelaS3_GRO-seq_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/HelaS3_GRO-seq/cutadapt/HelaS3_GRO-seq_adapter_insertion_distribution.png)
             * :fa-file-text-o: HelaS3_GRO-seq_R1_cutadapt.txt
             * :fa-file-text-o: HelaS3_GRO-seq_R2_cutadapt.txt
             * :fa-file-text-o: HelaS3_GRO-seq.hist
@@ -673,8 +673,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: Jurkat_ChRO-seq_1_minus.bam 
             * :fa-file-o: Jurkat_ChRO-seq_1_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: Jurkat_ChRO-seq_1_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/Jurkat_ChRO-seq_1/QC_hg38/Jurkat_ChRO-seq_1_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: Jurkat_ChRO-seq_1_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/Jurkat_ChRO-seq_1/QC_hg38/Jurkat_ChRO-seq_1_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: Jurkat_ChRO-seq_1_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/Jurkat_ChRO-seq_1/cutadapt/Jurkat_ChRO-seq_1_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: Jurkat_ChRO-seq_1_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/Jurkat_ChRO-seq_1/cutadapt/Jurkat_ChRO-seq_1_adapter_insertion_distribution.png)
             * :fa-file-text-o: Jurkat_ChRO-seq_1_R1_cutadapt.txt
             * :fa-file-text-o: Jurkat_ChRO-seq_1_R2_cutadapt.txt
             * :fa-file-text-o: Jurkat_ChRO-seq_1.hist
@@ -742,8 +742,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: Jurkat_ChRO-seq_2_minus.bam 
             * :fa-file-o: Jurkat_ChRO-seq_2_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: Jurkat_ChRO-seq_2_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: Jurkat_ChRO-seq_2_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: Jurkat_ChRO-seq_2_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: Jurkat_ChRO-seq_2_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_adapter_insertion_distribution.png)
             * :fa-file-text-o: Jurkat_ChRO-seq_2_R1_cutadapt.txt
             * :fa-file-text-o: Jurkat_ChRO-seq_2_R2_cutadapt.txt
             * :fa-file-text-o: Jurkat_ChRO-seq_2.hist
@@ -811,8 +811,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_GRO-seq_minus.bam 
             * :fa-file-o: K562_GRO-seq_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_GRO-seq_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_GRO-seq/QC_hg38/K562_GRO-seq_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_GRO-seq_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_GRO-seq/QC_hg38/K562_GRO-seq_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_GRO-seq_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_GRO-seq/cutadapt/K562_GRO-seq_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_GRO-seq_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_GRO-seq/cutadapt/K562_GRO-seq_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_GRO-seq_R1_cutadapt.txt
             * :fa-file-text-o: K562_GRO-seq_R2_cutadapt.txt
             * :fa-file-text-o: K562_GRO-seq.hist
@@ -880,8 +880,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_PRO-seq_minus.bam 
             * :fa-file-o: K562_PRO-seq_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_PRO-seq_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_PRO-seq_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_PRO-seq_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_PRO-seq/cutadapt/K562_PRO-seq_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_PRO-seq_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_PRO-seq/cutadapt/K562_PRO-seq_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_PRO-seq_R1_cutadapt.txt
             * :fa-file-text-o: K562_PRO-seq_R2_cutadapt.txt
             * :fa-file-text-o: K562_PRO-seq.hist
@@ -949,8 +949,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_RNA-seq_10_minus.bam 
             * :fa-file-o: K562_RNA-seq_10_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_RNA-seq_10_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_10/QC_hg38/K562_RNA-seq_10_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_RNA-seq_10_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_10/QC_hg38/K562_RNA-seq_10_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_RNA-seq_10_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_10/cutadapt/K562_RNA-seq_10_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_RNA-seq_10_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_10/cutadapt/K562_RNA-seq_10_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_RNA-seq_10_R1_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_10_R2_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_10.hist
@@ -1018,8 +1018,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_RNA-seq_20_minus.bam 
             * :fa-file-o: K562_RNA-seq_20_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_RNA-seq_20_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_20/QC_hg38/K562_RNA-seq_20_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_RNA-seq_20_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_20/QC_hg38/K562_RNA-seq_20_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_RNA-seq_20_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_20/cutadapt/K562_RNA-seq_20_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_RNA-seq_20_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_20/cutadapt/K562_RNA-seq_20_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_RNA-seq_20_R1_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_20_R2_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_20.hist
@@ -1087,8 +1087,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_RNA-seq_30_minus.bam 
             * :fa-file-o: K562_RNA-seq_30_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_RNA-seq_30_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_30/QC_hg38/K562_RNA-seq_30_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_RNA-seq_30_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_30/QC_hg38/K562_RNA-seq_30_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_RNA-seq_30_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_30/cutadapt/K562_RNA-seq_30_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_RNA-seq_30_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_30/cutadapt/K562_RNA-seq_30_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_RNA-seq_30_R1_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_30_R2_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_30.hist
@@ -1156,8 +1156,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_RNA-seq_40_minus.bam 
             * :fa-file-o: K562_RNA-seq_40_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_RNA-seq_40_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_40/QC_hg38/K562_RNA-seq_40_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_RNA-seq_40_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_40/QC_hg38/K562_RNA-seq_40_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_RNA-seq_40_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_40/cutadapt/K562_RNA-seq_40_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_RNA-seq_40_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_40/cutadapt/K562_RNA-seq_40_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_RNA-seq_40_R1_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_40_R2_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_40.hist
@@ -1225,8 +1225,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_RNA-seq_50_minus.bam 
             * :fa-file-o: K562_RNA-seq_50_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_RNA-seq_50_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_50/QC_hg38/K562_RNA-seq_50_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_RNA-seq_50_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_50/QC_hg38/K562_RNA-seq_50_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_RNA-seq_50_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_50/cutadapt/K562_RNA-seq_50_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_RNA-seq_50_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_50/cutadapt/K562_RNA-seq_50_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_RNA-seq_50_R1_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_50_R2_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_50.hist
@@ -1294,8 +1294,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_RNA-seq_60_minus.bam 
             * :fa-file-o: K562_RNA-seq_60_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_RNA-seq_60_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_60/QC_hg38/K562_RNA-seq_60_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_RNA-seq_60_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_60/QC_hg38/K562_RNA-seq_60_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_RNA-seq_60_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_60/cutadapt/K562_RNA-seq_60_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_RNA-seq_60_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_60/cutadapt/K562_RNA-seq_60_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_RNA-seq_60_R1_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_60_R2_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_60.hist
@@ -1363,8 +1363,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_RNA-seq_70_minus.bam 
             * :fa-file-o: K562_RNA-seq_70_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_RNA-seq_70_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_70/QC_hg38/K562_RNA-seq_70_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_RNA-seq_70_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_70/QC_hg38/K562_RNA-seq_70_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_RNA-seq_70_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_70/cutadapt/K562_RNA-seq_70_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_RNA-seq_70_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_70/cutadapt/K562_RNA-seq_70_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_RNA-seq_70_R1_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_70_R2_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_70.hist
@@ -1432,8 +1432,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_RNA-seq_80_minus.bam 
             * :fa-file-o: K562_RNA-seq_80_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_RNA-seq_80_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_80/QC_hg38/K562_RNA-seq_80_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_RNA-seq_80_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_80/QC_hg38/K562_RNA-seq_80_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_RNA-seq_80_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_80/cutadapt/K562_RNA-seq_80_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_RNA-seq_80_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_80/cutadapt/K562_RNA-seq_80_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_RNA-seq_80_R1_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_80_R2_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_80.hist
@@ -1501,8 +1501,8 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_RNA-seq_90_minus.bam 
             * :fa-file-o: K562_RNA-seq_90_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_RNA-seq_90_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_90/QC_hg38/K562_RNA-seq_90_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_RNA-seq_90_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_90/QC_hg38/K562_RNA-seq_90_adapter_insertion_distribution.png)
+            * [:fa-file-pdf-o: K562_RNA-seq_90_adapter_insertion_distribution.pdf](../files/examples/paper/results_pipeline/K562_RNA-seq_90/cutadapt/K562_RNA-seq_90_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_RNA-seq_90_adapter_insertion_distribution.png](../files/examples/paper/results_pipeline/K562_RNA-seq_90/cutadapt/K562_RNA-seq_90_adapter_insertion_distribution.png)
             * :fa-file-text-o: K562_RNA-seq_90_R1_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_90_R2_cutadapt.txt
             * :fa-file-text-o: K562_RNA-seq_90.hist
