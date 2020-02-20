@@ -4,7 +4,7 @@
 
 [![PEP compatible](http://pepkit.github.io/img/PEP-compatible-green.svg)](http://pepkit.github.io)
 
-`PEPPRO` is a pipeline for PRO-seq nascent RNA sequencing data. It is optimized on unique features of PRO-seq to be fast and accurate. It performs  variable-length UMI adapter removal, read deduplication, trimming, mapping, QC, and signal tracks (bigWig) for plus and minus strands using mappability-scaled or unscaled read counts. 
+`PEPPRO` is a pipeline for nascent RNA sequencing data. It can process GRO-seq, PRO-seq, and ChRO-seq data and is optimized on unique features of nascent RNA to be fast and accurate. It performs variable-length UMI adapter removal, read deduplication, trimming, mapping, QC, and signal tracks (bigWig) for plus and minus strands using mappability-scaled or unscaled read counts. 
 
 ## Outputs
 

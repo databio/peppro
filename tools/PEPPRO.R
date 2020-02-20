@@ -456,6 +456,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Version: ", version, "\n\n",
         "Command: pi \t plot pause indicies distribution\n\n",
         " -i, --input\t Pause density/gene body density ratios.\n",
+        " -w, --raw\t Plot raw exon/intron ratios instead of log10.\n",
         " -y, --type\t Choose plot type from: histogram, boxplot, or violin.\n",
         " -a, --annotate\t Display median and mean values on plot.\n"
     )
@@ -473,6 +474,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
     } else {
         input <- opt_get(name = c("input", "i"), required=TRUE,
                          description="Pause density/gene body density ratios.")
+        raw   <- opt_get(name = c("raw", "w"), required=FALSE, default=FALSE,
+                         description="Plot raw ratios (Default = FALSE).")
         type  <- opt_get(name = c("type", "y"), required=FALSE, default="histogram",
                          description="Choose plot type from: histogram, boxplot, or violin (Default = histogram).")
         annotate <- opt_get(name = c("annotate", "a"), required=FALSE, default=FALSE,
@@ -480,7 +483,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         sample_name        <- sampleName(input)
         name               <- basename(sample_name)
-        suppressWarnings(p <- plotPI(pi=input, name=name,
+        suppressWarnings(p <- plotPI(pi=input, name=name, raw=raw,
                                      type=tolower(type), annotate=annotate))
 
         # Save plot to pdf file

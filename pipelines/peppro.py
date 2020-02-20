@@ -1,12 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env pytho
 """
 PEPPRO - Run-on sequencing pipeline
 """
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.8.9"
-
+__version__ = "0.9.0"
 
 from argparse import ArgumentParser
 import os

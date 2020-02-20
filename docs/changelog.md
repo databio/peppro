@@ -1,6 +1,16 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] -- 2020-02-20
+
+### Added
+- Add a how-to guide for configuring UMI settings
+
+### Changed
+- Update mRNA contamination plots display properties to be more readable
+- Update pause index plots to default to log10 histograms and update their display properties
+- Use paper samples as the default output examples in the docs
+
 ## [0.8.9] -- 2020-02-11
 
 ### Changed
