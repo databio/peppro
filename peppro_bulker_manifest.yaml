@@ -29,6 +29,6 @@ manifest:
   - command: cutadapt
     docker_image: quay.io/biocontainers/cutadapt:2.4--py37h14c3975_0
   - command: flash
-    docker_image: quay.io/biocontainers/flash:1.2.11--hed695b0_5
+    docker_image: databio/flashz
   - command: bedtools
     docker_image: quay.io/biocontainers/bedtools:2.27.1--1
