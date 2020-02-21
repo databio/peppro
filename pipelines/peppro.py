@@ -1285,7 +1285,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     # Put it all together
     if read2:
         pm.run([adapter_command, trim_command], trimmed_fq2,
-               follow=ngstk.check_trim(trimmed_fq2, True, None,
+               follow=ngstk.check_trim(processed_fastq, True, trimmed_fq2,
                                        fastqc_folder=fastqc_folder))
         if args.adapter == "cutadapt":
             output_folder = os.path.join(outfolder, "cutadapt")
