@@ -21,9 +21,20 @@ pip install --user -r requirements.txt
 
 ### R package
 
-`PEPPRO` uses R to produce QC plots, and we include an R package for these functions. From the `peppro/` directory:
+`PEPPRO` uses R to produce QC plots, and we include an R package for these functions.  The `PEPPRO` package relies on a handful of additional packages. 
+
+To install the prerequisite packages from the command line:
 ```console
-Rscript -e 'install.packages("PEPPROr", repos=NULL, type="source")'
+Rscript -e 'install.packages("devtools")'
+Rscript -e 'devtools::install_github("pepkit/pepr")'
+Rscript -e 'install.packages("BiocManager")'
+Rscript -e 'BiocManager::install("GenomicRanges")'
+```
+
+Then, install the `PEPPRO` package. From the `peppro/` directory:
+```console
+Rscript -e 'devtools::install(file.path("PEPPROr/"), dependencies=TRUE, repos="https://cloud.r-project.org/")'
+
 ```
 
 ### Tools
