@@ -32,3 +32,10 @@ manifest:
     docker_image: databio/flashz
   - command: bedtools
     docker_image: quay.io/biocontainers/bedtools:2.27.1--1
+  - command: Rscript
+    docker_image: bioconductor/release_base2:R3.6.2_Bioc3.10
+    dockerargs: "--volume=${HOME}/.local/lib/R:/usr/local/lib/R/host-site-library"
+  - command: R
+    docker_image: bioconductor/release_base2:R3.6.2_Bioc3.10
+    docker_command: R
+    dockerargs: "-it --volume=${HOME}/.local/lib/R:/usr/lib/R/site-library" 
