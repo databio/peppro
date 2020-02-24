@@ -70,6 +70,11 @@ pipelines:
         description: "Plots each sample's library complexity on a single plot."
         thumbnail_path: "summary/{name}_libComplexity.png"
         path: "summary/{name}_libComplexity.pdf"
+      - counts_table:
+        caption: "Gene counts table"
+        description: "Combines all sample gene count files into a project level gene counts table."
+        thumbnail_path: "summary/{name}_countData.csv"
+        path: "summary/{name}_countData.csv"
     resources:
       default:
         file_size: "0"
