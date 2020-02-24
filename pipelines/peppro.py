@@ -1161,8 +1161,18 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             args.sample_name + "_R1_noadap.fastq.paired.fq")
         rep_fq2 = os.path.join(infolder,
             args.sample_name + "_R2_noadap.fastq.paired.fq")
+        orphan_fq1 = os.path.join(infolder,
+            args.sample_name + "_R1_noadap.fastq.single.fq")
+        orphan_fq2 = os.path.join(infolder,
+            args.sample_name + "_R2_noadap.fastq.single.fq")
         flash_hist = os.path.join(outfolder, args.sample_name + ".hist")
         flash_gram = os.path.join(outfolder, args.sample_name + ".histogram")
+        flash_extended = os.path.join(outfolder,
+            args.sample_name + ".extendedFrags.fastq.gz")
+        flash_notCombined_fq1 = os.path.join(outfolder,
+            args.sample_name + ".notCombined_1.fastq.gz")
+        flash_notCombined_fq2 = os.path.join(outfolder,
+            args.sample_name + ".notCombined_2.fastq.gz")
 
         tmp = float(pm.get_stat("Raw_reads"))
         if tmp:
@@ -1181,7 +1191,13 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 rep_fq1 + " " + rep_fq2 + " -o " + args.sample_name +
                 " -d " + outfolder)
         pm.run([cmd1, cmd2], [flash_hist, flash_gram])
-
+        pm.clean_add(rep_fq1)
+        pm.clean_add(rep_fq2)
+        pm.clean_add(orphan_fq1)
+        pm.clean_add(orphan_fq2)
+        pm.clean_add(flash_extended)
+        pm.clean_add(flash_notCombined_fq1)
+        pm.clean_add(flash_notCombined_fq2)
 
         pm.timestamp("### Plot adapter insertion distribution")
 
@@ -1430,7 +1446,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
             if os.path.exists(out_fastq_tmp):
                 os.remove(out_fastq_tmp)
             pm.run(cmd, out_fastq_tmp)
-            pm.clean_add(cmd, out_fastq_tmp)
+            pm.clean_add(out_fastq_tmp)
 
         else:
             if dups:
