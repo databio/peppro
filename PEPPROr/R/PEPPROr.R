@@ -314,8 +314,8 @@ plotComplexityCurves <- function(ccurves,
     }
 
     # plot perfect library as dashed line
-    fig <- fig + geom_segment(aes(x = 0, xend=x_max, y=0, yend=x_max),
-                              linetype=2, col ='black')
+    #fig <- fig + geom_segment(aes(x = 0, xend=x_max, y=0, yend=x_max),
+    #                          linetype=2, col ='black')
 
     # Set the axis limits
     max_total <- 0
@@ -475,6 +475,10 @@ plotComplexityCurves <- function(ccurves,
     if (length(ccurves) == 1) {
         fig <- fig + theme(legend.position = "none")
     }
+
+    # Add perfect line at end (reduce number of resultant nodes)
+    fig <- fig + geom_segment(aes(x = 0, xend=x_max, y=0, yend=x_max),
+                              linetype=2, col ='black')
 
     return(fig)
 }
