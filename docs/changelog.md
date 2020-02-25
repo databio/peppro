@@ -1,6 +1,18 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] -- 2020-02-25
+
+### Added
+ - Report project counts table as a summary object
+ - Clean up additional uncommonly used downstream files
+
+### Changed
+ - Update bulker crate
+ - Update R install process
+ - Correct FastQC object reporting
+ - Fixed logic for recovery mode not re-running superfluous steps
+
 ## [0.9.0] -- 2020-02-20
 
 ### Added
