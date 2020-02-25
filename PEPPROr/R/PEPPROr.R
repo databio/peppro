@@ -735,7 +735,8 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                 #geom_line(aes(linetype=feature), size=2, alpha=0.5) +
                 geom_line(size=2, alpha=0.5) +
                 guides(linetype = FALSE) +
-                labs(x=expression(log[10](number of bases)), y="FRiF") +
+                labs(x=expression(log[10](paste0("number of bases"))),
+                     y="FRiF") +
                 theme_PEPPRO()
 
             # Recolor and reposition legend
@@ -818,7 +819,8 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                             group=feature, color=feature)) +
                 geom_line(aes(linetype=feature), size=2, alpha=0.5) +
                 guides(linetype = FALSE) +
-                labs(x=expression(log[10](number of bases)), y="FRiF") +
+                labs(x=expression(log[10](paste0("number of bases"))),
+                     y="FRiF") +
                 theme_PEPPRO()
 
             # Recolor and reposition legend
