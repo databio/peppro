@@ -420,7 +420,7 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
         if int(args.max_len) > 0:
             trim_cmd_chunks.extend([
                 "|",
-                (tools.seqtk, "trimfq")
+                (tools.seqtk, "trimfq"),
                 ("-L", args.max_len),
                 "-"
             ])
@@ -606,7 +606,7 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
                 # Trim to max length if specified
                 trim_cmd_chunks.extend([
                     "|",
-                    (tools.seqtk, "trimfq")
+                    (tools.seqtk, "trimfq"),
                     ("-L", args.max_len),
                     "-"
                 ])
@@ -719,13 +719,12 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
                 ("-o", trimmed_fastq)
             ])
         else:
+            trim_cmd_chunks.extend([("|", rc_tool)])
             if encoding == "Illumina-1.8":
                 trim_cmd_chunks.extend([
                     ("-Q", str(33))
                 ])
-            trim_cmd_chunks.extend([
-                ("-o", trimmed_fastq)
-            ])
+            trim_cmd_chunks.extend([("-o", trimmed_fastq)])
     else:
         # Default to seqtk
         # Remove UMI blindly by position only
