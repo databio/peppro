@@ -317,6 +317,8 @@ plotComplexityCurves <- function(ccurves,
     #fig <- fig + geom_segment(aes(x = 0, xend=x_max, y=0, yend=x_max),
     #                          linetype=2, col ='black')
 
+    fig <- fig + geom_abline(intercept = 0, slope = 1, linetype="dashed") 
+
     # Set the axis limits
     max_total <- 0
     if (any(rcDT$total > 0)) {
@@ -475,10 +477,6 @@ plotComplexityCurves <- function(ccurves,
     if (length(ccurves) == 1) {
         fig <- fig + theme(legend.position = "none")
     }
-
-    # Add perfect line at end (reduce number of resultant nodes)
-    fig <- fig + geom_segment(aes(x = 0, xend=x_max, y=0, yend=x_max),
-                              linetype=2, col ='black')
 
     return(fig)
 }
