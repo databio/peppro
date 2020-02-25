@@ -2032,11 +2032,7 @@ def main():
             pm.warning("You set adapter arg to '{}' but you must select "
                        "'cutadapt' to plot the adapter insertion distribution "
                        "for single end data.".format(args.adapter))
-        #args.adapter = "cutadapt"
 
-    # If we've already aligned to the primary genome, skip these steps unless
-    # it's a --new-start
-    #if not pm.get_stat("Aligned_reads") or args.new_start:
     if args.paired_end:
         if not args.complexity and args.umi_len > 0:
             unmap_fq1, unmap_fq1_dups = _process_fastq(
@@ -2090,21 +2086,21 @@ def main():
                     " " + unmap_fq1 + " > " + noUMI_fq1)
             cmd2 = ("sed -e 's|\\:[^:]*\\([[:space:]].*\\)|\\1 |g'" +
                     " " + unmap_fq2 + " > " + noUMI_fq2)
-            pm.run([cmd1, cmd2], [noUMI_fq1, noUMI_fq2], shell=True)
+            pm.run([cmd1, cmd2], rmUMI_target, shell=True)
+
             cmd1 = ("mv " + noUMI_fq1 + " " + unmap_fq1)
             cmd2 = ("mv " + noUMI_fq2 + " " + unmap_fq2)
             cmd3 = ("touch " + rmUMI_target)
             pm.run([cmd1, cmd2, cmd3], rmUMI_target)
 
-        cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
-               unmap_fq1 + " " + unmap_fq2)
-        pm.run(cmd, [r1_repair, r2_repair])
+        cmd1 = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " + 
+                unmap_fq1 + " " + unmap_fq2)
+        cmd2 = ("mv " + r1_repair + " " + unmap_fq1)
+        cmd3 = ("mv " + r2_repair + " " + unmap_fq2)
+        cmd4 = ("touch " + repair_target)
+        pm.run([cmd1, cmd2, cmd3, cmd4], repair_target)
         pm.clean_add(r1_repair_single)
         pm.clean_add(r2_repair_single)
-        cmd1 = ("mv " + r1_repair + " " + unmap_fq1)
-        cmd2 = ("mv " + r2_repair + " " + unmap_fq2)
-        cmd3 = ("touch " + repair_target)
-        pm.run([cmd1, cmd2, cmd3], repair_target)
 
         # Re-pair the duplicates (but only if we could identify duplicates)
         if args.umi_len > 0:
@@ -3695,7 +3691,7 @@ def main():
                 seqtable,
                 plus_bam,
                 "--skip-bed",
-                str("--bw=" + plus_bw)
+                str("--bw=" + plus_exact_bw)
             ]
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 scale_plus_chunks.extend([("--tail-edge")])
@@ -3706,7 +3702,7 @@ def main():
                 seqtable,
                 minus_bam,
                 "--skip-bed",
-                str("--bw=" + minus_bw),
+                str("--bw=" + minus_exact_bw),
             ]
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 scale_minus_chunks.extend([("--tail-edge")])
@@ -3718,7 +3714,7 @@ def main():
                 plus_bam,
                 "--no-scale",
                 "--skip-bed",
-                str("--bw=" + plus_bw)
+                str("--bw=" + plus_exact_bw)
             ]
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 scale_plus_chunks.extend([("--tail-edge")])
@@ -3730,13 +3726,13 @@ def main():
                 minus_bam,
                 "--no-scale",
                 "--skip-bed",
-                str("--bw=" + minus_bw),
+                str("--bw=" + minus_exact_bw),
             ]
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 scale_minus_chunks.extend([("--tail-edge")])
             scale_minus_cmd = build_command(scale_minus_chunks)
 
-        pm.run([scale_plus_cmd, scale_minus_cmd], minus_bw)
+        pm.run([scale_plus_cmd, scale_minus_cmd], minus_exact_bw)
 
     # Remove potentially empty folders
     if os.path.exists(raw_folder) and os.path.isdir(raw_folder):
