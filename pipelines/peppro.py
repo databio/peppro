@@ -2017,9 +2017,13 @@ def main():
     #                          Process read files                              #
     ############################################################################
     pm.timestamp("### FASTQ processing: ")
+
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
     cutadapt_report = os.path.join(cutadapt_folder,
                                    args.sample_name + "_R1_cutadapt.txt")
+
+    processed_target_R1 = os.path.join(fastq_folder, "processed_R1.flag")
+    processed_target_R2 = os.path.join(fastq_folder, "processed_R2.flag")
     rmUMI_target = os.path.join(fastq_folder, "readname_repaired.flag")
     rmUMI_dups_target = os.path.join(fastq_folder, "readname_dups_repaired.flag")
     repair_target = os.path.join(fastq_folder, "repaired.flag")
@@ -2034,16 +2038,26 @@ def main():
 
     if args.paired_end:
         if not args.complexity and int(args.umi_len) > 0:
-            unmap_fq1, unmap_fq1_dups = _process_fastq(
-                args, tools, res, False,
-                untrimmed_fastq1, outfolder=param.outfolder)
+            if not os.path.exists(processed_target_R1) or args.new_start:
+                unmap_fq1, unmap_fq1_dups = _process_fastq(
+                    args, tools, res, False,
+                    untrimmed_fastq1, outfolder=param.outfolder)
+            cmd = ("touch " + processed_target_R1)
+            pm.run(cmd, processed_target_R1)
         else:
-            unmap_fq1 = _process_fastq(
-                args, tools, res, False,
-                untrimmed_fastq1, outfolder=param.outfolder)
-        unmap_fq2, unmap_fq2_dups = _process_fastq(
-            args, tools, res, True,
-            untrimmed_fastq2, outfolder=param.outfolder)
+            if not os.path.exists(processed_target_R1) or args.new_start:
+                unmap_fq1 = _process_fastq(
+                    args, tools, res, False,
+                    untrimmed_fastq1, outfolder=param.outfolder)
+            cmd = ("touch " + processed_target_R1)
+            pm.run(cmd, processed_target_R1)
+
+        if not os.path.exists(processed_target_R2) or args.new_start:
+            unmap_fq2, unmap_fq2_dups = _process_fastq(
+                args, tools, res, True,
+                untrimmed_fastq2, outfolder=param.outfolder)
+        cmd = ("touch " + processed_target_R2)
+        pm.run(cmd, processed_target_R2)
 
         pm.debug("\n\nunmap_fq1: {}\nunmap_fq2: {}\n\n".format(unmap_fq1, unmap_fq2))
 
@@ -2139,16 +2153,22 @@ def main():
             pm.run([cmd1, cmd2, cmd3], dups_repair_target)
     else:
         if not args.complexity and int(args.umi_len) > 0:
-            unmap_fq1, unmap_fq1_dups = _process_fastq(
-                args, tools, res, False,
-                untrimmed_fastq1, outfolder=param.outfolder)
-            unmap_fq2 = ""
-            unmap_fq2_dups = ""
+            if not os.path.exists(processed_target_R1) or args.new_start:
+                unmap_fq1, unmap_fq1_dups = _process_fastq(
+                    args, tools, res, False,
+                    untrimmed_fastq1, outfolder=param.outfolder)
+                unmap_fq2 = ""
+                unmap_fq2_dups = ""
+            cmd = ("touch " + processed_target_R1)
+            pm.run(cmd, processed_target_R1)
         else:
-            unmap_fq1 = _process_fastq(
-                args, tools, res, False,
-                untrimmed_fastq1, outfolder=param.outfolder)
-            unmap_fq2 = ""
+            if not os.path.exists(processed_target_R1) or args.new_start:
+                unmap_fq1 = _process_fastq(
+                    args, tools, res, False,
+                    untrimmed_fastq1, outfolder=param.outfolder)
+                unmap_fq2 = ""
+            cmd = ("touch " + processed_target_R1)
+            pm.run(cmd, processed_target_R1)
 
     # NOTE: maintain this functionality for single-end data
     #       for paired-end it has already been generated at this point
