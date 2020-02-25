@@ -213,10 +213,6 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         ngstk.make_dir(fastp_folder)
         adapter_report = fastp_report_txt
 
-    # Check quality encoding for use with FastX_Tools
-    if args.trimmer == "fastx":
-        encoding = _guess_encoding(fq_file)
-
     # Create adapter trimming command(s).
     if args.adapter == "fastp":
         adapter_cmd_chunks = [
@@ -497,6 +493,10 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
                 ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
             ])
 
+        # Remove too short reads
+        trim_cmd_chunks.extend([("-m", (2 + int(float(args.umi_len))))])
+
+        # Add input file
         trim_cmd_chunks.extend([("-i", dedup_fastq)])
 
         # Do not reverse complement if GRO-seq
@@ -706,6 +706,9 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([
                 ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
             ])
+
+        # Remove too short reads
+        trim_cmd_chunks.extend([("-m", (2 + int(float(args.umi_len))))])
 
         # Need undeduplicated results for complexity calculation
         trim_cmd_chunks.extend([
@@ -949,6 +952,9 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 trim_cmd_chunks.extend([
                     ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
                 ])
+
+        # Remove too short reads
+        trim_cmd_chunks.extend([("-m", (2 + int(float(args.umi_len))))])
 
         # Do not reverse complement for GRO-seq
         if args.protocol.lower() in RUNON_SOURCE_GRO:
