@@ -2018,6 +2018,9 @@ def main():
     ############################################################################
     pm.timestamp("### FASTQ processing: ")
 
+    unmap_fq1 = out_fastq_pre + '_unmap_R1.fq'
+    unmap_fq2 = out_fastq_pre + '_unmap_R2.fq'
+
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
     cutadapt_report = os.path.join(cutadapt_folder,
                                    args.sample_name + "_R1_cutadapt.txt")
@@ -3120,7 +3123,7 @@ def main():
         cmd2 = (tools.bedtools + " coverage -sorted -counts -s -a " +
                 gene_sort + " -b " + mapping_genome_bam +
                 " -g " + chr_order + " > " + gene_cov)
-        pm.run([cmd1, cmd2], [gene_sort, gene_cov])
+        pm.run([cmd1, cmd2], gene_cov)
         pm.clean_add(gene_sort)
 
     ############################################################################
@@ -3647,7 +3650,7 @@ def main():
             cmd4 += " -i " + minus_bam
             cmd4 += " -c " + res.chrom_sizes
             cmd4 += " -o " + minus_exact_bw # DEBUG formerly smoothed " -w " + minus_bw
-            cmd2 += " -w " + minus_smooth_bw  
+            cmd4 += " -w " + minus_smooth_bw  
             cmd4 += " -p " + str(int(max(1, int(pm.cores) * 2/3)))
             cmd4 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
