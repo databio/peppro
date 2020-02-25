@@ -2180,7 +2180,7 @@ def main():
 
         if not args.adapter == "cutadapt":
             pm.info("Skipping adapter insertion distribution plotting...")
-            pm.info("This requires using 'cutadapt' for adapter removal.")
+            pm.info("For SE data, this requires using 'cutadapt' for adapter removal.")
         elif not os.path.exists(cutadapt_report):
             pm.info("Skipping adapter insertion distribution plotting...")
             pm.info("Could not find {}.`".format(cutadapt_report))
