@@ -242,7 +242,6 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         ])
         # If calculating library complexity and this is read 1 or single-end,
         # must produce an intermediate file.
-        #if not args.complexity and args.umi_len > 0 and not read2 :
         adapter_cmd_chunks.extend([("-o", noadap_fastq)])  # Must keep intermediates always now
         # else:
         #     adapter_cmd_chunks.extend([("--stdout")])
@@ -334,7 +333,7 @@ def _deduplicate(args, tools, fq_file, outfolder):
     dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
 
     # Create deduplication command(s).
-    if not args.complexity and args.umi_len > 0:
+    if not args.complexity and int(args.umi_len) > 0:
         if args.dedup == "seqkit":
             dedup_cmd_chunks = [
                 (tools.seqkit, "rmdup"),
@@ -389,7 +388,7 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
     :return str: command to trim adapter trimmed and deduplicated reads
     """
 
-    # Only call this when args.complexity32 and args.umi_len > 0
+    # Only call this when args.complexity32 and int(args.umi_len) > 0
     sname = args.sample_name  # for concise code
 
     fastq_folder = os.path.join(outfolder, "fastq")
@@ -781,7 +780,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
     :return str: command to trim adapter trimmed and deduplicated reads
     """
 
-    # Only call this when NOT args.complexity or NOT args.umi_len > 0
+    # Only call this when NOT args.complexity or NOT int(args.umi_len) > 0
     sname = args.sample_name  # for concise code
 
     fastq_folder = os.path.join(outfolder, "fastq")
@@ -807,7 +806,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
     if args.adapter == "fastp":
         # There are no intermediate files, just pipes
         # Remove UMI
-        if args.umi_len > 0:
+        if int(args.umi_len) > 0:
             trim_cmd_chunks = [
                 tools.fastp,
                 ("--thread", str(pm.cores)),
@@ -898,7 +897,7 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 ]
             else:
                 trim_cmd_chunks = []
-    # if not args.complexity and args.umi_len > 0 retain intermediate files
+    # if not args.complexity and int(args.umi_len) > 0 retain intermediate files
     elif args.trimmer == "seqtk":
         trim_cmd_chunks = [
             tools.seqtk,
@@ -1060,7 +1059,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     pm.debug("Read2 status: {}".format(read2))
 
     # To plot fragment sizes requires keeping intermediate files
-    if not args.complexity and args.umi_len > 0:
+    if not args.complexity and int(args.umi_len) > 0:
         deduplicate_command = _deduplicate(args, tools, fq_file, outfolder)
         pm.debug("Dedup command: {}".format(deduplicate_command))
         trim_command = _trim_adapter_files(args, tools, read2, fq_file, outfolder)
@@ -1071,7 +1070,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     # original method included option to not retain intermediates
     # if read2:
     #     trim_command = _trim_pipes(args, tools, True, fq_file, outfolder)
-    # elif not args.complexity and args.umi_len > 0:
+    # elif not args.complexity and int(args.umi_len) > 0:
     #     deduplicate_command = _deduplicate(args, tools, fq_file, outfolder)
     #     pm.debug("Dedup command: {}".format(deduplicate_command))
     #     trim_command = _trim_adapter_files(args, tools, fq_file, outfolder)
@@ -1311,7 +1310,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pm.run(cp_cmd, trimmed_dups_fq2,
                follow=plot_fragments(fastq_folder, output_folder))
         return trimmed_fq2, trimmed_dups_fq2
-    elif not args.complexity and args.umi_len > 0:
+    elif not args.complexity and int(args.umi_len) > 0:
         # This trim command DOES need the adapter file...
         pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
         pm.run([adapter_command, trim_command], processed_fastq,
@@ -1350,7 +1349,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     #     pm.run(cp_cmd, trimmed_dups_faq2)
     #     return trimmed_fastq_R2, trimmed_dups_fastq_R2
     # else:
-    #     if not args.complexity and args.umi_len > 0:
+    #     if not args.complexity and int(args.umi_len) > 0:
     #         # This trim command DOES need the adapter file...
     #         pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
     #         pm.run([adapter_command, trim_command], processed_fastq,
@@ -2034,7 +2033,7 @@ def main():
                        "for single end data.".format(args.adapter))
 
     if args.paired_end:
-        if not args.complexity and args.umi_len > 0:
+        if not args.complexity and int(args.umi_len) > 0:
             unmap_fq1, unmap_fq1_dups = _process_fastq(
                 args, tools, res, False,
                 untrimmed_fastq1, outfolder=param.outfolder)
@@ -2103,7 +2102,7 @@ def main():
         pm.clean_add(r2_repair_single)
 
         # Re-pair the duplicates (but only if we could identify duplicates)
-        if args.umi_len > 0:
+        if int(args.umi_len) > 0:
             r1_dups_repair = os.path.join(
                 fastq_folder, args.sample_name + "_R1_trimmed.fastq.paired.fq")
             r2_dups_repair = os.path.join(
@@ -2139,7 +2138,7 @@ def main():
             cmd3 = ("touch " + dups_repair_target)
             pm.run([cmd1, cmd2, cmd3], dups_repair_target)
     else:
-        if not args.complexity and args.umi_len > 0:
+        if not args.complexity and int(args.umi_len) > 0:
             unmap_fq1, unmap_fq1_dups = _process_fastq(
                 args, tools, res, False,
                 untrimmed_fastq1, outfolder=param.outfolder)
@@ -2280,7 +2279,7 @@ def main():
         print("Prealignment assemblies: " + str(args.prealignments))
         # Loop through any prealignment references and map to them sequentially
         for reference in args.prealignments:
-            if not args.complexity and args.umi_len > 0:
+            if not args.complexity and int(args.umi_len) > 0:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1,
@@ -2416,7 +2415,7 @@ def main():
     cmd += " -T " + tempdir
     cmd += " -o " + mapping_genome_bam_temp
 
-    if not args.complexity and args.umi_len > 0:
+    if not args.complexity and int(args.umi_len) > 0:
         # check input for zipped or not
         if pypiper.is_gzipped_fastq(unmap_fq1_dups):
             cmd = (ngstk.ziptool + " -d " + (unmap_fq1_dups + ".gz"))
@@ -2449,7 +2448,7 @@ def main():
             " -U " + failQC_genome_bam + " ")
     cmd2 += mapping_genome_bam_temp + " > " + mapping_genome_bam
 
-    if not args.complexity and args.umi_len > 0:
+    if not args.complexity and int(args.umi_len) > 0:
         cmd2_dups = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
             " -U " + failQC_genome_bam_dups + " ")
         cmd2_dups += mapping_genome_bam_temp_dups + " > " + mapping_genome_bam_dups
@@ -2502,7 +2501,7 @@ def main():
            follow=lambda: check_alignment_genome(mapping_genome_bam_temp,
                                                  mapping_genome_bam))
 
-    if not args.complexity and args.umi_len > 0:
+    if not args.complexity and int(args.umi_len) > 0:
         pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups)
 
     pm.timestamp("### Compress all unmapped read files")
@@ -2522,7 +2521,7 @@ def main():
         pm.run(cmd, temp_mapping_index)
         pm.clean_add(temp_mapping_index)
 
-        if not args.complexity and args.umi_len > 0:
+        if not args.complexity and int(args.umi_len) > 0:
             cmd_dups = tools.samtools + " index " + mapping_genome_bam_temp_dups
             pm.run(cmd_dups, temp_mapping_index_dups)
             pm.clean_add(temp_mapping_index_dups)
@@ -2647,7 +2646,7 @@ def main():
         QC_folder, args.sample_name + "_preseq_plot.png")
 
     if not _itsa_file(preseq_plot) or args.new_start:
-        if not args.complexity and args.umi_len > 0:
+        if not args.complexity and int(args.umi_len) > 0:
             if os.path.exists(mapping_genome_bam_temp_dups):
                 if not os.path.exists(temp_mapping_index_dups):
                     cmd = tools.samtools + " index " + mapping_genome_bam_temp_dups
