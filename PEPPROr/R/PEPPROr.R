@@ -361,39 +361,39 @@ plotComplexityCurves <- function(ccurves,
     if (coverage > 0) {
         if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
-                labs(x = paste0("total coverage (incl. duplicates)"),
+                labs(x = paste0("Total coverage (incl. duplicates)"),
                      caption = paste0("Points show read count versus ",
                                       "deduplicated read counts ",
                                       "(externally calculated)"))
         } else if (any(rcDT$total > 0)) {
             fig <- fig +
-                labs(x = "total coverage (incl. duplicates)",
+                labs(x = "Total coverage (incl. duplicates)",
                      caption = paste0("Points show read count versus projected ",
                                       "unique read counts on the curves"))
         } else {
             fig <- fig +
-                labs(x = "total coverage (incl. duplicates)")
+                labs(x = "Total coverage (incl. duplicates)")
         }
         fig <- fig +
-            labs = (y = "unique coverage")
+            labs = (y = "Unique coverage")
             #ggtitle("Complexity Curve: preseq")
     } else {
         if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
-                labs(x = "total reads (M) (incl. duplicates)",
+                labs(x = "Total reads (M) (incl. duplicates)",
                      caption = paste0("Points show read count versus deduplicated ",
                                       "read counts (externally calculated)"))
         } else if (any(rcDT$total > 0)) {
             fig <- fig +
-                labs(x = "total reads (M) (incl. duplicates)",
+                labs(x = "Total reads (M) (incl. duplicates)",
                      caption = paste0("Points show externally calculated read ",
                                       "counts on the curves"))
         } else {
             fig <- fig +
-                labs(x = "total reads (M) (incl. duplicates)")
+                labs(x = "Total reads (M) (incl. duplicates)")
         }
         fig <- fig +
-            labs(y = "unique reads (M)")
+            labs(y = "Unique reads (M)")
             #ggtitle("Complexity Curve: preseq")
     }
 
