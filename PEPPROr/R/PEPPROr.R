@@ -735,7 +735,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                 #geom_line(aes(linetype=feature), size=2, alpha=0.5) +
                 geom_line(size=2, alpha=0.5) +
                 guides(linetype = FALSE) +
-                labs(x="log10(number of bases)", y="FRiF") +
+                labs(x=expression(log[10](number of bases)), y="FRiF") +
                 theme_PEPPRO()
 
             # Recolor and reposition legend
@@ -755,7 +755,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                 geom_bar(stat="identity", fill=labels$color, alpha=0.5) + 
                 geom_hline(aes(yintercept=0), linetype="dotted") +
                 xlab('') +
-                ylab('log10(Obs/Exp)') +
+                ylab(expression(log[10](over(Obs, Exp)))) +
                 coord_flip() +
                 scale_x_discrete(position="top") +
                 theme_PEPPRO() +
@@ -807,7 +807,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                          alpha = 0.5) + 
                 geom_hline(aes(yintercept=0), linetype="dotted") +
                 xlab('') +
-                ylab('log10(Obs/Exp)') +
+                ylab(expression(log[10](over(Obs, Exp)))) +
                 coord_flip() +
                 theme_PEPPRO()
         } else {
@@ -818,7 +818,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                             group=feature, color=feature)) +
                 geom_line(aes(linetype=feature), size=2, alpha=0.5) +
                 guides(linetype = FALSE) +
-                labs(x="log10(number of bases)", y="FRiF") +
+                labs(x=expression(log[10](number of bases)), y="FRiF") +
                 theme_PEPPRO()
 
             # Recolor and reposition legend
@@ -837,7 +837,8 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                 geom_bar(stat="identity", fill=labels$color, alpha=0.5) + 
                 geom_hline(aes(yintercept=0), linetype="dotted") +
                 xlab('') +
-                ylab('log10(Obs/Exp)') +
+                #ylab('log10(Obs/Exp)') +
+                ylab(expression(log[10](over(Obs, Exp)))) +
                 coord_flip() +
                 scale_x_discrete(position="top") +
                 theme_PEPPRO() +
