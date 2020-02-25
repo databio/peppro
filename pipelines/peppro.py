@@ -32,7 +32,7 @@ DEFAULT_TRIMMER = "seqtk"
 
 BT2_IDX_KEY = "bowtie2_index"
 DEFAULT_UMI_LEN = 0
-DEFAULT_MAX_LEN = 30
+DEFAULT_MAX_LEN = -1
 
 def parse_arguments():
     """
