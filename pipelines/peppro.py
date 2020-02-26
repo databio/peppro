@@ -143,7 +143,7 @@ def parse_arguments():
 
     parser.add_argument("--prioritize", action='store_true', default=False,
                         dest="prioritize",
-                        help="Plot FRiF/PRiF using mutually exclusive priority"
+                        help="Plot cFRiF/FRiF using mutually exclusive priority"
                              " ranked features based on the order of feature"
                              " appearance in the feature annotation asset.")
 
@@ -3206,28 +3206,17 @@ def main():
     ############################################################################ 
     #                  Determine genomic feature coverage                      #
     ############################################################################
-    pm.timestamp("### Calculate fraction and proportion of reads in features (FRiF/PRiF)")
+    pm.timestamp("### Calculate cumulative and terminal fraction of reads in features (cFRiF/FRiF)")
 
-    frif_PDF = os.path.join(QC_folder, args.sample_name + "_frif.pdf")
-    frif_PNG = os.path.join(QC_folder, args.sample_name + "_frif.png")
-    # frif_plus_PDF = os.path.join(QC_folder, args.sample_name + "_plus_frif.pdf")
-    # frif_plus_PNG = os.path.join(QC_folder, args.sample_name + "_plus_frif.png")
-    # frif_minus_PDF = os.path.join(QC_folder,
-    #                               args.sample_name + "_minus_frif.pdf")
-    # frif_minus_PNG = os.path.join(QC_folder,
-    #                               args.sample_name + "_minus_frif.png")
+    # Cummulative Fraction of Reads in Features (cFRiF)
+    cFRiF_PDF = os.path.join(QC_folder, args.sample_name + "_cFRiF.pdf")
+    cFRiF_PNG = os.path.join(QC_folder, args.sample_name + "_cFRiF.png")
 
-    # Proportion of Reads in Feature (PRiF)
-    prif_PDF = os.path.join(QC_folder, args.sample_name + "_prif.pdf")
-    prif_PNG = os.path.join(QC_folder, args.sample_name + "_prif.png")
-    # prif_plus_PDF = os.path.join(QC_folder, args.sample_name + "_plus_prif.pdf")
-    # prif_plus_PNG = os.path.join(QC_folder, args.sample_name + "_plus_prif.png")
-    # prif_minus_PDF = os.path.join(QC_folder,
-    #                               args.sample_name + "_minus_prif.pdf")
-    # prif_minus_PNG = os.path.join(QC_folder,
-    #                               args.sample_name + "_minus_prif.png")
+    # Fraction of Reads in Feature (FRiF)
+    FRiF_PDF = os.path.join(QC_folder, args.sample_name + "_FRiF.pdf")
+    FRiF_PNG = os.path.join(QC_folder, args.sample_name + "_FRiF.png")
 
-    if not os.path.exists(frif_PDF) or args.new_start:
+    if not os.path.exists(cFRiF_PDF) or args.new_start:
         anno_files = list()
         anno_list_plus = list()
         anno_list_minus = list()
@@ -3316,7 +3305,7 @@ def main():
                                                 temp.name)
                                         cmd2 = ("mv " + temp.name +
                                                 " " + annotation)
-                                        pm.run([cmd1, cmd2], frif_PDF)
+                                        pm.run([cmd1, cmd2], cFRiF_PDF)
                                         temp.close()
 
                     anno_list_plus.reverse()
@@ -3331,14 +3320,14 @@ def main():
                                         annotation + " -b " + plus_bam +
                                         " -g " + chr_order + " > " +
                                         anno_list_plus[idx])
-                                pm.run(cmd4, frif_PDF)
+                                pm.run(cmd4, cFRiF_PDF)
                             if _itsa_file(annotation):
                                 cmd5 = (tools.bedtools +
                                         " coverage -sorted -a " +
                                         annotation + " -b " + minus_bam +
                                         " -g " + chr_order + " > " +
                                         anno_list_minus[idx])
-                                pm.run(cmd5, frif_PDF)
+                                pm.run(cmd5, cFRiF_PDF)
             else:
                 if len(ft_list) >= 1:
                     for pos, anno in enumerate(ft_list):
@@ -3398,12 +3387,12 @@ def main():
                         pm.clean_add(anno_cov_minus)
 
     ############################################################################
-    #                                 Plot FRiF                                #
+    #                            Plot cFRiF/FRiF                               #
     ############################################################################
-    pm.timestamp("### Plot FRiF/PRiF")
+    pm.timestamp("### Plot cFRiF/FRiF")
 
     # Plus
-    if not os.path.exists(frif_PDF) or args.new_start:
+    if not os.path.exists(cFRiF_PDF) or args.new_start:
         if args.prioritize:
             # Count bases, not reads
             # return to original priority ranked order
@@ -3419,43 +3408,39 @@ def main():
         plus_read_count = pm.checkprint(count_cmd)
         plus_read_count = str(plus_read_count).rstrip()
 
-        frif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+        cFRiF_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+                     "-s", args.sample_name, "-z", str(genome_size).rstrip(),
+                     "-n", plus_read_count, "-y", "cfrif"]
+
+        FRiF_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
                     "-s", args.sample_name, "-z", str(genome_size).rstrip(),
                     "-n", plus_read_count, "-y", "frif"]
 
-        prif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-                     "-s", args.sample_name, "-z", str(genome_size).rstrip(),
-                     "-n", plus_read_count, "-y", "prif"]
-
         if not args.prioritize:
             # Use reads for calculation
-            frif_cmd.append("--reads")
-            prif_cmd.append("--reads")
+            cFRiF_cmd.append("--reads")
+            FRiF_cmd.append("--reads")
 
-        frif_cmd.append("-o")
-        frif_cmd.append(frif_PDF)
-        frif_cmd.append("--bed")
+        cFRiF_cmd.append("-o")
+        cFRiF_cmd.append(cFRiF_PDF)
+        cFRiF_cmd.append("--bed")
 
-        prif_cmd.append("-o")
-        prif_cmd.append(prif_PDF)
-        prif_cmd.append("--bed")
+        FRiF_cmd.append("-o")
+        FRiF_cmd.append(FRiF_PDF)
+        FRiF_cmd.append("--bed")
 
         if anno_list_plus:
             for cov in anno_list_plus:
                 if _itsa_file(cov):
-                    frif_cmd.append(cov)
-                    prif_cmd.append(cov)
-            cmd = build_command(frif_cmd)
-            pm.run(cmd, frif_PDF, nofail=False)
-            # pm.report_object("Plus FRiF", frif_plus_PDF,
-            #                  anchor_image=frif_plus_PNG)
-            pm.report_object("FRiF", frif_PDF, anchor_image=frif_PNG)
+                    cFRiF_cmd.append(cov)
+                    FRiF_cmd.append(cov)
+            cmd = build_command(cFRiF_cmd)
+            pm.run(cmd, cFRiF_PDF, nofail=False)
+            pm.report_object("cFRiF", cFRiF_PDF, anchor_image=cFRiF_PNG)
 
-            cmd = build_command(prif_cmd)
-            pm.run(cmd, prif_PDF, nofail=False)
-            # pm.report_object("Plus PRiF", prif_plus_PDF,
-            #                  anchor_image=prif_plus_PNG)
-            pm.report_object("PRiF", prif_PDF, anchor_image=prif_PNG)
+            cmd = build_command(FRiF_cmd)
+            pm.run(cmd, FRiF_PDF, nofail=False)
+            pm.report_object("FRiF", FRiF_PDF, anchor_image=FRiF_PNG)
 
     # Minus (unused as we currently use unstranded feature coverage calculation)
     # if not os.path.exists(frif_minus_PDF) or args.new_start:
@@ -3464,25 +3449,25 @@ def main():
     #     minus_read_count = pm.checkprint(count_cmd)
     #     minus_read_count = str(minus_read_count).rstrip()
 
-    #     frif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+    #     cFRiF_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
     #                "-n", args.sample_name, "-s", str(genome_size).rstrip(),
     #                "-r", minus_read_count, "-y", "frif",
     #                "-o", frif_minus_PDF, "--bed"]
 
-    #     prif_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
+    #     FRiF_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
     #                  "-n", args.sample_name, "-s", str(genome_size).rstrip(),
     #                  "-r", minus_read_count, "-y", "prif",
     #                  "-o", prif_minus_PDF, "--bed"]
 
     #     if anno_list_minus:
     #         for cov in anno_list_minus:
-    #             frif_cmd.append(cov)
-    #             prif_cmd.append(cov)
-    #         cmd = build_command(frif_cmd)
+    #             cFRiF_cmd.append(cov)
+    #             FRiF_cmd.append(cov)
+    #         cmd = build_command(cFRiF_cmd)
     #         pm.run(cmd, frif_minus_PDF, nofail=False)
     #         pm.report_object("Minus FRiF", frif_minus_PDF,
     #                          anchor_image=frif_minus_PNG)
-    #         cmd = build_command(prif_cmd)
+    #         cmd = build_command(FRiF_cmd)
     #         pm.run(cmd, prif_minus_PDF, nofail=False)
     #         pm.report_object("Minus PRiF", prif_minus_PDF,
     #                          anchor_image=prif_minus_PNG)

@@ -206,7 +206,7 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         " -s, --sample_name\t   Sample name.\n",
         " -n, --num_reads\t\t   Number of mapped reads.\n",
         " -z, --size\t\t   Size of genome (bp).\n",
-        " -y, --type\t Choose plot type: FRiF, PRiF, or Both.\n",
+        " -y, --type\t Choose plot type: cFRiF, FRiF, or Both.\n",
         " -o, --output_name\t   Output file name.\n",
         " -b, --bed\t\t   Coverage file(s).\n"
     )
@@ -228,8 +228,8 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                description="Number of mapped reads (or bases).")
         genome_size <- opt_get(name = c("size", "z"), required=TRUE,
                                description="Size of genome (bp).")
-        type        <- opt_get(name = c("type", "y"), required=FALSE, default="frif",
-                               description="Choose plot type: FRiF, PRiF, or Both (Default = frif).")
+        type        <- opt_get(name = c("type", "y"), required=FALSE, default="cfrif",
+                               description="Choose plot type: cFRiF, FRiF, or Both (Default = cfrif).")
         reads       <- opt_get(name = c("reads", "r"), required=FALSE, default=FALSE,
                                description="Calculate using reads (TRUE) or bases (FALSE) (Default = FALSE).")
         output_name <- opt_get(name = c("output_name", "o"), required=TRUE,

@@ -592,7 +592,7 @@ calcFRiF <- function(bedFile, total, reads) {
 #'                      "intron", "utr3", "utr5"))
 #' @export
 plotFRiF <- function(sample_name, num_reads, genome_size,
-                     type = c("frif", "prif", "both"),
+                     type = c("cfrif", "frif", "both"),
                      reads=TRUE, output_name, bedFile) {
     labels  <- data.frame(xPos=numeric(), yPos=numeric(), name=character(),
                           val=numeric(), color=character(),
@@ -777,14 +777,13 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
             p <- p + annotation_custom(grob = g, xmin = 1.05*min_x,
                                        xmax=min_x*2.05, ymin=max_y/2,
                                        ymax=max_y)
-        } else if (tolower(type) == "frif") {
+        } else if (tolower(type) == "cfrif") {
             # take minimum quantile (only works if everything is above that value)
             #p <- ggplot(covDF[which(covDF$frip > min(density(covDF$frip)$y)),],
             #           aes(x=log10(cumSize), y=frip,
             #               group=feature, color=feature)) +
             p <- ggplot(covDF, aes(x=log10(cumSize), y=frip,
                         group=feature, color=feature)) +
-                #geom_line(aes(linetype=feature), size=2, alpha=0.5) +
                 geom_line(size=2, alpha=0.5) +
                 guides(linetype = FALSE) +
                 labs(x="log10(number of bases)", y="FRiF") +
@@ -803,7 +802,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                       legend.key = element_blank(),
                       axis.text.x = element_text(angle = 0, hjust = 1,
                                                  vjust=0.5))
-        } else if (tolower(type) == "prif") {
+        } else if (tolower(type) == "frif") {
             p <- ggplot(feature_dist, aes(x = feature, y = logOE)) +
                 geom_bar(stat="identity",
                          fill = feature_dist$color,
@@ -814,7 +813,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                 coord_flip() +
                 theme_PEPPRO()
         } else {
-            #default to both
+            # default to both
             # Produce plot with bed files
             p <- ggplot(covDF,
                         aes(x=log10(cumSize), y=frip,
@@ -841,7 +840,6 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                 geom_bar(stat="identity", fill=labels$color, alpha=0.5) + 
                 geom_hline(aes(yintercept=0), linetype="dotted") +
                 xlab('') +
-                #ylab('log10(Obs/Exp)') +
                 ylab(expression(log[10](over(Obs, Exp)))) +
                 coord_flip() +
                 scale_x_discrete(position="top") +
@@ -865,7 +863,8 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
 
         
     } else {
-        write("Unable to produce FRiF plot!\n", stdout())
+        err_msg <- paste0("Unable to produce ", type ," plot!\n")
+        write(err_msg, stdout())
     }
 
     if (!exists("p")) {
