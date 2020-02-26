@@ -1,17 +1,19 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
-## [0.9.1] -- 2020-02-25
+## [0.9.1] -- 2020-02-27
 
 ### Added
  - Report project counts table as a summary object
  - Clean up additional uncommonly used downstream files
 
 ### Changed
- - Update bulker crate
+ - Use bulker for container usage
  - Update R install process
  - Correct FastQC object reporting
  - Fixed logic for recovery mode not re-running superfluous steps
+ - Default max length trimming is now none
+ - Change nomenclature regarding FRiF/PRiF plots
 
 ## [0.9.0] -- 2020-02-20
 
