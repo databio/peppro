@@ -1124,11 +1124,9 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             pm.report_result("Reads_with_adapter", ac)
             total_bases = float(pm.checkprint(bases).replace(',',''))
             total_adapter = float(pm.checkprint(adapter_bases).replace(',',''))
-            # pm.report_result("Pct_adapter_contamination",
-            #                  round(float(total_adapter/total_bases), 2))
 
             ts = float(pm.checkprint(ts_cmd).replace(',',''))
-            pm.report_result("Reads_too_short", round(ts, 2))
+            pm.report_result("Uninformative_adapter_reads", round(ts, 2))
 
             if _itsa_file(noadap_fq1):
                 tr = int(ngstk.count_lines(noadap_fq1).strip())
@@ -1142,7 +1140,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
 
             if _itsa_file(preprocessed_fq1):
                 pre = int(ngstk.count_lines(preprocessed_fq1).strip())
-                pm.report_result("Pct_reads_too_short", 
+                pm.report_result("Pct_uninformative_adapter_reads", 
                     round(float(100*(ts/(float(pre)/4))), 4))
         else:
             pm.fail_pipeline("Could not find '{}' to report adapter "
