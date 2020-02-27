@@ -25,7 +25,7 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--silent] [--verbosity V]
                  [--coverage] [--keep] [--noFIFO] [--no-complexity]
                  [--prioritize] [-V]
 
-PEPPRO version 0.9.0
+PEPPRO version 0.9.1
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -61,7 +61,7 @@ optional arguments:
   --umi-len UMI_LEN     Specify the length of the UMI.If your data does not
                         utilize UMIs, set to 0. Default: 0
   --max-len MAX_LEN     Trim reads to maximum length. Set to -1 to disable
-                        length trimming. Default: 30
+                        length trimming. Default: -1
   --sob                 Use seqOutBias to produce signal tracks and
                         incorporate mappability information.
   --scale               Scale output with seqOutBias when producing signal
@@ -88,7 +88,7 @@ optional arguments:
   --keep                Keep prealignment BAM files
   --noFIFO              Do NOT use named pipes during prealignments.
   --no-complexity       Disable library complexity calculation (faster).
-  --prioritize          Plot FRiF/PRiF using mutually exclusive priority
+  --prioritize          Plot cFRiF/FRiF using mutually exclusive priority
                         ranked features based on the order of feature
                         appearance in the feature annotation asset.
   -V, --version         show program's version number and exit
