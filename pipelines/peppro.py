@@ -3020,6 +3020,8 @@ def main():
         pm.timestamp("### Calculate Pause Index (PI)")
         pause_index = os.path.join(QC_folder, args.sample_name +
                                    "_pause_index.bed")
+        pause_index_gz = os.path.join(QC_folder, args.sample_name +
+                                      "_pause_index.bed.gz")
         if not pm.get_stat("Pause_index") or args.new_start:
             # Remove missing chr from PI annotations
             tss_local = os.path.join(QC_folder,
@@ -3080,6 +3082,11 @@ def main():
                               "_pause_index.pdf")
         pi_png = os.path.join(QC_folder, args.sample_name +
                               "_pause_index.png")
+
+        if _itsa_file(pause_index_gz) and not _itsa_file(pi_pdf):
+            cmd = (ngstk.ziptool + " -d " + pause_index_gz)
+            pm.run(cmd, pause_index)
+
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                " pi --annotate -i " + pause_index)
         pm.run(cmd, pi_pdf, nofail=True)
@@ -3481,6 +3488,8 @@ def main():
         pm.timestamp("### Calculate mRNA contamination")
         intron_exon = os.path.join(QC_folder, args.sample_name +
                                    "_exon_intron_ratios.bed")
+        intron_exon_gz = os.path.join(QC_folder, args.sample_name +
+                                      "_exon_intron_ratios.bed.gz")
 
         if not pm.get_stat("mRNA_contamination") or args.new_start:
             # Sort exons and introns
@@ -3588,6 +3597,11 @@ def main():
             args.sample_name + "_mRNA_contamination.pdf")
         mRNApng = os.path.join(QC_folder,
             args.sample_name + "_mRNA_contamination.png")
+
+        if _itsa_file(intron_exon_gz) and not _itsa_file(mRNApdf):
+            cmd = (ngstk.ziptool + " -d " + intron_exon_gz)
+            pm.run(cmd, intron_exon)
+
         mRNAplot = [tools.Rscript, tool_path("PEPPRO.R"), "mrna",
                     "-i", intron_exon, "--annotate"]
         cmd = build_command(mRNAplot)
