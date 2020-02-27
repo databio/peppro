@@ -40,7 +40,7 @@ Rscript -e 'devtools::install(file.path("PEPPROr/"), dependencies=TRUE, repos="h
 
 ### Tools
 
-The pipeline also relies on a set of publicly available bioinformatic tools, but if you don't want to install the prerequisite software used by PEPPRO natively, you can follow our tutorial on [running PEPPRO directly in a container](container.md) and skip this step.
+The pipeline also relies on a set of publicly available bioinformatic tools, but if you don't want to install the prerequisite software used by PEPPRO natively, you can learn to [run PEPPRO using containers](container.md) and skip this step.
 
 Otherwise, you'll need to install the following: [bedtools](https://bedtools.readthedocs.io/en/latest/content/installation.html), [bigWigCat](http://hgdownload.soe.ucsc.edu/admin/exe/), [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), [fastq-pair](https://github.com/linsalrob/fastq-pair.git), [flash](https://ccb.jhu.edu/software/FLASH/), [picard](https://broadinstitute.github.io/picard/), [preseq](http://smithlabresearch.org/software/preseq/), [seqkit](https://bioinf.shenwei.me/seqkit/), [samtools](http://www.htslib.org/), [seqtk](https://github.com/lh3/seqtk), and [wigToBigWig](http://hgdownload.soe.ucsc.edu/admin/exe/). If you need help, we have [detailed installation instructions](detailed_install.md) for installing these.
 
@@ -98,11 +98,11 @@ If that worked, let's actually run the example by taking out the `-d` flag:
 looper run examples/meta/peppro_test.yaml
 ```
 
-Or, if you're using containers, adjust the `--compute` argument accordingly:
+Or, if you're using [`bulker`](https://bulker.databio.org/en/latest/) to run the pipeline in containers:
 
 ```console
-looper run examples/meta/peppro_test.yaml --compute docker
-looper run examples/meta/peppro_test.yaml --compute singularity
+bulker activate databio/peppro
+looper run examples/meta/peppro_test.yaml
 ```
 
 There are lots of other cool things you can do with looper, like dry runs, summarize results, check on pipeline run status, clean intermediate files to save disk space, lump multiple samples into one job, and more. For details, consult the [`looper` docs](http://looper.databio.org/).

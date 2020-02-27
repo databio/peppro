@@ -4,14 +4,14 @@
 
 [![PEP compatible](http://pepkit.github.io/img/PEP-compatible-green.svg)](http://pepkit.github.io)
 
-`PEPPRO` is a pipeline for nascent RNA sequencing data. It can process GRO-seq, PRO-seq, and ChRO-seq data and is optimized on unique features of nascent RNA to be fast and accurate. It performs variable-length UMI adapter removal, read deduplication, trimming, mapping, QC, and signal tracks (bigWig) for plus and minus strands using mappability-scaled or unscaled read counts. 
+`PEPPRO` is a pipeline for nascent RNA sequencing data. It can process PRO-seq, GRO-seq, and ChRO-seq data and is optimized on unique features of nascent RNA to be fast and accurate. It performs variable-length UMI adapter removal, read deduplication, trimming, mapping, QC, and signal tracks (bigWig) for plus and minus strands using mappability-scaled or unscaled read counts. 
 
 ## Outputs
 
 `PEPPRO` produces quality control plots, statistics, and data formats to set the stage for project-specific analysis. We have produced an [interactive display of the output folder structure](browse_output/), which includes:
 
-- **HTML report**: an easily-navigable HTML report with pretty plots: [HTML summary report demo](files/examples/tutorial/tutorial_summary.html).
-- **Stats**: An easily parsable stats file: [Summary statistics demo file](files/examples/tutorial/results_pipeline/tutorial/stats.tsv).
+- **HTML report**: an easily-navigable HTML report with pretty plots: [HTML summary report demo](files/examples/paper/PEPPRO_summary.html).
+- **Stats**: An easily parsable stats file: [Summary statistics demo file](files/examples/paper/PEPPRO_stats_summary.tsv).
 - **Processed data**: Several bigWig signal tracks (plus and minus stranded), with options to produce: smoothed signal; exact (nucleotide-resolution) RNA polymerase position signal; or nucleotide-resolution signal corrected for enzymatic sequence bias.
 
 ## User interface
