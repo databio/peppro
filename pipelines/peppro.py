@@ -2025,6 +2025,8 @@ def main():
 
     unmap_fq1 = out_fastq_pre + '_unmap_R1.fq'
     unmap_fq2 = out_fastq_pre + '_unmap_R2.fq'
+    unmap_fq1_dups = out_fastq_pre + '_unmap_dups_R1.fq'
+    unmap_fq2_dups = out_fastq_pre + '_unmap_dups_R2.fq'
 
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
     cutadapt_report = os.path.join(cutadapt_folder,
@@ -2150,15 +2152,14 @@ def main():
                 cmd3 = ("touch " + rmUMI_dups_target)
                 pm.run([cmd1, cmd2, cmd3], rmUMI_dups_target)
 
-            cmd = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " +
-                   unmap_fq1_dups + " " + unmap_fq2_dups)
-            pm.run(cmd, [r1_dups_repair, r2_dups_repair])
+            cmd1 = (tools.fastqpair + " -t " + str(int(0.9*rr)) + " " +
+                    unmap_fq1_dups + " " + unmap_fq2_dups)
+            cmd2 = ("mv " + r1_dups_repair + " " + unmap_fq1_dups)
+            cmd3 = ("mv " + r2_dups_repair + " " + unmap_fq2_dups)
+            cmd4 = ("touch " + dups_repair_target)
+            pm.run([cmd1, cmd2, cmd3, cmd4], dups_repair_target)
             pm.clean_add(r1_dups_repair_single)
             pm.clean_add(r2_dups_repair_single)
-            cmd1 = ("mv " + r1_dups_repair + " " + unmap_fq1_dups)
-            cmd2 = ("mv " + r2_dups_repair + " " + unmap_fq2_dups)
-            cmd3 = ("touch " + dups_repair_target)
-            pm.run([cmd1, cmd2, cmd3], dups_repair_target)
     else:
         if not args.complexity and int(args.umi_len) > 0:
             if not os.path.exists(processed_target_R1) or args.new_start:
@@ -2384,6 +2385,7 @@ def main():
         param.outfolder, "aligned_" + args.genome_assembly)
     ngstk.make_dir(map_genome_folder)
 
+    # Deduplicated alignment files
     mapping_genome_bam = os.path.join(
         map_genome_folder, args.sample_name + "_sort.bam")
     mapping_genome_bam_temp = os.path.join(
@@ -2393,6 +2395,7 @@ def main():
     unmap_genome_bam = os.path.join(
         map_genome_folder, args.sample_name + "_unmap.bam")
 
+    # Alignment files with duplicates (for library complexity)
     mapping_genome_bam_dups = os.path.join(
         map_genome_folder, args.sample_name + "_sort_dups.bam")
     mapping_genome_bam_temp_dups = os.path.join(
@@ -2401,6 +2404,14 @@ def main():
         map_genome_folder, args.sample_name + "_fail_qc_dups.bam")
     unmap_genome_bam_dups = os.path.join(
         map_genome_folder, args.sample_name + "_unmap_dups.bam")
+
+    # For quality control output
+    QC_folder = os.path.join(param.outfolder, "QC_" + args.genome_assembly)
+    ngstk.make_dir(QC_folder)
+
+    # For library complexity (for --recover)
+    preseq_pdf = os.path.join(
+        QC_folder, args.sample_name + "_preseq_plot.pdf")
 
     temp_mapping_index = os.path.join(mapping_genome_bam_temp + ".bai")
     temp_mapping_index_dups = os.path.join(mapping_genome_bam_temp_dups + ".bai")
@@ -2418,6 +2429,7 @@ def main():
     # check input for zipped or not
     unmap_fq1_gz = unmap_fq1 + ".gz"
     unmap_fq2_gz = unmap_fq2 + ".gz"
+
     if _itsa_file(unmap_fq1_gz) and not _itsa_file(unmap_fq1):
         cmd = (ngstk.ziptool + " -d " + unmap_fq1_gz)
         pm.run(cmd, mapping_genome_bam)
@@ -2478,7 +2490,7 @@ def main():
 
     if not args.complexity and int(args.umi_len) > 0:
         cmd2_dups = (tools.samtools + " view -q 10 -b -@ " + str(pm.cores) +
-            " -U " + failQC_genome_bam_dups + " ")
+                     " -U " + failQC_genome_bam_dups + " ")
         cmd2_dups += mapping_genome_bam_temp_dups + " > " + mapping_genome_bam_dups
         pm.clean_add(failQC_genome_bam_dups)
 
@@ -2530,7 +2542,8 @@ def main():
                                                  mapping_genome_bam))
 
     if not args.complexity and int(args.umi_len) > 0:
-        pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups)
+        if not _itsa_file(preseq_pdf) or args.new_start:
+            pm.run([cmd_dups, cmd2_dups], mapping_genome_bam_dups)
 
     pm.timestamp("### Compress all unmapped read files")
     for unmapped_fq in list(set(to_compress)):
@@ -2658,8 +2671,6 @@ def main():
     ############################################################################
     #                     Calculate library complexity                         #
     ############################################################################
-    QC_folder = os.path.join(param.outfolder, "QC_" + args.genome_assembly)
-    ngstk.make_dir(QC_folder)
     preseq_output = os.path.join(
         QC_folder, args.sample_name + "_preseq_out.txt")
     preseq_yield = os.path.join(
@@ -2668,12 +2679,10 @@ def main():
         QC_folder, args.sample_name + "_preseq_counts.txt")
     preseq_plot = os.path.join(
         QC_folder, args.sample_name + "_preseq_plot")
-    preseq_pdf = os.path.join(
-        QC_folder, args.sample_name + "_preseq_plot.pdf")
     preseq_png = os.path.join(
         QC_folder, args.sample_name + "_preseq_plot.png")
 
-    if not _itsa_file(preseq_plot) or args.new_start:
+    if not _itsa_file(preseq_pdf) or args.new_start:
         if not args.complexity and int(args.umi_len) > 0:
             if os.path.exists(mapping_genome_bam_temp_dups):
                 if not os.path.exists(temp_mapping_index_dups):
