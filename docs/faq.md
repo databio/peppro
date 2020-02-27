@@ -16,3 +16,18 @@ To run using `looper`:
 ```
 looper run peppro_paper.yaml
 ```
+
+## How do I determine if my samples are good quality?
+
+To assist in determining whether you are working with a good quality nascent RNA library, we recommend several cutoffs for `PEPPRO` quality metrics that can be used to help make this decision.  If your sample meets or exceeds these values, it suggests it is a high quality sample.
+
+| Metric                        | Recommended value |
+|-------------------------------|-------------------|
+| Degradation ratio             | < 1               |
+| rDNA alignment rate           | < 20%             |
+| Pause index                   | > 10              |
+| mRNA contamination            | 1 - 1.5           |
+| % uninformative adapter reads | < 25%             |
+| TSS enrichment (coding)       | > 10              |
+| TSS enrichment (non-coding)   | > 5               |
+| % unique at 10M reads         | > 75%             |

@@ -170,8 +170,13 @@ That should do it!  Now we'll install some **optional** packages.  Of course, th
  - [optigrab (v0.9.2.1)](https://cran.r-project.org/web/packages/optigrab/index.html)
 
 To install the needed packages, enter the following command in the pipeline folder:
-```
-Rscript -e 'install.packages("PEPPROr", repos=NULL, type="source")'
+```console
+Rscript -e 'install.packages("devtools")'
+Rscript -e 'devtools::install_github("pepkit/pepr")'
+Rscript -e 'install.packages("BiocManager")'
+Rscript -e 'BiocManager::install("GenomicRanges")'
+Rscript -e 'devtools::install_github("databio/GenomicDistributions")'
+Rscript -e 'devtools::install(file.path("PEPPROr/"), dependencies=TRUE, repos="https://cloud.r-project.org/")'
 ```
 
 To extract files quicker, `PEPPRO` can also utilize `pigz` in place of `gzip` if you have it installed.  Let's go ahead and do that now. It's not required, but it can help speed everything up when you have many samples to process.

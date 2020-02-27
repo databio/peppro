@@ -1,6 +1,21 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] -- 2020-02-27
+
+### Added
+ - Report project counts table as a summary object
+ - Clean up additional uncommonly used downstream files
+
+### Changed
+ - Use bulker for container usage
+ - Update R install process
+ - Correct FastQC object reporting
+ - Updated logic for recover mode
+ - Default max length trimming is now none
+ - Change nomenclature regarding FRiF/PRiF plots
+ - Change TSS score nomenclature
+
 ## [0.9.0] -- 2020-02-20
 
 ### Added

@@ -314,8 +314,10 @@ plotComplexityCurves <- function(ccurves,
     }
 
     # plot perfect library as dashed line
-    fig <- fig + geom_segment(aes(x = 0, xend=x_max, y=0, yend=x_max),
-                              linetype=2, col ='black')
+    #fig <- fig + geom_segment(aes(x = 0, xend=x_max, y=0, yend=x_max),
+    #                          linetype=2, col ='black')
+
+    fig <- fig + geom_abline(intercept = 0, slope = 1, linetype="dashed") 
 
     # Set the axis limits
     max_total <- 0
@@ -361,39 +363,39 @@ plotComplexityCurves <- function(ccurves,
     if (coverage > 0) {
         if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
-                labs(x = paste0("total coverage (incl. duplicates)"),
+                labs(x = paste0("Total coverage (incl. duplicates)"),
                      caption = paste0("Points show read count versus ",
                                       "deduplicated read counts ",
                                       "(externally calculated)"))
         } else if (any(rcDT$total > 0)) {
             fig <- fig +
-                labs(x = "total coverage (incl. duplicates)",
+                labs(x = "Total coverage (incl. duplicates)",
                      caption = paste0("Points show read count versus projected ",
                                       "unique read counts on the curves"))
         } else {
             fig <- fig +
-                labs(x = "total coverage (incl. duplicates)")
+                labs(x = "Total coverage (incl. duplicates)")
         }
         fig <- fig +
-            labs = (y = "unique coverage")
+            labs = (y = "Unique coverage")
             #ggtitle("Complexity Curve: preseq")
     } else {
         if (!any(is.na(rcDT$unique)) && any(rcDT$unique > 0)) {
             fig <- fig +
-                labs(x = "total reads (M) (incl. duplicates)",
+                labs(x = "Total reads (M) (incl. duplicates)",
                      caption = paste0("Points show read count versus deduplicated ",
                                       "read counts (externally calculated)"))
         } else if (any(rcDT$total > 0)) {
             fig <- fig +
-                labs(x = "total reads (M) (incl. duplicates)",
+                labs(x = "Total reads (M) (incl. duplicates)",
                      caption = paste0("Points show externally calculated read ",
                                       "counts on the curves"))
         } else {
             fig <- fig +
-                labs(x = "total reads (M) (incl. duplicates)")
+                labs(x = "Total reads (M) (incl. duplicates)")
         }
         fig <- fig +
-            labs(y = "unique reads (M)")
+            labs(y = "Unique reads (M)")
             #ggtitle("Complexity Curve: preseq")
     }
 
@@ -590,7 +592,7 @@ calcFRiF <- function(bedFile, total, reads) {
 #'                      "intron", "utr3", "utr5"))
 #' @export
 plotFRiF <- function(sample_name, num_reads, genome_size,
-                     type = c("frif", "prif", "both"),
+                     type = c("cfrif", "frif", "both"),
                      reads=TRUE, output_name, bedFile) {
     labels  <- data.frame(xPos=numeric(), yPos=numeric(), name=character(),
                           val=numeric(), color=character(),
@@ -735,7 +737,8 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                 #geom_line(aes(linetype=feature), size=2, alpha=0.5) +
                 geom_line(size=2, alpha=0.5) +
                 guides(linetype = FALSE) +
-                labs(x="log10(number of bases)", y="FRiF") +
+                labs(x=expression(log[10](paste0("number of bases"))),
+                     y="FRiF") +
                 theme_PEPPRO()
 
             # Recolor and reposition legend
@@ -755,7 +758,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                 geom_bar(stat="identity", fill=labels$color, alpha=0.5) + 
                 geom_hline(aes(yintercept=0), linetype="dotted") +
                 xlab('') +
-                ylab('log10(Obs/Exp)') +
+                ylab(expression(log[10](over(Obs, Exp)))) +
                 coord_flip() +
                 scale_x_discrete(position="top") +
                 theme_PEPPRO() +
@@ -774,14 +777,13 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
             p <- p + annotation_custom(grob = g, xmin = 1.05*min_x,
                                        xmax=min_x*2.05, ymin=max_y/2,
                                        ymax=max_y)
-        } else if (tolower(type) == "frif") {
+        } else if (tolower(type) == "cfrif") {
             # take minimum quantile (only works if everything is above that value)
             #p <- ggplot(covDF[which(covDF$frip > min(density(covDF$frip)$y)),],
             #           aes(x=log10(cumSize), y=frip,
             #               group=feature, color=feature)) +
             p <- ggplot(covDF, aes(x=log10(cumSize), y=frip,
                         group=feature, color=feature)) +
-                #geom_line(aes(linetype=feature), size=2, alpha=0.5) +
                 geom_line(size=2, alpha=0.5) +
                 guides(linetype = FALSE) +
                 labs(x="log10(number of bases)", y="FRiF") +
@@ -800,25 +802,26 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                       legend.key = element_blank(),
                       axis.text.x = element_text(angle = 0, hjust = 1,
                                                  vjust=0.5))
-        } else if (tolower(type) == "prif") {
+        } else if (tolower(type) == "frif") {
             p <- ggplot(feature_dist, aes(x = feature, y = logOE)) +
                 geom_bar(stat="identity",
                          fill = feature_dist$color,
                          alpha = 0.5) + 
                 geom_hline(aes(yintercept=0), linetype="dotted") +
                 xlab('') +
-                ylab('log10(Obs/Exp)') +
+                ylab(expression(log[10](over(Obs, Exp)))) +
                 coord_flip() +
                 theme_PEPPRO()
         } else {
-            #default to both
+            # default to both
             # Produce plot with bed files
             p <- ggplot(covDF,
                         aes(x=log10(cumSize), y=frip,
                             group=feature, color=feature)) +
                 geom_line(aes(linetype=feature), size=2, alpha=0.5) +
                 guides(linetype = FALSE) +
-                labs(x="log10(number of bases)", y="FRiF") +
+                labs(x=expression(log[10](paste0("number of bases"))),
+                     y="FRiF") +
                 theme_PEPPRO()
 
             # Recolor and reposition legend
@@ -837,7 +840,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                 geom_bar(stat="identity", fill=labels$color, alpha=0.5) + 
                 geom_hline(aes(yintercept=0), linetype="dotted") +
                 xlab('') +
-                ylab('log10(Obs/Exp)') +
+                ylab(expression(log[10](over(Obs, Exp)))) +
                 coord_flip() +
                 scale_x_discrete(position="top") +
                 theme_PEPPRO() +
@@ -860,7 +863,8 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
 
         
     } else {
-        write("Unable to produce FRiF plot!\n", stdout())
+        err_msg <- paste0("Unable to produce ", type ," plot!\n")
+        write(err_msg, stdout())
     }
 
     if (!exists("p")) {

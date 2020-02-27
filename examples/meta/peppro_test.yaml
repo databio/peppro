@@ -21,7 +21,7 @@ implied_columns:
       trimmer: seqtk     # Default
       protocol: pro      # Default
       umi_len: 0         # Default
-      max_len: -1        # Disable length trimming 
+      max_len: -1        # Default
 
 pipeline_args:
 #  peppro.py:

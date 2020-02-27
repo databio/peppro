@@ -8,13 +8,13 @@ Prealignments can be added via the command-line or included in a *PEP* project c
 
 ## Using prealignments on the command-line
 
-In this example, we'll align sequentially to human mitochondrial sequence (e.g. the Revised Cambridge Reference Sequence of Human Mitochondrial DNA) and then a "human_repeats" genome which is the combination of alu elements, centromeric or alpha-satellite DNA, and ribosomal sequence.
+In this example, we'll align sequentially to human rDNA sequences curated from GenBank.
 
 ```console
 /pipelines/peppro.py \
   --sample-name test \
   --genome hg38 \
-  --prealignments human_rDNA rCRSd \
+  --prealignments human_rDNA \
   --input examples/data/test_r1.fq.gz \
   --single-or-paired single \
   -O $HOME/peppro_example/
