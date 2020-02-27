@@ -2893,7 +2893,7 @@ def main():
         Tss_minus = os.path.join(QC_folder, args.sample_name +
                                  "_minus_TssEnrichment.txt")
 
-        if not pm.get_stat("TSS_Minus_Score") or args.new_start:
+        if not pm.get_stat("TSS_non-coding_score") or args.new_start:
             # Split TSS file
             plus_TSS  = os.path.join(QC_folder, "plus_TSS.tsv")
             minus_TSS = os.path.join(QC_folder, "minus_TSS.tsv")
@@ -2939,7 +2939,7 @@ def main():
                     (sum(normTSS[int(max_index-50):int(max_index+50)])) /
                     (len(normTSS[int(max_index-50):int(max_index+50)])), 1)
 
-                pm.report_result("TSS_Plus_Score", round(Tss_score, 1))
+                pm.report_result("TSS_coding_score", round(Tss_score, 1))
             except ZeroDivisionError:
                 pass
 
@@ -2971,7 +2971,7 @@ def main():
                     (sum(normTSS[int(max_index-50):int(max_index+50)])) /
                     (len(normTSS[int(max_index-50):int(max_index+50)])), 1)
 
-                pm.report_result("TSS_Minus_Score", round(Tss_score, 1))
+                pm.report_result("TSS_non-coding_score", round(Tss_score, 1))
             except ZeroDivisionError:
                 pass
 
