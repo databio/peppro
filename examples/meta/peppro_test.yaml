@@ -1,31 +1,30 @@
 # Run test sample through PEPPRO
 name: test
+sample_table: "peppro_test.csv"
+output_dir: "$HOME/peppro_test/"
+pipeline_interfaces: "$HOME/peppro/pipeline_interface.yaml" 
 
-metadata:
-  sample_annotation: "peppro_test.csv"
-  output_dir: "$HOME/peppro_test/"
-  pipeline_interfaces: "$HOME/peppro/pipeline_interface.yaml" 
-  
-derived_columns: [read1]
-
-data_sources:
-  R1: "$CODE/peppro/examples/data/{sample_name}_r1.fq.gz"
-  
-implied_columns:
-  organism:
-    human:
-      genome: hg38
-      prealignments: human_rDNA rCRSd
-      adapter: fastp  # Default
-      dedup: seqkit   # Default
-      trimmer: seqtk  # Default
-      runon: pro      # Default
-      umi_len: 8      # Default
-      max_len: 30     # Default
-      TSS_name: $HOME/genomes/hg38/hg38_TSS.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
-      CpA_name: $HOME/genomes/hg38/hg38_CpA.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
-      pre_name: $HOME/genomes/hg38/hg38_pre-mRNA.tsv         # Default. Pipeline checks corresponding genome folder without specifying.
-      anno_name: $HOME/genomes/hg38/hg38_annotations.bed.gz  # Default. Pipeline checks corresponding genome folder without specifying.
+sample_modifiers:
+  derive:
+    attributes: ["read1"]
+    sources: 
+      R1: "$CODE/peppro/examples/data/{sample_name}_r1.fq.gz"
+  imply:
+    - if: 
+        organism: ["human"]
+      then:
+        genome: hg38
+        prealignments: human_rDNA rCRSd
+        adapter: fastp  # Default
+        dedup: seqkit   # Default
+        trimmer: seqtk  # Default
+        runon: pro      # Default
+        umi_len: 8      # Default
+        max_len: 30     # Default
+        TSS_name: $HOME/genomes/hg38/hg38_TSS.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
+        CpA_name: $HOME/genomes/hg38/hg38_CpA.tsv              # Default. Pipeline checks corresponding genome folder without specifying.
+        pre_name: $HOME/genomes/hg38/hg38_pre-mRNA.tsv         # Default. Pipeline checks corresponding genome folder without specifying.
+        anno_name: $HOME/genomes/hg38/hg38_annotations.bed.gz  # Default. Pipeline checks corresponding genome folder without specifying.
 
 pipeline_args:
 #  peppro.py:
