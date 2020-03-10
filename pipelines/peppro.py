@@ -2589,20 +2589,23 @@ def main():
                 mapping_genome_index = os.path.join(mapping_genome_bam + ".bai")
                 noMT_mapping_genome_bam = os.path.join(
                     map_genome_folder, args.sample_name + "_noMT.bam")
+                chr_bed = os.path.join(map_genome_folder, "chr_sizes.bed")
 
                 cmd1 = tools.samtools + " index " + mapping_genome_bam
                 cmd2 = (tools.samtools + " idxstats " + mapping_genome_bam +
                         " | cut -f 1 | grep")
                 for name in mito_name:
                     cmd2 += " -vwe '" + name + "'"
-                cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
-                         str(pm.cores) + " " + mapping_genome_bam + " > " +
-                         noMT_mapping_genome_bam)
-                cmd3 = ("mv " + noMT_mapping_genome_bam +
+                cmd2 += (" > " + chr_bed)
+                cmd3 = (tools.samtools + " view -L " + chr_bed + " -b -@ " +
+                        str(pm.cores) + " " + mapping_genome_bam + " > " +
+                        noMT_mapping_genome_bam)
+                cmd4 = ("mv " + noMT_mapping_genome_bam +
                         " " + mapping_genome_bam)
-                cmd4 = tools.samtools + " index " + mapping_genome_bam
-                pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam)
+                cmd5 = tools.samtools + " index " + mapping_genome_bam
+                pm.run([cmd1, cmd2, cmd3, cmd4, cmd5], noMT_mapping_genome_bam)
                 pm.clean_add(mapping_genome_index)
+                pm.clean_add(chr_bed)
 
     # Remove PE2 reads
     if args.paired_end:
