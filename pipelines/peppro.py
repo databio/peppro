@@ -2307,41 +2307,42 @@ def main():
         # Loop through any prealignment references and map to them sequentially
         for reference in args.prealignments:
             if not args.complexity and int(args.umi_len) > 0:
+                bt2_index = os.path.join(rgc.get_asset(reference, BT2_IDX_KEY))
+                if not bt2_index.endswith(reference):
+                    bt2_index = os.path.join(
+                        rgc.get_asset(reference, BT2_IDX_KEY), reference)
+
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1,
                         unmap_fq2, reference,
-                        assembly_bt2=os.path.join(
-                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments")
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1_dups,
                         unmap_fq2_dups, reference,
-                        assembly_bt2=os.path.join(
-                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         dups=True)
-                    
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1,
                         unmap_fq2, reference,
-                        assembly_bt2=os.path.join(
-                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments")
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1_dups,
                         unmap_fq2_dups, reference,
-                        assembly_bt2=os.path.join(
-                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         dups=True)
+
                 if args.paired_end:
                     to_compress.append(unmap_fq1_dups)
                     to_compress.append(unmap_fq2_dups)
