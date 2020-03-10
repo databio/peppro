@@ -2593,7 +2593,7 @@ def main():
 
                 cmd1 = tools.samtools + " index " + mapping_genome_bam
                 cmd2 = (tools.samtools + " idxstats " + mapping_genome_bam +
-                        " | cut -f 1 | grep")
+                        " | cut -f 1-2 | awk '{print $1, 0, $2}' | grep")
                 for name in mito_name:
                     cmd2 += " -vwe '" + name + "'"
                 cmd2 += (" > " + chr_bed)
