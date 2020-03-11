@@ -11,7 +11,6 @@ pipelines:
     name: PEPPRO
     path: pipelines/peppro.py
     schema: https://schema.databio.org/pipelines/ProseqPEP.yaml
-    looper_args: True
     required_input_files: [read1]
     all_input_files: [read1, read2]
     ngs_input_files: [read1, read2]
@@ -21,6 +20,7 @@ pipelines:
       --genome {sample.genome}
       --input {sample.read1}
       --single-or-paired {sample.read_type}
+      -O { looper.output_folder }
       {% if sample.read2 is defined %} --input2 {sample.read2} {% endif %}
       {% if sample.adapter is defined %} --adapter-tool {sample.adapter} {% endif %}
       {% if sample.dedup is defined %} --dedup-tool {sample.dedup} {% endif %}
