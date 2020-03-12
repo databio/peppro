@@ -20,7 +20,10 @@ pipelines:
       --genome {sample.genome}
       --input {sample.read1}
       --single-or-paired {sample.read_type}
-      -O { looper.output_folder }
+      -O {looper.output_folder}
+      {% if looper.job_name is defined %} -J {looper.job_name} {% endif %}
+      {% if looper.cores is defined %} -P {looper.cores} {% endif %}
+      {% if looper.mem is defined %} -M {looper.mem} {% endif %}
       {% if sample.read2 is defined %} --input2 {sample.read2} {% endif %}
       {% if sample.adapter is defined %} --adapter-tool {sample.adapter} {% endif %}
       {% if sample.dedup is defined %} --dedup-tool {sample.dedup} {% endif %}
