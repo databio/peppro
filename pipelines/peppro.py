@@ -1788,7 +1788,7 @@ def _add_resources(args, res, asset_dict=None):
     for reference in args.prealignments:
         for asset in [BT2_IDX_KEY]:
             try:
-                res[asset] = rgc.get_asset(reference, asset)
+                res[asset] = rgc.seek(reference, asset)
             except KeyError:
                 err_msg = "{} for {} is missing from REFGENIE config file."
                 pm.fail_pipeline(KeyError(err_msg.format(asset, reference)))
@@ -1817,7 +1817,7 @@ def _add_resources(args, res, asset_dict=None):
                                                     asset,
                                                     seek_key,
                                                     tag))  # DEBUG
-                    res[seek_key] = rgc.get_asset(args.genome_assembly,
+                    res[seek_key] = rgc.seek(args.genome_assembly,
                                                   asset_name=str(asset),
                                                   tag_name=str(tag),
                                                   seek_key=str(seek_key))
@@ -2359,10 +2359,10 @@ def main():
         # Loop through any prealignment references and map to them sequentially
         for reference in args.prealignments:
             if not args.complexity and int(args.umi_len) > 0:
-                bt2_index = os.path.join(rgc.get_asset(reference, BT2_IDX_KEY))
+                bt2_index = os.path.join(rgc.seek(reference, BT2_IDX_KEY))
                 if not bt2_index.endswith(reference):
                     bt2_index = os.path.join(
-                        rgc.get_asset(reference, BT2_IDX_KEY), reference)
+                        rgc.seek(reference, BT2_IDX_KEY), reference)
 
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
@@ -2409,7 +2409,7 @@ def main():
                         args, tools, args.paired_end, False,
                         unmap_fq1, unmap_fq2, reference,
                         assembly_bt2=os.path.join(
-                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                            rgc.seek(reference, BT2_IDX_KEY), reference),
                         outfolder=param.outfolder,
                         aligndir="prealignments")
                 else:
@@ -2417,7 +2417,7 @@ def main():
                         args, tools, args.paired_end, True,
                         unmap_fq1, unmap_fq2, reference,
                         assembly_bt2=os.path.join(
-                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                            rgc.seek(reference, BT2_IDX_KEY), reference),
                         outfolder=param.outfolder,
                         aligndir="prealignments")
                 if args.paired_end:
@@ -2495,7 +2495,7 @@ def main():
     cmd += bt2_options
     cmd += " --rg-id " + args.sample_name
     cmd += " -x " + os.path.join(
-        rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
+        rgc.seek(args.genome_assembly, BT2_IDX_KEY),
         args.genome_assembly)
     if args.paired_end:
         cmd += " --rf -1 " + unmap_fq1 + " -2 " + unmap_fq2
@@ -2520,7 +2520,7 @@ def main():
         cmd_dups += bt2_options
         cmd_dups += " --rg-id " + args.sample_name
         cmd_dups += " -x " + os.path.join(
-            rgc.get_asset(args.genome_assembly, BT2_IDX_KEY),
+            rgc.seek(args.genome_assembly, BT2_IDX_KEY),
             args.genome_assembly)
         if args.paired_end:
             cmd_dups += " --rf -1 " + unmap_fq1_dups + " -2 " + unmap_fq2_dups
@@ -3683,7 +3683,7 @@ def main():
     ############################################################################
     #                             Produce BigWigs                              #
     ############################################################################
-    genome_fq = rgc.get_asset(args.genome_assembly,
+    genome_fq = rgc.seek(args.genome_assembly,
                               asset_name="fasta",
                               seek_key="fasta")
     plus_exact_bw = os.path.join(
