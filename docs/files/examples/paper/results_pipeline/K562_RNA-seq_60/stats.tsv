@@ -4,8 +4,8 @@ Genome	hg38	PEPPRO
 Raw_reads	10000000	PEPPRO
 Fastq_reads	10000000	PEPPRO
 Reads_with_adapter	5519636.0	PEPPRO
-Reads_too_short	99594.0	PEPPRO
-Pct_reads_too_short	0.9959	PEPPRO
+Uninformative_adapter_reads	99594.0	PEPPRO
+Pct_uninformative_adapter_reads	0.9959	PEPPRO
 Trimmed_reads	9900406	PEPPRO
 Trim_loss_rate	1.0	PEPPRO
 Peak_adapter_insertion_size	34	PEPPRO
@@ -25,11 +25,11 @@ NRF	0.86	PEPPRO
 PBC1	0.95	PEPPRO
 PBC2	31.45	PEPPRO
 Unmapped_reads	939882	PEPPRO
-TSS_Plus_Score	17.1	PEPPRO
-TSS_Minus_Score	4.3	PEPPRO
+TSS_coding_score	17.1	PEPPRO
+TSS_non-coding_score	4.3	PEPPRO
 Pause_index	12.56	PEPPRO
 Plus_FRiP	0.38	PEPPRO
 Minus_FRiP	0.38	PEPPRO
 mRNA_contamination	5.45	PEPPRO
-Time	0:52:13	PEPPRO
-Success	02-18-12:01:11	PEPPRO
+Time	1:04:08	PEPPRO
+Success	02-27-10:28:10	PEPPRO
