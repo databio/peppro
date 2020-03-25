@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.9.3"
+__version__ = "0.9.4"
 
 from argparse import ArgumentParser
 import os
@@ -2497,12 +2497,12 @@ def main():
     # check input for zipped or not
     unmap_fq1_gz = unmap_fq1 + ".gz"
     unmap_fq2_gz = unmap_fq2 + ".gz"
-    
+
     bt2_index = rgc.seek(args.genome_assembly, BT2_IDX_KEY)
-        if not bt2_index.endswith(args.genome_assembly):
-            bt2_index = os.path.join(
-                rgc.seek(args.genome_assembly, BT2_IDX_KEY),
-                         args.genome_assembly)
+    if not bt2_index.endswith(args.genome_assembly):
+        bt2_index = os.path.join(
+            rgc.seek(args.genome_assembly, BT2_IDX_KEY),
+                     args.genome_assembly)
 
     if _itsa_file(unmap_fq1_gz) and not _itsa_file(unmap_fq1):
         cmd = (ngstk.ziptool + " -d " + unmap_fq1_gz)
