@@ -2378,7 +2378,7 @@ def main():
         # Loop through any prealignment references and map to them sequentially
         for reference in args.prealignments:
             if not args.complexity and int(args.umi_len) > 0:
-                bt2_index = os.path.join(rgc.seek(reference, BT2_IDX_KEY))
+                bt2_index = rgc.seek(reference, BT2_IDX_KEY)
                 if not bt2_index.endswith(reference):
                     bt2_index = os.path.join(
                         rgc.seek(reference, BT2_IDX_KEY), reference)
@@ -2427,16 +2427,14 @@ def main():
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, False,
                         unmap_fq1, unmap_fq2, reference,
-                        assembly_bt2=os.path.join(
-                            rgc.seek(reference, BT2_IDX_KEY), reference),
+                        assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments")
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True,
                         unmap_fq1, unmap_fq2, reference,
-                        assembly_bt2=os.path.join(
-                            rgc.seek(reference, BT2_IDX_KEY), reference),
+                        assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments")
                 if args.paired_end:
@@ -2499,6 +2497,12 @@ def main():
     # check input for zipped or not
     unmap_fq1_gz = unmap_fq1 + ".gz"
     unmap_fq2_gz = unmap_fq2 + ".gz"
+    
+    bt2_index = rgc.seek(args.genome_assembly, BT2_IDX_KEY)
+        if not bt2_index.endswith(args.genome_assembly):
+            bt2_index = os.path.join(
+                rgc.seek(args.genome_assembly, BT2_IDX_KEY),
+                         args.genome_assembly)
 
     if _itsa_file(unmap_fq1_gz) and not _itsa_file(unmap_fq1):
         cmd = (ngstk.ziptool + " -d " + unmap_fq1_gz)
@@ -2513,9 +2517,7 @@ def main():
     cmd = tools.bowtie2 + " -p " + str(pm.cores)
     cmd += bt2_options
     cmd += " --rg-id " + args.sample_name
-    cmd += " -x " + os.path.join(
-        rgc.seek(args.genome_assembly, BT2_IDX_KEY),
-        args.genome_assembly)
+    cmd += " -x " + bt2_index
     if args.paired_end:
         cmd += " --rf -1 " + unmap_fq1 + " -2 " + unmap_fq2
     else:
@@ -2538,9 +2540,7 @@ def main():
         cmd_dups = tools.bowtie2 + " -p " + str(pm.cores)
         cmd_dups += bt2_options
         cmd_dups += " --rg-id " + args.sample_name
-        cmd_dups += " -x " + os.path.join(
-            rgc.seek(args.genome_assembly, BT2_IDX_KEY),
-            args.genome_assembly)
+        cmd_dups += " -x " + bt2_index
         if args.paired_end:
             cmd_dups += " --rf -1 " + unmap_fq1_dups + " -2 " + unmap_fq2_dups
         else:
