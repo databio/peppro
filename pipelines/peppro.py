@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.9.2"
+__version__ = "0.9.1"
 
 from argparse import ArgumentParser
 import os
@@ -1120,12 +1120,31 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             pm.report_object("FastP_report", fastp_report_html)
 
         if _itsa_file(report):
-            ac = float(pm.checkprint(ac_cmd).replace(',',''))
+            tmp = pm.checkprint(ac_cmd)
+            if tmp:
+                ac = float(tmp.replace(',',''))
+            else:
+                ac = 0
             pm.report_result("Reads_with_adapter", ac)
-            total_bases = float(pm.checkprint(bases).replace(',',''))
-            total_adapter = float(pm.checkprint(adapter_bases).replace(',',''))
-
-            ts = float(pm.checkprint(ts_cmd).replace(',',''))
+            
+            tmp = pm.checkprint(bases)
+            if tmp:
+                total_bases = float(tmp.replace(',',''))
+            else:
+                total_bases = 0
+                
+            tmp = pm.checkprint(adapter_bases)
+            if tmp:
+                total_adapter = float(tmp.replace(',',''))
+            else:
+                total_adapter = 0
+            
+            tmp = pm.checkprint(ts_cmd)
+            if tmp:
+                ts = float(tmp.replace(',',''))
+            else:
+                ts = 0
+            
             pm.report_result("Uninformative_adapter_reads", round(ts, 2))
 
             if _itsa_file(noadap_fq1):
