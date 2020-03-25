@@ -1,6 +1,12 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.9.2] -- 2020-03-25
+
+### Changed
+ - Updated refgenconf use from get_asset() to seek()
+ - Added check for bowtie2_index asset naming
+
 ## [0.9.1] -- 2020-02-27
 
 ### Added
