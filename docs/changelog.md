@@ -1,6 +1,11 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.9.3] -- 2020-03-25
+
+## Changed
+ - Added checks for correct value return on cutadapt report checks
+
 ## [0.9.2] -- 2020-03-25
 
 ### Changed
