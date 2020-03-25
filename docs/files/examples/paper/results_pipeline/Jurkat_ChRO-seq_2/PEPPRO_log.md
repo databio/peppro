@@ -1,10 +1,10 @@
 ### Pipeline run code and environment:
 
-*              Command:  `/scratch/jps3dp/tools/databio/peppro/pipelines/peppro.py --sample-name Jurkat_ChRO-seq_2 --genome hg38 --input /project/shefflab/data/sra_fastq/SRR7616134.fastq.gz --single-or-paired single --protocol PRO --umi-len 6 --max-len -1 --prealignments human_rDNA -O /project/shefflab/processed/peppro/paper/results_pipeline -P 8 -M 16000`
-*         Compute host:  udc-aj38-13c1
+*              Command:  `/scratch/jps3dp/tools/databio/peppro/pipelines/peppro.py --sample-name Jurkat_ChRO-seq_2 --genome hg38 --input /project/shefflab/data/sra_fastq/SRR7616134.fastq.gz --single-or-paired single --protocol PRO --umi-len 6 --prealignments human_rDNA -O /project/shefflab/processed/peppro/paper/dev4/results_pipeline -P 8 -M 16000`
+*         Compute host:  udc-ba26-20
 *          Working dir:  /sfs/lustre/bahamut/scratch/jps3dp/tools/databio/ppqc
-*            Outfolder:  /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/
-*  Pipeline started at:   (02-18 11:08:58) elapsed: 0.0 _TIME_
+*            Outfolder:  /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/
+*  Pipeline started at:   (02-27 09:25:04) elapsed: 1.0 _TIME_
 
 ### Version log:
 
@@ -12,10 +12,10 @@
 *          Pypiper dir:  `/sfs/qumulo/qhome/jps3dp/.local/lib/python3.6/site-packages/pypiper`
 *      Pypiper version:  0.12.1
 *         Pipeline dir:  `/sfs/lustre/bahamut/scratch/jps3dp/tools/databio/peppro/pipelines`
-*     Pipeline version:  0.8.9
-*        Pipeline hash:  d6fefacd05f25e266e8a162fa20e48a6f6c830d2
+*     Pipeline version:  0.9.1
+*        Pipeline hash:  2fe0657f50e41000560af043f4914b3a240296f2
 *      Pipeline branch:  * dev
-*        Pipeline date:  2020-02-17 11:24:59 -0500
+*        Pipeline date:  2020-02-27 09:20:39 -0500
 
 ### Arguments passed to pipeline:
 
@@ -42,7 +42,7 @@
 *                `mem`:  `16000`
 *          `new_start`:  `False`
 *            `no_fifo`:  `False`
-*      `output_parent`:  `/project/shefflab/processed/peppro/paper/results_pipeline`
+*      `output_parent`:  `/project/shefflab/processed/peppro/paper/dev4/results_pipeline`
 *         `paired_end`:  `False`
 *           `pre_name`:  `None`
 *      `prealignments`:  `['human_rDNA']`
@@ -71,52 +71,52 @@ Local input file: /project/shefflab/data/sra_fastq/SRR7616134.fastq.gz
 > `Genome`	hg38	PEPPRO	_RES_
 Detected PRO input
 
-### Merge/link and fastq conversion:  (02-18 11:08:58) elapsed: 0.0 _TIME_
+### Merge/link and fastq conversion:  (02-27 09:25:05) elapsed: 0.0 _TIME_
 
 Number of input file sets: 1
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/Jurkat_ChRO-seq_2.fastq.gz`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/Jurkat_ChRO-seq_2.fastq.gz`  
 
-> `ln -sf /project/shefflab/data/sra_fastq/SRR7616134.fastq.gz /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/Jurkat_ChRO-seq_2.fastq.gz` (327687)
+> `ln -sf /project/shefflab/data/sra_fastq/SRR7616134.fastq.gz /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/Jurkat_ChRO-seq_2.fastq.gz` (32454)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 0GB.  
-  PID: 327687;	Command: ln;	Return code: 0;	Memory used: 0.0GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 0.0GB.  
+  PID: 32454;	Command: ln;	Return code: 0;	Memory used: 0.0GB
 
-Local input file: '/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/Jurkat_ChRO-seq_2.fastq.gz'
+Local input file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/Jurkat_ChRO-seq_2.fastq.gz'
 Found .fastq.gz file
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1.fastq`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1.fastq`  
 
-> `pigz -f -p 8 -d -c /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/Jurkat_ChRO-seq_2.fastq.gz > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1.fastq` (327688)
+> `pigz -f -p 8 -d -c /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/Jurkat_ChRO-seq_2.fastq.gz > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1.fastq` (32455)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:02:41. Running peak memory: 0.003GB.  
-  PID: 327688;	Command: pigz;	Return code: 0;	Memory used: 0.003GB
+Command completed. Elapsed time: 0:01:08. Running peak memory: 0.003GB.  
+  PID: 32455;	Command: pigz;	Return code: 0;	Memory used: 0.003GB
 
 
 > `Raw_reads`	49841170	PEPPRO	_RES_
 
 > `Fastq_reads`	49841170	PEPPRO	_RES_
-['/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/Jurkat_ChRO-seq_2.fastq.gz']
+['/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/Jurkat_ChRO-seq_2.fastq.gz']
 
-### FASTQ processing:  (02-18 11:12:10) elapsed: 192.0 _TIME_
+### FASTQ processing:  (02-27 09:26:45) elapsed: 100.0 _TIME_
 
 
 > `cutadapt --version`
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_processed.fastq`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_processed.fastq`  
 
-> `(cutadapt -j 8 -m 8 -O 1 -a TGGAATTCTCGGGTGCCAAGG /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1.fastq -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_noadap.fastq) > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt` (328152)
+> `(cutadapt -j 8 -m 8 -O 1 -a TGGAATTCTCGGGTGCCAAGG /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1.fastq -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_noadap.fastq) > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt` (32569)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:50. Running peak memory: 0.293GB.  
-  PID: 328152;	Command: cutadapt;	Return code: 0;	Memory used: 0.293GB
+Command completed. Elapsed time: 0:01:24. Running peak memory: 0.283GB.  
+  PID: 32569;	Command: cutadapt;	Return code: 0;	Memory used: 0.283GB
 
 
-> `seqtk trimfq -b 6 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_noadap.fastq | seqtk seq -L 8 -r - > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_processed.fastq` (328306,328307)
+> `seqtk trimfq -b 6 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_noadap.fastq | seqtk seq -L 8 -r - > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_processed.fastq` (32665,32666)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:59. Running peak memory: 0.293GB.  
-  PID: 328306;	Command: seqtk;	Return code: 0;	Memory used: 0.001GB  
-  PID: 328307;	Command: seqtk;	Return code: 0;	Memory used: 0.003GB
+Command completed. Elapsed time: 0:00:49. Running peak memory: 0.283GB.  
+  PID: 32665;	Command: seqtk;	Return code: 0;	Memory used: 0.001GB  
+  PID: 32666;	Command: seqtk;	Return code: 0;	Memory used: 0.003GB
 
 Evaluating read trimming
 
@@ -125,7 +125,7 @@ Evaluating read trimming
 > `Trim_loss_rate`	3.16	PEPPRO	_RES_
 Targetless command, running...  
 
-> `fastqc --noextract --outdir /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastqc /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_processed.fastq` (329739)
+> `fastqc --noextract --outdir /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastqc /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_processed.fastq` (32727)
 <pre>
 Picked up JAVA_TOOL_OPTIONS: -Xss1280k
 Picked up _JAVA_OPTIONS: -Djava.io.tmpdir=/scratch/jps3dp/tmp
@@ -151,87 +151,95 @@ Approx 90% complete for Jurkat_ChRO-seq_2_R1_processed.fastq
 Approx 95% complete for Jurkat_ChRO-seq_2_R1_processed.fastq
 Analysis complete for Jurkat_ChRO-seq_2_R1_processed.fastq
 </pre>
-Command completed. Elapsed time: 0:02:25. Running peak memory: 0.293GB.  
-  PID: 329739;	Command: fastqc;	Return code: 0;	Memory used: 0.184GB
+Command completed. Elapsed time: 0:02:39. Running peak memory: 0.283GB.  
+  PID: 32727;	Command: fastqc;	Return code: 0;	Memory used: 0.183GB
 
 > `FastQC report r1`	fastqc/Jurkat_ChRO-seq_2_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_trimmed.fastq`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_trimmed.fastq`  
 
-> `seqkit rmdup --threads 8 --by-seq --ignore-case -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_dedup.fastq /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_noadap.fastq` (329992)
+> `seqkit rmdup --threads 8 --by-seq --ignore-case -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_dedup.fastq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_noadap.fastq` (33111)
 <pre>
 [INFO][0m 5764233 duplicated records removed
 </pre>
-Command completed. Elapsed time: 0:01:44. Running peak memory: 3.993GB.  
-  PID: 329992;	Command: seqkit;	Return code: 0;	Memory used: 3.993GB
+Command completed. Elapsed time: 0:01:42. Running peak memory: 2.03GB.  
+  PID: 33111;	Command: seqkit;	Return code: 0;	Memory used: 2.03GB
 
 
-> `seqtk trimfq -b 6 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_dedup.fastq | seqtk seq -L 8 -r - > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_trimmed.fastq` (330096,330097)
+> `seqtk trimfq -b 6 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_dedup.fastq | seqtk seq -L 8 -r - > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_trimmed.fastq` (33252,33253)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:56. Running peak memory: 3.993GB.  
-  PID: 330096;	Command: seqtk;	Return code: 0;	Memory used: 0.001GB  
-  PID: 330097;	Command: seqtk;	Return code: 0;	Memory used: 0.003GB
+Command completed. Elapsed time: 0:00:45. Running peak memory: 2.03GB.  
+  PID: 33252;	Command: seqtk;	Return code: 0;	Memory used: 0.001GB  
+  PID: 33253;	Command: seqtk;	Return code: 0;	Memory used: 0.003GB
 
 
-> `grep 'Reads with adapters:' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{print $(NF-1)}'`
+> `grep 'Reads with adapters:' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{print $(NF-1)}'`
 
 > `Reads_with_adapter`	42416468.0	PEPPRO	_RES_
 
-> `grep 'Total basepairs processed:' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{print $(NF-1)}'`
+> `grep 'Total basepairs processed:' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{print $(NF-1)}'`
 
-> `awk '{sum+=$1*$2} END {printf "%.0f", sum}' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt`
+> `awk '{sum+=$1*$2} END {printf "%.0f", sum}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt`
 
-> `grep 'Reads that were too short:' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{print $(NF-1)}'`
+> `grep 'Reads that were too short:' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{print $(NF-1)}'`
 
-> `Reads_too_short`	223715.0	PEPPRO	_RES_
+> `Uninformative_adapter_reads`	223715.0	PEPPRO	_RES_
 
 > `Duplicate_reads`	5764233.0	PEPPRO	_RES_
 
-> `Pct_reads_too_short`	0.4489	PEPPRO	_RES_
+> `Pct_uninformative_adapter_reads`	0.4489	PEPPRO	_RES_
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/processed_R1.flag`  
 
-### Plot adapter insertion distribution (02-18 11:20:43) elapsed: 513.0 _TIME_
+> `touch /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/processed_R1.flag` (33353)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:00. Running peak memory: 2.03GB.  
+  PID: 33353;	Command: touch;	Return code: 0;	Memory used: 0.002GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_adapter_insertion_distribution.pdf`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R cutadapt -i /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt -u 6` (330433)
+### Plot adapter insertion distribution (02-27 09:34:55) elapsed: 491.0 _TIME_
+
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_adapter_insertion_distribution.pdf`  
+
+> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R cutadapt -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt -u 6` (33354)
 <pre>
 Adapter insertion distribution plot completed!
 
 </pre>
-Command completed. Elapsed time: 0:00:08. Running peak memory: 3.993GB.  
-  PID: 330433;	Command: Rscript;	Return code: 0;	Memory used: 0.125GB
+Command completed. Elapsed time: 0:00:07. Running peak memory: 2.03GB.  
+  PID: 33354;	Command: Rscript;	Return code: 0;	Memory used: 0.129GB
 
 > `Adapter insertion distribution`	cutadapt/Jurkat_ChRO-seq_2_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_2_R1_adapter_insertion_distribution.png	PEPPRO	_OBJ_
 Missing stat 'Peak_adapter_insertion_size'
 
-> `awk '/count/,0' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk 'NR>2 {print prev} {prev=$0}' | awk '{if ($3/$2 < 0.01) print $1, $2}' | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max) {max=$2; len=$1}; max_len=$1} END{print max_len-len}'`
+> `awk '/count/,0' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk 'NR>2 {print prev} {prev=$0}' | awk '{if ($3/$2 < 0.01) print $1, $2}' | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max) {max=$2; len=$1}; max_len=$1} END{print max_len-len}'`
 
 > `Peak_adapter_insertion_size`	39	PEPPRO	_RES_
 Missing stat 'Degradation_ratio'
 
-###  Calculating degradation ratio (02-18 11:20:51) elapsed: 8.0 _TIME_
+###  Calculating degradation ratio (02-27 09:35:03) elapsed: 7.0 _TIME_
 
 
-> `awk 'NR>2 {print prev} {prev=$0}' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{ if ($1 == 10) {status = 1}} END {if (status) {print status} else {print 0}}'`
+> `awk 'NR>2 {print prev} {prev=$0}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{ if ($1 == 10) {status = 1}} END {if (status) {print status} else {print 0}}'`
 
-> `awk 'NR>2 {print prev} {prev=$0}' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{ if ($1 == 20) {status = 1}} END {if (status) {print status} else {print 0}}'`
+> `awk 'NR>2 {print prev} {prev=$0}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{ if ($1 == 20) {status = 1}} END {if (status) {print status} else {print 0}}'`
 
-> `awk 'NR>2 {print prev} {prev=$0}' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{ if ($1 == 30) {status = 1}} END {if (status) {print status} else {print 0}}'`
+> `awk 'NR>2 {print prev} {prev=$0}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{ if ($1 == 30) {status = 1}} END {if (status) {print status} else {print 0}}'`
 
-> `awk 'NR>2 {print prev} {prev=$0}' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{ if ($1 == 40) {status = 1}} END {if (status) {print status} else {print 0}}'`
+> `awk 'NR>2 {print prev} {prev=$0}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk '{ if ($1 == 40) {status = 1}} END {if (status) {print status} else {print 0}}'`
 
-> `awk '/count/,0' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk 'NR>2 {print prev} {prev=$0}' | awk '{if ($3/$2 < 0.01) print $1, $2}' | awk '{a[NR]=$1; b[NR]=$2; max_len=$1}{if ($1 > max_len) {max_len=$1}} END{ for (i in a) print 1+max_len-a[i], b[i]}' | sort -nk1 | awk '($1 <= 20 && $1 >= 10){degradedSum += $2}; ($1 >= 30 && $1 <= 40){intactSum += $2} END {if (intactSum < 1) {intactSum = 1} print degradedSum/intactSum}'`
+> `awk '/count/,0' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/cutadapt/Jurkat_ChRO-seq_2_R1_cutadapt.txt | awk 'NR>2 {print prev} {prev=$0}' | awk '{if ($3/$2 < 0.01) print $1, $2}' | awk '{a[NR]=$1; b[NR]=$2; max_len=$1}{if ($1 > max_len) {max_len=$1}} END{ for (i in a) print 1+max_len-a[i], b[i]}' | sort -nk1 | awk '($1 <= 20 && $1 >= 10){degradedSum += $2}; ($1 >= 30 && $1 <= 40){intactSum += $2} END {if (intactSum < 1) {intactSum = 1} print degradedSum/intactSum}'`
 
 > `Degradation_ratio`	0.4899	PEPPRO	_RES_
 
-### Prealignments (02-18 11:20:51) elapsed: 0.0 _TIME_
+### Prealignments (02-27 09:35:03) elapsed: 0.0 _TIME_
 
 Prealignment assemblies: ['human_rDNA']
 
-### Map to human_rDNA (02-18 11:20:51) elapsed: 0.0 _TIME_
+### Map to human_rDNA (02-27 09:35:03) elapsed: 0.0 _TIME_
 
 
-> `(bowtie2 -p 8 -k 1 -D 20 -R 3 -N 1 -L 20 -i S,1,0.50 -x /scratch/jps3dp/DATA/genomes/human_rDNA/bowtie2_index/default/human_rDNA --rg-id Jurkat_ChRO-seq_2 -U /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_processed.fastq --un /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap.fq 2>&1 > /dev/null)`
+> `(bowtie2 -p 8 -k 1 -D 20 -R 3 -N 1 -L 20 -i S,1,0.50 -x /scratch/jps3dp/DATA/genomes/human_rDNA/bowtie2_index/default/human_rDNA --rg-id Jurkat_ChRO-seq_2 -U /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_processed.fastq --un /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap.fq 2>&1 > /dev/null)`
 Missing stat 'Aligned_reads_human_rDNA'
 48264585 reads; of these:
   48264585 (100.00%) were unpaired; of these:
@@ -244,16 +252,16 @@ Missing stat 'Aligned_reads_human_rDNA'
 
 > `Alignment_rate_human_rDNA`	8.19	PEPPRO	_RES_
 
-### Map to human_rDNA (02-18 11:25:44) elapsed: 293.0 _TIME_
+### Map to human_rDNA (02-27 09:39:06) elapsed: 243.0 _TIME_
 
 
-> `(bowtie2 -p 8 -k 1 -D 20 -R 3 -N 1 -L 20 -i S,1,0.50 -x /scratch/jps3dp/DATA/genomes/human_rDNA/bowtie2_index/default/human_rDNA --rg-id Jurkat_ChRO-seq_2 -U /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_trimmed.fastq --un /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap_dups.fq 2>&1 > /dev/null)`
+> `(bowtie2 -p 8 -k 1 -D 20 -R 3 -N 1 -L 20 -i S,1,0.50 -x /scratch/jps3dp/DATA/genomes/human_rDNA/bowtie2_index/default/human_rDNA --rg-id Jurkat_ChRO-seq_2 -U /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/fastq/Jurkat_ChRO-seq_2_R1_trimmed.fastq --un /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap_dups.fq 2>&1 > /dev/null)`
 
-### Map to genome (02-18 11:29:34) elapsed: 231.0 _TIME_
+### Map to genome (02-27 09:42:36) elapsed: 210.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam`  
 
-> `bowtie2 -p 8 --very-sensitive -X 2000 --rg-id Jurkat_ChRO-seq_2 -x /scratch/jps3dp/DATA/genomes/hg38/bowtie2_index/default/hg38 -U /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap.fq | samtools view -bS - -@ 1  | samtools sort - -@ 1 -T /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/tmp3yfbs809 -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam` (331215,331216,331217)
+> `bowtie2 -p 8 --very-sensitive -X 2000 --rg-id Jurkat_ChRO-seq_2 -x /scratch/jps3dp/DATA/genomes/hg38/bowtie2_index/default/hg38 -U /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap.fq | samtools view -bS - -@ 1  | samtools sort - -@ 1 -T /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/tmpcit98z64 -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam` (34234,34236,34238)
 <pre>
 44313938 reads; of these:
   44313938 (100.00%) were unpaired; of these:
@@ -263,20 +271,20 @@ Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Ju
 94.50% overall alignment rate
 [bam_sort_core] merging from 11 files and 1 in-memory blocks...
 </pre>
-Command completed. Elapsed time: 0:26:35. Running peak memory: 3.993GB.  
-  PID: 331215;	Command: bowtie2;	Return code: 0;	Memory used: 3.637GB  
-  PID: 331216;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
-  PID: 331217;	Command: samtools;	Return code: 0;	Memory used: 0.874GB
+Command completed. Elapsed time: 0:28:01. Running peak memory: 3.609GB.  
+  PID: 34234;	Command: bowtie2;	Return code: 0;	Memory used: 3.609GB  
+  PID: 34236;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
+  PID: 34238;	Command: samtools;	Return code: 0;	Memory used: 0.874GB
 
 
-> `samtools view -q 10 -b -@ 8 -U /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_fail_qc.bam /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam` (334291)
+> `samtools view -q 10 -b -@ 8 -U /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_fail_qc.bam /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam` (37054)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:14. Running peak memory: 3.993GB.  
-  PID: 334291;	Command: samtools;	Return code: 0;	Memory used: 0.014GB
+Command completed. Elapsed time: 0:01:17. Running peak memory: 3.609GB.  
+  PID: 37054;	Command: samtools;	Return code: 0;	Memory used: 0.014GB
 
 
-> `samtools depth -b /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam | awk '{counter++;sum+=$3}END{print sum/counter}'`
+> `samtools depth -b /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam | awk '{counter++;sum+=$3}END{print sum/counter}'`
 
 > `Mapped_reads`	41878067	PEPPRO	_RES_
 
@@ -289,9 +297,9 @@ Command completed. Elapsed time: 0:01:14. Running peak memory: 3.993GB.
 > `Total_efficiency`	68.22	PEPPRO	_RES_
 
 > `Read_depth`	4.27	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam`  
 
-> `bowtie2 -p 8 --very-sensitive -X 2000 --rg-id Jurkat_ChRO-seq_2 -x /scratch/jps3dp/DATA/genomes/hg38/bowtie2_index/default/hg38 -U /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap_dups.fq | samtools view -bS - -@ 1  | samtools sort - -@ 1 -T /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/tmp3yfbs809 -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp_dups.bam` (335678,335679,335681)
+> `bowtie2 -p 8 --very-sensitive -X 2000 --rg-id Jurkat_ChRO-seq_2 -x /scratch/jps3dp/DATA/genomes/hg38/bowtie2_index/default/hg38 -U /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap_dups.fq | samtools view -bS - -@ 1  | samtools sort - -@ 1 -T /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/tmpcit98z64 -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp_dups.bam` (38503,38508,38509)
 <pre>
 39606611 reads; of these:
   39606611 (100.00%) were unpaired; of these:
@@ -301,77 +309,77 @@ Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Ju
 94.25% overall alignment rate
 [bam_sort_core] merging from 10 files and 1 in-memory blocks...
 </pre>
-Command completed. Elapsed time: 0:22:11. Running peak memory: 3.993GB.  
-  PID: 335678;	Command: bowtie2;	Return code: 0;	Memory used: 3.61GB  
-  PID: 335679;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
-  PID: 335681;	Command: samtools;	Return code: 0;	Memory used: 0.931GB
+Command completed. Elapsed time: 0:23:13. Running peak memory: 3.61GB.  
+  PID: 38503;	Command: bowtie2;	Return code: 0;	Memory used: 3.61GB  
+  PID: 38508;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
+  PID: 38509;	Command: samtools;	Return code: 0;	Memory used: 0.873GB
 
 
-> `samtools view -q 10 -b -@ 8 -U /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_fail_qc_dups.bam /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp_dups.bam > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam` (339372)
+> `samtools view -q 10 -b -@ 8 -U /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_fail_qc_dups.bam /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp_dups.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam` (40628)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:10. Running peak memory: 3.993GB.  
-  PID: 339372;	Command: samtools;	Return code: 0;	Memory used: 0.014GB
+Command completed. Elapsed time: 0:01:08. Running peak memory: 3.61GB.  
+  PID: 40628;	Command: samtools;	Return code: 0;	Memory used: 0.015GB
 
 
-### Compress all unmapped read files (02-18 12:33:16) elapsed: 3822.0 _TIME_
+### Compress all unmapped read files (02-27 10:50:03) elapsed: 4048.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap.fq.gz`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap.fq.gz`  
 
-> `pigz -f -p 8 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap.fq` (339457)
+> `pigz -f -p 8 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/prealignments/Jurkat_ChRO-seq_2_human_rDNA_unmap.fq` (40919)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:14. Running peak memory: 3.993GB.  
-  PID: 339457;	Command: pigz;	Return code: 0;	Memory used: 0.011GB
+Command completed. Elapsed time: 0:01:11. Running peak memory: 3.61GB.  
+  PID: 40919;	Command: pigz;	Return code: 0;	Memory used: 0.006GB
 
 Missing stat 'Mitochondrial_reads'
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam.bai`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam.bai`  
 
-> `samtools index /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam` (339531)
+> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam` (40995)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:30. Running peak memory: 3.993GB.  
-  PID: 339531;	Command: samtools;	Return code: 0;	Memory used: 0.012GB
+Command completed. Elapsed time: 0:00:32. Running peak memory: 3.61GB.  
+  PID: 40995;	Command: samtools;	Return code: 0;	Memory used: 0.011GB
 
 
-> `samtools idxstats /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam | grep -we 'chrM' -we 'chrMT' -we 'M' -we 'MT' -we 'rCRSd' -we 'rCRSd_3k'| cut -f 3`
+> `samtools idxstats /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam | grep -we 'chrM' -we 'chrMT' -we 'M' -we 'MT' -we 'rCRSd' -we 'rCRSd_3k'| cut -f 3`
 
 > `Mitochondrial_reads`	18250	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_noMT.bam`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_noMT.bam`  
 
-> `samtools index /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam` (339560)
+> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam` (41026)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:23. Running peak memory: 3.993GB.  
-  PID: 339560;	Command: samtools;	Return code: 0;	Memory used: 0.012GB
+Command completed. Elapsed time: 0:00:24. Running peak memory: 3.61GB.  
+  PID: 41026;	Command: samtools;	Return code: 0;	Memory used: 0.012GB
 
 
-> `samtools idxstats /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam | cut -f 1 | grep -vwe 'chrM' -vwe 'chrMT' -vwe 'M' -vwe 'MT' -vwe 'rCRSd' -vwe 'rCRSd_3k'| xargs samtools view -b -@ 8 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_noMT.bam` (339797,339798,339799,339800)
+> `samtools idxstats /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam | cut -f 1 | grep -vwe 'chrM' -vwe 'chrMT' -vwe 'M' -vwe 'MT' -vwe 'rCRSd' -vwe 'rCRSd_3k'| xargs samtools view -b -@ 8 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_noMT.bam` (41051,41052,41053,41054)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:32. Running peak memory: 3.993GB.  
-  PID: 339798;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 339797;	Command: samtools;	Return code: 0;	Memory used: 0.01GB  
-  PID: 339799;	Command: grep;	Return code: 0;	Memory used: 0.0GB  
-  PID: 339800;	Command: xargs;	Return code: 0;	Memory used: 0.064GB
+Command completed. Elapsed time: 0:00:32. Running peak memory: 3.61GB.  
+  PID: 41051;	Command: samtools;	Return code: 0;	Memory used: 0.006GB  
+  PID: 41053;	Command: grep;	Return code: 0;	Memory used: 0.001GB  
+  PID: 41052;	Command: cut;	Return code: 0;	Memory used: 0.001GB  
+  PID: 41054;	Command: xargs;	Return code: 0;	Memory used: 0.065GB
 
 
-> `mv /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_noMT.bam /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam` (339838)
+> `mv /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_noMT.bam /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam` (41094)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 339838;	Command: mv;	Return code: 0;	Memory used: 0.0GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 41094;	Command: mv;	Return code: 0;	Memory used: 0.0GB
 
 
-> `samtools index /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam` (339840)
+> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam` (41095)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:23. Running peak memory: 3.993GB.  
-  PID: 339840;	Command: samtools;	Return code: 0;	Memory used: 0.012GB
+Command completed. Elapsed time: 0:00:25. Running peak memory: 3.61GB.  
+  PID: 41095;	Command: samtools;	Return code: 0;	Memory used: 0.012GB
 
 Missing stat 'Maximum_read_length'
 
-> `samtools stats /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam | grep '^SN' | cut -f 2- | grep 'maximum length:' | cut -f 2-`
+> `samtools stats /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam | grep '^SN' | cut -f 2- | grep 'maximum length:' | cut -f 2-`
 
 > `Maximum_read_length`	70	PEPPRO	_RES_
 Missing stat 'Genome_size'
@@ -379,23 +387,23 @@ Missing stat 'Genome_size'
 > `awk '{sum+=$2} END {printf "%.0f", sum}' /scratch/jps3dp/DATA/genomes/hg38/fasta/default/hg38.chrom.sizes`
 
 > `Genome_size`	3099922541	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp_dups.bam.bai`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp_dups.bam.bai`  
 
-> `samtools index /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp_dups.bam` (339926)
+> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp_dups.bam` (41191)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:27. Running peak memory: 3.993GB.  
-  PID: 339926;	Command: samtools;	Return code: 0;	Memory used: 0.013GB
+Command completed. Elapsed time: 0:00:28. Running peak memory: 3.61GB.  
+  PID: 41191;	Command: samtools;	Return code: 0;	Memory used: 0.012GB
 
 
-> `samtools idxstats /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp_dups.bam | grep -we 'chrM' -we 'chrMT' -we 'M' -we 'MT' -we 'rCRSd' -we 'rCRSd_3k'| cut -f 3`
-Target exists: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam`  
+> `samtools idxstats /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp_dups.bam | grep -we 'chrM' -we 'chrMT' -we 'M' -we 'MT' -we 'rCRSd' -we 'rCRSd_3k'| cut -f 3`
+Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam`  
 
-### Calculate library complexity (02-18 12:37:51) elapsed: 275.0 _TIME_
+### Calculate library complexity (02-27 10:54:46) elapsed: 283.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_out.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_out.txt`  
 
-> `preseq c_curve -v -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_out.txt -B /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam` (339953)
+> `preseq c_curve -v -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_out.txt -B /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam` (41221)
 <pre>
 BAM_INPUT
 TOTAL READS     = 30468400
@@ -1555,12 +1563,12 @@ sample size: 28000000
 sample size: 29000000
 sample size: 30000000
 </pre>
-Command completed. Elapsed time: 0:02:47. Running peak memory: 3.993GB.  
-  PID: 339953;	Command: preseq;	Return code: 0;	Memory used: 0.005GB
+Command completed. Elapsed time: 0:03:01. Running peak memory: 3.61GB.  
+  PID: 41221;	Command: preseq;	Return code: 0;	Memory used: 0.005GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_yield.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_yield.txt`  
 
-> `preseq lc_extrap -v -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_yield.txt -B /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam` (340488)
+> `preseq lc_extrap -v -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_yield.txt -B /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam` (41575)
 <pre>
 BAM_INPUT
 TOTAL READS     = 30468400
@@ -2691,24 +2699,24 @@ OBSERVED COUNTS (6927)
 
 [ESTIMATING YIELD CURVE]
 [BOOTSTRAPPING HISTOGRAM]
-.............................................._........_..............................................
+...._......................_......._......_..............................._._.............................
 [COMPUTING CONFIDENCE INTERVALS]
 [WRITING OUTPUT]
 </pre>
-Command completed. Elapsed time: 0:02:58. Running peak memory: 3.993GB.  
-  PID: 340488;	Command: preseq;	Return code: 0;	Memory used: 0.005GB
+Command completed. Elapsed time: 0:03:06. Running peak memory: 3.61GB.  
+  PID: 41575;	Command: preseq;	Return code: 0;	Memory used: 0.005GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_counts.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_counts.txt`  
 
-> `echo '/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_yield.txt '$(samtools view -c -F 4 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam)' '$(samtools view -c -F 4 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam) > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_counts.txt` (340652)
+> `echo '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_yield.txt '$(samtools view -c -F 4 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort_dups.bam)' '$(samtools view -c -F 4 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam) > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_counts.txt` (41967)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:41. Running peak memory: 3.993GB.  
-  PID: 340652;	Command: echo;	Return code: 0;	Memory used: 0.006GB
+Command completed. Elapsed time: 0:00:43. Running peak memory: 3.61GB.  
+  PID: 41967;	Command: echo;	Return code: 0;	Memory used: 0.006GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_plot.pdf`,`/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_plot.png`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_plot.pdf`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_plot.png`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R preseq -i /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_yield.txt -r /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_counts.txt -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_plot` (340695)
+> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R preseq -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_yield.txt -r /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_counts.txt -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_plot` (42026)
 <pre>
 Processing Jurkat_ChRO-seq_2
 INFO: Found real counts for Jurkat_ChRO-seq_2 - Total (M): 33.989659 Unique (M): 30.4684
@@ -2716,626 +2724,626 @@ INFO: Found real counts for Jurkat_ChRO-seq_2 - Total (M): 33.989659 Unique (M):
 Library complexity plot completed!
 
 </pre>
-Command completed. Elapsed time: 0:00:06. Running peak memory: 3.993GB.  
-  PID: 340695;	Command: Rscript;	Return code: 0;	Memory used: 0.205GB
+Command completed. Elapsed time: 0:00:20. Running peak memory: 3.61GB.  
+  PID: 42026;	Command: Rscript;	Return code: 0;	Memory used: 0.31GB
 
 > `Library complexity`	QC_hg38/Jurkat_ChRO-seq_2_preseq_plot.pdf	Library complexity	QC_hg38/Jurkat_ChRO-seq_2_preseq_plot.png	PEPPRO	_OBJ_
 Missing stat 'Frac_exp_unique_at_10M'
 
-> `grep -w '10000000' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_yield.txt | awk '{print $2}'`
+> `grep -w '10000000' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_preseq_yield.txt | awk '{print $2}'`
 
 > `Frac_exp_unique_at_10M`	0.6458	PEPPRO	_RES_
 
-### Calculate NRF, PBC1, and PBC2 (02-18 12:44:23) elapsed: 392.0 _TIME_
+### Calculate NRF, PBC1, and PBC2 (02-27 11:01:57) elapsed: 431.0 _TIME_
 
-Target exists: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam.bai`  
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_bamQC.tsv`  
+Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam.bai`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_bamQC.tsv`  
 
-> `/scratch/jps3dp/tools/databio/peppro/tools/bamQC.py --silent -i /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -c 8 -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_bamQC.tsv` (340714)
+> `/scratch/jps3dp/tools/databio/peppro/tools/bamQC.py --silent -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -c 8 -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_bamQC.tsv` (42059)
 <pre>
 Configured logger 'root' using pararead v0.6
-Registering input file: '/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam'
-Temporary files will be stored in: '/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/tmp_Jurkat_ChRO-seq_2_sort_bi4oecyh'
+Registering input file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam'
+Temporary files will be stored in: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/tmp_Jurkat_ChRO-seq_2_sort_yruxenk3'
 Processing with 8 cores...
 Discarding 98 chunk(s) of reads: ['chrM', 'chr1_KI270707v1_random', 'chr1_KI270709v1_random', 'chr2_KI270715v1_random', 'chr2_KI270716v1_random', 'chr9_KI270717v1_random', 'chr14_KI270723v1_random', 'chr14_KI270724v1_random', 'chr17_KI270730v1_random', 'chr22_KI270735v1_random', 'chr22_KI270737v1_random', 'chr22_KI270739v1_random', 'chrY_KI270740v1_random', 'chrUn_KI270302v1', 'chrUn_KI270304v1', 'chrUn_KI270303v1', 'chrUn_KI270305v1', 'chrUn_KI270322v1', 'chrUn_KI270320v1', 'chrUn_KI270310v1', 'chrUn_KI270316v1', 'chrUn_KI270315v1', 'chrUn_KI270312v1', 'chrUn_KI270311v1', 'chrUn_KI270317v1', 'chrUn_KI270412v1', 'chrUn_KI270411v1', 'chrUn_KI270414v1', 'chrUn_KI270419v1', 'chrUn_KI270418v1', 'chrUn_KI270420v1', 'chrUn_KI270424v1', 'chrUn_KI270417v1', 'chrUn_KI270422v1', 'chrUn_KI270423v1', 'chrUn_KI270425v1', 'chrUn_KI270429v1', 'chrUn_KI270466v1', 'chrUn_KI270465v1', 'chrUn_KI270468v1', 'chrUn_KI270509v1', 'chrUn_KI270508v1', 'chrUn_KI270516v1', 'chrUn_KI270522v1', 'chrUn_KI270515v1', 'chrUn_KI270517v1', 'chrUn_KI270529v1', 'chrUn_KI270528v1', 'chrUn_KI270530v1', 'chrUn_KI270539v1', 'chrUn_KI270544v1', 'chrUn_KI270548v1', 'chrUn_KI270581v1', 'chrUn_KI270579v1', 'chrUn_KI270589v1', 'chrUn_KI270593v1', 'chrUn_KI270329v1', 'chrUn_KI270334v1', 'chrUn_KI270333v1', 'chrUn_KI270335v1', 'chrUn_KI270338v1', 'chrUn_KI270340v1', 'chrUn_KI270336v1', 'chrUn_KI270337v1', 'chrUn_KI270363v1', 'chrUn_KI270364v1', 'chrUn_KI270362v1', 'chrUn_KI270378v1', 'chrUn_KI270379v1', 'chrUn_KI270389v1', 'chrUn_KI270390v1', 'chrUn_KI270387v1', 'chrUn_KI270395v1', 'chrUn_KI270396v1', 'chrUn_KI270388v1', 'chrUn_KI270394v1', 'chrUn_KI270386v1', 'chrUn_KI270391v1', 'chrUn_KI270383v1', 'chrUn_KI270393v1', 'chrUn_KI270384v1', 'chrUn_KI270392v1', 'chrUn_KI270381v1', 'chrUn_KI270385v1', 'chrUn_KI270382v1', 'chrUn_KI270376v1', 'chrUn_KI270374v1', 'chrUn_KI270372v1', 'chrUn_KI270373v1', 'chrUn_KI270375v1', 'chrUn_KI270371v1', 'chrUn_KI270448v1', 'chrUn_GL000226v1', 'chrUn_KI270747v1', 'chrUn_KI270750v1', 'chrUn_KI270753v1', 'chrUn_KI270756v1', 'chrUn_GL000214v1']
 Keeping 97 chunk(s) of reads: ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chrX', 'chrY', 'chr1_KI270706v1_random', 'chr1_KI270708v1_random', 'chr1_KI270710v1_random', 'chr1_KI270711v1_random', 'chr1_KI270712v1_random', 'chr1_KI270713v1_random', 'chr1_KI270714v1_random', 'chr3_GL000221v1_random', 'chr4_GL000008v2_random', 'chr5_GL000208v1_random', 'chr9_KI270718v1_random', 'chr9_KI270719v1_random', 'chr9_KI270720v1_random', 'chr11_KI270721v1_random', 'chr14_GL000009v2_random', 'chr14_GL000225v1_random', 'chr14_KI270722v1_random', 'chr14_GL000194v1_random', 'chr14_KI270725v1_random', 'chr14_KI270726v1_random', 'chr15_KI270727v1_random', 'chr16_KI270728v1_random', 'chr17_GL000205v2_random', 'chr17_KI270729v1_random', 'chr22_KI270731v1_random', 'chr22_KI270732v1_random', 'chr22_KI270733v1_random', 'chr22_KI270734v1_random', 'chr22_KI270736v1_random', 'chr22_KI270738v1_random', 'chrUn_KI270442v1', 'chrUn_KI270467v1', 'chrUn_KI270435v1', 'chrUn_KI270438v1', 'chrUn_KI270510v1', 'chrUn_KI270518v1', 'chrUn_KI270512v1', 'chrUn_KI270519v1', 'chrUn_KI270511v1', 'chrUn_KI270507v1', 'chrUn_KI270538v1', 'chrUn_KI270583v1', 'chrUn_KI270587v1', 'chrUn_KI270580v1', 'chrUn_KI270590v1', 'chrUn_KI270584v1', 'chrUn_KI270582v1', 'chrUn_KI270588v1', 'chrUn_KI270591v1', 'chrUn_KI270330v1', 'chrUn_KI270366v1', 'chrUn_KI270521v1', 'chrUn_GL000195v1', 'chrUn_GL000219v1', 'chrUn_GL000220v1', 'chrUn_GL000224v1', 'chrUn_KI270741v1', 'chrUn_GL000213v1', 'chrUn_KI270743v1', 'chrUn_KI270744v1', 'chrUn_KI270745v1', 'chrUn_KI270746v1', 'chrUn_KI270748v1', 'chrUn_KI270749v1', 'chrUn_KI270751v1', 'chrUn_KI270752v1', 'chrUn_KI270754v1', 'chrUn_KI270755v1', 'chrUn_KI270757v1', 'chrUn_KI270742v1', 'chrUn_GL000216v2', 'chrUn_GL000218v1', 'chrEBV']
 </pre>
-Command completed. Elapsed time: 0:00:46. Running peak memory: 3.993GB.  
-  PID: 340714;	Command: /scratch/jps3dp/tools/databio/peppro/tools/bamQC.py;	Return code: 0;	Memory used: 1.085GB
+Command completed. Elapsed time: 0:00:53. Running peak memory: 3.61GB.  
+  PID: 42059;	Command: /scratch/jps3dp/tools/databio/peppro/tools/bamQC.py;	Return code: 0;	Memory used: 0.889GB
 
 
-> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "NRF") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_bamQC.tsv`
+> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "NRF") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_bamQC.tsv`
 
-> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "PBC1") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_bamQC.tsv`
+> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "PBC1") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_bamQC.tsv`
 
-> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "PBC2") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_bamQC.tsv`
+> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "PBC2") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_bamQC.tsv`
 
 > `NRF`	0.53	PEPPRO	_RES_
 
 > `PBC1`	0.8	PEPPRO	_RES_
 
 > `PBC2`	8.39	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_unmap.bam`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_unmap.bam`  
 
-> `samtools view -b -@ 8 -f 4  /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_unmap.bam` (340990)
+> `samtools view -b -@ 8 -f 4  /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_unmap.bam` (42127)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:09. Running peak memory: 3.993GB.  
-  PID: 340990;	Command: samtools;	Return code: 0;	Memory used: 0.008GB
+Command completed. Elapsed time: 0:00:10. Running peak memory: 3.61GB.  
+  PID: 42127;	Command: samtools;	Return code: 0;	Memory used: 0.008GB
 
 
-> `samtools view -c -f 4 -@ 8 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam`
+> `samtools view -c -f 4 -@ 8 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_temp.bam`
 
 > `Unmapped_reads`	2435871	PEPPRO	_RES_
 
-### Split BAM by strand (02-18 12:45:24) elapsed: 61.0 _TIME_
+### Split BAM by strand (02-27 11:03:07) elapsed: 69.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam`,`/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam`  
 
-> `samtools view -bh -F 20 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam` (341028)
+> `samtools view -bh -F 20 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam` (42166)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:43. Running peak memory: 3.993GB.  
-  PID: 341028;	Command: samtools;	Return code: 0;	Memory used: 0.006GB
+Command completed. Elapsed time: 0:01:44. Running peak memory: 3.61GB.  
+  PID: 42166;	Command: samtools;	Return code: 0;	Memory used: 0.006GB
 
 
-> `samtools view -bh -f 16 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam` (341123)
+> `samtools view -bh -f 16 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam` (42296)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:42. Running peak memory: 3.993GB.  
-  PID: 341123;	Command: samtools;	Return code: 0;	Memory used: 0.006GB
+Command completed. Elapsed time: 0:01:43. Running peak memory: 3.61GB.  
+  PID: 42296;	Command: samtools;	Return code: 0;	Memory used: 0.006GB
 
 
-### Calculate TSS enrichment (02-18 12:48:49) elapsed: 205.0 _TIME_
+### Calculate TSS enrichment (02-27 11:06:34) elapsed: 208.0 _TIME_
 
-Missing stat 'TSS_Minus_Score'
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/plus_TSS.tsv`,`/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/minus_TSS.tsv`  
+Missing stat 'TSS_non-coding_score'
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/plus_TSS.tsv`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/minus_TSS.tsv`  
 
-> `sed -n -e '/[[:space:]]+/w /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/plus_TSS.tsv' -e '/[[:space:]]-/w /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/minus_TSS.tsv' /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_TSS.bed` (341212)
+> `sed -n -e '/[[:space:]]+/w /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/plus_TSS.tsv' -e '/[[:space:]]-/w /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/minus_TSS.tsv' /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_TSS.bed` (42586)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 341212;	Command: sed;	Return code: 0;	Memory used: 0.0GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 3.61GB.  
+  PID: 42586;	Command: sed;	Return code: 0;	Memory used: 0.0GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_plus_TssEnrichment.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_plus_TssEnrichment.txt`  
 
-> `/scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/plus_TSS.tsv -p ends -c 8 -z -v -s 6 -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_plus_TssEnrichment.txt` (341213)
+> `/scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/plus_TSS.tsv -p ends -c 8 -z -v -s 6 -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_plus_TssEnrichment.txt` (42587)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:26. Running peak memory: 3.993GB.  
-  PID: 341213;	Command: /scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py;	Return code: 0;	Memory used: 0.438GB
+Command completed. Elapsed time: 0:00:17. Running peak memory: 3.61GB.  
+  PID: 42587;	Command: /scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py;	Return code: 0;	Memory used: 0.438GB
 
 
-> `TSS_Plus_Score`	68.4	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_minus_TssEnrichment.txt`  
+> `TSS_coding_score`	68.4	PEPPRO	_RES_
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_minus_TssEnrichment.txt`  
 
-> `/scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/minus_TSS.tsv -p ends -c 8 -z -v -s 6 -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_minus_TssEnrichment.txt` (341256)
+> `/scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/minus_TSS.tsv -p ends -c 8 -z -v -s 6 -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_minus_TssEnrichment.txt` (42620)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:23. Running peak memory: 3.993GB.  
-  PID: 341256;	Command: /scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py;	Return code: 0;	Memory used: 0.51GB
+Command completed. Elapsed time: 0:00:15. Running peak memory: 3.61GB.  
+  PID: 42620;	Command: /scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py;	Return code: 0;	Memory used: 0.642GB
 
 
-> `TSS_Minus_Score`	23.2	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_TSSenrichment.pdf`  
+> `TSS_non-coding_score`	23.2	PEPPRO	_RES_
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_TSSenrichment.pdf`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R tss -i /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_plus_TssEnrichment.txt /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_minus_TssEnrichment.txt` (341293)
+> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R tss -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_plus_TssEnrichment.txt /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_minus_TssEnrichment.txt` (42656)
 <pre>
 
-Generating TSS plot with /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_plus_TssEnrichment.txt and /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_minus_TssEnrichment.txt
+Generating TSS plot with /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_plus_TssEnrichment.txt and /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_minus_TssEnrichment.txt
 TSS enrichment plot completed!
 
 </pre>
-Command completed. Elapsed time: 0:00:05. Running peak memory: 3.993GB.  
-  PID: 341293;	Command: Rscript;	Return code: 0;	Memory used: 0.255GB
+Command completed. Elapsed time: 0:00:05. Running peak memory: 3.61GB.  
+  PID: 42656;	Command: Rscript;	Return code: 0;	Memory used: 0.234GB
 
 > `TSS enrichment`	QC_hg38/Jurkat_ChRO-seq_2_TSSenrichment.pdf	TSS enrichment	QC_hg38/Jurkat_ChRO-seq_2_TSSenrichment.png	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt`  
 
-> `samtools view -H /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam | grep 'SN:' | awk -F':' '{print $2,$3}' | awk -F' ' -v OFS='	' '{print $1,$3}' > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt` (341312,341313,341314,341315)
+> `samtools view -H /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam | grep 'SN:' | awk -F':' '{print $2,$3}' | awk -F' ' -v OFS='	' '{print $1,$3}' > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt` (42675,42676,42677,42678)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 341312;	Command: samtools;	Return code: 0;	Memory used: 0.0GB  
-  PID: 341314;	Command: awk;	Return code: 0;	Memory used: 0.0GB  
-  PID: 341313;	Command: grep;	Return code: 0;	Memory used: 0.0GB  
-  PID: 341315;	Command: awk;	Return code: 0;	Memory used: 0.0GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 42675;	Command: samtools;	Return code: 0;	Memory used: 0.0GB  
+  PID: 42677;	Command: awk;	Return code: 0;	Memory used: 0.0GB  
+  PID: 42676;	Command: grep;	Return code: 0;	Memory used: 0.0GB  
+  PID: 42678;	Command: awk;	Return code: 0;	Memory used: 0.0GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt` (341317)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt` (42680)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 341317;	Command: cut;	Return code: 0;	Memory used: 0.002GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 42680;	Command: cut;	Return code: 0;	Memory used: 0.002GB
 
 
-### Calculate Pause Index (PI) (02-18 12:49:43) elapsed: 54.0 _TIME_
+### Calculate Pause Index (PI) (02-27 11:07:13) elapsed: 38.0 _TIME_
 
 Missing stat 'Pause_index'
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_tss.bed`,`/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_gene_body.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_tss.bed`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_gene_body.bed`  
 
-> `grep -wf /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/ensembl_gtf/default/hg38_ensembl_TSS.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_tss.bed` (341319,341320)
+> `grep -wf /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/ensembl_gtf/default/hg38_ensembl_TSS.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_tss.bed` (42682,42683)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:02. Running peak memory: 3.993GB.  
-  PID: 341319;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
-  PID: 341320;	Command: bedtools;	Return code: 0;	Memory used: 0.097GB
+Command completed. Elapsed time: 0:00:02. Running peak memory: 3.61GB.  
+  PID: 42682;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
+  PID: 42683;	Command: bedtools;	Return code: 0;	Memory used: 0.093GB
 
 
-> `grep -wf /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/ensembl_gtf/default/hg38_ensembl_gene_body.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_gene_body.bed` (341324,341325)
+> `grep -wf /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/ensembl_gtf/default/hg38_ensembl_gene_body.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_gene_body.bed` (42687,42688)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 3.993GB.  
-  PID: 341324;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
-  PID: 341325;	Command: bedtools;	Return code: 0;	Memory used: 0.022GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 3.61GB.  
+  PID: 42687;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
+  PID: 42688;	Command: bedtools;	Return code: 0;	Memory used: 0.022GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_TSS_density.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_TSS_density.bed`  
 
-> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_tss.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | awk '$7>0' | sort -k4,4 -k7,7nr | sort -k4,4 -u > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_TSS_density.bed` (341327,341328,341329,341330)
+> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_tss.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | awk '$7>0' | sort -k4,4 -k7,7nr | sort -k4,4 -u > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_TSS_density.bed` (42690,42691,42692,42694)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:49. Running peak memory: 3.993GB.  
-  PID: 341330;	Command: sort;	Return code: 0;	Memory used: 0.003GB  
-  PID: 341327;	Command: bedtools;	Return code: 0;	Memory used: 0.029GB  
-  PID: 341329;	Command: sort;	Return code: 0;	Memory used: 0.009GB  
-  PID: 341328;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:49. Running peak memory: 3.61GB.  
+  PID: 42694;	Command: sort;	Return code: 0;	Memory used: 0.003GB  
+  PID: 42690;	Command: bedtools;	Return code: 0;	Memory used: 0.029GB  
+  PID: 42692;	Command: sort;	Return code: 0;	Memory used: 0.008GB  
+  PID: 42691;	Command: awk;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_gene_body_density.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_gene_body_density.bed`  
 
-> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_gene_body.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | awk '$7>0' | sort -k4 > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_gene_body_density.bed` (341611,341612,341613)
+> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_ensembl_gene_body.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | awk '$7>0' | sort -k4 > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_gene_body_density.bed` (42738,42739,42740)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:03. Running peak memory: 3.993GB.  
-  PID: 341612;	Command: awk;	Return code: 0;	Memory used: 0.001GB  
-  PID: 341611;	Command: bedtools;	Return code: 0;	Memory used: 0.099GB  
-  PID: 341613;	Command: sort;	Return code: 0;	Memory used: 0.009GB
+Command completed. Elapsed time: 0:00:52. Running peak memory: 3.61GB.  
+  PID: 42738;	Command: bedtools;	Return code: 0;	Memory used: 0.101GB  
+  PID: 42740;	Command: sort;	Return code: 0;	Memory used: 0.004GB  
+  PID: 42739;	Command: awk;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed`  
 
-> `join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 2.2 2.3 2.7 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_TSS_density.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_gene_body_density.bed | awk -v OFS='	' '{print $1, $2, $3, $4, ($6/($3-$2))/($9/($8-$7)), $5}' | env LC_COLLATE=C sort -k1,1 -k2,2n > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed` (341669,341670,341671)
+> `join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 2.2 2.3 2.7 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_TSS_density.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_gene_body_density.bed | awk -v OFS='	' '{print $1, $2, $3, $4, ($6/($3-$2))/($9/($8-$7)), $5}' | env LC_COLLATE=C sort -k1,1 -k2,2n > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed` (42784,42785,42786)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 341669;	Command: join;	Return code: 0;	Memory used: 0.001GB  
-  PID: 341671;	Command: env;	Return code: 0;	Memory used: 0.004GB  
-  PID: 341670;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 3.61GB.  
+  PID: 42784;	Command: join;	Return code: 0;	Memory used: 0.001GB  
+  PID: 42786;	Command: env;	Return code: 0;	Memory used: 0.004GB  
+  PID: 42785;	Command: awk;	Return code: 0;	Memory used: 0.001GB
 
 
-> `sort -k5,5n /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed | awk ' { a[i++]=$5; } END { x=int((i+1)/2); if (x < (i+1)/2) print (a[x-1]+a[x])/2; else print a[x-1]; }'`
+> `sort -k5,5n /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed | awk ' { a[i++]=$5; } END { x=int((i+1)/2); if (x < (i+1)/2) print (a[x-1]+a[x])/2; else print a[x-1]; }'`
 
 > `Pause_index`	78.33	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.pdf`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.pdf`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R pi --annotate -i /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed` (341677)
+> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R pi --annotate -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed` (42792)
 <pre>
 Pause index plot completed!
 
 </pre>
-Command completed. Elapsed time: 0:00:05. Running peak memory: 3.993GB.  
-  PID: 341677;	Command: Rscript;	Return code: 0;	Memory used: 0.245GB
+Command completed. Elapsed time: 0:00:05. Running peak memory: 3.61GB.  
+  PID: 42792;	Command: Rscript;	Return code: 0;	Memory used: 0.218GB
 
 > `Pause index`	QC_hg38/Jurkat_ChRO-seq_2_pause_index.pdf	Pause index	QC_hg38/Jurkat_ChRO-seq_2_pause_index.png	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed.gz`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed.gz`  
 
-> `pigz -f -p 8 -f /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed` (341696)
+> `pigz -f -p 8 -f /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_pause_index.bed` (42814)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 341696;	Command: pigz;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 42814;	Command: pigz;	Return code: 0;	Memory used: 0.004GB
 
 
-### Calculate Fraction of Reads in pre-mature mRNA (02-18 12:51:43) elapsed: 120.0 _TIME_
+### Calculate Fraction of Reads in pre-mature mRNA (02-27 11:09:03) elapsed: 110.0 _TIME_
 
 Missing stat 'Plus_FRiP'
 
-> `samtools view -@ 4 -c -L /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam`
+> `samtools view -@ 4 -c -L /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam`
 34004054 12298505
 
 > `Plus_FRiP`	0.36	PEPPRO	_RES_
 Missing stat 'Minus_FRiP'
 
-> `samtools view -@ 4 -c -L /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam`
+> `samtools view -@ 4 -c -L /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam`
 34004054 11929067
 
 > `Minus_FRiP`	0.35	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_gene_sort.bed`,`/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_gene_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_gene_coverage.bed`  
 
-> `grep -wf /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_gene_sort.bed` (341779,341780)
+> `grep -wf /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_gene_sort.bed` (43103,43104)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 3.993GB.  
-  PID: 341779;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 341780;	Command: bedtools;	Return code: 0;	Memory used: 0.002GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 3.61GB.  
+  PID: 43104;	Command: bedtools;	Return code: 0;	Memory used: 0.013GB  
+  PID: 43103;	Command: grep;	Return code: 0;	Memory used: 0.004GB
 
 
-> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_gene_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_gene_coverage.bed` (341782)
+> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_gene_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_gene_coverage.bed` (43107)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:05. Running peak memory: 3.993GB.  
-  PID: 341782;	Command: bedtools;	Return code: 0;	Memory used: 0.101GB
+Command completed. Elapsed time: 0:00:52. Running peak memory: 3.61GB.  
+  PID: 43107;	Command: bedtools;	Return code: 0;	Memory used: 0.101GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed`  
 
-> `ln -sf /scratch/jps3dp/DATA/genomes/hg38/feat_annotation/default/hg38_annotations.bed.gz /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed.gz` (341841)
+> `ln -sf /scratch/jps3dp/DATA/genomes/hg38/feat_annotation/default/hg38_annotations.bed.gz /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed.gz` (43162)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 341841;	Command: ln;	Return code: 0;	Memory used: 0.002GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 43162;	Command: ln;	Return code: 0;	Memory used: 0.001GB
 
 
-> `pigz -f -p 8 -d -c /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed.gz > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed` (341842)
+> `pigz -f -p 8 -d -c /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed.gz > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed` (43163)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 341842;	Command: pigz;	Return code: 0;	Memory used: 0.002GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 43163;	Command: pigz;	Return code: 0;	Memory used: 0.003GB
 
 
-### Calculate fraction and proportion of reads in features (FRiF/PRiF) (02-18 12:53:50) elapsed: 127.0 _TIME_
+### Calculate cumulative and terminal fraction of reads in features (cFRiF/FRiF) (02-27 11:11:03) elapsed: 120.0 _TIME_
 
 
-> `cut -f 4 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed | sort -u`
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3' UTR`  
+> `cut -f 4 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed | sort -u`
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3' UTR`  
 
-> `awk -F'	' '{print>"/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/"$4}' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed` (341850)
+> `awk -F'	' '{print>"/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/"$4}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/raw/hg38_annotations.bed` (43172)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 3.993GB.  
-  PID: 341850;	Command: awk;	Return code: 0;	Memory used: 0.002GB
+Command completed. Elapsed time: 0:00:02. Running peak memory: 3.61GB.  
+  PID: 43172;	Command: awk;	Return code: 0;	Memory used: 0.002GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR`  
 
-> `mv "/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3' UTR" "/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR"` (341853)
+> `mv "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3' UTR" "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR"` (43175)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 341853;	Command: mv;	Return code: 0;	Memory used: 0.0GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 43175;	Command: mv;	Return code: 0;	Memory used: 0.0GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR_sort.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR_sort.bed`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR_sort.bed` (341854,341855,341857,341858)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR_sort.bed` (43176,43177,43178,43179)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 3.993GB.  
-  PID: 341854;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 341855;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 341858;	Command: bedtools;	Return code: 0;	Memory used: 0.036GB  
-  PID: 341857;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 3.61GB.  
+  PID: 43176;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 43177;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
+  PID: 43179;	Command: bedtools;	Return code: 0;	Memory used: 0.007GB  
+  PID: 43178;	Command: cut;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_plus_coverage.bed` (341861)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_plus_coverage.bed` (43181)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:19. Running peak memory: 3.993GB.  
-  PID: 341861;	Command: bedtools;	Return code: 0;	Memory used: 0.015GB
+Command completed. Elapsed time: 0:00:21. Running peak memory: 3.61GB.  
+  PID: 43181;	Command: bedtools;	Return code: 0;	Memory used: 0.015GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_minus_coverage.bed` (341881)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/3_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_minus_coverage.bed` (43200)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:19. Running peak memory: 3.993GB.  
-  PID: 341881;	Command: bedtools;	Return code: 0;	Memory used: 0.017GB
+Command completed. Elapsed time: 0:00:20. Running peak memory: 3.61GB.  
+  PID: 43200;	Command: bedtools;	Return code: 0;	Memory used: 0.017GB
 
-Target exists: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5' UTR`  
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR`  
+Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5' UTR`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR`  
 
-> `mv "/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5' UTR" "/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR"` (341899)
+> `mv "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5' UTR" "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR"` (43218)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 341899;	Command: mv;	Return code: 0;	Memory used: 0.0GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 43218;	Command: mv;	Return code: 0;	Memory used: 0.0GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR_sort.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR_sort.bed`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR_sort.bed` (341900,341901,341902,341903)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR_sort.bed` (43219,43220,43221,43222)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 3.993GB.  
-  PID: 341900;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 341901;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 341903;	Command: bedtools;	Return code: 0;	Memory used: 0.005GB  
-  PID: 341902;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 3.61GB.  
+  PID: 43219;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 43220;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
+  PID: 43222;	Command: bedtools;	Return code: 0;	Memory used: 0.03GB  
+  PID: 43221;	Command: cut;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_plus_coverage.bed` (341906)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_plus_coverage.bed` (43225)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:24. Running peak memory: 3.993GB.  
-  PID: 341906;	Command: bedtools;	Return code: 0;	Memory used: 0.037GB
+Command completed. Elapsed time: 0:00:23. Running peak memory: 3.61GB.  
+  PID: 43225;	Command: bedtools;	Return code: 0;	Memory used: 0.037GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_minus_coverage.bed` (341927)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/5_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_minus_coverage.bed` (43249)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:24. Running peak memory: 3.993GB.  
-  PID: 341927;	Command: bedtools;	Return code: 0;	Memory used: 0.029GB
+Command completed. Elapsed time: 0:00:22. Running peak memory: 3.61GB.  
+  PID: 43249;	Command: bedtools;	Return code: 0;	Memory used: 0.029GB
 
-Target exists: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer`  
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer_sort.bed`  
+Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer_sort.bed`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer_sort.bed` (342169,342170,342171,342172)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer_sort.bed` (43268,43269,43270,43271)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 3.993GB.  
-  PID: 342169;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 342170;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 342172;	Command: bedtools;	Return code: 0;	Memory used: 0.048GB  
-  PID: 342171;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 3.61GB.  
+  PID: 43268;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 43269;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
+  PID: 43271;	Command: bedtools;	Return code: 0;	Memory used: 0.045GB  
+  PID: 43270;	Command: cut;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_plus_coverage.bed` (342174)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_plus_coverage.bed` (43274)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:19. Running peak memory: 3.993GB.  
-  PID: 342174;	Command: bedtools;	Return code: 0;	Memory used: 0.009GB
+Command completed. Elapsed time: 0:00:20. Running peak memory: 3.61GB.  
+  PID: 43274;	Command: bedtools;	Return code: 0;	Memory used: 0.008GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_minus_coverage.bed` (342192)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Enhancer_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_minus_coverage.bed` (43292)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:19. Running peak memory: 3.993GB.  
-  PID: 342192;	Command: bedtools;	Return code: 0;	Memory used: 0.009GB
+Command completed. Elapsed time: 0:00:20. Running peak memory: 3.61GB.  
+  PID: 43292;	Command: bedtools;	Return code: 0;	Memory used: 0.009GB
 
-Target exists: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon`  
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon_sort.bed`  
+Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon_sort.bed`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon_sort.bed` (342209,342210,342211,342212)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon_sort.bed` (43313,43314,43315,43316)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:04. Running peak memory: 3.993GB.  
-  PID: 342209;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 342210;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
-  PID: 342212;	Command: bedtools;	Return code: 0;	Memory used: 0.174GB  
-  PID: 342211;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:03. Running peak memory: 3.61GB.  
+  PID: 43313;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 43314;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
+  PID: 43316;	Command: bedtools;	Return code: 0;	Memory used: 0.161GB  
+  PID: 43315;	Command: cut;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_plus_coverage.bed` (342217)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_plus_coverage.bed` (43322)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:26. Running peak memory: 3.993GB.  
-  PID: 342217;	Command: bedtools;	Return code: 0;	Memory used: 0.039GB
+Command completed. Elapsed time: 0:00:25. Running peak memory: 3.61GB.  
+  PID: 43322;	Command: bedtools;	Return code: 0;	Memory used: 0.039GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_minus_coverage.bed` (342244)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Exon_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_minus_coverage.bed` (43344)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:26. Running peak memory: 3.993GB.  
-  PID: 342244;	Command: bedtools;	Return code: 0;	Memory used: 0.035GB
+Command completed. Elapsed time: 0:00:24. Running peak memory: 3.61GB.  
+  PID: 43344;	Command: bedtools;	Return code: 0;	Memory used: 0.035GB
 
-Target exists: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron`  
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron_sort.bed`  
+Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron_sort.bed`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron_sort.bed` (342267,342268,342269,342270)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron_sort.bed` (43368,43369,43370,43371)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:02. Running peak memory: 3.993GB.  
-  PID: 342267;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 342270;	Command: bedtools;	Return code: 0;	Memory used: 0.084GB  
-  PID: 342268;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 342269;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:02. Running peak memory: 3.61GB.  
+  PID: 43368;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 43370;	Command: cut;	Return code: 0;	Memory used: 0.001GB  
+  PID: 43369;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
+  PID: 43371;	Command: bedtools;	Return code: 0;	Memory used: 0.007GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_plus_coverage.bed` (342274)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_plus_coverage.bed` (43375)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:26. Running peak memory: 3.993GB.  
-  PID: 342274;	Command: bedtools;	Return code: 0;	Memory used: 0.067GB
+Command completed. Elapsed time: 0:00:25. Running peak memory: 3.61GB.  
+  PID: 43375;	Command: bedtools;	Return code: 0;	Memory used: 0.067GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_minus_coverage.bed` (342300)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Intron_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_minus_coverage.bed` (43399)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:25. Running peak memory: 3.993GB.  
-  PID: 342300;	Command: bedtools;	Return code: 0;	Memory used: 0.072GB
+Command completed. Elapsed time: 0:00:25. Running peak memory: 3.61GB.  
+  PID: 43399;	Command: bedtools;	Return code: 0;	Memory used: 0.072GB
 
-Target exists: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter`  
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_sort.bed`  
+Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_sort.bed`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_sort.bed` (342323,342324,342325,342326)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_sort.bed` (43421,43422,43423,43424)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 342323;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 342324;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 342326;	Command: bedtools;	Return code: 0;	Memory used: 0.006GB  
-  PID: 342325;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 43421;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 43422;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
+  PID: 43424;	Command: bedtools;	Return code: 0;	Memory used: 0.006GB  
+  PID: 43423;	Command: cut;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_plus_coverage.bed` (342328)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_plus_coverage.bed` (43426)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:26. Running peak memory: 3.993GB.  
-  PID: 342328;	Command: bedtools;	Return code: 0;	Memory used: 0.057GB
+Command completed. Elapsed time: 0:00:24. Running peak memory: 3.61GB.  
+  PID: 43426;	Command: bedtools;	Return code: 0;	Memory used: 0.067GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_minus_coverage.bed` (342354)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_minus_coverage.bed` (43649)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:27. Running peak memory: 3.993GB.  
-  PID: 342354;	Command: bedtools;	Return code: 0;	Memory used: 0.047GB
+Command completed. Elapsed time: 0:00:24. Running peak memory: 3.61GB.  
+  PID: 43649;	Command: bedtools;	Return code: 0;	Memory used: 0.047GB
 
-Target exists: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter Flanking Region`  
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region`  
+Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter Flanking Region`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region`  
 
-> `mv "/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter Flanking Region" "/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region"` (342377)
+> `mv "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter Flanking Region" "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region"` (43669)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 342377;	Command: mv;	Return code: 0;	Memory used: 0.0GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 43669;	Command: mv;	Return code: 0;	Memory used: 0.0GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region_sort.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region_sort.bed`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region_sort.bed` (342378,342379,342380,342381)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region_sort.bed` (43670,43671,43672,43674)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 3.993GB.  
-  PID: 342378;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 342380;	Command: cut;	Return code: 0;	Memory used: 0.001GB  
-  PID: 342379;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 342381;	Command: bedtools;	Return code: 0;	Memory used: 0.007GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 3.61GB.  
+  PID: 43670;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 43672;	Command: cut;	Return code: 0;	Memory used: 0.001GB  
+  PID: 43671;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
+  PID: 43674;	Command: bedtools;	Return code: 0;	Memory used: 0.006GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_plus_coverage.bed` (342385)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_plus_coverage.bed` (43678)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:20. Running peak memory: 3.993GB.  
-  PID: 342385;	Command: bedtools;	Return code: 0;	Memory used: 0.011GB
+Command completed. Elapsed time: 0:00:21. Running peak memory: 3.61GB.  
+  PID: 43678;	Command: bedtools;	Return code: 0;	Memory used: 0.011GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_minus_coverage.bed` (342403)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Promoter_Flanking_Region_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_minus_coverage.bed` (43697)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:19. Running peak memory: 3.993GB.  
-  PID: 342403;	Command: bedtools;	Return code: 0;	Memory used: 0.019GB
+Command completed. Elapsed time: 0:00:21. Running peak memory: 3.61GB.  
+  PID: 43697;	Command: bedtools;	Return code: 0;	Memory used: 0.019GB
 
 
-### Plot FRiF/PRiF (02-18 12:59:22) elapsed: 332.0 _TIME_
+### Plot cFRiF/FRiF (02-27 11:16:28) elapsed: 326.0 _TIME_
 
 
-> `samtools view -@ 8 -q 10 -c -F4 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam`
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_frif.pdf`  
+> `samtools view -@ 8 -q 10 -c -F4 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam`
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_cFRiF.pdf`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R frif -s Jurkat_ChRO-seq_2 -z 3099922541 -n 17068847 -y frif --reads -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_frif.pdf --bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_plus_coverage.bed` (342436)
+> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R frif -s Jurkat_ChRO-seq_2 -z 3099922541 -n 17068847 -y cfrif --reads -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_cFRiF.pdf --bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_plus_coverage.bed` (43731)
+<pre>
+Cumulative cfrif plot completed!
+
+</pre>
+Command completed. Elapsed time: 0:00:38. Running peak memory: 3.61GB.  
+  PID: 43731;	Command: Rscript;	Return code: 0;	Memory used: 0.501GB
+
+> `cFRiF`	QC_hg38/Jurkat_ChRO-seq_2_cFRiF.pdf	cFRiF	QC_hg38/Jurkat_ChRO-seq_2_cFRiF.png	PEPPRO	_OBJ_
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_FRiF.pdf`  
+
+> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R frif -s Jurkat_ChRO-seq_2 -z 3099922541 -n 17068847 -y frif --reads -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_FRiF.pdf --bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_plus_coverage.bed` (43777)
 <pre>
 Cumulative frif plot completed!
 
 </pre>
-Command completed. Elapsed time: 0:00:35. Running peak memory: 3.993GB.  
-  PID: 342436;	Command: Rscript;	Return code: 0;	Memory used: 0.496GB
+Command completed. Elapsed time: 0:00:28. Running peak memory: 3.61GB.  
+  PID: 43777;	Command: Rscript;	Return code: 0;	Memory used: 0.501GB
 
-> `FRiF`	QC_hg38/Jurkat_ChRO-seq_2_frif.pdf	FRiF	QC_hg38/Jurkat_ChRO-seq_2_frif.png	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_prif.pdf`  
+> `FRiF`	QC_hg38/Jurkat_ChRO-seq_2_FRiF.pdf	FRiF	QC_hg38/Jurkat_ChRO-seq_2_FRiF.png	PEPPRO	_OBJ_
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R frif -s Jurkat_ChRO-seq_2 -z 3099922541 -n 17068847 -y prif --reads -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_prif.pdf --bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_3_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_5_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Enhancer_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Exon_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Intron_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_plus_coverage.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_Promoter_Flanking_Region_plus_coverage.bed` (342477)
-<pre>
-Cumulative prif plot completed!
-
-</pre>
-Command completed. Elapsed time: 0:00:27. Running peak memory: 3.993GB.  
-  PID: 342477;	Command: Rscript;	Return code: 0;	Memory used: 0.502GB
-
-> `PRiF`	QC_hg38/Jurkat_ChRO-seq_2_prif.pdf	PRiF	QC_hg38/Jurkat_ChRO-seq_2_prif.png	PEPPRO	_OBJ_
-
-### Calculate mRNA contamination (02-18 13:00:26) elapsed: 64.0 _TIME_
+### Calculate mRNA contamination (02-27 11:17:38) elapsed: 69.0 _TIME_
 
 Missing stat 'mRNA_contamination'
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_exons_sort.bed`,`/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_introns_sort.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_exons_sort.bed`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_introns_sort.bed`  
 
-> `grep -wf /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_exons.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_exons_sort.bed` (342759,342760)
+> `grep -wf /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_exons.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_exons_sort.bed` (43812,43813)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:06. Running peak memory: 3.993GB.  
-  PID: 342760;	Command: bedtools;	Return code: 0;	Memory used: 0.084GB  
-  PID: 342759;	Command: grep;	Return code: 0;	Memory used: 0.005GB
+Command completed. Elapsed time: 0:00:07. Running peak memory: 3.61GB.  
+  PID: 43813;	Command: bedtools;	Return code: 0;	Memory used: 0.08GB  
+  PID: 43812;	Command: grep;	Return code: 0;	Memory used: 0.005GB
 
 
-> `grep -wf /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_introns.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_introns_sort.bed` (342766,342767,342768)
+> `grep -wf /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_introns.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_introns_sort.bed` (43820,43821,43822)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:06. Running peak memory: 3.993GB.  
-  PID: 342766;	Command: grep;	Return code: 0;	Memory used: 0.005GB  
-  PID: 342768;	Command: bedtools;	Return code: 0;	Memory used: 0.007GB  
-  PID: 342767;	Command: bedtools;	Return code: 0;	Memory used: 0.036GB
+Command completed. Elapsed time: 0:00:07. Running peak memory: 3.61GB.  
+  PID: 43821;	Command: bedtools;	Return code: 0;	Memory used: 0.078GB  
+  PID: 43820;	Command: grep;	Return code: 0;	Memory used: 0.005GB  
+  PID: 43822;	Command: bedtools;	Return code: 0;	Memory used: 0.092GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_coverage.bed`,`/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_coverage.bed`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_coverage.bed`  
 
-> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_exons_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_coverage.bed` (342775)
+> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_exons_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_coverage.bed` (43830)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:42. Running peak memory: 3.993GB.  
-  PID: 342775;	Command: bedtools;	Return code: 0;	Memory used: 0.032GB
+Command completed. Elapsed time: 0:00:41. Running peak memory: 3.61GB.  
+  PID: 43830;	Command: bedtools;	Return code: 0;	Memory used: 0.032GB
 
 
-> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_introns_sort.bed -b /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -g /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_coverage.bed` (342826)
+> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/hg38_introns_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_sort.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_coverage.bed` (43869)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:51. Running peak memory: 3.993GB.  
-  PID: 342826;	Command: bedtools;	Return code: 0;	Memory used: 0.083GB
+Command completed. Elapsed time: 0:00:48. Running peak memory: 3.61GB.  
+  PID: 43869;	Command: bedtools;	Return code: 0;	Memory used: 0.083GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_rpkm.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_rpkm.bed`  
 
-> `awk -v OFS='	' '{chrom[$4] = $1; if($4!=prev4) {chromStart[$4] = $2} strand[$4] = $6; readCount[$4] += $7; exonCount[$4] += 1; geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); gene[$4] = $4; chromEnd[$4]=$3; prev4=$4} END { for (a in readCount) { print chrom[a], chromStart[a], chromEnd[a], gene[a], (readCount[a]/34.004054)/geneSizeKB[a], strand[a]}}' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_coverage.bed | awk '$5>0' | sort -k4 > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_rpkm.bed` (342872,342873,342874)
+> `awk -v OFS='	' '{chrom[$4] = $1; if($4!=prev4) {chromStart[$4] = $2} strand[$4] = $6; readCount[$4] += $7; exonCount[$4] += 1; geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); gene[$4] = $4; chromEnd[$4]=$3; prev4=$4} END { for (a in readCount) { print chrom[a], chromStart[a], chromEnd[a], gene[a], (readCount[a]/34.004054)/geneSizeKB[a], strand[a]}}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_coverage.bed | awk '$5>0' | sort -k4 > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_rpkm.bed` (43912,43913,43914)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 3.993GB.  
-  PID: 342872;	Command: awk;	Return code: 0;	Memory used: 0.009GB  
-  PID: 342874;	Command: sort;	Return code: 0;	Memory used: 0.003GB  
-  PID: 342873;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 3.61GB.  
+  PID: 43912;	Command: awk;	Return code: 0;	Memory used: 0.005GB  
+  PID: 43914;	Command: sort;	Return code: 0;	Memory used: 0.004GB  
+  PID: 43913;	Command: awk;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_rpkm.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_rpkm.bed`  
 
-> `awk -v OFS='	' '{chrom[$4] = $1; if($4!=prev4) {chromStart[$4] = $2} strand[$4] = $6; readCount[$4] += $7; exonCount[$4] += 1; geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); gene[$4] = $4; chromEnd[$4]=$3; prev4=$4} END { for (a in readCount) { print chrom[a], chromStart[a], chromEnd[a], gene[a], (readCount[a]/34.004054)/geneSizeKB[a], strand[a]}}' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_coverage.bed | awk '$5>0' | sort -k4 > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_rpkm.bed` (342877,342878,342879)
+> `awk -v OFS='	' '{chrom[$4] = $1; if($4!=prev4) {chromStart[$4] = $2} strand[$4] = $6; readCount[$4] += $7; exonCount[$4] += 1; geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); gene[$4] = $4; chromEnd[$4]=$3; prev4=$4} END { for (a in readCount) { print chrom[a], chromStart[a], chromEnd[a], gene[a], (readCount[a]/34.004054)/geneSizeKB[a], strand[a]}}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_coverage.bed | awk '$5>0' | sort -k4 > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_rpkm.bed` (43916,43917,43918)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 3.993GB.  
-  PID: 342877;	Command: awk;	Return code: 0;	Memory used: 0.01GB  
-  PID: 342879;	Command: sort;	Return code: 0;	Memory used: 0.006GB  
-  PID: 342878;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 3.61GB.  
+  PID: 43916;	Command: awk;	Return code: 0;	Memory used: 0.005GB  
+  PID: 43918;	Command: sort;	Return code: 0;	Memory used: 0.004GB  
+  PID: 43917;	Command: awk;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed`  
 
-> `join --nocheck-order -a1 -a2 -j4 /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_rpkm.bed /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_rpkm.bed | awk -v OFS='	' 'NF==11 {print $7, $8, $9, $1, ($10/$5), $11}' | sort -k1,1 -k2,2n > /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed` (342881,342882,342883)
+> `join --nocheck-order -a1 -a2 -j4 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_introns_rpkm.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exons_rpkm.bed | awk -v OFS='	' 'NF==11 {print $7, $8, $9, $1, ($10/$5), $11}' | sort -k1,1 -k2,2n > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed` (43921,43922,43923)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 342881;	Command: join;	Return code: 0;	Memory used: 0.001GB  
-  PID: 342883;	Command: sort;	Return code: 0;	Memory used: 0.004GB  
-  PID: 342882;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 43921;	Command: join;	Return code: 0;	Memory used: 0.001GB  
+  PID: 43923;	Command: sort;	Return code: 0;	Memory used: 0.004GB  
+  PID: 43922;	Command: awk;	Return code: 0;	Memory used: 0.001GB
 
 
-> `awk '{print $5}' /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed | sort -n | awk ' { a[i++]=$1; } END { x=int((i+1)/2); if (x < (i+1)/2) print (a[x-1]+a[x])/2; else print a[x-1]; }'`
+> `awk '{print $5}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed | sort -n | awk ' { a[i++]=$1; } END { x=int((i+1)/2); if (x < (i+1)/2) print (a[x-1]+a[x])/2; else print a[x-1]; }'`
 
 > `mRNA_contamination`	1.2	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_mRNA_contamination.pdf`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_mRNA_contamination.pdf`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R mrna -i /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed --annotate` (342890)
+> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R mrna -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed --annotate` (43929)
 <pre>
 mRNA contamination plot completed!
 
 </pre>
-Command completed. Elapsed time: 0:00:05. Running peak memory: 3.993GB.  
-  PID: 342890;	Command: Rscript;	Return code: 0;	Memory used: 0.238GB
+Command completed. Elapsed time: 0:00:05. Running peak memory: 3.61GB.  
+  PID: 43929;	Command: Rscript;	Return code: 0;	Memory used: 0.236GB
 
 > `mRNA contamination`	QC_hg38/Jurkat_ChRO-seq_2_mRNA_contamination.pdf	mRNA contamination	QC_hg38/Jurkat_ChRO-seq_2_mRNA_contamination.png	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed.gz`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed.gz`  
 
-> `pigz -f -p 8 -f /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed` (342909)
+> `pigz -f -p 8 -f /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/QC_hg38/Jurkat_ChRO-seq_2_exon_intron_ratios.bed` (43948)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 3.993GB.  
-  PID: 342909;	Command: pigz;	Return code: 0;	Memory used: 0.003GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 3.61GB.  
+  PID: 43948;	Command: pigz;	Return code: 0;	Memory used: 0.003GB
 
 
-### Produce bigWig files (02-18 13:02:18) elapsed: 112.0 _TIME_
+### Produce bigWig files (02-27 11:19:27) elapsed: 109.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_exact_body_0-mer.bw`,`/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_smooth_body_0-mer.bw`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_exact_body_0-mer.bw`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_smooth_body_0-mer.bw`  
 
-> `samtools index /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam` (342917)
+> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam` (43956)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:12. Running peak memory: 3.993GB.  
-  PID: 342917;	Command: samtools;	Return code: 0;	Memory used: 0.007GB
+Command completed. Elapsed time: 0:00:12. Running peak memory: 3.61GB.  
+  PID: 43956;	Command: samtools;	Return code: 0;	Memory used: 0.007GB
 
 
-> `/scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py -i /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -c /scratch/jps3dp/DATA/genomes/hg38/fasta/default/hg38.chrom.sizes -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_exact_body_0-mer.bw -w /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_smooth_body_0-mer.bw -p 5 --variable-step --tail-edge` (342934)
+> `/scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam -c /scratch/jps3dp/DATA/genomes/hg38/fasta/default/hg38.chrom.sizes -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_exact_body_0-mer.bw -w /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_smooth_body_0-mer.bw -p 5 --variable-step --tail-edge` (43968)
 <pre>
 Cutting parallel chroms in half to accommodate two tracks.
-Registering input file: '/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam'
-Temporary files will be stored in: 'tmp_Jurkat_ChRO-seq_2_plus_cuttrace_p79dowbp'
+Registering input file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_plus.bam'
+Temporary files will be stored in: 'tmp_Jurkat_ChRO-seq_2_plus_cuttrace_idbgpnk1'
 Processing with 2 cores...
 stdin is empty of data
 stdin is empty of data
@@ -3343,34 +3351,36 @@ stdin is empty of data
 Discarding 114 chunk(s) of reads: ['chrM', 'chr1_KI270707v1_random', 'chr1_KI270709v1_random', 'chr2_KI270715v1_random', 'chr2_KI270716v1_random', 'chr3_GL000221v1_random', 'chr9_KI270717v1_random', 'chr9_KI270718v1_random', 'chr14_GL000194v1_random', 'chr14_KI270723v1_random', 'chr14_KI270724v1_random', 'chr17_KI270730v1_random', 'chr22_KI270732v1_random', 'chr22_KI270735v1_random', 'chr22_KI270737v1_random', 'chr22_KI270739v1_random', 'chrY_KI270740v1_random', 'chrUn_KI270302v1', 'chrUn_KI270304v1', 'chrUn_KI270303v1', 'chrUn_KI270305v1', 'chrUn_KI270322v1', 'chrUn_KI270320v1', 'chrUn_KI270310v1', 'chrUn_KI270316v1', 'chrUn_KI270315v1', 'chrUn_KI270312v1', 'chrUn_KI270311v1', 'chrUn_KI270317v1', 'chrUn_KI270412v1', 'chrUn_KI270411v1', 'chrUn_KI270414v1', 'chrUn_KI270419v1', 'chrUn_KI270418v1', 'chrUn_KI270420v1', 'chrUn_KI270424v1', 'chrUn_KI270417v1', 'chrUn_KI270422v1', 'chrUn_KI270423v1', 'chrUn_KI270425v1', 'chrUn_KI270429v1', 'chrUn_KI270466v1', 'chrUn_KI270465v1', 'chrUn_KI270468v1', 'chrUn_KI270509v1', 'chrUn_KI270508v1', 'chrUn_KI270516v1', 'chrUn_KI270522v1', 'chrUn_KI270511v1', 'chrUn_KI270515v1', 'chrUn_KI270517v1', 'chrUn_KI270529v1', 'chrUn_KI270528v1', 'chrUn_KI270530v1', 'chrUn_KI270539v1', 'chrUn_KI270544v1', 'chrUn_KI270548v1', 'chrUn_KI270580v1', 'chrUn_KI270581v1', 'chrUn_KI270579v1', 'chrUn_KI270589v1', 'chrUn_KI270590v1', 'chrUn_KI270584v1', 'chrUn_KI270582v1', 'chrUn_KI270588v1', 'chrUn_KI270593v1', 'chrUn_KI270330v1', 'chrUn_KI270329v1', 'chrUn_KI270334v1', 'chrUn_KI270333v1', 'chrUn_KI270335v1', 'chrUn_KI270338v1', 'chrUn_KI270340v1', 'chrUn_KI270336v1', 'chrUn_KI270337v1', 'chrUn_KI270363v1', 'chrUn_KI270364v1', 'chrUn_KI270362v1', 'chrUn_KI270366v1', 'chrUn_KI270378v1', 'chrUn_KI270379v1', 'chrUn_KI270389v1', 'chrUn_KI270390v1', 'chrUn_KI270387v1', 'chrUn_KI270395v1', 'chrUn_KI270396v1', 'chrUn_KI270388v1', 'chrUn_KI270394v1', 'chrUn_KI270386v1', 'chrUn_KI270391v1', 'chrUn_KI270383v1', 'chrUn_KI270393v1', 'chrUn_KI270384v1', 'chrUn_KI270392v1', 'chrUn_KI270381v1', 'chrUn_KI270385v1', 'chrUn_KI270382v1', 'chrUn_KI270376v1', 'chrUn_KI270374v1', 'chrUn_KI270372v1', 'chrUn_KI270373v1', 'chrUn_KI270375v1', 'chrUn_KI270371v1', 'chrUn_KI270448v1', 'chrUn_KI270741v1', 'chrUn_GL000226v1', 'chrUn_KI270747v1', 'chrUn_KI270749v1', 'chrUn_KI270750v1', 'chrUn_KI270753v1', 'chrUn_KI270756v1', 'chrUn_GL000214v1', 'chrUn_KI270742v1', 'chrUn_GL000216v2']
 Keeping 81 chunk(s) of reads: ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chrX', 'chrY', 'chr1_KI270706v1_random', 'chr1_KI270708v1_random', 'chr1_KI270710v1_random', 'chr1_KI270711v1_random', 'chr1_KI270712v1_random', 'chr1_KI270713v1_random', 'chr1_KI270714v1_random', 'chr4_GL000008v2_random', 'chr5_GL000208v1_random', 'chr9_KI270719v1_random', 'chr9_KI270720v1_random', 'chr11_KI270721v1_random', 'chr14_GL000009v2_random', 'chr14_GL000225v1_random', 'chr14_KI270722v1_random', 'chr14_KI270725v1_random', 'chr14_KI270726v1_random', 'chr15_KI270727v1_random', 'chr16_KI270728v1_random', 'chr17_GL000205v2_random', 'chr17_KI270729v1_random', 'chr22_KI270731v1_random', 'chr22_KI270733v1_random', 'chr22_KI270734v1_random', 'chr22_KI270736v1_random', 'chr22_KI270738v1_random', 'chrUn_KI270442v1', 'chrUn_KI270467v1', 'chrUn_KI270435v1', 'chrUn_KI270438v1', 'chrUn_KI270510v1', 'chrUn_KI270518v1', 'chrUn_KI270512v1', 'chrUn_KI270519v1', 'chrUn_KI270507v1', 'chrUn_KI270538v1', 'chrUn_KI270583v1', 'chrUn_KI270587v1', 'chrUn_KI270591v1', 'chrUn_KI270521v1', 'chrUn_GL000195v1', 'chrUn_GL000219v1', 'chrUn_GL000220v1', 'chrUn_GL000224v1', 'chrUn_GL000213v1', 'chrUn_KI270743v1', 'chrUn_KI270744v1', 'chrUn_KI270745v1', 'chrUn_KI270746v1', 'chrUn_KI270748v1', 'chrUn_KI270751v1', 'chrUn_KI270752v1', 'chrUn_KI270754v1', 'chrUn_KI270755v1', 'chrUn_KI270757v1', 'chrUn_GL000218v1', 'chrEBV']
 Reduce step (merge files)...
-Merging 81 files into output file: '/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_exact_body_0-mer.bw'
-Merging 81 files into output file: '/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_smooth_body_0-mer.bw'
+Merging 81 files into output file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_exact_body_0-mer.bw'
+Merging 81 files into output file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_plus_smooth_body_0-mer.bw'
 </pre>
-Command completed. Elapsed time: 0:10:37. Running peak memory: 3.993GB.  
-  PID: 342934;	Command: /scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py;	Return code: 0;	Memory used: 1.325GB
+Command completed. Elapsed time: 0:11:26. Running peak memory: 3.61GB.  
+  PID: 43968;	Command: /scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py;	Return code: 0;	Memory used: 2.604GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_minus_exact_body_0-mer.bw`,`/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_minus_smooth_body_0-mer.bw`  
+Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_minus_exact_body_0-mer.bw`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_minus_smooth_body_0-mer.bw`  
 
-> `samtools index /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam` (344740)
+> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam` (45949)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:11. Running peak memory: 3.993GB.  
-  PID: 344740;	Command: samtools;	Return code: 0;	Memory used: 0.007GB
+Command completed. Elapsed time: 0:00:12. Running peak memory: 3.61GB.  
+  PID: 45949;	Command: samtools;	Return code: 0;	Memory used: 0.007GB
 
 
-> `/scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py -i /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -c /scratch/jps3dp/DATA/genomes/hg38/fasta/default/hg38.chrom.sizes -o /project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_minus_exact_body_0-mer.bw -p 5 --variable-step --tail-edge` (344753)
+> `/scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam -c /scratch/jps3dp/DATA/genomes/hg38/fasta/default/hg38.chrom.sizes -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_minus_exact_body_0-mer.bw -w /project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_minus_smooth_body_0-mer.bw -p 5 --variable-step --tail-edge` (45963)
 <pre>
-Registering input file: '/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam'
-Temporary files will be stored in: 'tmp_Jurkat_ChRO-seq_2_minus_cuttrace_hk7uv8oy'
-Processing with 5 cores...
+Cutting parallel chroms in half to accommodate two tracks.
+Registering input file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/aligned_hg38/Jurkat_ChRO-seq_2_minus.bam'
+Temporary files will be stored in: 'tmp_Jurkat_ChRO-seq_2_minus_cuttrace_6c4tdu27'
+Processing with 2 cores...
 stdin is empty of data
 Discarding 111 chunk(s) of reads: ['chrM', 'chr1_KI270707v1_random', 'chr1_KI270709v1_random', 'chr2_KI270715v1_random', 'chr2_KI270716v1_random', 'chr9_KI270717v1_random', 'chr9_KI270719v1_random', 'chr14_KI270722v1_random', 'chr14_KI270723v1_random', 'chr14_KI270724v1_random', 'chr14_KI270725v1_random', 'chr17_KI270730v1_random', 'chr22_KI270735v1_random', 'chr22_KI270737v1_random', 'chr22_KI270739v1_random', 'chrY_KI270740v1_random', 'chrUn_KI270302v1', 'chrUn_KI270304v1', 'chrUn_KI270303v1', 'chrUn_KI270305v1', 'chrUn_KI270322v1', 'chrUn_KI270320v1', 'chrUn_KI270310v1', 'chrUn_KI270316v1', 'chrUn_KI270315v1', 'chrUn_KI270312v1', 'chrUn_KI270311v1', 'chrUn_KI270317v1', 'chrUn_KI270412v1', 'chrUn_KI270411v1', 'chrUn_KI270414v1', 'chrUn_KI270419v1', 'chrUn_KI270418v1', 'chrUn_KI270420v1', 'chrUn_KI270424v1', 'chrUn_KI270417v1', 'chrUn_KI270422v1', 'chrUn_KI270423v1', 'chrUn_KI270425v1', 'chrUn_KI270429v1', 'chrUn_KI270466v1', 'chrUn_KI270465v1', 'chrUn_KI270468v1', 'chrUn_KI270509v1', 'chrUn_KI270518v1', 'chrUn_KI270508v1', 'chrUn_KI270516v1', 'chrUn_KI270512v1', 'chrUn_KI270522v1', 'chrUn_KI270515v1', 'chrUn_KI270517v1', 'chrUn_KI270529v1', 'chrUn_KI270528v1', 'chrUn_KI270530v1', 'chrUn_KI270539v1', 'chrUn_KI270544v1', 'chrUn_KI270548v1', 'chrUn_KI270583v1', 'chrUn_KI270581v1', 'chrUn_KI270579v1', 'chrUn_KI270589v1', 'chrUn_KI270593v1', 'chrUn_KI270591v1', 'chrUn_KI270329v1', 'chrUn_KI270334v1', 'chrUn_KI270333v1', 'chrUn_KI270335v1', 'chrUn_KI270338v1', 'chrUn_KI270340v1', 'chrUn_KI270336v1', 'chrUn_KI270337v1', 'chrUn_KI270363v1', 'chrUn_KI270364v1', 'chrUn_KI270362v1', 'chrUn_KI270378v1', 'chrUn_KI270379v1', 'chrUn_KI270389v1', 'chrUn_KI270390v1', 'chrUn_KI270387v1', 'chrUn_KI270395v1', 'chrUn_KI270396v1', 'chrUn_KI270388v1', 'chrUn_KI270394v1', 'chrUn_KI270386v1', 'chrUn_KI270391v1', 'chrUn_KI270383v1', 'chrUn_KI270393v1', 'chrUn_KI270384v1', 'chrUn_KI270392v1', 'chrUn_KI270381v1', 'chrUn_KI270385v1', 'chrUn_KI270382v1', 'chrUn_KI270376v1', 'chrUn_KI270374v1', 'chrUn_KI270372v1', 'chrUn_KI270373v1', 'chrUn_KI270375v1', 'chrUn_KI270371v1', 'chrUn_KI270448v1', 'chrUn_KI270521v1', 'chrUn_GL000226v1', 'chrUn_GL000213v1', 'chrUn_KI270746v1', 'chrUn_KI270747v1', 'chrUn_KI270748v1', 'chrUn_KI270750v1', 'chrUn_KI270752v1', 'chrUn_KI270753v1', 'chrUn_KI270754v1', 'chrUn_KI270756v1', 'chrUn_GL000214v1']
 Keeping 84 chunk(s) of reads: ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chrX', 'chrY', 'chr1_KI270706v1_random', 'chr1_KI270708v1_random', 'chr1_KI270710v1_random', 'chr1_KI270711v1_random', 'chr1_KI270712v1_random', 'chr1_KI270713v1_random', 'chr1_KI270714v1_random', 'chr3_GL000221v1_random', 'chr4_GL000008v2_random', 'chr5_GL000208v1_random', 'chr9_KI270718v1_random', 'chr9_KI270720v1_random', 'chr11_KI270721v1_random', 'chr14_GL000009v2_random', 'chr14_GL000225v1_random', 'chr14_GL000194v1_random', 'chr14_KI270726v1_random', 'chr15_KI270727v1_random', 'chr16_KI270728v1_random', 'chr17_GL000205v2_random', 'chr17_KI270729v1_random', 'chr22_KI270731v1_random', 'chr22_KI270732v1_random', 'chr22_KI270733v1_random', 'chr22_KI270734v1_random', 'chr22_KI270736v1_random', 'chr22_KI270738v1_random', 'chrUn_KI270442v1', 'chrUn_KI270467v1', 'chrUn_KI270435v1', 'chrUn_KI270438v1', 'chrUn_KI270510v1', 'chrUn_KI270519v1', 'chrUn_KI270511v1', 'chrUn_KI270507v1', 'chrUn_KI270538v1', 'chrUn_KI270587v1', 'chrUn_KI270580v1', 'chrUn_KI270590v1', 'chrUn_KI270584v1', 'chrUn_KI270582v1', 'chrUn_KI270588v1', 'chrUn_KI270330v1', 'chrUn_KI270366v1', 'chrUn_GL000195v1', 'chrUn_GL000219v1', 'chrUn_GL000220v1', 'chrUn_GL000224v1', 'chrUn_KI270741v1', 'chrUn_KI270743v1', 'chrUn_KI270744v1', 'chrUn_KI270745v1', 'chrUn_KI270749v1', 'chrUn_KI270751v1', 'chrUn_KI270755v1', 'chrUn_KI270757v1', 'chrUn_KI270742v1', 'chrUn_GL000216v2', 'chrUn_GL000218v1', 'chrEBV']
 Reduce step (merge files)...
-Merging 84 files into output file: '/project/shefflab/processed/peppro/paper/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_minus_exact_body_0-mer.bw'
+Merging 84 files into output file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_minus_exact_body_0-mer.bw'
+Merging 84 files into output file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/Jurkat_ChRO-seq_2/signal_hg38/Jurkat_ChRO-seq_2_minus_smooth_body_0-mer.bw'
 </pre>
-Command completed. Elapsed time: 0:00:28. Running peak memory: 3.993GB.  
-  PID: 344753;	Command: /scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py;	Return code: 0;	Memory used: 0.306GB
+Command completed. Elapsed time: 0:11:26. Running peak memory: 3.61GB.  
+  PID: 45963;	Command: /scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py;	Return code: 0;	Memory used: 2.662GB
 
 Starting cleanup: 63 files; 2 conditional files for cleanup
 
@@ -3379,7 +3389,7 @@ Cleaning up flagged intermediate files. . .
 Cleaning up conditional list. . .
 
 ### Pipeline completed. Epilogue
-*        Elapsed time (this run):  2:04:52
-*  Total elapsed time (all runs):  3:10:43
-*         Peak memory (this run):  3.9933 GB
-*        Pipeline completed time: 2020-02-18 13:13:50
+*        Elapsed time (this run):  2:17:43
+*  Total elapsed time (all runs):  3:26:18
+*         Peak memory (this run):  3.6101 GB
+*        Pipeline completed time: 2020-02-27 11:42:46

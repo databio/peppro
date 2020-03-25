@@ -183,16 +183,19 @@
                       <a class="dropdown-item" href="fastqc_report_r1.html">FastQC report r1</a>
                     
                       
-                      <a class="dropdown-item" href="library_complexity.html">Library complexity</a>
+                      <a class="dropdown-item" href="fastqc_report_r2.html">FastQC report r2</a>
                     
                       
-                      <a class="dropdown-item" href="prif.html">PRiF</a>
+                      <a class="dropdown-item" href="library_complexity.html">Library complexity</a>
                     
                       
                       <a class="dropdown-item" href="pause_index.html">Pause index</a>
                     
                       
                       <a class="dropdown-item" href="tss_enrichment.html">TSS enrichment</a>
+                    
+                      
+                      <a class="dropdown-item" href="cfrif.html">cFRiF</a>
                     
                       
                       <a class="dropdown-item" href="mrna_contamination.html">mRNA contamination</a>
@@ -417,7 +420,7 @@
     							</tr>
     						
     							<tr>
-    								<th>Reads_too_short</th>
+    								<th>Uninformative_adapter_reads</th>
                                     
                                         <td class="text">17998987.0</td>
                                     
@@ -431,7 +434,7 @@
     							</tr>
     						
     							<tr>
-    								<th>Pct_reads_too_short</th>
+    								<th>Pct_uninformative_adapter_reads</th>
                                     
                                         <td class="text">36.8342</td>
                                     
@@ -440,14 +443,14 @@
     							<tr>
     								<th>Trimmed_reads</th>
                                     
-                                        <td class="text">31605871</td>
+                                        <td class="text">60442686</td>
                                     
     							</tr>
     						
     							<tr>
     								<th>Trim_loss_rate</th>
                                     
-                                        <td class="text">67.66</td>
+                                        <td class="text">38.15</td>
                                     
     							</tr>
     						
@@ -475,7 +478,7 @@
     							<tr>
     								<th>Alignment_rate_human_rDNA</th>
                                     
-                                        <td class="text">17.11</td>
+                                        <td class="text">8.95</td>
                                     
     							</tr>
     						
@@ -503,7 +506,7 @@
     							<tr>
     								<th>Alignment_rate</th>
                                     
-                                        <td class="text">65.67</td>
+                                        <td class="text">34.34</td>
                                     
     							</tr>
     						
@@ -578,14 +581,14 @@
     							</tr>
     						
     							<tr>
-    								<th>TSS_Plus_Score</th>
+    								<th>TSS_coding_score</th>
                                     
                                         <td class="text">26.7</td>
                                     
     							</tr>
     						
     							<tr>
-    								<th>TSS_Minus_Score</th>
+    								<th>TSS_non-coding_score</th>
                                     
                                         <td class="text">10.1</td>
                                     
@@ -622,14 +625,14 @@
     							<tr>
     								<th>Time</th>
                                     
-                                        <td class="text">4:02:57</td>
+                                        <td class="text">3:25:37</td>
                                     
     							</tr>
     						
     							<tr>
     								<th>Success</th>
                                     
-                                        <td class="text">02-18-15:11:55</td>
+                                        <td class="text">02-27-12:51:09</td>
                                     
     							</tr>
     						
@@ -649,7 +652,7 @@
 	        		
 			    		<a href='../results_pipeline/H9_PRO-seq_1/fastqc/H9_PRO-seq_1_R1_processed_fastqc.html' class="list-group-item">FastQC report r1</a>
 	        		
-			    		<a href='../results_pipeline/H9_PRO-seq_1/fastqc/H9_PRO-seq_1_R2_trimmed_fastqc.html' class="list-group-item">FastQC report r1</a>
+			    		<a href='../results_pipeline/H9_PRO-seq_1/fastqc/H9_PRO-seq_1_R2_trimmed_fastqc.html' class="list-group-item">FastQC report r2</a>
 	        		
 	        		</div>
             	
@@ -698,21 +701,21 @@
             		
                         
     		            <figure class="figure">
-    		                <a href='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_frif.pdf'>
-    		                	<img id="fig" src='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_frif.png' class="figure-img img-fluid rounded" alt="">
+    		                <a href='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_cFRiF.pdf'>
+    		                	<img id="fig" src='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_cFRiF.png' class="figure-img img-fluid rounded" alt="">
     		                </a>
-    		                <a href='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_frif.pdf'>
-                                <figcaption class="figure-caption text-center"><b>Fig.4 </b><i>FRiF</i></figcaption>
+    		                <a href='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_cFRiF.pdf'>
+                                <figcaption class="figure-caption text-center"><b>Fig.4 </b><i>cFRiF</i></figcaption>
     		                </a>
     		            </figure>
             		
                         
     		            <figure class="figure">
-    		                <a href='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_prif.pdf'>
-    		                	<img id="fig" src='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_prif.png' class="figure-img img-fluid rounded" alt="">
+    		                <a href='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_FRiF.pdf'>
+    		                	<img id="fig" src='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_FRiF.png' class="figure-img img-fluid rounded" alt="">
     		                </a>
-    		                <a href='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_prif.pdf'>
-                                <figcaption class="figure-caption text-center"><b>Fig.5 </b><i>PRiF</i></figcaption>
+    		                <a href='../results_pipeline/H9_PRO-seq_1/QC_hg38/H9_PRO-seq_1_FRiF.pdf'>
+                                <figcaption class="figure-caption text-center"><b>Fig.5 </b><i>FRiF</i></figcaption>
     		                </a>
     		            </figure>
             		

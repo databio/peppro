@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 PEPPRO - Run-on sequencing pipeline
 """
@@ -1914,30 +1914,82 @@ def main():
          "required":True},
         {"asset_name":BT2_IDX_KEY, "seek_key":None,
          "tag_name":"default", "arg":None, "user_arg":None,
-         "required":True},
-        {"asset_name":"refgene_anno", "seek_key":"refgene_tss",
-         "tag_name":"default", "arg":"TSS_name", "user_arg":"TSS-name",
-         "required":False},
-        {"asset_name":"ensembl_gtf", "seek_key":"ensembl_tss",
-         "tag_name":"default", "arg":"ensembl_tss", "user_arg":"pi-tss",
-         "required":False},
-        {"asset_name":"ensembl_gtf", "seek_key":"ensembl_gene_body",
-         "tag_name":"default", "arg":"ensembl_gene_body", "user_arg":"pi-body",
-         "required":False},
-        {"asset_name":"refgene_anno", "seek_key":"refgene_pre_mRNA",
-         "tag_name":"default", "arg":"pre_name", "user_arg":"pre-name",
-         "required":False},
-        {"asset_name":"feat_annotation", "seek_key":"feat_annotation",
-         "tag_name":"default", "arg":"anno_name", "user_arg":"anno-name",
-         "required":False},
-        {"asset_name":"refgene_anno", "seek_key":"refgene_exon",
-         "tag_name":"default", "arg":"exon_name", "user_arg":"exon-name",
-         "required":False},
-        {"asset_name":"refgene_anno", "seek_key":"refgene_intron",
-         "tag_name":"default", "arg":"intron_name", "user_arg":"intron-name",
-         "required":False}
+         "required":True}
     ]
+    # If user specifies TSS file, use that instead of the refgenie asset
+    if not (args.TSS_name):
+        check_list.append(
+            {"asset_name":"refgene_anno", "seek_key":"refgene_tss",
+             "tag_name":"default", "arg":"TSS_name", "user_arg":"TSS-name",
+             "required":False}
+        )
+    # If user specifies a custom pause index TSS file, use that instead
+    if not (args.ensembl_tss):
+        check_list.append(
+            {"asset_name":"ensembl_gtf", "seek_key":"ensembl_tss",
+             "tag_name":"default", "arg":"ensembl_tss", "user_arg":"pi-tss",
+             "required":False}
+        )
+    # If user specifies a custom pause index gene body file, use that instead
+    if not (args.ensembl_gene_body):
+        check_list.append(
+            {"asset_name":"ensembl_gtf", "seek_key":"ensembl_gene_body",
+             "tag_name":"default", "arg":"ensembl_gene_body",
+             "user_arg":"pi-body", "required":False}
+        )
+    # If user specifies a custom premature RNA file, use that instead
+    if not (args.pre_name):
+        check_list.append(
+            {"asset_name":"refgene_anno", "seek_key":"refgene_pre_mRNA",
+             "tag_name":"default", "arg":"pre_name", "user_arg":"pre-name",
+             "required":False}
+        )
+    # If user specifies feature annotation file,
+    # use that instead of the refgenie managed asset
+    if not (args.anno_name):
+        check_list.append(
+            {"asset_name":"feat_annotation", "seek_key":"feat_annotation",
+            "tag_name":"default", "arg":"anno_name", "user_arg":"anno-name",
+            "required":False}
+        )
+    # If user specifies a custom exon file, use that instead
+    if not (args.exon_name):
+        check_list.append(
+            {"asset_name":"refgene_anno", "seek_key":"refgene_exon",
+             "tag_name":"default", "arg":"exon_name", "user_arg":"exon-name",
+             "required":False}
+        )
+    # If user specifies a custom intron file, use that instead
+    if not (args.intron_name):
+        check_list.append(
+            {"asset_name":"refgene_anno", "seek_key":"refgene_intron",
+             "tag_name":"default", "arg":"intron_name",
+             "user_arg":"intron-name", "required":False}
+        )
     res, rgc = _add_resources(args, res, check_list)
+
+    # If the user specifies optional files, add those to our resources
+    if ((args.TSS_name) and os.path.isfile(args.TSS_name) and
+            os.stat(args.TSS_name).st_size > 0):
+        res.refgene_tss = args.TSS_name
+    if ((args.ensembl_tss) and os.path.isfile(args.ensembl_tss) and
+            os.stat(args.ensembl_tss).st_size > 0):
+        res.ensembl_tss = args.ensembl_tss
+    if ((args.ensembl_gene_body) and os.path.isfile(args.ensembl_gene_body) and
+            os.stat(args.ensembl_gene_body).st_size > 0):
+        res.ensembl_gene_body = args.ensembl_gene_body
+    if ((args.pre_name) and os.path.isfile(args.pre_name) and
+            os.stat(args.pre_name).st_size > 0):
+        res.refgene_pre_mRNA = args.pre_name
+    if ((args.anno_name) and os.path.isfile(args.anno_name) and
+            os.stat(args.anno_name).st_size > 0):
+        res.feat_annotation = args.anno_name
+    if ((args.exon_name) and os.path.isfile(args.exon_name) and
+            os.stat(args.exon_name).st_size > 0):
+        res.refgene_exon = args.exon_name
+    if ((args.intron_name) and os.path.isfile(args.intron_name) and
+            os.stat(args.intron_name).st_size > 0):
+        res.refgene_intron = args.intron_name
 
     # Adapter file can be set in the config; if left null, we use a default.
     # Expects headers to include >5prime and >3prime
@@ -2307,41 +2359,42 @@ def main():
         # Loop through any prealignment references and map to them sequentially
         for reference in args.prealignments:
             if not args.complexity and int(args.umi_len) > 0:
+                bt2_index = os.path.join(rgc.get_asset(reference, BT2_IDX_KEY))
+                if not bt2_index.endswith(reference):
+                    bt2_index = os.path.join(
+                        rgc.get_asset(reference, BT2_IDX_KEY), reference)
+
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1,
                         unmap_fq2, reference,
-                        assembly_bt2=os.path.join(
-                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments")
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1_dups,
                         unmap_fq2_dups, reference,
-                        assembly_bt2=os.path.join(
-                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         dups=True)
-                    
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1,
                         unmap_fq2, reference,
-                        assembly_bt2=os.path.join(
-                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments")
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1_dups,
                         unmap_fq2_dups, reference,
-                        assembly_bt2=os.path.join(
-                            rgc.get_asset(reference, BT2_IDX_KEY), reference),
+                        assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         dups=True)
+
                 if args.paired_end:
                     to_compress.append(unmap_fq1_dups)
                     to_compress.append(unmap_fq2_dups)
@@ -2588,20 +2641,23 @@ def main():
                 mapping_genome_index = os.path.join(mapping_genome_bam + ".bai")
                 noMT_mapping_genome_bam = os.path.join(
                     map_genome_folder, args.sample_name + "_noMT.bam")
+                chr_bed = os.path.join(map_genome_folder, "chr_sizes.bed")
 
                 cmd1 = tools.samtools + " index " + mapping_genome_bam
                 cmd2 = (tools.samtools + " idxstats " + mapping_genome_bam +
-                        " | cut -f 1 | grep")
+                        " | cut -f 1-2 | awk '{print $1, 0, $2}' | grep")
                 for name in mito_name:
                     cmd2 += " -vwe '" + name + "'"
-                cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
-                         str(pm.cores) + " " + mapping_genome_bam + " > " +
-                         noMT_mapping_genome_bam)
-                cmd3 = ("mv " + noMT_mapping_genome_bam +
+                cmd2 += (" > " + chr_bed)
+                cmd3 = (tools.samtools + " view -L " + chr_bed + " -b -@ " +
+                        str(pm.cores) + " " + mapping_genome_bam + " > " +
+                        noMT_mapping_genome_bam)
+                cmd4 = ("mv " + noMT_mapping_genome_bam +
                         " " + mapping_genome_bam)
-                cmd4 = tools.samtools + " index " + mapping_genome_bam
-                pm.run([cmd1, cmd2, cmd3, cmd4], noMT_mapping_genome_bam)
+                cmd5 = tools.samtools + " index " + mapping_genome_bam
+                pm.run([cmd1, cmd2, cmd3, cmd4, cmd5], noMT_mapping_genome_bam)
                 pm.clean_add(mapping_genome_index)
+                pm.clean_add(chr_bed)
 
     # Remove PE2 reads
     if args.paired_end:
@@ -2641,20 +2697,24 @@ def main():
     # interest for mappability purposes.
     if args.sob:
         pm.debug("max_len: {}".format(max_len))  # DEBUG
-        if max_len == DEFAULT_MAX_LEN:
-            search_asset = [{"asset_name":"tallymer_index",
-                             "seek_key":"search_file",
-                             "tag_name":"default",
-                             "arg":"search_file",
-                             "user_arg":"search-file",
-                             "required":True}]
-        else:
-            search_asset = [{"asset_name":"tallymer_index",
-                             "seek_key":"search_file",
-                             "tag_name":max_len,
-                             "arg":"search_file",
-                             "user_arg":"search-file",
-                             "required":True}]
+        if not args.search_file:
+            if max_len == DEFAULT_MAX_LEN:
+                search_asset = [{"asset_name":"tallymer_index",
+                                 "seek_key":"search_file",
+                                 "tag_name":"default",
+                                 "arg":"search_file",
+                                 "user_arg":"search-file",
+                                 "required":True}]
+            else:
+                search_asset = [{"asset_name":"tallymer_index",
+                                 "seek_key":"search_file",
+                                 "tag_name":max_len,
+                                 "arg":"search_file",
+                                 "user_arg":"search-file",
+                                 "required":True}]
+        elif ((args.search_file) and os.path.isfile(args.search_file) and
+                os.stat(args.search_file).st_size > 0):
+            res.search_file = args.search_file
         res, rgc = _add_resources(args, res, search_asset)
 
     # Calculate size of genome
