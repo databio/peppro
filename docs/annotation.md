@@ -33,7 +33,7 @@ refgenie build -g GENOME -a refgene_anno --files refgene=/path/to/refGene.txt.gz
 ```
 
 ## 5: Build the feat_annotation asset
-The `feat_annotation` asset includes feature annotations used to calculate the [FRiF](glossary.md) and [PRiF](glossary.md). `Refgenie` can automatically build this after you have the above assets installed:
+The `feat_annotation` asset includes feature annotations used to calculate the FRiF and cFRiF. `Refgenie` can automatically build this after you have the above assets installed:
 
 ```console
 refgenie build -g GENOME -a feat_annotation
