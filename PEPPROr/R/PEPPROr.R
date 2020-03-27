@@ -552,17 +552,23 @@ calcFRiF <- function(bedFile, total, reads) {
         bedFile <- bedFile[order(-bedFile$bases),]
     }
 
-    bedFile <- bedFile[apply(bedFile != 0, 1, all),]
+    bedFile <- bedFile[bedFile$count > 0,]
+    if (nrow(bedFile) != 0) {
+        if (reads) {
+            bedFile <- cbind(bedFile, cumsum=cumsum(bedFile$count))
+        } else {
+            bedFile <- cbind(bedFile, cumsum=cumsum(bedFile$bases))
+        }
 
-    if (reads) {
-        bedFile <- cbind(bedFile, cumsum=cumsum(bedFile$count))
+        bedFile <- cbind(bedFile, cumSize=cumsum(bedFile$size))
+        bedFile <- cbind(bedFile, frip=bedFile$cumsum/as.numeric(total))
+        bedFile <- cbind(bedFile, numfeats=as.numeric(1:nrow(bedFile)))
     } else {
-        bedFile <- cbind(bedFile, cumsum=cumsum(bedFile$bases))
+        bedFile$cumsum = integer()
+        bedFile$frip = integer()
+        bedFile$numfeats = integer()
     }
-
-    bedFile <- cbind(bedFile, cumSize=cumsum(bedFile$size))
-    bedFile <- cbind(bedFile, frip=bedFile$cumsum/as.numeric(total))
-    bedFile <- cbind(bedFile, numfeats=as.numeric(1:nrow(bedFile)))
+    
     return(bedFile)
 }
 

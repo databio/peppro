@@ -1,6 +1,12 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.9.5] -- 2020-03-26
+
+## Changed
+ - Updated FRiF calculation to only account for the `count` column
+ - Updated FRiF calculation to check if results are empty
+
 ## [0.9.4] -- 2020-03-25
 
 ## Changed
