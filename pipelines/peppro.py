@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.9.5"
+__version__ = "0.9.6"
 
 from argparse import ArgumentParser
 import os
@@ -2377,12 +2377,11 @@ def main():
         print("Prealignment assemblies: " + str(args.prealignments))
         # Loop through any prealignment references and map to them sequentially
         for reference in args.prealignments:
+            bt2_index = rgc.seek(reference, BT2_IDX_KEY)
+            if not bt2_index.endswith(reference):
+                bt2_index = os.path.join(
+                    rgc.seek(reference, BT2_IDX_KEY), reference)
             if not args.complexity and int(args.umi_len) > 0:
-                bt2_index = rgc.seek(reference, BT2_IDX_KEY)
-                if not bt2_index.endswith(reference):
-                    bt2_index = os.path.join(
-                        rgc.seek(reference, BT2_IDX_KEY), reference)
-
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1,
