@@ -1,6 +1,11 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.9.6] -- 2020-03-31
+
+## Changed
+ - Fixed refgenie bowtie2 index assignment
+
 ## [0.9.5] -- 2020-03-26
 
 ## Changed
