@@ -16,7 +16,7 @@ pipelines:
   peppro:
     name: PEPPRO
     path: pipelines/peppro.py
-    schema: ProseqPEP.yaml
+    schema: peppro_input_schema.yaml
     output_schema: peppro_output_schema.yaml
     command_template: >
       {pipeline.path}
