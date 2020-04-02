@@ -1,19 +1,23 @@
 protocol_mapping:
-  PRO: peppro.py
-  pro: peppro.py
-  PRO-SEQ: peppro.py
-  PRO-seq: peppro.py
-  PROSEQ: peppro.py
-  proseq: peppro.py
+  PRO: peppro
+  pro: peppro
+  GRO: peppro
+  gro: peppro
+  PRO-SEQ: peppro
+  PRO-seq: peppro
+  PROSEQ: peppro
+  proseq: peppro
+  groseq: peppro
+  GROSEQ: peppro
+  GRO-SEQ: peppro
+  GRO-seq: peppro
 
 pipelines:
-  peppro.py:
+  peppro:
     name: PEPPRO
     path: pipelines/peppro.py
-    schema: https://schema.databio.org/pipelines/ProseqPEP.yaml
-    required_input_files: [read1]
-    all_input_files: [read1, read2]
-    ngs_input_files: [read1, read2]
+    schema: ProseqPEP.yaml
+    output_schema: peppro_output_schema.yaml
     command_template: >
       {pipeline.path}
       --sample-name {sample.sample_name}
@@ -21,65 +25,79 @@ pipelines:
       --input {sample.read1}
       --single-or-paired {sample.read_type}
       -O {looper.output_folder}
-      {% if looper.job_name is defined %} -J {looper.job_name} {% endif %}
-      {% if looper.cores is defined %} -P {looper.cores} {% endif %}
-      {% if looper.mem is defined %} -M {looper.mem} {% endif %}
-      {% if sample.read2 is defined %} --input2 {sample.read2} {% endif %}
-      {% if sample.adapter is defined %} --adapter-tool {sample.adapter} {% endif %}
-      {% if sample.dedup is defined %} --dedup-tool {sample.dedup} {% endif %}
-      {% if sample.umi_len is defined %} --umi-len {sample.umi_len} {% endif %}
-      {% if sample.max_len is defined %} --max-len {sample.max_len} {% endif %}
-      {% if sample.sob is defined %} --sob {sample.sob} {% endif %}
-      {% if sample.scale is defined %} --scale {sample.scale} {% endif %}
-      {% if sample.prealignments is defined %} --prealignments {sample.prealignments} {% endif %}
-      {% if sample.TSS_name is defined %} --TSS-name {sample.TSS_name} {% endif %}
-      {% if sample.pre_name is defined %} --pre-name {sample.pre_name} {% endif %}
-      {% if sample.anno_name is defined %} --anno_name {sample.anno_name} {% endif %}
-      {% if sample.search_file is defined %} --search-file {sample.search_file} {% endif %}
-      {% if sample.coverage is defined %} --coverage {sample.coverage} {% endif %}
-      {% if sample.keep is defined %} --keep {sample.keep} {% endif %}
-      {% if sample.no_fifo is defined %} --noFIFO {sample.no_fifo} {% endif %}
-      {% if sample.prioritize is defined %} --prioritize {sample.prioritize} {% endif %}
-      {% if sample.complexity is defined %} --complexity {sample.complexity} {% endif %}
+      -P {compute.cores}
+      -M {compute.mem}
+      {% if sample.read2
+       is defined -%}
+         --input2 {sample.read2}
+      {%- endif %}
+      {% if sample.adapter is defined -%}
+        --adapter-tool {sample.adapter} 
+      {%- endif %}
+      {% if sample.dedup is defined -%}
+        --dedup-tool {sample.dedup} 
+      {%- endif %}
+      {% if sample.umi_len is defined -%}
+        --umi-len {sample.umi_len} 
+      {%- endif %}
+      {% if sample.max_len is defined -%}
+        --max-len {sample.max_len} 
+      {%- endif %}
+      {% if sample.sob is defined -%}
+        --sob {sample.sob} 
+      {%- endif %}
+      {% if sample.scale is defined -%}
+        --scale {sample.scale} 
+      {%- endif %}
+      {% if sample.prealignments is defined -%}
+        --prealignments {sample.prealignments} 
+      {%- endif -%}
+      {% if sample.TSS_name is defined -%}
+        --TSS-name {sample.TSS_name} 
+      {%- endif %}
+      {% if sample.pre_name is defined -%}
+        --pre-name {sample.pre_name} 
+      {%- endif %}
+      {% if sample.anno_name is defined -%}
+        --anno_name {sample.anno_name} 
+      {%- endif %}
+      {% if sample.search_file is defined -%}
+        --search-file {sample.search_file} 
+      {%- endif %}
+      {% if sample.coverage is defined -%}
+        --coverage {sample.coverage} 
+      {%- endif %}
+      {% if sample.keep is defined -%}
+        --keep {sample.keep} 
+      {%- endif %}
+      {% if sample.no_fifo is defined -%}
+        --noFIFO {sample.no_fifo} 
+      {%- endif %}
+      {% if sample.prioritize is defined -%}
+        --prioritize {sample.prioritize} 
+      {%- endif %}
+      {% if sample.complexity is defined -%}
+        --complexity {sample.complexity} 
+      {%- endif %}
     compute:
       singularity_image: ${SIMAGES}peppro
       docker_image: databio/peppro
-    summarizers:
-      - tools/PEPPRO_summarizer.R
-    summary_results:
-      - library_complexity_file:
-        caption: "Library complexity file"
-        description: "Plots each sample's library complexity on a single plot."
-        thumbnail_path: "summary/{name}_libComplexity.png"
-        path: "summary/{name}_libComplexity.pdf"
-    resources:
-      default:
-        file_size: "0"
-        cores: "8"
-        mem: "16000"
-        time: "00-18:00:00"
-      femto:
-        file_size: "0.001"
-        cores: "1"
-        mem: "8000"
-        time: "00-04:00:00"
-      pico:
-        file_size: "0.05"
-        cores: "2"
-        mem: "12000"
-        time: "00-08:00:00"
-      nano:
-        file_size: "0.5"
-        cores: "4"
-        mem: "16000"
-        time: "00-12:00:00"
-      micro:
-        file_size: "1"
-        cores: "8"
-        mem: "16000"
-        time: "00-24:00:00"
-      milli:
-        file_size: "10"
-        cores: "16"
-        mem: "32000"
-        time: "02-00:00:00"
+      bulker_crate: databio/peppro
+      size_dependent_variables: resources.tsv
+    bioconductor:
+      readFunName: readPepproGeneCounts
+      readFunPath: BiocProject/readPepproGeneCounts.R
+
+collator_mappings:
+  peppro: peppro_collator
+
+collators:
+  peppro_collator:
+    name: PEPPRO_collator1
+    path: pipelines/peppro_collator.py
+    command_template: >
+      {pipeline.path} -c {looper.pep_config} -o {looper.output_folder} -n {project.name}
+    compute:
+      singularity_image: ${SIMAGES}peppro
+      bulker_crate: databio/peppro
+      size_dependent_variables: resources.tsv
