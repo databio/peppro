@@ -1,0 +1,46 @@
+description: objects produced by PEPPRO pipeline.
+properties:
+  samples:
+    type: array
+    items:
+      type: object
+      properties:
+        cutadapt_report: 
+          path: "cutadapt/{sample.sample_name}_cutadapt.txt"
+          type: string
+          description: "Test sample property"
+        plus_bw: 
+          path: "signal_{sample.genome}/{sample.sample_name}_plus_body_0-mer.bw"
+          type: string
+          description: "Test sample property"
+        minus_bw: 
+          path: "signal_{sample.genome}/{sample.sample_name}_minus_body_0-mer.bw"
+          type: string
+          description: "Test sample property"
+        plus_bam: 
+          path: "aligned_{sample.genome}/{sample.sample_name}_plus.bam"
+          type: string
+          description: "Test sample property"
+        minus_bam: 
+          path: "aligned_{sample.genome}/{sample.sample_name}_minus.bam"
+          type: string
+          description: "Test sample property"
+        gene_counts_bed: 
+          path: "signal_{sample.genome}/{sample.sample_name}_gene_coverage.bed"
+          type: string
+          description: "Test sample property"
+        pause_indicies_bed: 
+          path: "QC_{sample.genome}/{sample.sample_name}_pause_index.bed.gz"
+          type: string
+          description: "Test sample property"
+  library_complexity_file:
+    title: "Library complexity file"
+    description: "Plots each sample's library complexity on a single plot."
+    thumbnail_path: "summary/{name}_libComplexity.png"
+    path: "summary/{name}_libComplexity.pdf"
+    type: image
+  counts_table:
+    title: "Gene counts table"
+    description: "Combines all sample gene count files into a project level gene counts table."
+    path: "summary/{name}_countData.csv"
+    type: link
