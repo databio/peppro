@@ -3,7 +3,7 @@
 # PEPPRO R parser
 
 ###############################################################################
-version <- 0.5
+version <- 0.6
 ##### Load dependencies #####
 
 required_libraries <- c("PEPPROr")
@@ -46,10 +46,11 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Command: preseq\t\t plot preseq complexity curves\n",
         "\t frif\t\t plot fraction of reads in features\n",
         "\t tss\t\t plot TSS enrichment\n",
-        "\t frag\t\t plot fragment length distribution\n",
+        "\t frag\t\t plot PE fragment length distribution\n",
         "\t mrna\t\t plot mRNA contamination distribution\n",
         "\t pi\t\t plot pause indicies distribution\n",
-        "\t cutadapt\t plot adapter insertion distribution\n"
+        "\t cutadapt\t plot cutadapt-based adapter insertion distribution\n",
+        "\t adapt\t plot generalized adapter insertion distribution\n"
     )
     message(usage)
 } else if (!is.na(subcmd) && tolower(subcmd) == "preseq") {
@@ -165,15 +166,30 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                   ignore_unique = ign_unique,
                                   x_min = x_min,
                                   x_max = x_max)
-        # now save the plot
-        pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-            width= 10, height = 7, useDingbats=F)
-        print(fig)
-        invisible(dev.off())
-        png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-            width = 686, height = 480)
-        print(fig)
-        invisible(dev.off())
+
+        if (length(input) == 1) {
+            # now save the plot
+            pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+                height = 4, width = 4.25, useDingbats=F)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+
+            png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+                height = 275, width = 300)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+        } else {
+            # now save the plot
+            pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+                height = 5, width = 6, useDingbats=F)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+
+            png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+                height = 315, width = 425)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+        }
 
         if (exists("p")) {
             write("Library complexity plot completed!\n", stdout())
@@ -187,8 +203,10 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Usage:   PEPPRO.R [command] {args}\n",
         "Version: ", version, "\n\n",
         "Command: frif \t plot fraction of reads in features\n\n",
-        " -n, --sample_name\t   Sample name.\n",
-        " -r, --reads\t\t   Number of mapped reads.\n",
+        " -s, --sample_name\t   Sample name.\n",
+        " -n, --num_reads\t\t   Number of mapped reads.\n",
+        " -z, --size\t\t   Size of genome (bp).\n",
+        " -y, --type\t Choose plot type: cFRiF, FRiF, or Both.\n",
         " -o, --output_name\t   Output file name.\n",
         " -b, --bed\t\t   Coverage file(s).\n"
     )
@@ -204,35 +222,60 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         message(usage)
         quit()
     } else {
-        sample_name <- opt_get(name = c("sample_name", "n"), required=TRUE,
+        sample_name <- opt_get(name = c("sample_name", "s"), required=TRUE,
                                description="Sample name.")
-        reads       <- opt_get(name = c("reads", "r"), required=TRUE,
-                               description="Number of mapped reads.")
+        num_reads   <- opt_get(name = c("num_reads", "n"), required=TRUE,
+                               description="Number of mapped reads (or bases).")
+        genome_size <- opt_get(name = c("size", "z"), required=TRUE,
+                               description="Size of genome (bp).")
+        type        <- opt_get(name = c("type", "y"), required=FALSE, default="cfrif",
+                               description="Choose plot type: cFRiF, FRiF, or Both (Default = cfrif).")
+        reads       <- opt_get(name = c("reads", "r"), required=FALSE, default=FALSE,
+                               description="Calculate using reads (TRUE) or bases (FALSE) (Default = FALSE).")
         output_name <- opt_get(name = c("output_name", "o"), required=TRUE,
                                description="Output file name.")
         numArgs     <- length(opt_get_args())
+        #message(numArgs)
+        argGap      <- ifelse(reads, 13, 12)
+        #message(argGap)
         bed         <- opt_get(name = c("bed", "b"), required=TRUE,
-                               n=(numArgs - 8),
+                               n=(numArgs - argGap),
                                description="Coverage file(s).")
+        #message(paste0("\nbed: ", bed))
 
         p <- plotFRiF(sample_name = sample_name,
-                      num_reads = reads,
+                      num_reads = as.numeric(num_reads),
+                      genome_size = as.numeric(genome_size),
+                      type = tolower(type),
+                      reads = reads,
                       output_name = output_name,
                       bedFile = bed)
 
-        pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
-        width= 7, height = 7, useDingbats=F)
-        print(p)
-        invisible(dev.off())
-        png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
-            width = 480, height = 480)
-        print(p)
-        invisible(dev.off())
+        if (tolower(type) == "both") {
+            pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+                height = 5.45, width = 8.39, useDingbats=F)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+            png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+                height = 550, width=850)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+        } else {
+            pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
+                height = 4, width = 4, useDingbats=F)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+            png(filename = paste0(tools::file_path_sans_ext(output_name), ".png"),
+                height = 275, width=275)
+            suppressWarnings(print(p))
+            invisible(dev.off())
+        }
+        
 
         if (exists("p")) {
-            write("Cumulative FRiF plot completed!\n", stdout())
+            write(paste0("Cumulative ", type, " plot completed!\n"), stdout())
         } else {
-            write("Unable to produce FRiF plot!\n", stdout())
+            write(paste0("Unable to produce ", type, " plot!\n"), stdout())
         }
     }
 } else if (!is.na(subcmd) && tolower(subcmd) == "tss") {
@@ -282,13 +325,13 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         sample_name <- sampleName(TSSfile[1])
 
         png(filename = paste0(sample_name, "_TSSenrichment.png"),
-        width = 480, height = 480)
-        print(p)
+            width = 275, height = 275)
+        suppressWarnings(print(p))
         invisible(dev.off())
 
         pdf(file = paste0(sample_name, "_TSSenrichment.pdf"),
-            width= 7, height = 7, useDingbats=F)
-        print(p)
+            width = 4, height = 4, useDingbats=F)
+        suppressWarnings(print(p))
         invisible(dev.off())
 
         if (exists("p")) {
@@ -334,14 +377,14 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                      fragL_txt = fragL_txt)
 
         # Save plot to pdf file
-        pdf(file=fragL_name, width= 7, height = 7, useDingbats=F)
-        print(p)
+        pdf(file=fragL_name, width = 4, height = 4, useDingbats=F)
+        suppressWarnings(print(p))
         invisible(dev.off())
 
         # Save plot to png file
         outfile_png <- gsub('pdf', 'png', fragL_name)
-        png(filename=outfile_png, width = 480, height = 480)
-        print(p)
+        png(filename=outfile_png, width = 275, height = 275)
+        suppressWarnings(print(p))
         invisible(dev.off())
 
         if (exists("p")) {
@@ -357,7 +400,9 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Version: ", version, "\n\n",
         "Command: mrna \t plot mRNA contamination distribution\n\n",
         " -i, --rpkm\t Three column TSV of intron and exon RPKM by gene.\n",
-        " -w, --raw\t Plot raw exon/intron ratios instead of log10.\n"
+        " -w, --raw\t Plot raw exon/intron ratios instead of log10.\n",
+        " -y, --type\t Choose plot type from: histogram, boxplot, or violin.\n",
+        " -a, --annotate\t Display raw and log10-transformed median values on plot.\n"
     )
 
     help <- opt_get(name = c("help", "?", "h"), required=FALSE,
@@ -375,21 +420,27 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                         description="Three column TSV containing gene exon and intron RPKMs.")
         raw  <- opt_get(name = c("raw", "w"), required=FALSE, default=FALSE,
                         description="Plot raw ratios (Default = FALSE).")
+        type <- opt_get(name = c("type", "y"), required=FALSE, default="histogram",
+                        description="Choose plot type from: histogram, boxplot, or violin (Default = histogram).")
+        annotate <- opt_get(name = c("annotate", "a"), required=FALSE, default=FALSE,
+                            description="Display raw and log10-transformed median values on plot.")
 
-        suppressWarnings(p <- mRNAcontamination(rpkm=rpkm, raw=raw))
-
-        sample_name <- sampleName(rpkm)
+        sample_name        <- sampleName(rpkm, 3)
+        name               <- basename(sample_name)
+        suppressWarnings(p <- mRNAcontamination(rpkm=rpkm, name=name, raw=raw,
+                                                type=tolower(type),
+                                                annotate=annotate))
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
-            width= 7, height = 7, useDingbats=F)
-        print(q)
+            width = 4, height = 4, useDingbats=F)
+        suppressMessages(suppressWarnings(print(p)))
         invisible(dev.off())
              
         # Save plot to png file
         png(filename = paste0(sample_name, "_mRNA_contamination.png"),
-            width = 480, height = 480)
-        print(q)
+            width = 275, height = 275)
+        suppressMessages(suppressWarnings(print(p)))
         invisible(dev.off())
 
         if (exists("p")) {
@@ -404,7 +455,10 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Usage:   PEPPRO.R [command] {args}\n",
         "Version: ", version, "\n\n",
         "Command: pi \t plot pause indicies distribution\n\n",
-        " -i, --input\t Pause density/gene body density ratios.\n"
+        " -i, --input\t Pause density/gene body density ratios.\n",
+        " -w, --raw\t Plot raw exon/intron ratios instead of log10.\n",
+        " -y, --type\t Choose plot type from: histogram, boxplot, or violin.\n",
+        " -a, --annotate\t Display median and mean values on plot.\n"
     )
 
     help <- opt_get(name = c("help", "?", "h"), required=FALSE,
@@ -420,21 +474,28 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
     } else {
         input <- opt_get(name = c("input", "i"), required=TRUE,
                          description="Pause density/gene body density ratios.")
+        raw   <- opt_get(name = c("raw", "w"), required=FALSE, default=FALSE,
+                         description="Plot raw ratios (Default = FALSE).")
+        type  <- opt_get(name = c("type", "y"), required=FALSE, default="histogram",
+                         description="Choose plot type from: histogram, boxplot, or violin (Default = histogram).")
+        annotate <- opt_get(name = c("annotate", "a"), required=FALSE, default=FALSE,
+                            description="Display median and mean values on plot.")
 
-        suppressWarnings(p <- plotPI(pi=input))
-
-        sample_name <- sampleName(input)
+        sample_name        <- sampleName(input)
+        name               <- basename(sample_name)
+        suppressWarnings(p <- plotPI(pi=input, name=name, raw=raw,
+                                     type=tolower(type), annotate=annotate))
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_pause_index.pdf"),
-            width= 7, height = 7, useDingbats=F)
-        print(p)
+            width = 4, height = 4, useDingbats=F)
+        suppressWarnings(print(p))
         invisible(dev.off())
              
         # Save plot to png file
         png(filename = paste0(sample_name, "_pause_index.png"),
-            width = 480, height = 480)
-        print(p)
+            width = 275, height = 275)
+        suppressWarnings(print(p))
         invisible(dev.off())
 
         if (exists("p")) {
@@ -448,9 +509,11 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "\n",
         "Usage:   PEPPRO.R [command] {args}\n",
         "Version: ", version, "\n\n",
-        "Command: cutadapt \t plot adapter insertion distribution\n\n",
+        "Command: cutadapt \t plot cutadapt-based adapter insertion distribution\n\n",
         " -i, --input\t cutadapt report.\n",
-        " -o, --output\t output directory.\n"
+        " -o, --output\t output directory.\n",
+        " -u, --umi_len\t UMI length (Default 0).\n",
+        " -f, --factor\t Factor to divide read count (Default 1M).\n"
     )
 
     help <- opt_get(name = c("help", "?", "h"), required=FALSE,
@@ -464,26 +527,93 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         message(usage)
         quit()
     } else {
-        input  <- opt_get(name = c("input", "i"), required=TRUE,
-                          description="cutadapt report.")
-        output <- opt_get(name = c("output", "o"), required=TRUE,
-                          description="output destination directory.")
+        input   <- opt_get(name = c("input", "i"), required=TRUE,
+                           description="cutadapt report.")
+        output  <- opt_get(name = c("output", "o"), required=TRUE,
+                           description="output destination directory.")
+        umi_len <- opt_get(name = c("umi_len", "u"), required=FALSE,
+                           default = 0,
+                           description="UMI length (Default 0).")
+        factor  <- opt_get(name = c("factor", "f"), required=FALSE,
+                           default = 1000000,
+                           description="Factor to divide read count (Default 1M).")
 
-        name               <- basename(sampleName(input))
-        suppressWarnings(p <- plotCutadapt(input=input, name=name))
+        name               <- basename(sampleName(input, num_fields=1))
+        #message(name)
+        suppressWarnings(p <- plotCutadapt(input=input, name=name,
+                                           umi_len = umi_len,
+                                           count_factor=factor))
         sample_name        <- paste(output, name, sep="/")
+        #message(sample_name)
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_adapter_insertion_distribution.pdf"),
-            width= 7, height = 7, useDingbats=F)
-        print(p)
+            width = 4, height = 4, useDingbats=F)
+        suppressWarnings(print(p))
         invisible(dev.off())
              
         # Save plot to png file
         png(filename = paste0(sample_name,
                               "_adapter_insertion_distribution.png"),
-            width = 480, height = 480)
-        print(p)
+            width = 275, height = 275)
+        suppressWarnings(print(p))
+        invisible(dev.off())
+
+        if (exists("p")) {
+            write("Adapter insertion distribution plot completed!\n", stdout())
+        } else {
+            write("Unable to produce adapter insertion distribution plot!\n",
+                  stdout())
+        }
+    }
+}  else if (!is.na(subcmd) && tolower(subcmd) == "adapt") {
+    usage <- paste0(
+        "\n",
+        "Usage:   PEPPRO.R [command] {args}\n",
+        "Version: ", version, "\n\n",
+        "Command: adapt \t plot generalized adapter insertion distribution\n\n",
+        " -i, --input\t flash histogram output.\n",
+        " -o, --output\t output directory.\n",
+        " -u, --umi_len\t UMI length (Default 0).\n"
+    )
+
+    help <- opt_get(name = c("help", "?", "h"), required=FALSE,
+                    default=FALSE, n=0)
+    if (!help) {
+        help <- suppressWarnings(
+            if(length(opt_get_args()) == 1) {TRUE} else {FALSE}
+        )
+    }
+    if (help) {
+        message(usage)
+        quit()
+    } else {
+        input   <- opt_get(name = c("input", "i"), required=TRUE,
+                           description="flash histogram output.")
+        output  <- opt_get(name = c("output", "o"), required=TRUE,
+                           description="output destination directory.")
+        umi_len <- opt_get(name = c("umi_len", "u"), required=FALSE,
+                           default = 0,
+                           description="UMI length (Default 0).")
+
+        name               <- basename(sampleName(input, num_fields=0))
+        #message(name)
+        suppressWarnings(p <- plotAdapt(input=input, name=name,
+                                        umi_len = umi_len))
+        sample_name        <- paste(output, name, sep="/")
+        #message(sample_name)
+
+        # Save plot to pdf file
+        pdf(file=paste0(sample_name, "_adapter_insertion_distribution.pdf"),
+            width = 4, height = 4, useDingbats=F)
+        suppressWarnings(print(p))
+        invisible(dev.off())
+             
+        # Save plot to png file
+        png(filename = paste0(sample_name,
+                              "_adapter_insertion_distribution.png"),
+            width = 275, height = 275)
+        suppressWarnings(print(p))
         invisible(dev.off())
 
         if (exists("p")) {
@@ -501,10 +631,11 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         "Command: preseq\t\t plot preseq complexity curves\n",
         "\t frif\t\t plot fraction of reads in features\n",
         "\t tss\t\t plot TSS enrichment\n",
-        "\t frag\t\t plot fragment length distribution\n",
+        "\t frag\t\t plot PE fragment length distribution\n",
         "\t mrna\t\t plot mRNA contamination distribution\n",
         "\t pi\t\t plot pause indicies distribution\n",
-        "\t cutadapt\t plot adapter insertion distribution\n"
+        "\t cutadapt\t plot cutadapt-based adapter insertion distribution\n",
+        "\t adapt\t plot generalized adapter insertion distribution\n"
     )
     message(usage)
     quit()
