@@ -88,7 +88,7 @@ pipelines:
       readFunName: readPepproGeneCounts
       readFunPath: BiocProject/readPepproGeneCounts.R
 
-collator_mappings:
+collator_mapping:
   peppro: peppro_collator
 
 collators:
