@@ -1,103 +1,50 @@
-protocol_mapping:
-  PRO: peppro
-  pro: peppro
-  GRO: peppro
-  gro: peppro
-  PRO-SEQ: peppro
-  PRO-seq: peppro
-  PROSEQ: peppro
-  proseq: peppro
-  groseq: peppro
-  GROSEQ: peppro
-  GRO-SEQ: peppro
-  GRO-seq: peppro
+pipeline_name: PEPRO
 
-pipelines:
-  peppro:
-    name: PEPPRO
-    path: pipelines/peppro.py
-    schema: peppro_input_schema.yaml
-    output_schema: peppro_output_schema.yaml
-    command_template: >
-      {pipeline.path}
-      --sample-name {sample.sample_name}
-      --genome {sample.genome}
-      --input {sample.read1}
-      --single-or-paired {sample.read_type}
-      -O {looper.output_folder}
-      -P {compute.cores}
-      -M {compute.mem}
-      {% if sample.read2
-       is defined -%}
-         --input2 {sample.read2}
-      {%- endif %}
-      {% if sample.adapter is defined -%}
-        --adapter-tool {sample.adapter} 
-      {%- endif %}
-      {% if sample.dedup is defined -%}
-        --dedup-tool {sample.dedup} 
-      {%- endif %}
-      {% if sample.umi_len is defined -%}
-        --umi-len {sample.umi_len} 
-      {%- endif %}
-      {% if sample.max_len is defined -%}
-        --max-len {sample.max_len} 
-      {%- endif %}
-      {% if sample.sob is defined -%}
-        --sob {sample.sob} 
-      {%- endif %}
-      {% if sample.scale is defined -%}
-        --scale {sample.scale} 
-      {%- endif %}
-      {% if sample.prealignments is defined -%}
-        --prealignments {sample.prealignments} 
-      {%- endif -%}
-      {% if sample.TSS_name is defined -%}
-        --TSS-name {sample.TSS_name} 
-      {%- endif %}
-      {% if sample.pre_name is defined -%}
-        --pre-name {sample.pre_name} 
-      {%- endif %}
-      {% if sample.anno_name is defined -%}
-        --anno_name {sample.anno_name} 
-      {%- endif %}
-      {% if sample.search_file is defined -%}
-        --search-file {sample.search_file} 
-      {%- endif %}
-      {% if sample.coverage is defined -%}
-        --coverage {sample.coverage} 
-      {%- endif %}
-      {% if sample.keep is defined -%}
-        --keep {sample.keep} 
-      {%- endif %}
-      {% if sample.no_fifo is defined -%}
-        --noFIFO {sample.no_fifo} 
-      {%- endif %}
-      {% if sample.prioritize is defined -%}
-        --prioritize {sample.prioritize} 
-      {%- endif %}
-      {% if sample.complexity is defined -%}
-        --complexity {sample.complexity} 
-      {%- endif %}
-    compute:
-      singularity_image: ${SIMAGES}peppro
-      docker_image: databio/peppro
-      bulker_crate: databio/peppro
-      size_dependent_variables: resources.tsv
-    bioconductor:
-      readFunName: readPepproGeneCounts
-      readFunPath: BiocProject/readPepproGeneCounts.R
+sample_pipeline:
+  path: pipelines/peppro.py
+  schema: peppro_input_schema.yaml
+  output_schema: peppro_output_schema.yaml
+  command_template: >
+    {pipeline.path}
+    --sample-name {sample.sample_name}
+    --genome {sample.genome}
+    --input {sample.read1}
+    --single-or-paired {sample.read_type}
+    -O {looper.output_folder}
+    -P {compute.cores}
+    -M {compute.mem}
+    {% if sample.read2 is defined %} --input2 {sample.read2} {% endif %}
+    {% if sample.adapter is defined %} --adapter-tool {sample.adapter} {% endif %}
+    {% if sample.dedup is defined %} --dedup-tool {sample.dedup} {% endif %}
+    {% if sample.umi_len is defined %} --umi-len {sample.umi_len} {% endif %}
+    {% if sample.max_len is defined %} --max-len {sample.max_len} {% endif %}
+    {% if sample.sob is defined %} --sob {sample.sob} {% endif %}
+    {% if sample.scale is defined %} --scale {sample.scale} {% endif %}
+    {% if sample.prealignments is defined %} --prealignments {sample.prealignments} {%- endif -%}
+    {% if sample.TSS_name is defined %} --TSS-name {sample.TSS_name} {% endif %}
+    {% if sample.pre_name is defined %} --pre-name {sample.pre_name} {% endif %}
+    {% if sample.anno_name is defined %} --anno_name {sample.anno_name} {% endif %}
+    {% if sample.search_file is defined %} --search-file {sample.search_file} {% endif %}
+    {% if sample.coverage is defined %} --coverage {sample.coverage} {% endif %}
+    {% if sample.keep is defined %} --keep {sample.keep} {% endif %}
+    {% if sample.no_fifo is defined %} --noFIFO {sample.no_fifo} {% endif %}
+    {% if sample.prioritize is defined %} --prioritize {sample.prioritize} {% endif %}
+    {% if sample.complexity is defined %} --complexity {sample.complexity} {% endif %}
+  compute:
+    singularity_image: ${SIMAGES}peppro
+    docker_image: databio/peppro
+    bulker_crate: databio/peppro
+    size_dependent_variables: resources.tsv
 
-collator_mapping:
-  peppro: peppro_collator
+project_pipeline:
+  path: pipelines/peppro_collator.py
+  command_template: >
+    {pipeline.path} -c {looper.pep_config} -o {looper.output_folder} -n {project.name}
+  compute:
+    singularity_image: ${SIMAGES}peppro
+    bulker_crate: databio/peppro
+    size_dependent_variables: resources.tsv
 
-collators:
-  peppro_collator:
-    name: PEPPRO_collator1
-    path: pipelines/peppro_collator.py
-    command_template: >
-      {pipeline.path} -c {looper.pep_config} -o {looper.output_folder} -n {project.name}
-    compute:
-      singularity_image: ${SIMAGES}peppro
-      bulker_crate: databio/peppro
-      size_dependent_variables: resources.tsv
+bioconductor:
+  readFunName: readPepproGeneCounts
+  readFunPath: BiocProject/readPepproGeneCounts.R
