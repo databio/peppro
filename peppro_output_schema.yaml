@@ -6,31 +6,31 @@ properties:
       type: object
       properties:
         cutadapt_report: 
-          path: "cutadapt/{sample.sample_name}_cutadapt.txt"
+          path: "cutadapt/{sample_name}_cutadapt.txt"
           type: string
           description: "Test sample property"
         plus_bw: 
-          path: "signal_{sample.genome}/{sample.sample_name}_plus_body_0-mer.bw"
+          path: "signal_{genome}/{sample_name}_plus_body_0-mer.bw"
           type: string
           description: "Test sample property"
         minus_bw: 
-          path: "signal_{sample.genome}/{sample.sample_name}_minus_body_0-mer.bw"
+          path: "signal_{genome}/{sample_name}_minus_body_0-mer.bw"
           type: string
           description: "Test sample property"
         plus_bam: 
-          path: "aligned_{sample.genome}/{sample.sample_name}_plus.bam"
+          path: "aligned_{genome}/{sample_name}_plus.bam"
           type: string
           description: "Test sample property"
         minus_bam: 
-          path: "aligned_{sample.genome}/{sample.sample_name}_minus.bam"
+          path: "aligned_{genome}/{sample_name}_minus.bam"
           type: string
           description: "Test sample property"
         gene_counts_bed: 
-          path: "signal_{sample.genome}/{sample.sample_name}_gene_coverage.bed"
+          path: "signal_{genome}/{sample_name}_gene_coverage.bed"
           type: string
           description: "Test sample property"
         pause_indicies_bed: 
-          path: "QC_{sample.genome}/{sample.sample_name}_pause_index.bed.gz"
+          path: "QC_{genome}/{sample_name}_pause_index.bed.gz"
           type: string
           description: "Test sample property"
   library_complexity_file:

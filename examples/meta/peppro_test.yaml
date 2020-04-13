@@ -4,14 +4,15 @@ name: test
 
 sample_table: "peppro_test.csv"
 looper:
-  output_dir: "$PROCESSED/peppro/peppro_test/"
-  pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
+  output_dir: "$HOME/peppro/peppro_test/"
 
-sample_modifiers:  
+sample_modifiers:
+  append:
+    pipeline_interfaces: $CODE/peppro/pipeline_interface.yaml
   derive:
     attributes: [read1]
     sources:
-        R1: "~/code/peppro/examples/data/{sample_name}_r1.fq.gz"
+        R1: "$CODE/peppro/examples/data/{sample_name}_r1.fq.gz"
   imply:
     - if:
         organism: human
