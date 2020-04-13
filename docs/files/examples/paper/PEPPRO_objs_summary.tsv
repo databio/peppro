@@ -1,0 +1,181 @@
+	key	filename	anchor_text	anchor_image	annotation	sample_name
+0	FastQC report r1	fastqc/K562_PRO-seq_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_PRO-seq
+1	Adapter insertion distribution	cutadapt/K562_PRO-seq_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_PRO-seq_R1_adapter_insertion_distribution.png	PEPPRO	K562_PRO-seq
+2	TSS enrichment	QC_hg38/K562_PRO-seq_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_PRO-seq_TSSenrichment.png	PEPPRO	K562_PRO-seq
+3	Pause index	QC_hg38/K562_PRO-seq_pause_index.pdf	Pause index	QC_hg38/K562_PRO-seq_pause_index.png	PEPPRO	K562_PRO-seq
+4	cFRiF	QC_hg38/K562_PRO-seq_cFRiF.pdf	cFRiF	QC_hg38/K562_PRO-seq_cFRiF.png	PEPPRO	K562_PRO-seq
+5	FRiF	QC_hg38/K562_PRO-seq_FRiF.pdf	FRiF	QC_hg38/K562_PRO-seq_FRiF.png	PEPPRO	K562_PRO-seq
+6	mRNA contamination	QC_hg38/K562_PRO-seq_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_PRO-seq_mRNA_contamination.png	PEPPRO	K562_PRO-seq
+7	FastQC report r1	fastqc/K562_RNA-seq_10_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_RNA-seq_10
+8	Adapter insertion distribution	cutadapt/K562_RNA-seq_10_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_10_R1_adapter_insertion_distribution.png	PEPPRO	K562_RNA-seq_10
+9	TSS enrichment	QC_hg38/K562_RNA-seq_10_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_10_TSSenrichment.png	PEPPRO	K562_RNA-seq_10
+10	Pause index	QC_hg38/K562_RNA-seq_10_pause_index.pdf	Pause index	QC_hg38/K562_RNA-seq_10_pause_index.png	PEPPRO	K562_RNA-seq_10
+11	cFRiF	QC_hg38/K562_RNA-seq_10_cFRiF.pdf	cFRiF	QC_hg38/K562_RNA-seq_10_cFRiF.png	PEPPRO	K562_RNA-seq_10
+12	FRiF	QC_hg38/K562_RNA-seq_10_FRiF.pdf	FRiF	QC_hg38/K562_RNA-seq_10_FRiF.png	PEPPRO	K562_RNA-seq_10
+13	mRNA contamination	QC_hg38/K562_RNA-seq_10_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_RNA-seq_10_mRNA_contamination.png	PEPPRO	K562_RNA-seq_10
+14	FastQC report r1	fastqc/K562_RNA-seq_20_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_RNA-seq_20
+15	Adapter insertion distribution	cutadapt/K562_RNA-seq_20_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_20_R1_adapter_insertion_distribution.png	PEPPRO	K562_RNA-seq_20
+16	TSS enrichment	QC_hg38/K562_RNA-seq_20_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_20_TSSenrichment.png	PEPPRO	K562_RNA-seq_20
+17	Pause index	QC_hg38/K562_RNA-seq_20_pause_index.pdf	Pause index	QC_hg38/K562_RNA-seq_20_pause_index.png	PEPPRO	K562_RNA-seq_20
+18	cFRiF	QC_hg38/K562_RNA-seq_20_cFRiF.pdf	cFRiF	QC_hg38/K562_RNA-seq_20_cFRiF.png	PEPPRO	K562_RNA-seq_20
+19	FRiF	QC_hg38/K562_RNA-seq_20_FRiF.pdf	FRiF	QC_hg38/K562_RNA-seq_20_FRiF.png	PEPPRO	K562_RNA-seq_20
+20	mRNA contamination	QC_hg38/K562_RNA-seq_20_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_RNA-seq_20_mRNA_contamination.png	PEPPRO	K562_RNA-seq_20
+21	FastQC report r1	fastqc/K562_RNA-seq_30_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_RNA-seq_30
+22	Adapter insertion distribution	cutadapt/K562_RNA-seq_30_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_30_R1_adapter_insertion_distribution.png	PEPPRO	K562_RNA-seq_30
+23	TSS enrichment	QC_hg38/K562_RNA-seq_30_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_30_TSSenrichment.png	PEPPRO	K562_RNA-seq_30
+24	Pause index	QC_hg38/K562_RNA-seq_30_pause_index.pdf	Pause index	QC_hg38/K562_RNA-seq_30_pause_index.png	PEPPRO	K562_RNA-seq_30
+25	cFRiF	QC_hg38/K562_RNA-seq_30_cFRiF.pdf	cFRiF	QC_hg38/K562_RNA-seq_30_cFRiF.png	PEPPRO	K562_RNA-seq_30
+26	FRiF	QC_hg38/K562_RNA-seq_30_FRiF.pdf	FRiF	QC_hg38/K562_RNA-seq_30_FRiF.png	PEPPRO	K562_RNA-seq_30
+27	mRNA contamination	QC_hg38/K562_RNA-seq_30_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_RNA-seq_30_mRNA_contamination.png	PEPPRO	K562_RNA-seq_30
+28	FastQC report r1	fastqc/K562_RNA-seq_40_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_RNA-seq_40
+29	Adapter insertion distribution	cutadapt/K562_RNA-seq_40_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_40_R1_adapter_insertion_distribution.png	PEPPRO	K562_RNA-seq_40
+30	TSS enrichment	QC_hg38/K562_RNA-seq_40_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_40_TSSenrichment.png	PEPPRO	K562_RNA-seq_40
+31	Pause index	QC_hg38/K562_RNA-seq_40_pause_index.pdf	Pause index	QC_hg38/K562_RNA-seq_40_pause_index.png	PEPPRO	K562_RNA-seq_40
+32	cFRiF	QC_hg38/K562_RNA-seq_40_cFRiF.pdf	cFRiF	QC_hg38/K562_RNA-seq_40_cFRiF.png	PEPPRO	K562_RNA-seq_40
+33	FRiF	QC_hg38/K562_RNA-seq_40_FRiF.pdf	FRiF	QC_hg38/K562_RNA-seq_40_FRiF.png	PEPPRO	K562_RNA-seq_40
+34	mRNA contamination	QC_hg38/K562_RNA-seq_40_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_RNA-seq_40_mRNA_contamination.png	PEPPRO	K562_RNA-seq_40
+35	FastQC report r1	fastqc/K562_RNA-seq_50_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_RNA-seq_50
+36	Adapter insertion distribution	cutadapt/K562_RNA-seq_50_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_50_R1_adapter_insertion_distribution.png	PEPPRO	K562_RNA-seq_50
+37	TSS enrichment	QC_hg38/K562_RNA-seq_50_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_50_TSSenrichment.png	PEPPRO	K562_RNA-seq_50
+38	Pause index	QC_hg38/K562_RNA-seq_50_pause_index.pdf	Pause index	QC_hg38/K562_RNA-seq_50_pause_index.png	PEPPRO	K562_RNA-seq_50
+39	cFRiF	QC_hg38/K562_RNA-seq_50_cFRiF.pdf	cFRiF	QC_hg38/K562_RNA-seq_50_cFRiF.png	PEPPRO	K562_RNA-seq_50
+40	FRiF	QC_hg38/K562_RNA-seq_50_FRiF.pdf	FRiF	QC_hg38/K562_RNA-seq_50_FRiF.png	PEPPRO	K562_RNA-seq_50
+41	mRNA contamination	QC_hg38/K562_RNA-seq_50_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_RNA-seq_50_mRNA_contamination.png	PEPPRO	K562_RNA-seq_50
+42	FastQC report r1	fastqc/K562_RNA-seq_60_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_RNA-seq_60
+43	Adapter insertion distribution	cutadapt/K562_RNA-seq_60_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_60_R1_adapter_insertion_distribution.png	PEPPRO	K562_RNA-seq_60
+44	TSS enrichment	QC_hg38/K562_RNA-seq_60_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_60_TSSenrichment.png	PEPPRO	K562_RNA-seq_60
+45	Pause index	QC_hg38/K562_RNA-seq_60_pause_index.pdf	Pause index	QC_hg38/K562_RNA-seq_60_pause_index.png	PEPPRO	K562_RNA-seq_60
+46	cFRiF	QC_hg38/K562_RNA-seq_60_cFRiF.pdf	cFRiF	QC_hg38/K562_RNA-seq_60_cFRiF.png	PEPPRO	K562_RNA-seq_60
+47	FRiF	QC_hg38/K562_RNA-seq_60_FRiF.pdf	FRiF	QC_hg38/K562_RNA-seq_60_FRiF.png	PEPPRO	K562_RNA-seq_60
+48	mRNA contamination	QC_hg38/K562_RNA-seq_60_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_RNA-seq_60_mRNA_contamination.png	PEPPRO	K562_RNA-seq_60
+49	FastQC report r1	fastqc/K562_RNA-seq_70_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_RNA-seq_70
+50	Adapter insertion distribution	cutadapt/K562_RNA-seq_70_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_70_R1_adapter_insertion_distribution.png	PEPPRO	K562_RNA-seq_70
+51	TSS enrichment	QC_hg38/K562_RNA-seq_70_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_70_TSSenrichment.png	PEPPRO	K562_RNA-seq_70
+52	Pause index	QC_hg38/K562_RNA-seq_70_pause_index.pdf	Pause index	QC_hg38/K562_RNA-seq_70_pause_index.png	PEPPRO	K562_RNA-seq_70
+53	cFRiF	QC_hg38/K562_RNA-seq_70_cFRiF.pdf	cFRiF	QC_hg38/K562_RNA-seq_70_cFRiF.png	PEPPRO	K562_RNA-seq_70
+54	FRiF	QC_hg38/K562_RNA-seq_70_FRiF.pdf	FRiF	QC_hg38/K562_RNA-seq_70_FRiF.png	PEPPRO	K562_RNA-seq_70
+55	mRNA contamination	QC_hg38/K562_RNA-seq_70_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_RNA-seq_70_mRNA_contamination.png	PEPPRO	K562_RNA-seq_70
+56	FastQC report r1	fastqc/K562_RNA-seq_80_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_RNA-seq_80
+57	Adapter insertion distribution	cutadapt/K562_RNA-seq_80_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_80_R1_adapter_insertion_distribution.png	PEPPRO	K562_RNA-seq_80
+58	TSS enrichment	QC_hg38/K562_RNA-seq_80_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_80_TSSenrichment.png	PEPPRO	K562_RNA-seq_80
+59	Pause index	QC_hg38/K562_RNA-seq_80_pause_index.pdf	Pause index	QC_hg38/K562_RNA-seq_80_pause_index.png	PEPPRO	K562_RNA-seq_80
+60	cFRiF	QC_hg38/K562_RNA-seq_80_cFRiF.pdf	cFRiF	QC_hg38/K562_RNA-seq_80_cFRiF.png	PEPPRO	K562_RNA-seq_80
+61	FRiF	QC_hg38/K562_RNA-seq_80_FRiF.pdf	FRiF	QC_hg38/K562_RNA-seq_80_FRiF.png	PEPPRO	K562_RNA-seq_80
+62	mRNA contamination	QC_hg38/K562_RNA-seq_80_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_RNA-seq_80_mRNA_contamination.png	PEPPRO	K562_RNA-seq_80
+63	FastQC report r1	fastqc/K562_RNA-seq_90_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_RNA-seq_90
+64	Adapter insertion distribution	cutadapt/K562_RNA-seq_90_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_90_R1_adapter_insertion_distribution.png	PEPPRO	K562_RNA-seq_90
+65	TSS enrichment	QC_hg38/K562_RNA-seq_90_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_90_TSSenrichment.png	PEPPRO	K562_RNA-seq_90
+66	Pause index	QC_hg38/K562_RNA-seq_90_pause_index.pdf	Pause index	QC_hg38/K562_RNA-seq_90_pause_index.png	PEPPRO	K562_RNA-seq_90
+67	cFRiF	QC_hg38/K562_RNA-seq_90_cFRiF.pdf	cFRiF	QC_hg38/K562_RNA-seq_90_cFRiF.png	PEPPRO	K562_RNA-seq_90
+68	FRiF	QC_hg38/K562_RNA-seq_90_FRiF.pdf	FRiF	QC_hg38/K562_RNA-seq_90_FRiF.png	PEPPRO	K562_RNA-seq_90
+69	mRNA contamination	QC_hg38/K562_RNA-seq_90_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_RNA-seq_90_mRNA_contamination.png	PEPPRO	K562_RNA-seq_90
+70	FastQC report r1	fastqc/K562_GRO-seq_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	K562_GRO-seq
+71	Adapter insertion distribution	cutadapt/K562_GRO-seq_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_GRO-seq_R1_adapter_insertion_distribution.png	PEPPRO	K562_GRO-seq
+72	TSS enrichment	QC_hg38/K562_GRO-seq_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_GRO-seq_TSSenrichment.png	PEPPRO	K562_GRO-seq
+73	Pause index	QC_hg38/K562_GRO-seq_pause_index.pdf	Pause index	QC_hg38/K562_GRO-seq_pause_index.png	PEPPRO	K562_GRO-seq
+74	cFRiF	QC_hg38/K562_GRO-seq_cFRiF.pdf	cFRiF	QC_hg38/K562_GRO-seq_cFRiF.png	PEPPRO	K562_GRO-seq
+75	FRiF	QC_hg38/K562_GRO-seq_FRiF.pdf	FRiF	QC_hg38/K562_GRO-seq_FRiF.png	PEPPRO	K562_GRO-seq
+76	mRNA contamination	QC_hg38/K562_GRO-seq_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_GRO-seq_mRNA_contamination.png	PEPPRO	K562_GRO-seq
+77	FastQC report r1	fastqc/HelaS3_GRO-seq_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	HelaS3_GRO-seq
+78	Adapter insertion distribution	cutadapt/HelaS3_GRO-seq_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/HelaS3_GRO-seq_R1_adapter_insertion_distribution.png	PEPPRO	HelaS3_GRO-seq
+79	TSS enrichment	QC_hg38/HelaS3_GRO-seq_TSSenrichment.pdf	TSS enrichment	QC_hg38/HelaS3_GRO-seq_TSSenrichment.png	PEPPRO	HelaS3_GRO-seq
+80	Pause index	QC_hg38/HelaS3_GRO-seq_pause_index.pdf	Pause index	QC_hg38/HelaS3_GRO-seq_pause_index.png	PEPPRO	HelaS3_GRO-seq
+81	cFRiF	QC_hg38/HelaS3_GRO-seq_cFRiF.pdf	cFRiF	QC_hg38/HelaS3_GRO-seq_cFRiF.png	PEPPRO	HelaS3_GRO-seq
+82	FRiF	QC_hg38/HelaS3_GRO-seq_FRiF.pdf	FRiF	QC_hg38/HelaS3_GRO-seq_FRiF.png	PEPPRO	HelaS3_GRO-seq
+83	mRNA contamination	QC_hg38/HelaS3_GRO-seq_mRNA_contamination.pdf	mRNA contamination	QC_hg38/HelaS3_GRO-seq_mRNA_contamination.png	PEPPRO	HelaS3_GRO-seq
+84	FastQC report r1	fastqc/Jurkat_ChRO-seq_1_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	Jurkat_ChRO-seq_1
+85	Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_1_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_1_R1_adapter_insertion_distribution.png	PEPPRO	Jurkat_ChRO-seq_1
+86	Library complexity	QC_hg38/Jurkat_ChRO-seq_1_preseq_plot.pdf	Library complexity	QC_hg38/Jurkat_ChRO-seq_1_preseq_plot.png	PEPPRO	Jurkat_ChRO-seq_1
+87	TSS enrichment	QC_hg38/Jurkat_ChRO-seq_1_TSSenrichment.pdf	TSS enrichment	QC_hg38/Jurkat_ChRO-seq_1_TSSenrichment.png	PEPPRO	Jurkat_ChRO-seq_1
+88	Pause index	QC_hg38/Jurkat_ChRO-seq_1_pause_index.pdf	Pause index	QC_hg38/Jurkat_ChRO-seq_1_pause_index.png	PEPPRO	Jurkat_ChRO-seq_1
+89	cFRiF	QC_hg38/Jurkat_ChRO-seq_1_cFRiF.pdf	cFRiF	QC_hg38/Jurkat_ChRO-seq_1_cFRiF.png	PEPPRO	Jurkat_ChRO-seq_1
+90	FRiF	QC_hg38/Jurkat_ChRO-seq_1_FRiF.pdf	FRiF	QC_hg38/Jurkat_ChRO-seq_1_FRiF.png	PEPPRO	Jurkat_ChRO-seq_1
+91	mRNA contamination	QC_hg38/Jurkat_ChRO-seq_1_mRNA_contamination.pdf	mRNA contamination	QC_hg38/Jurkat_ChRO-seq_1_mRNA_contamination.png	PEPPRO	Jurkat_ChRO-seq_1
+92	FastQC report r1	fastqc/Jurkat_ChRO-seq_2_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	Jurkat_ChRO-seq_2
+93	Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_2_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_2_R1_adapter_insertion_distribution.png	PEPPRO	Jurkat_ChRO-seq_2
+94	Library complexity	QC_hg38/Jurkat_ChRO-seq_2_preseq_plot.pdf	Library complexity	QC_hg38/Jurkat_ChRO-seq_2_preseq_plot.png	PEPPRO	Jurkat_ChRO-seq_2
+95	TSS enrichment	QC_hg38/Jurkat_ChRO-seq_2_TSSenrichment.pdf	TSS enrichment	QC_hg38/Jurkat_ChRO-seq_2_TSSenrichment.png	PEPPRO	Jurkat_ChRO-seq_2
+96	Pause index	QC_hg38/Jurkat_ChRO-seq_2_pause_index.pdf	Pause index	QC_hg38/Jurkat_ChRO-seq_2_pause_index.png	PEPPRO	Jurkat_ChRO-seq_2
+97	cFRiF	QC_hg38/Jurkat_ChRO-seq_2_cFRiF.pdf	cFRiF	QC_hg38/Jurkat_ChRO-seq_2_cFRiF.png	PEPPRO	Jurkat_ChRO-seq_2
+98	FRiF	QC_hg38/Jurkat_ChRO-seq_2_FRiF.pdf	FRiF	QC_hg38/Jurkat_ChRO-seq_2_FRiF.png	PEPPRO	Jurkat_ChRO-seq_2
+99	mRNA contamination	QC_hg38/Jurkat_ChRO-seq_2_mRNA_contamination.pdf	mRNA contamination	QC_hg38/Jurkat_ChRO-seq_2_mRNA_contamination.png	PEPPRO	Jurkat_ChRO-seq_2
+100	FastQC report r1	fastqc/HEK_PRO-seq_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	HEK_PRO-seq
+101	FastQC report r1	fastqc/HEK_PRO-seq_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	HEK_PRO-seq
+102	FastQC report r2	fastqc/HEK_PRO-seq_R2_trimmed_fastqc.html	FastQC report r2	None	PEPPRO	HEK_PRO-seq
+103	Adapter insertion distribution	cutadapt/HEK_PRO-seq_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/HEK_PRO-seq_adapter_insertion_distribution.png	PEPPRO	HEK_PRO-seq
+104	Library complexity	QC_hg38/HEK_PRO-seq_preseq_plot.pdf	Library complexity	QC_hg38/HEK_PRO-seq_preseq_plot.png	PEPPRO	HEK_PRO-seq
+105	TSS enrichment	QC_hg38/HEK_PRO-seq_TSSenrichment.pdf	TSS enrichment	QC_hg38/HEK_PRO-seq_TSSenrichment.png	PEPPRO	HEK_PRO-seq
+106	Pause index	QC_hg38/HEK_PRO-seq_pause_index.pdf	Pause index	QC_hg38/HEK_PRO-seq_pause_index.png	PEPPRO	HEK_PRO-seq
+107	cFRiF	QC_hg38/HEK_PRO-seq_cFRiF.pdf	cFRiF	QC_hg38/HEK_PRO-seq_cFRiF.png	PEPPRO	HEK_PRO-seq
+108	FRiF	QC_hg38/HEK_PRO-seq_FRiF.pdf	FRiF	QC_hg38/HEK_PRO-seq_FRiF.png	PEPPRO	HEK_PRO-seq
+109	mRNA contamination	QC_hg38/HEK_PRO-seq_mRNA_contamination.pdf	mRNA contamination	QC_hg38/HEK_PRO-seq_mRNA_contamination.png	PEPPRO	HEK_PRO-seq
+110	FastQC report r1	fastqc/HEK_ARF_PRO-seq_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	HEK_ARF_PRO-seq
+111	FastQC report r1	fastqc/HEK_ARF_PRO-seq_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	HEK_ARF_PRO-seq
+112	FastQC report r2	fastqc/HEK_ARF_PRO-seq_R2_trimmed_fastqc.html	FastQC report r2	None	PEPPRO	HEK_ARF_PRO-seq
+113	Adapter insertion distribution	cutadapt/HEK_ARF_PRO-seq_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/HEK_ARF_PRO-seq_adapter_insertion_distribution.png	PEPPRO	HEK_ARF_PRO-seq
+114	Library complexity	QC_hg38/HEK_ARF_PRO-seq_preseq_plot.pdf	Library complexity	QC_hg38/HEK_ARF_PRO-seq_preseq_plot.png	PEPPRO	HEK_ARF_PRO-seq
+115	TSS enrichment	QC_hg38/HEK_ARF_PRO-seq_TSSenrichment.pdf	TSS enrichment	QC_hg38/HEK_ARF_PRO-seq_TSSenrichment.png	PEPPRO	HEK_ARF_PRO-seq
+116	Pause index	QC_hg38/HEK_ARF_PRO-seq_pause_index.pdf	Pause index	QC_hg38/HEK_ARF_PRO-seq_pause_index.png	PEPPRO	HEK_ARF_PRO-seq
+117	cFRiF	QC_hg38/HEK_ARF_PRO-seq_cFRiF.pdf	cFRiF	QC_hg38/HEK_ARF_PRO-seq_cFRiF.png	PEPPRO	HEK_ARF_PRO-seq
+118	FRiF	QC_hg38/HEK_ARF_PRO-seq_FRiF.pdf	FRiF	QC_hg38/HEK_ARF_PRO-seq_FRiF.png	PEPPRO	HEK_ARF_PRO-seq
+119	mRNA contamination	QC_hg38/HEK_ARF_PRO-seq_mRNA_contamination.pdf	mRNA contamination	QC_hg38/HEK_ARF_PRO-seq_mRNA_contamination.png	PEPPRO	HEK_ARF_PRO-seq
+120	FastQC report r1	fastqc/H9_PRO-seq_1_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_PRO-seq_1
+121	FastQC report r1	fastqc/H9_PRO-seq_1_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_PRO-seq_1
+122	FastQC report r2	fastqc/H9_PRO-seq_1_R2_trimmed_fastqc.html	FastQC report r2	None	PEPPRO	H9_PRO-seq_1
+123	Adapter insertion distribution	cutadapt/H9_PRO-seq_1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/H9_PRO-seq_1_adapter_insertion_distribution.png	PEPPRO	H9_PRO-seq_1
+124	Library complexity	QC_hg38/H9_PRO-seq_1_preseq_plot.pdf	Library complexity	QC_hg38/H9_PRO-seq_1_preseq_plot.png	PEPPRO	H9_PRO-seq_1
+125	TSS enrichment	QC_hg38/H9_PRO-seq_1_TSSenrichment.pdf	TSS enrichment	QC_hg38/H9_PRO-seq_1_TSSenrichment.png	PEPPRO	H9_PRO-seq_1
+126	Pause index	QC_hg38/H9_PRO-seq_1_pause_index.pdf	Pause index	QC_hg38/H9_PRO-seq_1_pause_index.png	PEPPRO	H9_PRO-seq_1
+127	cFRiF	QC_hg38/H9_PRO-seq_1_cFRiF.pdf	cFRiF	QC_hg38/H9_PRO-seq_1_cFRiF.png	PEPPRO	H9_PRO-seq_1
+128	FRiF	QC_hg38/H9_PRO-seq_1_FRiF.pdf	FRiF	QC_hg38/H9_PRO-seq_1_FRiF.png	PEPPRO	H9_PRO-seq_1
+129	mRNA contamination	QC_hg38/H9_PRO-seq_1_mRNA_contamination.pdf	mRNA contamination	QC_hg38/H9_PRO-seq_1_mRNA_contamination.png	PEPPRO	H9_PRO-seq_1
+130	FastQC report r1	fastqc/H9_PRO-seq_2_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_PRO-seq_2
+131	FastQC report r1	fastqc/H9_PRO-seq_2_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_PRO-seq_2
+132	FastQC report r2	fastqc/H9_PRO-seq_2_R2_trimmed_fastqc.html	FastQC report r2	None	PEPPRO	H9_PRO-seq_2
+133	Adapter insertion distribution	cutadapt/H9_PRO-seq_2_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/H9_PRO-seq_2_adapter_insertion_distribution.png	PEPPRO	H9_PRO-seq_2
+134	Library complexity	QC_hg38/H9_PRO-seq_2_preseq_plot.pdf	Library complexity	QC_hg38/H9_PRO-seq_2_preseq_plot.png	PEPPRO	H9_PRO-seq_2
+135	TSS enrichment	QC_hg38/H9_PRO-seq_2_TSSenrichment.pdf	TSS enrichment	QC_hg38/H9_PRO-seq_2_TSSenrichment.png	PEPPRO	H9_PRO-seq_2
+136	Pause index	QC_hg38/H9_PRO-seq_2_pause_index.pdf	Pause index	QC_hg38/H9_PRO-seq_2_pause_index.png	PEPPRO	H9_PRO-seq_2
+137	cFRiF	QC_hg38/H9_PRO-seq_2_cFRiF.pdf	cFRiF	QC_hg38/H9_PRO-seq_2_cFRiF.png	PEPPRO	H9_PRO-seq_2
+138	FRiF	QC_hg38/H9_PRO-seq_2_FRiF.pdf	FRiF	QC_hg38/H9_PRO-seq_2_FRiF.png	PEPPRO	H9_PRO-seq_2
+139	mRNA contamination	QC_hg38/H9_PRO-seq_2_mRNA_contamination.pdf	mRNA contamination	QC_hg38/H9_PRO-seq_2_mRNA_contamination.png	PEPPRO	H9_PRO-seq_2
+140	FastQC report r1	fastqc/H9_PRO-seq_3_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_PRO-seq_3
+141	FastQC report r1	fastqc/H9_PRO-seq_3_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_PRO-seq_3
+142	FastQC report r2	fastqc/H9_PRO-seq_3_R2_trimmed_fastqc.html	FastQC report r2	None	PEPPRO	H9_PRO-seq_3
+143	Adapter insertion distribution	cutadapt/H9_PRO-seq_3_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/H9_PRO-seq_3_adapter_insertion_distribution.png	PEPPRO	H9_PRO-seq_3
+144	Library complexity	QC_hg38/H9_PRO-seq_3_preseq_plot.pdf	Library complexity	QC_hg38/H9_PRO-seq_3_preseq_plot.png	PEPPRO	H9_PRO-seq_3
+145	TSS enrichment	QC_hg38/H9_PRO-seq_3_TSSenrichment.pdf	TSS enrichment	QC_hg38/H9_PRO-seq_3_TSSenrichment.png	PEPPRO	H9_PRO-seq_3
+146	Pause index	QC_hg38/H9_PRO-seq_3_pause_index.pdf	Pause index	QC_hg38/H9_PRO-seq_3_pause_index.png	PEPPRO	H9_PRO-seq_3
+147	cFRiF	QC_hg38/H9_PRO-seq_3_cFRiF.pdf	cFRiF	QC_hg38/H9_PRO-seq_3_cFRiF.png	PEPPRO	H9_PRO-seq_3
+148	FRiF	QC_hg38/H9_PRO-seq_3_FRiF.pdf	FRiF	QC_hg38/H9_PRO-seq_3_FRiF.png	PEPPRO	H9_PRO-seq_3
+149	mRNA contamination	QC_hg38/H9_PRO-seq_3_mRNA_contamination.pdf	mRNA contamination	QC_hg38/H9_PRO-seq_3_mRNA_contamination.png	PEPPRO	H9_PRO-seq_3
+150	FastQC report r1	fastqc/H9_treated_PRO-seq_1_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_treated_PRO-seq_1
+151	FastQC report r1	fastqc/H9_treated_PRO-seq_1_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_treated_PRO-seq_1
+152	FastQC report r2	fastqc/H9_treated_PRO-seq_1_R2_trimmed_fastqc.html	FastQC report r2	None	PEPPRO	H9_treated_PRO-seq_1
+153	Adapter insertion distribution	cutadapt/H9_treated_PRO-seq_1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/H9_treated_PRO-seq_1_adapter_insertion_distribution.png	PEPPRO	H9_treated_PRO-seq_1
+154	Library complexity	QC_hg38/H9_treated_PRO-seq_1_preseq_plot.pdf	Library complexity	QC_hg38/H9_treated_PRO-seq_1_preseq_plot.png	PEPPRO	H9_treated_PRO-seq_1
+155	TSS enrichment	QC_hg38/H9_treated_PRO-seq_1_TSSenrichment.pdf	TSS enrichment	QC_hg38/H9_treated_PRO-seq_1_TSSenrichment.png	PEPPRO	H9_treated_PRO-seq_1
+156	Pause index	QC_hg38/H9_treated_PRO-seq_1_pause_index.pdf	Pause index	QC_hg38/H9_treated_PRO-seq_1_pause_index.png	PEPPRO	H9_treated_PRO-seq_1
+157	cFRiF	QC_hg38/H9_treated_PRO-seq_1_cFRiF.pdf	cFRiF	QC_hg38/H9_treated_PRO-seq_1_cFRiF.png	PEPPRO	H9_treated_PRO-seq_1
+158	FRiF	QC_hg38/H9_treated_PRO-seq_1_FRiF.pdf	FRiF	QC_hg38/H9_treated_PRO-seq_1_FRiF.png	PEPPRO	H9_treated_PRO-seq_1
+159	mRNA contamination	QC_hg38/H9_treated_PRO-seq_1_mRNA_contamination.pdf	mRNA contamination	QC_hg38/H9_treated_PRO-seq_1_mRNA_contamination.png	PEPPRO	H9_treated_PRO-seq_1
+160	FastQC report r1	fastqc/H9_treated_PRO-seq_2_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_treated_PRO-seq_2
+161	FastQC report r1	fastqc/H9_treated_PRO-seq_2_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_treated_PRO-seq_2
+162	FastQC report r2	fastqc/H9_treated_PRO-seq_2_R2_trimmed_fastqc.html	FastQC report r2	None	PEPPRO	H9_treated_PRO-seq_2
+163	Adapter insertion distribution	cutadapt/H9_treated_PRO-seq_2_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/H9_treated_PRO-seq_2_adapter_insertion_distribution.png	PEPPRO	H9_treated_PRO-seq_2
+164	Library complexity	QC_hg38/H9_treated_PRO-seq_2_preseq_plot.pdf	Library complexity	QC_hg38/H9_treated_PRO-seq_2_preseq_plot.png	PEPPRO	H9_treated_PRO-seq_2
+165	TSS enrichment	QC_hg38/H9_treated_PRO-seq_2_TSSenrichment.pdf	TSS enrichment	QC_hg38/H9_treated_PRO-seq_2_TSSenrichment.png	PEPPRO	H9_treated_PRO-seq_2
+166	Pause index	QC_hg38/H9_treated_PRO-seq_2_pause_index.pdf	Pause index	QC_hg38/H9_treated_PRO-seq_2_pause_index.png	PEPPRO	H9_treated_PRO-seq_2
+167	cFRiF	QC_hg38/H9_treated_PRO-seq_2_cFRiF.pdf	cFRiF	QC_hg38/H9_treated_PRO-seq_2_cFRiF.png	PEPPRO	H9_treated_PRO-seq_2
+168	FRiF	QC_hg38/H9_treated_PRO-seq_2_FRiF.pdf	FRiF	QC_hg38/H9_treated_PRO-seq_2_FRiF.png	PEPPRO	H9_treated_PRO-seq_2
+169	mRNA contamination	QC_hg38/H9_treated_PRO-seq_2_mRNA_contamination.pdf	mRNA contamination	QC_hg38/H9_treated_PRO-seq_2_mRNA_contamination.png	PEPPRO	H9_treated_PRO-seq_2
+170	FastQC report r1	fastqc/H9_treated_PRO-seq_3_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_treated_PRO-seq_3
+171	FastQC report r1	fastqc/H9_treated_PRO-seq_3_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	H9_treated_PRO-seq_3
+172	FastQC report r2	fastqc/H9_treated_PRO-seq_3_R2_trimmed_fastqc.html	FastQC report r2	None	PEPPRO	H9_treated_PRO-seq_3
+173	Adapter insertion distribution	cutadapt/H9_treated_PRO-seq_3_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/H9_treated_PRO-seq_3_adapter_insertion_distribution.png	PEPPRO	H9_treated_PRO-seq_3
+174	Library complexity	QC_hg38/H9_treated_PRO-seq_3_preseq_plot.pdf	Library complexity	QC_hg38/H9_treated_PRO-seq_3_preseq_plot.png	PEPPRO	H9_treated_PRO-seq_3
+175	TSS enrichment	QC_hg38/H9_treated_PRO-seq_3_TSSenrichment.pdf	TSS enrichment	QC_hg38/H9_treated_PRO-seq_3_TSSenrichment.png	PEPPRO	H9_treated_PRO-seq_3
+176	Pause index	QC_hg38/H9_treated_PRO-seq_3_pause_index.pdf	Pause index	QC_hg38/H9_treated_PRO-seq_3_pause_index.png	PEPPRO	H9_treated_PRO-seq_3
+177	cFRiF	QC_hg38/H9_treated_PRO-seq_3_cFRiF.pdf	cFRiF	QC_hg38/H9_treated_PRO-seq_3_cFRiF.png	PEPPRO	H9_treated_PRO-seq_3
+178	FRiF	QC_hg38/H9_treated_PRO-seq_3_FRiF.pdf	FRiF	QC_hg38/H9_treated_PRO-seq_3_FRiF.png	PEPPRO	H9_treated_PRO-seq_3
+179	mRNA contamination	QC_hg38/H9_treated_PRO-seq_3_mRNA_contamination.pdf	mRNA contamination	QC_hg38/H9_treated_PRO-seq_3_mRNA_contamination.png	PEPPRO	H9_treated_PRO-seq_3

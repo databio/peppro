@@ -1,0 +1,29 @@
+File_mb	50.42	PEPPRO
+Read_type	paired	PEPPRO
+Genome	hg38	PEPPRO
+Raw_reads	2000000	PEPPRO
+Fastq_reads	2000000	PEPPRO
+Trimmed_reads	497796	PEPPRO
+Trim_loss_rate	75.11	PEPPRO
+Aligned_reads_human_rDNA	5860.0	PEPPRO
+Alignment_rate_human_rDNA	1.18	PEPPRO
+Mapped_reads	431804	PEPPRO
+QC_filtered_reads	274898	PEPPRO
+Aligned_reads	156906.0	PEPPRO
+Alignment_rate	31.52	PEPPRO
+Total_efficiency	7.85	PEPPRO
+Read_depth	1.17	PEPPRO
+Mitochondrial_reads	5357	PEPPRO
+Maximum_read_length	30	PEPPRO
+NRF	1.0	PEPPRO
+PBC1	15975.0	PEPPRO
+PBC2	15975.0	PEPPRO
+Unmapped_reads	468224	PEPPRO
+TSS_Plus_Score	33.3	PEPPRO
+TSS_Minus_Score	4.3	PEPPRO
+Pause_index	228.97	PEPPRO
+Plus FRiP	0.07	PEPPRO
+Minus FRiP	0.07	PEPPRO
+mRNA_contamination	4.26	PEPPRO
+Time	0:09:52	PEPPRO
+Success	11-27-14:04:51	PEPPRO

@@ -3,7 +3,7 @@ theme: databio
 site_name: peppro
 site_author: Jason Smith
 site_url: http://peppro.databio.org/
-site_logo: img/peppro_inline_logo.svg
+site_logo: img/peppro_logo_gray.svg
 repo_url: https://github.com/databio/peppro/
 #google_analytics: ['UA-127092878-1', 'code.databio.org/peppro']
 
@@ -18,18 +18,20 @@ nav:
     - Install and run: 'install.md'
     - Extended tutorial: 'tutorial.md'
   - How-to Guides:
-    - Annotation files: 'howto/annotation_files/'
-    - Configuring prealignments: 'howto/prealignments/'
-    - Detailed install guide: 'howto/detailed_install.md'
-    - Running on a cluster: 'howto/run_cluster/'
-    - Running in a container: 'howto/use_container/'
-    - Using looper: 'howto/use_looper/'
+    - Run PEPPRO directly: 'run_direct.md'
+    - Run PEPPRO on a cluster: 'cluster.md'
+    - Run PEPPRO in containers: 'container.md'
+    - Configure prealignments: 'prealignments.md'
+    - Configure UMI: 'umi.md'
+    - Detailed install guide: 'detailed_install.md'
+    - Use custom reference data: 'annotation.md'
   - Reference: 
+    - FAQ: 'faq.md'
     - Usage: 'usage.md'
     - Changelog: 'changelog.md'
     - Support: 'https://github.com/databio/peppro/issues'
-    - Example output file structure: 'browse_output.md'
-    - "Example summary: tutorial project": 'files/examples/tutorial/tutorial_summary.html'
+    - PEPPRO paper output file structure: 'browse_output.md'
+    - PEPPRO paper summary: 'files/examples/paper/PEPPRO_summary.html'
 
 plugins:
   - search

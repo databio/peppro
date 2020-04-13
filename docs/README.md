@@ -1,22 +1,18 @@
-# <img src="img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:200px; margin-top:10px; margin-bottom:-10px" align="left">  
+# <img src="img/peppro_logo.svg" alt="PEPPRO" class="img-fluid" style="max-height:80px; margin-top:10px; margin-bottom:-10px" align="left">  
 
 <br clear="all">
 
 [![PEP compatible](http://pepkit.github.io/img/PEP-compatible-green.svg)](http://pepkit.github.io)
 
-`PEPPRO` is a pipeline designed to process PRO-seq data. It is optimized on unique features of PRO-seq to be fast and accurate. It performs adapter removal, including UMI of variable length, read deduplication, trimming, mapping, and signal tracks (bigWig) for plus and minus strands using scaled (based on mappability information) or unscaled read count patterns. 
+`PEPPRO` is a pipeline for nascent RNA sequencing data. It can process PRO-seq, GRO-seq, and ChRO-seq data and is optimized on unique features of nascent RNA to be fast and accurate. It performs variable-length UMI adapter removal, read deduplication, trimming, mapping, QC, and signal tracks (bigWig) for plus and minus strands using mappability-scaled or unscaled read counts. 
 
 ## Outputs
 
-`PEPPRO` produces quality control plots, summary statistics, and several data formats to set the stage for project-specific analysis. 
+`PEPPRO` produces quality control plots, statistics, and data formats to set the stage for project-specific analysis. We have produced an [interactive display of the output folder structure](browse_output/), which includes:
 
-- PEPPRO produces an easily-navigable HTML report when used with [`Looper`](http://looper.databio.org/en/latest/): View this [HTML Summary report demo](files/examples/tutorial/tutorial_summary.html)
-- We have produced an [interactive display of the output folder structure](browse_output/), which includes:
-	- [Easily parsable summary statistics file](files/examples/tutorial/results_pipeline/tutorial/stats.tsv)
-	- BigWig signal tracks (plus and minus stranded):
-	    - nucleotide-resolution, exact RNA polymerase position signal
-	    - smoothed signal
-	    - nucleotide-resolution signal corrected for enzymatic sequence bias
+- **HTML report**: an easily-navigable HTML report with pretty plots: [HTML summary report demo](files/examples/paper/PEPPRO_summary.html).
+- **Stats**: An easily parsable stats file: [Summary statistics demo file](files/examples/paper/PEPPRO_stats_summary.tsv).
+- **Processed data**: Several bigWig signal tracks (plus and minus stranded), with options to produce: smoothed signal; exact (nucleotide-resolution) RNA polymerase position signal; or nucleotide-resolution signal corrected for enzymatic sequence bias.
 
 ## User interface
 

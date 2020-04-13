@@ -1,6 +1,99 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.9.6] -- 2020-03-31
+
+## Changed
+ - Fixed refgenie bowtie2 index assignment
+
+## [0.9.5] -- 2020-03-26
+
+## Changed
+ - Updated FRiF calculation to only account for the `count` column
+ - Updated FRiF calculation to check if results are empty
+
+## [0.9.4] -- 2020-03-25
+
+## Changed
+ - Updated bowtie2 index checks to be in line with refgenie updates
+
+## [0.9.3] -- 2020-03-25
+
+## Changed
+ - Added checks for correct value return on cutadapt report checks
+
+## [0.9.2] -- 2020-03-25
+
+### Changed
+ - Updated refgenconf use from get_asset() to seek()
+ - Added check for bowtie2_index asset naming
+
+## [0.9.1] -- 2020-02-27
+
+### Added
+ - Report project counts table as a summary object
+ - Clean up additional uncommonly used downstream files
+
+### Changed
+ - Use bulker for container usage
+ - Update R install process
+ - Correct FastQC object reporting
+ - Updated logic for recover mode
+ - Default max length trimming is now none
+ - Change nomenclature regarding FRiF/PRiF plots
+ - Change TSS score nomenclature
+
+## [0.9.0] -- 2020-02-20
+
+### Added
+- Add a how-to guide for configuring UMI settings
+
+### Changed
+- Update mRNA contamination plots display properties to be more readable
+- Update pause index plots to default to log10 histograms and update their display properties
+- Use paper samples as the default output examples in the docs
+
+## [0.8.9] -- 2020-02-11
+
+### Changed
+- Corrected Pct_reads_too_short calculation
+- Updated mRNA and PI plots to plot on same axis across sample
+- Updated minimum acceptable read length
+- Produce both signal track types
+
+## [0.8.8] -- 2020-02-04
+
+### Changed
+- Updated degradation ratio calculation for PE data
+- Corrected Pct_reads_too_short to be percent not fraction
+
+## [0.8.7] -- 2020-02-04
+
+### Changed
+- Updated degradation ratio calculation for SE data
+- Fixed report_fastq to properly handle SE, non UMI data
+
+## [0.8.6] -- 2020-01-28
+
+### Changed
+- Update FRiF calculation to optionally follow a priority ranked method
+- Update how adapter insertion distributions are plotted to be the same for SE or PE data
+- Make cutadapt the default for adapter removal
+- Streamline the use of Refgenie assets
+    - Refgenie manages pause indicies
+    - Refgenie manages feature annotations
+    - Refgenie manages assets for mRNA contamination
+    - Refgenie manages seqOutBias required suffixerator indicies
+- Change pause index and mRNA contamination plots to histograms
+
+### Added
+- Add PRiF plot
+- Require FLASH tool
+- Produce sample level gene counts file as output
+- Generate project level counts table including all samples X gene counts
+- Report degradation metric for library quality
+- Add BiocProject integration
+
 ## [0.8.1] -- 2019-07-15
 
 ### Changed

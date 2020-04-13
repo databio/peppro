@@ -1,0 +1,29 @@
+Streaming uncompressed output to STDOUT...
+
+Read1 before filtering:
+total reads: 1000000
+total bases: 37678766
+Q20 bases: 34709953(92.1207%)
+Q30 bases: 34018346(90.2852%)
+
+Read1 after filtering:
+total reads: 439519
+total bases: 16134044
+Q20 bases: 15454671(95.7892%)
+Q30 bases: 15178418(94.077%)
+
+Filtering result:
+reads passed filter: 439519
+reads failed due to low quality: 66799
+reads failed due to too many N: 105
+reads failed due to too short: 493577
+reads with adapter trimmed: 540203
+bases trimmed due to adapters: 14696777
+
+Duplication rate (may be overestimated since this is SE data): 28.6979%
+
+JSON report: /sfs/lustre/allocations/shefflab/processed/peppro_tutorial/pe/07-31-19/results_pipeline/tutorial/fastqc/tutorial_R2_rmAdapter.json
+HTML report: /sfs/lustre/allocations/shefflab/processed/peppro_tutorial/pe/07-31-19/results_pipeline/tutorial/fastqc/tutorial_R2_rmAdapter.html
+
+fastp --overrepresentation_analysis --thread 1 --in1 /sfs/lustre/allocations/shefflab/processed/peppro_tutorial/pe/07-31-19/results_pipeline/tutorial/fastq/tutorial_R2.fastq --adapter_sequence GATCGTCGGACTGTAGAACTCTGAAC --length_required 26 --html /sfs/lustre/allocations/shefflab/processed/peppro_tutorial/pe/07-31-19/results_pipeline/tutorial/fastqc/tutorial_R2_rmAdapter.html --json /sfs/lustre/allocations/shefflab/processed/peppro_tutorial/pe/07-31-19/results_pipeline/tutorial/fastqc/tutorial_R2_rmAdapter.json --report_title tutorial --stdout 
+fastp v0.19.4, time used: 7 seconds

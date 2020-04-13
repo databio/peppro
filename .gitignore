@@ -1,3 +1,27 @@
+# General
+*.pyc
+.~lock*
+
+# Tests
+.cache/
+*peppro_test*
+
+# MkDocs files
+site/
+
+# Jekyll files
+jekyll/
+_site
+.DS_store
+.jekyll
+.bundle
+.sass-cache
+_site/
+/_site/
+.sass-cache/
+.jekyll-metadata
+
+# Annotation files
 # ignore local annotation files
 anno/hg19_annotations.bed.gz
 anno/hg19_annotations.bed
