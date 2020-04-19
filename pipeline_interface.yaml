@@ -2,7 +2,7 @@ pipeline_name: PEPRO
 
 sample_pipeline:
   path: pipelines/peppro.py
-  schema: peppro_input_schema.yaml
+  input_schema: peppro_input_schema.yaml
   output_schema: peppro_output_schema.yaml
   command_template: >
     {pipeline.path}
