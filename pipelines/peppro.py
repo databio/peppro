@@ -1873,6 +1873,31 @@ def _add_resources(args, res, asset_dict=None):
         return res, rgc
 
 
+def report_message(pm, report_file, message, annotation=None):
+    """
+    Writes a string to provided file in a safe way.
+    
+    :param PipelineManager pm: a pypiper PipelineManager object
+    :param str report_file: name of the output file
+    :param str message: string to write to the output file
+    :param str annotation: By default, the message will be annotated with the
+        pipeline name, so you can tell which pipeline records which stats.
+        If you want, you can change this; use annotation='shared' if you
+        need the stat to be used by another pipeline (using get_stat()).
+    """
+    # Default annotation is current pipeline name.
+    annotation = str(annotation or pm.name)
+
+    message = str(message).strip()
+    
+    message = "{message}\t{annotation}".format(
+        message=message, annotation=annotation)
+
+    # Just to be extra careful, let's lock the file while we we write
+    # in case multiple pipelines write to the same file.
+    pm._safe_write_to_file(report_file, message)
+
+
 ###############################################################################
 def main():
     """
@@ -2015,8 +2040,20 @@ def main():
     res.adapters = res.adapters or tool_path("adapter.fa")
 
     param.outfolder = outfolder
+    
+    # Report utilized assets
+    assets_file = os.path.join(param.outfolder, "assets.tsv")
+    for asset in res:
+        message = "{}\t{}".format(asset, os.path.expandvars(res[asset]))
+        report_message(pm, assets_file, message)
+        
+    # Report primary genome
+    message = "genome\t{}".format(args.genome_assembly)
+    report_message(pm, assets_file, message)
 
-    # Check that the input file(s) exist before continuing
+    ###########################################################################
+    #          Check that the input file(s) exist before continuing           #
+    ###########################################################################
     if _itsa_file(args.input[0]):
         print("Local input file: " + args.input[0])
     elif _itsa_empty_file(args.input[0]):
@@ -2040,10 +2077,11 @@ def main():
             err_msg = "Could not find: {}"
             pm.fail_pipeline(IOError(err_msg.format(args.input2[0])))
 
-    container = None
+    container = None # legacy
 
     ###########################################################################
-
+    #                      Grab and prepare input files                       #
+    ###########################################################################
     pm.report_result(
         "File_mb",
         round(ngstk.get_file_size(
