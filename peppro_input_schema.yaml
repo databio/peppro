@@ -6,13 +6,13 @@ properties:
     items:
       type: object
       properties:
-        sample_name: 
+        sample_name:
           type: string
           description: "Name of the sample"
-        organism: 
+        organism:
           type: string
           description: "Organism"
-        protocol: 
+        protocol:
           type: string
           description: "Specifies whether the sample is pro-seq or gro-seq"
           enum: ["PRO", "pro", "PRO-SEQ", "PRO-seq", "proseq", "PROSEQ", "GRO", "gro", "groseq", "GROSEQ", "GRO-SEQ", "GRO-seq"]
