@@ -1,4 +1,4 @@
-pipeline_name: PEPRO
+pipeline_name: PEPPRO
 
 sample_pipeline:
   path: pipelines/peppro.py
