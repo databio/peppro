@@ -43,9 +43,11 @@ sample_pipeline:
     size_dependent_variables: resources.tsv
 
 project_pipeline:
+  name: PEPPRO_summarizer
   path: pipelines/peppro_collator.py
   command_template: >
-    {pipeline.path} -c {looper.pep_config} -o {looper.output_folder} -n {project.name}
+    looper summarize {looper.pep_config} &&
+    {pipeline.path} -C {looper.pep_config} -o {looper.output_folder} -n {project.name}
   compute:
     singularity_image: ${SIMAGES}peppro
     bulker_crate: databio/peppro
