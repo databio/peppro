@@ -32,26 +32,28 @@ def parse_arguments():
     :return argparse.Namespace: parsed arguments namespace
     """
     parser = VersionInHelpParser(prog="PEPPRO collator", description='PEPPRO collator' , version=__version__)
-    parser.add_argument("-c", "--config", help="Path to the project config file.", type=str)
+    parser = pypiper.add_pypiper_args(parser, groups=['pypiper', 'looper'])
+    #parser.add_argument("-c", "--config", help="Path to the project config file.", type=str)
     parser.add_argument("-n", "--name", help="Name of the project to use.", type=str)
     parser.add_argument("-o", "--output", help="Output dir path.", type=str)
     args = parser.parse_args()
     return args
 
-args = parse_arguments()
-
-outfolder = os.path.abspath(os.path.join(args.output, "summary"))
-
 
 def main():
-    pm = pypiper.PipelineManager(name="PEPPRO collator", outfolder=outfolder, version=__version__)
+    args = parse_arguments()
+    outfolder = os.path.abspath(os.path.join(args.output, "summary"))
+    
+    pm = pypiper.PipelineManager(
+        name="PEPPRO collator", outfolder=outfolder,
+        args=args, version=__version__)
 
-    cmd1 = "Rscript {} {}".format(tool_path("PEPPRO_complexity_curves.R"), args.config)
-    cmd2 = "Rscript {} {}".format(tool_path("PEPPRO_counts.R"), args.config)
+    #pm.info("args: {}\n".format(args))
 
-    pm.run(cmd1, target=os.path.join(outfolder, "{name}_libComplexity.pdf".format(name=args.name)))
-    pm.run(cmd2, target=os.path.join(outfolder, "{name}_countData.csv".format(name=args.name)))
+    cmd = "Rscript {} {}".format(tool_path("PEPPRO_summarizer.R"), args.config_file)
 
+    pm.run(cmd, [os.path.join(outfolder, "{name}_libComplexity.pdf".format(name=args.name)),
+                 os.path.join(outfolder, "{name}_countData.csv".format(name=args.name))])
     pm.stop_pipeline()
 
 
