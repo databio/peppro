@@ -11,7 +11,6 @@ tools:  # absolute paths to required tools
   flash: flash
   seqtk: seqtk
   fastqpair: fastq_pair
-  picard: /apps/software/standard/core/picard/2.18.5/picard.jar
   # UCSC tools
   bigWigCat: bigWigCat
   wigToBigWig: wigToBigWig
