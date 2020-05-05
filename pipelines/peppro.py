@@ -2426,7 +2426,8 @@ def main():
                         unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1_dups,
@@ -2434,14 +2435,16 @@ def main():
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
-                        dups=True)
+                        dups=True,
+                        bt2_opts_txt=param.bowtie2_pre.params)
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1,
                         unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1_dups,
@@ -2449,7 +2452,8 @@ def main():
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
-                        dups=True)
+                        dups=True,
+                        bt2_opts_txt=param.bowtie2_pre.params)
 
                 if args.paired_end:
                     to_compress.append(unmap_fq1_dups)
@@ -2466,14 +2470,16 @@ def main():
                         unmap_fq1, unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True,
                         unmap_fq1, unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
                 if args.paired_end:
                     to_compress.append(unmap_fq1)
                     to_compress.append(unmap_fq2)
@@ -2523,8 +2529,12 @@ def main():
 
     mito_name = ["chrM", "chrMT", "M", "MT", "rCRSd", "rCRSd_3k"]
 
-    bt2_options = " --very-sensitive"
-    bt2_options += " -X 2000"
+    if not param.bowtie2.params:
+        bt2_options = " --very-sensitive"
+        if args.paired_end:
+            bt2_options += " -X 2000"
+    else:
+        bt2_options = param.bowtie2.params
 
     # samtools sort needs a temporary directory
     tempdir = tempfile.mkdtemp(dir=map_genome_folder)
@@ -3039,7 +3049,7 @@ def main():
             with open(Tss_plus) as f:
                 floats = list(map(float, f))
             try:
-                # If the TSS enrichment is 0, don't report            
+                # Catch if the TSS score is trying to divide by 0           
                 list_len = 0.05*float(len(floats))
                 normTSS = [x / (sum(floats[1:int(list_len)]) /
                            len(floats[1:int(list_len)])) for x in floats]
@@ -3057,6 +3067,7 @@ def main():
 
                 pm.report_result("TSS_coding_score", round(Tss_score, 1))
             except ZeroDivisionError:
+                pm.report_result("TSS_coding_score", 0)
                 pass
 
             # Minus TSS enrichment
@@ -3089,6 +3100,7 @@ def main():
 
                 pm.report_result("TSS_non-coding_score", round(Tss_score, 1))
             except ZeroDivisionError:
+                pm.report_result("TSS_non-coding_score", 0)
                 pass
 
         # Call Rscript to plot TSS Enrichment
