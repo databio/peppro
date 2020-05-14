@@ -84,8 +84,10 @@ def parse_arguments():
 
     parser.add_argument("--scale", action='store_true',
                         dest="scale", default=False,
-                        help="Scale output with seqOutBias when producing"
-                             " signal tracks.")
+                        help="Scale signal tracks: "
+                             "Default is to scale by read count.\n"
+                             "If using seqOutBias, scales by the expected/"
+                             "observed cut frequency.")
 
     parser.add_argument("--prealignments", default=[], type=str, nargs="+",
                         help="Space-delimited list of reference genomes to "
@@ -3371,6 +3373,17 @@ def main():
                 cmd1 = ("cut -f 4 " + anno_local + " | sort -u")
             ft_list = pm.checkprint(cmd1, shell=True)
             ft_list = ft_list.splitlines()
+            if param.precedence.params:
+                p_list = param.precedence.params.split(",")
+                p_list = [feature.strip() for feature in p_list]
+                if all(feature in ft_list for feature in p_list):
+                    ft_list = p_list
+                else:
+                    pm.warning("The provided precedence list ({}) of features "
+                               "are not all present in your annotation file "
+                               "({})".format(str(p_list), anno_local))
+                    pm.warning("Defaulting to the order of features in "
+                               "{}".format(anno_local))
 
             # Split annotation file on features
             cmd2 = ("awk -F'\t' '{print>\"" + QC_folder + "/\"$4}' " +
@@ -3768,6 +3781,10 @@ def main():
         # separate strand bigWigs; just convert the BAM's directly with 
         # bamSitesToWig.py which uses UCSC wigToBigWig
         pm.timestamp("### Produce bigWig files")
+        
+        # need Total Reads divided by 1M
+        ar = float(pm.get_stat("Aligned_reads"))
+        scaling_factor = float(ar/1000000)
 
         wig_cmd_callable = ngstk.check_command("wigToBigWig")
 
@@ -3782,6 +3799,8 @@ def main():
             cmd2 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd2 += " --tail-edge"
+            if args.scale:
+                cmd2 += " --scale " + ar
             pm.run([cmd1, cmd2], [plus_exact_bw, plus_smooth_bw])
 
             cmd3 = tools.samtools + " index " + minus_bam
@@ -3794,6 +3813,8 @@ def main():
             cmd4 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd4 += " --tail-edge"
+            if args.scale:
+                cmd4 += " --scale " + ar
             pm.run([cmd3, cmd4], [minus_exact_bw, minus_smooth_bw])
         else:
             print("Skipping signal track production -- Could not call \'wigToBigWig\'.")
