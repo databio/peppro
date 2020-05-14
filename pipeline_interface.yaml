@@ -1,59 +1,58 @@
 pipeline_name: PEPPRO
+pipeline_type: sample
+path: pipelines/peppro.py
+input_schema: peppro_input_schema.yaml
+output_schema: peppro_output_schema.yaml
+command_template: >
+  {pipeline.path}
+  --sample-name {sample.sample_name}
+  --genome {sample.genome}
+  --input {sample.read1}
+  --single-or-paired {sample.read_type}
+  -O {looper.output_folder}
+  -P {compute.cores}
+  -M {compute.mem}
+  {% if sample.read2 is defined %} --input2 {sample.read2} {% endif %}
+  {% if sample.protocol is defined %} --protocol {sample.protocol} {% endif %}
+  {% if sample.adapter is defined %} --adapter-tool {sample.adapter} {% endif %}
+  {% if sample.dedup is defined %} --dedup-tool {sample.dedup} {% endif %}
+  {% if sample.trimmer is defined %} --trimmer-tool {sample.trimmer} {% endif %}
+  {% if sample.umi_len is defined %} --umi-len {sample.umi_len} {% endif %}
+  {% if sample.max_len is defined %} --max-len {sample.max_len} {% endif %}
+  {% if sample.sob is defined %} --sob {% endif %}
+  {% if sample.scale is defined %} --scale {% endif %}
+  {% if sample.prealignments is defined %} --prealignments {sample.prealignments} {%- endif -%}
+  {% if sample.TSS_name is defined %} --TSS-name {sample.TSS_name} {% endif %}
+  {% if sample.ensembl_tss is defined %} --pi-tss {sample.ensembl_tss} {% endif %}
+  {% if sample.ensembl_gene_body is defined %} --pi-body {sample.ensembl_gene_body} {% endif %}
+  {% if sample.pre_name is defined %} --pre-name {sample.pre_name} {% endif %}
+  {% if sample.anno_name is defined %} --anno-name {sample.anno_name} {% endif %}
+  {% if sample.exon_name is defined %} --exon-name {sample.exon_name} {% endif %}
+  {% if sample.intron_name is defined %} --intron-name {sample.intron_name} {% endif %}
+  {% if sample.search_file is defined %} --search-file {sample.search_file} {% endif %}
+  {% if sample.coverage is defined %} --coverage {% endif %}
+  {% if sample.keep is defined %} --keep {% endif %}
+  {% if sample.no_fifo is defined %} --noFIFO {% endif %}
+  {% if sample.complexity is defined %} --no-complexity {% endif %}
+  {% if sample.prioritize is defined %} --prioritize {% endif %}
+compute:
+  singularity_image: ${SIMAGES}peppro
+  docker_image: databio/peppro
+  bulker_crate: databio/peppro
+  size_dependent_variables: resources.tsv
 
-sample_pipeline:
-  path: pipelines/peppro.py
-  input_schema: peppro_input_schema.yaml
-  output_schema: peppro_output_schema.yaml
-  command_template: >
-    {pipeline.path}
-    --sample-name {sample.sample_name}
-    --genome {sample.genome}
-    --input {sample.read1}
-    --single-or-paired {sample.read_type}
-    -O {looper.output_folder}
-    -P {compute.cores}
-    -M {compute.mem}
-    {% if sample.read2 is defined %} --input2 {sample.read2} {% endif %}
-    {% if sample.protocol is defined %} --protocol {sample.protocol} {% endif %}
-    {% if sample.adapter is defined %} --adapter-tool {sample.adapter} {% endif %}
-    {% if sample.dedup is defined %} --dedup-tool {sample.dedup} {% endif %}
-    {% if sample.trimmer is defined %} --trimmer-tool {sample.trimmer} {% endif %}
-    {% if sample.umi_len is defined %} --umi-len {sample.umi_len} {% endif %}
-    {% if sample.max_len is defined %} --max-len {sample.max_len} {% endif %}
-    {% if sample.sob is defined %} --sob {% endif %}
-    {% if sample.scale is defined %} --scale {% endif %}
-    {% if sample.prealignments is defined %} --prealignments {sample.prealignments} {%- endif -%}
-    {% if sample.TSS_name is defined %} --TSS-name {sample.TSS_name} {% endif %}
-    {% if sample.ensembl_tss is defined %} --pi-tss {sample.ensembl_tss} {% endif %}
-    {% if sample.ensembl_gene_body is defined %} --pi-body {sample.ensembl_gene_body} {% endif %}
-    {% if sample.pre_name is defined %} --pre-name {sample.pre_name} {% endif %}
-    {% if sample.anno_name is defined %} --anno-name {sample.anno_name} {% endif %}
-    {% if sample.exon_name is defined %} --exon-name {sample.exon_name} {% endif %}
-    {% if sample.intron_name is defined %} --intron-name {sample.intron_name} {% endif %}
-    {% if sample.search_file is defined %} --search-file {sample.search_file} {% endif %}
-    {% if sample.coverage is defined %} --coverage {% endif %}
-    {% if sample.keep is defined %} --keep {% endif %}
-    {% if sample.no_fifo is defined %} --noFIFO {% endif %}
-    {% if sample.complexity is defined %} --no-complexity {% endif %}
-    {% if sample.prioritize is defined %} --prioritize {% endif %}
-  compute:
-    singularity_image: ${SIMAGES}peppro
-    docker_image: databio/peppro
-    bulker_crate: databio/peppro
-    size_dependent_variables: resources.tsv
+# project_pipeline:
+  # name: PEPPRO_summarizer
+  # path: pipelines/peppro_collator.py
+  # command_template: >
+    # looper summarize {looper.pep_config} &&
+    # {pipeline.path} -C {looper.pep_config} -o {looper.output_folder} -n {project.name}
+  # compute:
+    # singularity_image: ${SIMAGES}peppro
+    # bulker_crate: databio/peppro
+    # size_dependent_variables: resources.tsv
 
-project_pipeline:
-  name: PEPPRO_summarizer
-  path: pipelines/peppro_collator.py
-  command_template: >
-    looper summarize {looper.pep_config} &&
-    {pipeline.path} -C {looper.pep_config} -o {looper.output_folder} -n {project.name}
-  compute:
-    singularity_image: ${SIMAGES}peppro
-    bulker_crate: databio/peppro
-    size_dependent_variables: resources.tsv
-
-bioconductor:
-  readFunName: readPepproGeneCounts
-  readFunPath: BiocProject/readPepproGeneCounts.R
+# bioconductor:
+  # readFunName: readPepproGeneCounts
+  # readFunPath: BiocProject/readPepproGeneCounts.R
   
