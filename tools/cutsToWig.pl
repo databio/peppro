@@ -3,6 +3,7 @@
 # By Nathan Sheffield, University of Virginia, 2017
 # Update 03.04.19 - Jason Smith - Add option to use variable or fixedStep
 # Update 05.14.19 - Jason Smith - Fix variableStep use
+# Update 05.14.20 - Jason Smith - Add scaling factor
 
 # This is an incredibly fast Perl utility that converts cut sites
 # (coordinates) into a wiggle-like output.
@@ -28,6 +29,7 @@
 # Setup
 my $chrSize = shift;       # Size of chromosome is the first argument
 my $variableStep = shift;  # Second argument is whether to use variable or fixed
+my $scale = shift;         # Third argument is scaling factor
 $countIndex = 1;
 $currentCount = 1;
 $header =  <>;  # Grab the first line (e.g. the header)
@@ -54,7 +56,8 @@ if ($variableStep) {  # Use variableStep wiggle format
 			}
 			# otherwise, it makes it past this loop;
 			# output the sum of counts for the previous spot
-			print "$previousCut\t$currentCount\n";
+            $scaledCount = $currentCount/$scale;
+			print "$previousCut\t$scaledCount\n";
 			# reset for the current spot
 			$currentCount = 1;
 			$previousCut = $cutSite;
@@ -83,7 +86,8 @@ if ($variableStep) {  # Use variableStep wiggle format
 
 		# otherwise, it makes it past this loop;
 		# output the sum of counts for the previous spot
-		print $currentCount."\n"; 
+        $scaledCount = $currentCount/$scale;
+		print $scaledCount."\n"; 
 		$countIndex++;
 		# reset for the current spot
 		$currentCount = 1;

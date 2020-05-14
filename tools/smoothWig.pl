@@ -21,13 +21,15 @@
 # cutsToWig.pl CHROMSIZE SMOOTH_LENGTH cuts.txt > out.wig
 
 # It's also useful to pipe this to the ucsc tool for bigwig compression:
-# cat cuts.txt | cutsToWig.pl CHROMSIZE | wigToBigWig -clip stdin chrom_sizes.txt out.bw
+# cat cuts.txt | cutsToWig.pl CHROMSIZE | wigToBigWig -clip stdin \
+# chrom_sizes.txt out.bw
 
 # Setup
 my $chrSize = shift;       # Size of chromosome is the first argument
 my $smoothSize = shift;    # Smooth size is 2nd argument
 my $stepSize = shift;      # Step size
 my $variableStep = shift;  # Fourth argument is whether to use variable or fixed
+my $scale = shift;         # Fifth argument is scaling factor
 
 $countIndex = 1;
 $currentCount = 0;
@@ -80,7 +82,8 @@ if ($variableStep) {
 			}
 
 			if ($countIndex % $stepSize == 0) {
-				print "$countIndex\t$currentCount\n";
+                $scaledCount = $currentCount/$scale;
+				print "$countIndex\t$scaledCount\n";
 			}
 			$countIndex++;
 		}
@@ -95,7 +98,8 @@ if ($variableStep) {
 			$endSite = shift @closers;
 		}
 		if ($countIndex % $stepSize == 0) {
-			print "$countIndex\t$currentCount\n";
+            $scaledCount = $currentCount/$scale;
+			print "$countIndex\t$scaledCount\n";
 		}
 		$countIndex++;	
 	}
@@ -126,7 +130,8 @@ if ($variableStep) {
 				$endSite = shift @closers;
 			}
 			if ($countIndex % $stepSize == 0) {
-				print "$currentCount\n";
+                $scaledCount = $currentCount/$scale;
+				print "$scaledCount\n";
 			}
 			$countIndex++;
 		}
@@ -141,7 +146,8 @@ if ($variableStep) {
 			$endSite = shift @closers;
 		}
 		if ($countIndex % $stepSize == 0) {
-			print "$currentCount\n";
+            $scaledCount = $currentCount/$scale;
+			print "$scaledCount\n";
 		}
 		$countIndex++;	
 	}
