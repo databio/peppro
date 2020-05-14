@@ -29,7 +29,7 @@ resources:
 parameters:  # parameters passed to bioinformatic tools, subclassed by tool
   # Adjust/Add/Remove parameters for individual tools here
   bowtie2_pre: # Modify bowtie2 prealignment settings
-    params: ''
+    params: ""
     # pipeline default: -k 1 -D 20 -R 3 -N 1 -L 20 -i S,1,0.50
     # -k 1: report up to <1> alns per read; MAPQ not meaningful
     # -D 20: give up extending after <20> failed extends in a row
@@ -38,10 +38,15 @@ parameters:  # parameters passed to bioinformatic tools, subclassed by tool
     # -L 20: length of seed substrings; must be >3, <32
     # -i S,1,0.50: interval between seed substrings w/r/t read len
   bowtie2: # Modify bowtie2 primary genome alignment settings
-    params: ''
+    params: ""
     # pipeline default: --very-sensitive -X 2000
     # --very-sensitive: -D 20 -R 3 -N 0 -L 20 -i S,1,0.50
     # -X 2000: paired-end maximum fragment length
   samtools:
-    params: '-q 10'
+    params: "-q 10"
     # -q: skip alignments with MAPQ < 10.
+  precedence: # Set the precedence of default genomic features
+    params: "Enhancer, Promoter, Promoter Flanking Region, 5' UTR, 3' UTR, Exon, Intron"
+    # pipeline default: Enhancer, Promoter, Promoter Flanking Region, 5' UTR,
+    #                   3' UTR, Exon, Intron
+    # These features are all present in the Refgenie feat_annotation asset.
