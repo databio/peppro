@@ -1,0 +1,18 @@
+pipeline_name: PEPPRO_summarizer
+pipeline_type: project
+path: pipelines/peppro_collator.py
+input_schema: peppro_input_schema.yaml
+output_schema: peppro_output_schema.yaml
+command_template: >
+  looper table {looper.pep_config} &&
+  {pipeline.path} -C {looper.pep_config} -o {looper.output_folder} -n {project.name}
+compute:
+  singularity_image: ${SIMAGES}peppro
+  docker_image: databio/peppro
+  bulker_crate: databio/peppro
+  size_dependent_variables: resources.tsv
+
+bioconductor:
+  readFunName: readPepproGeneCounts
+  readFunPath: BiocProject/readPepproGeneCounts.R
+  
