@@ -5,7 +5,7 @@ PEPPRO Collator - Run-on sequencing project-level pipeline
 
 __author__ = ["Michal Stolarczyk", "Jason Smith"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 from argparse import ArgumentParser
 import os
@@ -33,24 +33,23 @@ def parse_arguments():
     """
     parser = VersionInHelpParser(prog="PEPPRO collator", description='PEPPRO collator' , version=__version__)
     parser = pypiper.add_pypiper_args(parser, groups=['pypiper', 'looper'])
-    #parser.add_argument("-c", "--config", help="Path to the project config file.", type=str)
     parser.add_argument("-n", "--name", help="Name of the project to use.", type=str)
-    parser.add_argument("-o", "--output", help="Output dir path.", type=str)
+    parser.add_argument("-r", "--results", help="Output results sub directory path.", type=str)
     args = parser.parse_args()
     return args
 
 
 def main():
     args = parse_arguments()
-    outfolder = os.path.abspath(os.path.join(args.output, "summary"))
-    
-    pm = pypiper.PipelineManager(
-        name="PEPPRO collator", outfolder=outfolder,
-        args=args, version=__version__)
+    outfolder = os.path.abspath(os.path.join(args.output_parent, "summary"))
+
+    pm = pypiper.PipelineManager(name="PEPPRO collator", outfolder=outfolder,
+                                 args=args, version=__version__)
 
     #pm.info("args: {}\n".format(args))
 
-    cmd = "Rscript {} {}".format(tool_path("PEPPRO_summarizer.R"), args.config_file)
+    cmd = "Rscript {} {} {}".format(tool_path("PEPPRO_summarizer.R"),
+                                    args.config_file, args.output_parent)
 
     pm.run(cmd, [os.path.join(outfolder, "{name}_libComplexity.pdf".format(name=args.name)),
                  os.path.join(outfolder, "{name}_countData.csv".format(name=args.name))])
