@@ -48,11 +48,20 @@ def main():
 
     #pm.info("args: {}\n".format(args))
 
-    cmd = "Rscript {} {} {}".format(tool_path("PEPPRO_summarizer.R"),
-                                    args.config_file, args.output_parent)
+    cmd = "Rscript {R_file} {config_file} {output_dir} {results_subdir}".format(
+        R_file=tool_path("PEPPRO_summarizer.R"),
+        config_file=args.config_file,
+        output_dir=args.output_parent,
+        results_subdir=args.results)
+    if args.new_start:
+        cmd += " --new-start"
 
-    pm.run(cmd, [os.path.join(outfolder, "{name}_libComplexity.pdf".format(name=args.name)),
-                 os.path.join(outfolder, "{name}_countData.csv".format(name=args.name))])
+    complexity_file = os.path.join(
+        outfolder, "{name}_libComplexity.pdf".format(name=args.name))
+    counts_file = os.path.join(
+        outfolder, "{name}_countData.csv".format(name=args.name))
+
+    pm.run(cmd, [complexity_file, counts_file])
     pm.stop_pipeline()
 
 

@@ -6,10 +6,12 @@
 for each gene for each sample in the 
 format [gene],[sample1],[sample...],[sampleN]}
 \usage{
-calcCountsTable(project)
+calcCountsTable(project, results_subdir)
 }
 \arguments{
 \item{project}{A PEPr project object}
+
+\item{results_subdir}{A PEP project results subdirectory path}
 }
 \description{
 For each sample in a project, generate a counts object of gene counts

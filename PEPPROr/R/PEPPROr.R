@@ -2250,26 +2250,13 @@ plotAdapt <- function(input, name='adapt', umi_len = 0) {
 }
 
 
-#' Helper function to build a file path to the correct output folder using a
-#' specified suffix
-#'
-#' @param suffix A file suffix identifier
-#' @param pep A PEP project configuration file
-#' @export
-buildFilePath <- function(suffix, pep=prj) {
-    file.path(pepr::config(pep)$looper$output_dir, "summary",
-              paste0(config(pep)$name, suffix))
-}
-
-
 #' Read PEPPRO gene coverage files
 #'
 #' @param pep A PEPr project object
+#' @param results_subdir A PEP project results subdirectory path
 #' @keywords project gene coverage
 #' @export
-readPepproGeneCounts = function(project) {
-    cwd            <- getwd()
-    project_dir    <- pepr::config(project)$looper$output_dir
+readPepproGeneCounts = function(project, results_subdir) {
     sample_names   <- pepr::sampleTable(project)$sample_name
     genomes        <- as.list(pepr::sampleTable(project)$genome)
     names(genomes) <- sample_names
@@ -2277,7 +2264,7 @@ readPepproGeneCounts = function(project) {
     names(paths)   <- sample_names
 
     for (sample in sample_names) {
-        paths[[sample]] <- paste(project_dir, 'results_pipeline', sample,
+        paths[[sample]] <- paste(results_subdir, sample,
                                  paste0('signal_', genomes[[sample]]),
                                  paste0(sample, "_gene_coverage.bed"), sep="/")
     }
@@ -2293,7 +2280,6 @@ readPepproGeneCounts = function(project) {
         }
     })
 
-    setwd(cwd)
     return(GenomicRanges::GRangesList(Filter(length, result)))
 }
 
@@ -2303,24 +2289,17 @@ readPepproGeneCounts = function(project) {
 #' format [gene],[sample1],[sample...],[sampleN]
 #'
 #' @param project A PEPr project object
+#' @param results_subdir A PEP project results subdirectory path
 #' @export
-calcCountsTable = function(project) {
-    # Produce output directory (if needed)
-    dir.create(
-        suppressMessages(
-            file.path(pepr::config(project)$looper$output_dir, "summary")),
-        showWarnings = FALSE)
-
+calcCountsTable = function(project, results_subdir) {
     # Load gene counts files
-    totalSamples  <- length(suppressMessages(pepr::sampleTable(project)$sample_name))
-    countsGR      <- PEPPROr::readPepproGeneCounts(project)
+    totalSamples  <- length(
+        suppressMessages(pepr::sampleTable(project)$sample_name))
+    countsGR      <- PEPPROr::readPepproGeneCounts(project, results_subdir)
     actualSamples <- length(countsGR)
 
-    message(paste0(actualSamples, " of ", totalSamples, " files available"))
-
-    # Generate output file name
-    output_name <- PEPPROr::buildFilePath("_countData.csv", project)
-    output_name <- system(paste0("echo ", counts_path), intern = TRUE)
+    message(paste0(actualSamples, " of ", totalSamples,
+            " gene counts files available"))
 
     if (length(countsGR) > 0) {
         # Create gene name data table
@@ -2364,27 +2343,26 @@ calcCountsTable = function(project) {
 
 #' Create and return assets spreadsheet and save the spreadsheet to file
 #'
-#' @param pep A PEP configuration file
+#' @param project A PEPr project object
+#' @param output_dir A PEP project output directory path
+#' @param results_subdir A PEP project results subdirectory path
 #' @export
-createAssetsSummary <- function(pep) {
-    prj <- invisible(suppressWarnings(pepr::Project(pep)))
-    
-    # Grab project directory
-    project_dir <- config(prj)$looper$output_dir
-    project_dir <- system(paste0("echo ", project_dir), intern = TRUE)
+createAssetsSummary <- function(project, output_dir, results_subdir) {
+    # Convenience
+    project_name <- config(project)$name
     
     # Create assets_summary file
-    project_samples <- pepr::sampleTable(prj)$sample_name
+    project_samples <- pepr::sampleTable(project)$sample_name
     missing_files   <- 0
     assets  <- data.table(sample_name=character(),
                           asset=character(),
                           path=character(),
                           annotation=character())
     write(paste0("Creating assets summary..."), stdout())
+
     for (sample in project_samples) {
-        sample_output_folder = file.path(project_dir,
-               paste0("results_pipeline/", sample))
-        sample_assets_file = file.path(sample_output_folder, "assets.tsv")
+        sample_output_folder <- file.path(results_subdir, sample)
+        sample_assets_file   <- file.path(sample_output_folder, "assets.tsv")
 
         if (!file.exists(sample_assets_file)) {
             missing_files <- missing_files + 1
@@ -2393,12 +2371,13 @@ createAssetsSummary <- function(pep) {
 
         t <- fread(sample_assets_file, header=FALSE,
                    col.names=c('asset', 'path', 'annotation'))
-        t <- t[!duplicated(t[, c('asset', 'path', 'annotation')], fromLast=TRUE),]
+        t <- t[!duplicated(t[, c('asset', 'path', 'annotation')],
+               fromLast=TRUE),]
         t[,sample_name:=sample]
         assets = rbind(assets, t)
     }
-    project_assets_file <- file.path(project_dir,
-        paste0(config(prj)$name, '_assets_summary.tsv'))
+    project_assets_file <- file.path(output_dir,
+        paste0(project_name, '_assets_summary.tsv'))
     if (missing_files > 0) {
         warning(sprintf("Assets files missing for %s samples.", missing_files))
     }

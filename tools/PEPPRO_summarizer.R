@@ -36,9 +36,19 @@ if (length(loadLibrary)!=0) {
 # Create a parser
 p <- arg_parser("Produce nascent RNA profiling Summary Reports, Files, and Plots")
 # Add command line arguments
-p <- add_argument(p, "config", help="PEPPRO project_config.yaml")
+p <- add_argument(p, arg="config", short="-c",
+                  help="PEPPRO project_config.yaml")
+p <- add_argument(p, arg="output", short="-o",
+                  help="Project parent output directory path")
+p <- add_argument(p, arg="results", short="-r",
+                  help="Project results output subdirectory path")
+p <- add_argument(p, arg="--new-start", short="-N", flag=TRUE,
+                  help=paste0("New start mode. This flag will tell the ",
+                       "summarizer to start over, and run every command, even ",
+                       "if its target output already exists."))
 # Parse the command line arguments
 argv <- parse_args(p)
+#print(argv)  # DEBUG
 
 ###############################################################################
 ##### LOAD DEPENDENCIES #####
@@ -71,58 +81,64 @@ for (i in required_libraries) {
 ###############################################################################
 ##### MAIN #####
 
-# Identify the project configuration file
+# Set the project configuration file
 pep <- argv$config
+# Load the project
 prj <- invisible(suppressWarnings(pepr::Project(pep)))
+# Convenience
+project_name <- config(prj)$name
 
-# Project genomes
+# Set the output directory
+summary_dir <- suppressMessages(file.path(argv$output, "summary"))
+# Produce output directory (if needed)
+dir.create(summary_dir, showWarnings = FALSE)
+
+# Set the results subdirectory
+if (dir.exists(argv$results)) {
+    results_subdir <- suppressMessages(file.path(argv$results))
+} else {
+    warning(paste0("The project results subdirectory (", argv$results,
+            ") does not exist."))
+    quit()
+}
+
+# Get project genomes
 genomes <- invisible(suppressWarnings(pepr::sampleTable(prj)$genome))
 
-# Produce output directory (if needed)
-output_dir <- suppressMessages(
-    file.path(pepr::config(prj)$looper$output_dir, "summary"))
-#output_dir <- system(paste0("echo ", output_dir), intern = TRUE)
-dir.create(output_dir, showWarnings = FALSE)
-
 # Create project assets summary
-assets <- PEPPROr::createAssetsSummary(pep)
+assets  <- PEPPROr::createAssetsSummary(prj, argv$output, results_subdir)
 
 # Produce library complexity summary plots
-complexity_path <- PEPPROr::buildFilePath("_libComplexity.pdf", prj)
-#complexity_path <- system(paste0("echo ", complexity_path), intern = TRUE)
-if (!file.exists(complexity_path)) {
-    cc <- paste(suppressMessages(pepr::config(prj)$looper$output_dir),
-                "results_pipeline",
+complexity_path <- file.path(summary_dir,
+                             paste0(project_name, "_libComplexity.pdf"))
+if (!file.exists(complexity_path) || argv$new_start) {
+    cc <- paste(results_subdir,
                 suppressMessages(pepr::sampleTable(prj)$sample_name),
                 paste0("QC_", suppressMessages(pepr::sampleTable(prj)$genome)),
                 paste0(suppressMessages(pepr::sampleTable(prj)$sample_name),
                        "_preseq_yield.txt"),
                 sep="/")
-    #cc <- system(paste0("echo ", cc), intern = TRUE)
-    rc <- paste(suppressMessages(pepr::config(prj)$looper$output_dir),
-                "results_pipeline",
+    rc <- paste(results_subdir,
                 suppressMessages(pepr::sampleTable(prj)$sample_name),
                 paste0("QC_", suppressMessages(pepr::sampleTable(prj)$genome)),
                 paste0(suppressMessages(pepr::sampleTable(prj)$sample_name),
                        "_preseq_counts.txt"),
                 sep="/")
-    #rc <- system(paste0("echo ", rc), intern = TRUE)
     hasBoth <- file.exists(cc) & file.exists(rc)
     ccSub <- cc[hasBoth]
     rcSub <- rc[hasBoth]
-    message(paste0(length(ccSub), " of ", length(cc), " files available"))
+    message(paste0(length(ccSub), " of ", length(cc),
+            " library complexity files available."))
     if (sum(hasBoth) > 0){
         p <- PEPPROr::plotComplexityCurves(ccurves = ccSub, coverage = 0,
                                             read_length = 0,
                                             real_counts_path = rcSub,
                                             ignore_unique = FALSE)
         output_file <- PEPPROr::buildFilePath("_libComplexity.pdf", prj)
-        #output_file <- system(paste0("echo ", output_file), intern = TRUE)
         pdf(file = output_file, width= 10, height = 7, useDingbats=F)
         suppressWarnings(print(p))
         invisible(dev.off())
         output_file <- PEPPROr::buildFilePath("_libComplexity.png", prj)
-        #output_file <- system(paste0("echo ", output_file), intern = TRUE)
         png(filename = output_file, width = 686, height = 480)
         suppressWarnings(print(p))
         invisible(dev.off())
@@ -138,10 +154,9 @@ if (!file.exists(complexity_path)) {
     complexity_flag <- TRUE
 }
 
-counts_path <- PEPPROr::buildFilePath("_countData.csv", prj)
-#counts_path <- system(paste0("echo ", counts_path), intern = TRUE)
-if (!file.exists(counts_path)) {
-    counts_file <- PEPPROr::calcCountsTable(prj)
+counts_path <- file.path(summary_dir, paste0(project_name, "_countData.csv"))
+if (!file.exists(counts_path) || argv$new_start) {
+    counts_file <- PEPPROr::calcCountsTable(prj, results_subdir)
     if (!is.null(counts_file)) {
         data.table::fwrite(counts_file, file=counts_path)
         # Export as csv with rownames as the first column 

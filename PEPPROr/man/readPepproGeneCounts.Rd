@@ -4,9 +4,11 @@
 \alias{readPepproGeneCounts}
 \title{Read PEPPRO gene coverage files}
 \usage{
-readPepproGeneCounts(project)
+readPepproGeneCounts(project, results_subdir)
 }
 \arguments{
+\item{results_subdir}{A PEP project results subdirectory path}
+
 \item{pep}{A PEPr project object}
 }
 \description{
