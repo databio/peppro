@@ -137,12 +137,12 @@ looper run tutorial.yaml
 ```         
 Congratulations! Your first sample should be running through the pipeline now.  It takes right around 25 minutes for this process to complete using a single core and maxes at about 3.5 GB of memory.
 
-After the pipeline is finished, we can look through the output directory together.  We've provided a breakdown of that directory in the [browse output page](/browse_output/).
+After the pipeline is finished, we can look through the output directory together.  We've provided a breakdown of that directory in the [browse output page](browse_output.md).
 
 
 ## 6: Generate an `HTML` report using `looper`
 
-Let's take full advantage of `looper` and generate a pipeline `HTML` report that makes all our results easy to view and browse.  If you'd like to skip right to the results and see what it looks like, [check out the tutorial results](../files/examples/tutorial/tutorial_summary.html).  Otherwise, let's generate a report ourselves.
+Let's take full advantage of `looper` and generate a pipeline `HTML` report that makes all our results easy to view and browse.  If you'd like to skip right to the results and see what it looks like, [check out the tutorial results](files/examples/tutorial/tutorial_summary.html).  Otherwise, let's generate a report ourselves.
 Using our same configuration file we used to run the samples through the pipeline, we'll now employ the `summarize` function of `looper`.
 ```
 looper summarize tutorial.yaml

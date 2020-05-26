@@ -1,0 +1,47 @@
+description: A PEP for nascent RNA samples for the PEPPRO pipeline.
+imports:
+ - http://schema.databio.org/pep/2.0.0.yaml
+properties:
+  samples:
+    type: array
+    items:
+      type: object
+      properties:
+        sample_name:
+          type: string
+          description: "Name of the sample"
+        organism:
+          type: string
+          description: "Organism"
+        protocol:
+          type: string
+          description: "Specifies whether the sample is pro-seq or gro-seq"
+          enum: ["PRO", "pro", "PRO-SEQ", "PRO-seq", "proseq", "PROSEQ", "GRO", "gro", "groseq", "GROSEQ", "GRO-SEQ", "GRO-seq"]
+        genome:
+          type: string
+          description: "Refgenie genome registry identifier"
+        read_type:
+          type: string
+          description: "Is this single or paired-end data?"
+          enum: ["SINGLE", "single", "PAIRED", "paired"]
+        read1:
+          type: string
+          description: "Fastq file for read 1"
+        read2:
+          type: string
+          description: "Fastq file for read 2 (for paired-end experiments)"
+        umi_len:
+          type: integer
+          description: "Length of the Unique Molecular Identifier, if any"
+      required:
+        - sample_name
+        - protocol
+        - read1
+        - genome
+      required_input_attrs:
+        - read1
+      input_attrs:
+        - read1
+        - read2
+required:
+  - samples

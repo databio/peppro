@@ -26,7 +26,7 @@ If you're running `PEPPRO` with `looper`, you can also pass any number of additi
 For example:
 ```
 looper run examples/meta/peppro_test.yaml -d \
-  --compute slurm \
+  --package slurm \
   --umi-len 8
 ```
 
@@ -41,40 +41,41 @@ Below we'll go over two examples of customization in the project configuration f
 #### 1: Set a universal `--umi_len` in the project configuration file
 
 ```
-# Run test sample through PEPPRO
 name: test
 
-metadata:
-  sample_annotation: "peppro_test.csv"
+pep_version: 2.0.0
+sample_table: "peppro_test.csv"
+
+looper:
   output_dir: "$PROCESSED/peppro/peppro_test/"
-  pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
-  
-derived_columns: [read1]
+  pipeline_interfaces: ["$CODE/peppro/project_pipeline_interface.yaml"]
 
-data_sources:
-  R1: "$CODE/peppro/examples/data/{sample_name}_r1.fq.gz"
-  
-implied_columns:
-  organism:
-    human:
-      genome: hg38
-      prealignments: human_rDNA
-      adapter: cutadapt  # Default
-      dedup: seqkit      # Default
-      trimmer: seqtk     # Default
-      protocol: pro      # Default
-      umi_len: 8         # Custom --umi-len that will be passed to **all** samples
-      max_len: -1        # Disable length trimming 
-
-pipeline_args:
-#  peppro.py:
-#    "--prioritize": null # Default is FALSE. Pass flag to prioritize features by the order they appear in the feat_annotation asset when calculating FRiF/PRiF
-#    "--sob": null        # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
-#    "--scale": null      # Default is FALSE. Pass flag to scale seqOutBias signal tracks
-#    "--coverage": null   # Default is FALSE. Pass flag to use coverage when producing library complexity plots.
-#    "--keep": null       # Default is FALSE. Pass flag to keep prealignment BAM files.
-#    "--noFIFO": null     # Default is FALSE. Pass flag to NOT use named pipes during prealignments.
-#    "--complexity": null # Default is TRUE.  Pass flag to disable library complexity calculation. Faster.
+sample_modifiers:
+  append:
+    pipeline_interfaces: ["$CODE/peppro/sample_pipeline_interface.yaml"]
+    #prioritize: null # Default is FALSE. Pass flag to prioritize features by the order they appear in the feat_annotation asset when calculating FRiF/PRiF
+    #sob: null        # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
+    #no_scale: null   # Default is FALSE. Pass flag to not scale signal tracks
+    #coverage: null   # Default is FALSE. Pass flag to use coverage when producing library complexity plots.
+    #keep: null       # Default is FALSE. Pass flag to keep prealignment BAM files.
+    #noFIFO: null     # Default is FALSE. Pass flag to NOT use named pipes during prealignments.
+    #complexity: null # Default is TRUE.  Pass flag to disable library complexity calculation. Faster.
+  derive:
+    attributes: [read1]
+    sources:
+        R1: "$CODE/peppro/examples/data/{sample_name}_r1.fq.gz"
+  imply:
+    - if:
+        organism: ["human", "Homo sapiens", "Human", "Homo_sapiens"]
+      then:
+        genome: hg38
+        prealignments: human_rDNA
+        adapter: cutadapt  # Default
+        dedup: seqkit      # Default
+        trimmer: seqtk     # Default
+        protocol: pro      # Default
+        umi_len: 8         # Custom --umi-len that will be passed to **all** samples
+        max_len: -1        # Default
 ```
 
 #### 2: Set custom `--umi_len` arguments for individual samples
@@ -87,13 +88,17 @@ Here's a snippet of the relevant portion of the configuration files:
 
 - configuration file
 ```
- umi_status:
-    true_8:
+imply:
+  - if:
+     umi_status: "true_8"
+    then:
       umi_len: 8
-    true_6:
+  - if:
+      umi_status: "true_6"
+    then:
       umi_len: 6
 ```
-- annotation file
+- annotation file (umi_status column)
 ```
 umi_status
 FALSE

@@ -1,25 +1,35 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.9.7] -- 2020-05-26
+
+### Added
+ - Create assets summary for samples and project
+ - Add optional scaling of signal tracks
+
+### Changed
+ - Update to PEP 2.0 standard
+ - Update docs and examples
+
 ## [0.9.6] -- 2020-03-31
 
-## Changed
+### Changed
  - Fixed refgenie bowtie2 index assignment
 
 ## [0.9.5] -- 2020-03-26
 
-## Changed
+### Changed
  - Updated FRiF calculation to only account for the `count` column
  - Updated FRiF calculation to check if results are empty
 
 ## [0.9.4] -- 2020-03-25
 
-## Changed
+### Changed
  - Updated bowtie2 index checks to be in line with refgenie updates
 
 ## [0.9.3] -- 2020-03-25
 
-## Changed
+### Changed
  - Added checks for correct value return on cutadapt report checks
 
 ## [0.9.2] -- 2020-03-25

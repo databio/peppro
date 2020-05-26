@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.9.6"
+__version__ = "0.9.7"
 
 from argparse import ArgumentParser
 import os
@@ -84,8 +84,10 @@ def parse_arguments():
 
     parser.add_argument("--scale", action='store_true',
                         dest="scale", default=False,
-                        help="Scale output with seqOutBias when producing"
-                             " signal tracks.")
+                        help="Scale signal tracks: "
+                             "Default is to scale by read count.\n"
+                             "If using seqOutBias, scales by the expected/"
+                             "observed cut frequency.")
 
     parser.add_argument("--prealignments", default=[], type=str, nargs="+",
                         help="Space-delimited list of reference genomes to "
@@ -1873,6 +1875,31 @@ def _add_resources(args, res, asset_dict=None):
         return res, rgc
 
 
+def report_message(pm, report_file, message, annotation=None):
+    """
+    Writes a string to provided file in a safe way.
+    
+    :param PipelineManager pm: a pypiper PipelineManager object
+    :param str report_file: name of the output file
+    :param str message: string to write to the output file
+    :param str annotation: By default, the message will be annotated with the
+        pipeline name, so you can tell which pipeline records which stats.
+        If you want, you can change this; use annotation='shared' if you
+        need the stat to be used by another pipeline (using get_stat()).
+    """
+    # Default annotation is current pipeline name.
+    annotation = str(annotation or pm.name)
+
+    message = str(message).strip()
+    
+    message = "{message}\t{annotation}".format(
+        message=message, annotation=annotation)
+
+    # Just to be extra careful, let's lock the file while we we write
+    # in case multiple pipelines write to the same file.
+    pm._safe_write_to_file(report_file, message)
+
+
 ###############################################################################
 def main():
     """
@@ -1881,7 +1908,7 @@ def main():
 
     args = parse_arguments()
 
-    args.paired_end = args.single_or_paired == "paired"
+    args.paired_end = args.single_or_paired.lower() == "paired"
 
     # Initialize, creating global PipelineManager and NGSTk instance for
     # access in ancillary functions outside of main().
@@ -2015,8 +2042,20 @@ def main():
     res.adapters = res.adapters or tool_path("adapter.fa")
 
     param.outfolder = outfolder
+    
+    # Report utilized assets
+    assets_file = os.path.join(param.outfolder, "assets.tsv")
+    for asset in res:
+        message = "{}\t{}".format(asset, os.path.expandvars(res[asset]))
+        report_message(pm, assets_file, message)
+        
+    # Report primary genome
+    message = "genome\t{}".format(args.genome_assembly)
+    report_message(pm, assets_file, message)
 
-    # Check that the input file(s) exist before continuing
+    ###########################################################################
+    #          Check that the input file(s) exist before continuing           #
+    ###########################################################################
     if _itsa_file(args.input[0]):
         print("Local input file: " + args.input[0])
     elif _itsa_empty_file(args.input[0]):
@@ -2040,10 +2079,11 @@ def main():
             err_msg = "Could not find: {}"
             pm.fail_pipeline(IOError(err_msg.format(args.input2[0])))
 
-    container = None
+    container = None # legacy
 
     ###########################################################################
-
+    #                      Grab and prepare input files                       #
+    ###########################################################################
     pm.report_result(
         "File_mb",
         round(ngstk.get_file_size(
@@ -2388,7 +2428,8 @@ def main():
                         unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1_dups,
@@ -2396,14 +2437,16 @@ def main():
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
-                        dups=True)
+                        dups=True,
+                        bt2_opts_txt=param.bowtie2_pre.params)
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1,
                         unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1_dups,
@@ -2411,7 +2454,8 @@ def main():
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
-                        dups=True)
+                        dups=True,
+                        bt2_opts_txt=param.bowtie2_pre.params)
 
                 if args.paired_end:
                     to_compress.append(unmap_fq1_dups)
@@ -2428,14 +2472,16 @@ def main():
                         unmap_fq1, unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True,
                         unmap_fq1, unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
                 if args.paired_end:
                     to_compress.append(unmap_fq1)
                     to_compress.append(unmap_fq2)
@@ -2485,8 +2531,12 @@ def main():
 
     mito_name = ["chrM", "chrMT", "M", "MT", "rCRSd", "rCRSd_3k"]
 
-    bt2_options = " --very-sensitive"
-    bt2_options += " -X 2000"
+    if not param.bowtie2.params:
+        bt2_options = " --very-sensitive"
+        if args.paired_end:
+            bt2_options += " -X 2000"
+    else:
+        bt2_options = param.bowtie2.params
 
     # samtools sort needs a temporary directory
     tempdir = tempfile.mkdtemp(dir=map_genome_folder)
@@ -3001,7 +3051,7 @@ def main():
             with open(Tss_plus) as f:
                 floats = list(map(float, f))
             try:
-                # If the TSS enrichment is 0, don't report            
+                # Catch if the TSS score is trying to divide by 0           
                 list_len = 0.05*float(len(floats))
                 normTSS = [x / (sum(floats[1:int(list_len)]) /
                            len(floats[1:int(list_len)])) for x in floats]
@@ -3019,6 +3069,7 @@ def main():
 
                 pm.report_result("TSS_coding_score", round(Tss_score, 1))
             except ZeroDivisionError:
+                pm.report_result("TSS_coding_score", 0)
                 pass
 
             # Minus TSS enrichment
@@ -3051,6 +3102,7 @@ def main():
 
                 pm.report_result("TSS_non-coding_score", round(Tss_score, 1))
             except ZeroDivisionError:
+                pm.report_result("TSS_non-coding_score", 0)
                 pass
 
         # Call Rscript to plot TSS Enrichment
@@ -3321,6 +3373,17 @@ def main():
                 cmd1 = ("cut -f 4 " + anno_local + " | sort -u")
             ft_list = pm.checkprint(cmd1, shell=True)
             ft_list = ft_list.splitlines()
+            if param.precedence.params:
+                p_list = param.precedence.params.split(",")
+                p_list = [feature.strip() for feature in p_list]
+                if all(feature in ft_list for feature in p_list):
+                    ft_list = p_list
+                else:
+                    pm.warning("The provided precedence list ({}) of features "
+                               "are not all present in your annotation file "
+                               "({})".format(str(p_list), anno_local))
+                    pm.warning("Defaulting to the order of features in "
+                               "{}".format(anno_local))
 
             # Split annotation file on features
             cmd2 = ("awk -F'\t' '{print>\"" + QC_folder + "/\"$4}' " +
@@ -3718,6 +3781,10 @@ def main():
         # separate strand bigWigs; just convert the BAM's directly with 
         # bamSitesToWig.py which uses UCSC wigToBigWig
         pm.timestamp("### Produce bigWig files")
+        
+        # need Total Reads divided by 1M
+        ar = float(pm.get_stat("Aligned_reads"))
+        scaling_factor = float(ar/1000000)
 
         wig_cmd_callable = ngstk.check_command("wigToBigWig")
 
@@ -3732,6 +3799,8 @@ def main():
             cmd2 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd2 += " --tail-edge"
+            if args.scale:
+                cmd2 += " --scale " + ar
             pm.run([cmd1, cmd2], [plus_exact_bw, plus_smooth_bw])
 
             cmd3 = tools.samtools + " index " + minus_bam
@@ -3744,6 +3813,8 @@ def main():
             cmd4 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd4 += " --tail-edge"
+            if args.scale:
+                cmd4 += " --scale " + ar
             pm.run([cmd3, cmd4], [minus_exact_bw, minus_smooth_bw])
         else:
             print("Skipping signal track production -- Could not call \'wigToBigWig\'.")

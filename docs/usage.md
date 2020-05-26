@@ -25,7 +25,7 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--silent] [--verbosity V]
                  [--coverage] [--keep] [--noFIFO] [--no-complexity]
                  [--prioritize] [-V]
 
-PEPPRO version 0.9.6
+PEPPRO version 0.9.7
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -64,8 +64,9 @@ optional arguments:
                         length trimming. Default: -1
   --sob                 Use seqOutBias to produce signal tracks and
                         incorporate mappability information.
-  --scale               Scale output with seqOutBias when producing signal
-                        tracks.
+  --scale               Scale signal tracks: Default is to scale by read
+                        count. If using seqOutBias, scales by the
+                        expected/observed cut frequency.
   --prealignments PREALIGNMENTS [PREALIGNMENTS ...]
                         Space-delimited list of reference genomes to align to
                         before primary alignment.
