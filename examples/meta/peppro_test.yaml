@@ -1,21 +1,30 @@
 # Run test sample through PEPPRO
-pep_version: '2.0.0'
 name: test
 
+pep_version: 2.0.0
 sample_table: "peppro_test.csv"
+
 looper:
-  output_dir: "$HOME/peppro/peppro_test/"
+  output_dir: "$PROCESSED/peppro/peppro_test/"
+  pipeline_interfaces: ["$CODE/peppro/project_pipeline_interface.yaml"]
 
 sample_modifiers:
   append:
-    pipeline_interfaces: $CODE/peppro/pipeline_interface.yaml
+    pipeline_interfaces: ["$CODE/peppro/sample_pipeline_interface.yaml"]
+    #prioritize: null # Default is FALSE. Pass flag to prioritize features by the order they appear in the feat_annotation asset when calculating FRiF/PRiF
+    #sob: null        # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
+    #no_scale: null   # Default is FALSE. Pass flag to not scale signal tracks
+    #coverage: null   # Default is FALSE. Pass flag to use coverage when producing library complexity plots.
+    #keep: null       # Default is FALSE. Pass flag to keep prealignment BAM files.
+    #noFIFO: null     # Default is FALSE. Pass flag to NOT use named pipes during prealignments.
+    #complexity: null # Default is TRUE.  Pass flag to disable library complexity calculation. Faster.
   derive:
     attributes: [read1]
     sources:
         R1: "$CODE/peppro/examples/data/{sample_name}_r1.fq.gz"
   imply:
     - if:
-        organism: human
+        organism: ["human", "Homo sapiens", "Human", "Homo_sapiens"]
       then:
         genome: hg38
         prealignments: human_rDNA

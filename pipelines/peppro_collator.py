@@ -31,10 +31,13 @@ def parse_arguments():
 
     :return argparse.Namespace: parsed arguments namespace
     """
-    parser = VersionInHelpParser(prog="PEPPRO collator", description='PEPPRO collator' , version=__version__)
+    parser = VersionInHelpParser(prog="PEPPRO collator",
+        description='PEPPRO collator' , version=__version__)
     parser = pypiper.add_pypiper_args(parser, groups=['pypiper', 'looper'])
-    parser.add_argument("-n", "--name", help="Name of the project to use.", type=str)
-    parser.add_argument("-r", "--results", help="Output results sub directory path.", type=str)
+    parser.add_argument("-n", "--name",
+                        help="Name of the project to use.", type=str)
+    parser.add_argument("-r", "--results",
+                        help="Output results sub directory path.", type=str)
     args = parser.parse_args()
     return args
 

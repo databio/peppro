@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.9.6"
+__version__ = "0.9.7"
 
 from argparse import ArgumentParser
 import os
