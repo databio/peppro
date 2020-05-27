@@ -20,6 +20,9 @@ properties:
         genome:
           type: string
           description: "Refgenie genome registry identifier"
+        prealignments:
+          type: ["string", "array"]
+          descrption: "Refgenie genome registry identifiers"
         read_type:
           type: string
           description: "Is this single or paired-end data?"
@@ -33,15 +36,75 @@ properties:
         umi_len:
           type: integer
           description: "Length of the Unique Molecular Identifier, if any"
+        max_len:
+          type: integer
+          description: "Specify the maximum read length to trim all reads to"
+        adapter:
+          type: string
+          description: "Specify the adapter removal tool"
+          enum: ["cutadapt", "fastp"]
+        dedup:
+          type: string
+          description: "Specify the read deduplication tool (only if UMI is present)"
+          enum: ["seqkit", "fqdedup"]
+        trimmer:
+          type: string
+          description: "Specify the read trimming tool"  
+          enum: ["seqtk", "fastx"]
+        TSS_name:
+          type: string
+          description: "TSS annotation file (by default uses Refgenie asset)"
+        ensembl_tss:
+          type: string
+          description: "Pause index TSS annotation file (by default uses Refgenie asset)"
+        ensembl_gene_body:
+          type: string
+          description: "Pause index gene body annotation file (by default uses Refgenie asset)"
+        pre_name:
+          type: string
+          description: "Premature mRNA annotation file (by default uses Refgenie asset)"
+        anno_name:
+          type: string
+          description: "Genomic partitions annotation file (by default uses Refgenie asset)"
+        intron_name:
+          type: string
+          description: "Introns annotation file (by default uses Refgenie asset)"
+        exon_name:
+          type: string
+          description: "Exons annotation file (by default uses Refgenie asset)"
+        search_file:
+          type: string
+          description: "GenomeTools Tallymer read-length matched index search file (by default uses Refgenie asset)"
+        sob:
+          type: boolean
+          description: "Use seqOutBias to generate signal tracks"
+        scale:
+          type: boolean
+          description: "Scale signal tracks"
+        coverage:
+          type: boolean
+          description: "Report library complexity using coverage: reads / (bases in genome / read length)"
+        keep:
+          type: boolean
+          description: "Keep prealignment BAM files"
+        noFIFO:
+          type: boolean
+          description: "Do NOT use named pipes during prealignments"
+        complexity:
+          type: boolean
+          description: "Disable library complexity calculation (faster)"
+        prioritize:
+          type: boolean
+          description: "Plot cFRiF/FRiF using mutually exclusive priority ranked features based on the order of feature appearance in the feature annotation asset"
       required:
         - sample_name
         - protocol
         - read1
         - genome
-      required_input_attrs:
-        - read1
-      input_attrs:
+      files:
         - read1
         - read2
+      required_files:
+        - read1
 required:
   - samples

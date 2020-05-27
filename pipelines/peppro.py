@@ -3830,7 +3830,11 @@ def main():
         pm.timestamp("### Use seqOutBias to produce bigWig files")
 
         seqtable = os.path.join(signal_folder, (args.genome_assembly + ".tbl"))
+        seqtable_flag = os.path.join(signal_folder, "seqtable_complete.flag")
 
+        if not os.path.exists(seqtable_flag) and os.path.exists(seqtable):
+            os.remove(seqtable)
+            
         seqtable_cmd = build_command([
             (tools.seqoutbias, "seqtable"),
             res.fasta,
@@ -3839,33 +3843,35 @@ def main():
             str("--read-size=" + str(max_len)),
             str("--out=" + seqtable)
         ])
+        
+        complete_cmd = "touch " + seqtable_flag
 
-        pm.run(seqtable_cmd, seqtable)
+        pm.run([seqtable_cmd, complete_cmd], seqtable_flag)
         pm.clean_add(seqtable)
 
-        plus_table = os.path.join(
-            signal_folder, (args.genome_assembly + "_plus_tbl.txt"))
+        # plus_table = os.path.join(
+            # signal_folder, (args.genome_assembly + "_plus_tbl.txt"))
 
-        table_plus_cmd = build_command([
-            (tools.seqoutbias, "table"),
-            seqtable,
-            plus_bam,
-            (">", plus_table)
-        ])
+        # table_plus_cmd = build_command([
+            # (tools.seqoutbias, "table"),
+            # seqtable,
+            # plus_bam,
+            # (">", plus_table)
+        # ])
 
-        minus_table = os.path.join(
-            signal_folder, (args.genome_assembly + "_minus_tbl.txt"))
+        # minus_table = os.path.join(
+            # signal_folder, (args.genome_assembly + "_minus_tbl.txt"))
 
-        table_minus_cmd = build_command([
-            (tools.seqoutbias, "table"),
-            seqtable,
-            minus_bam,
-            (">", minus_table)
-        ])
+        # table_minus_cmd = build_command([
+            # (tools.seqoutbias, "table"),
+            # seqtable,
+            # minus_bam,
+            # (">", minus_table)
+        # ])
 
-        pm.run([table_plus_cmd, table_minus_cmd], minus_table)
-        pm.clean_add(plus_table)
-        pm.clean_add(minus_table)
+        # pm.run([table_plus_cmd, table_minus_cmd], minus_table)
+        # pm.clean_add(plus_table)
+        # pm.clean_add(minus_table)
 
         if args.scale:
             scale_plus_chunks = [
