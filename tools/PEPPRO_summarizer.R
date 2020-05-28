@@ -134,11 +134,13 @@ if (!file.exists(complexity_path) || argv$new_start) {
                                             read_length = 0,
                                             real_counts_path = rcSub,
                                             ignore_unique = FALSE)
-        output_file <- PEPPROr::buildFilePath("_libComplexity.pdf", prj)
+        output_file <- file.path(summary_dir,
+                                 paste0(project_name, "_libComplexity.pdf"))
         pdf(file = output_file, width= 10, height = 7, useDingbats=F)
         suppressWarnings(print(p))
         invisible(dev.off())
-        output_file <- PEPPROr::buildFilePath("_libComplexity.png", prj)
+        output_file <- file.path(summary_dir,
+                                 paste0(project_name, "_libComplexity.png"))
         png(filename = output_file, width = 686, height = 480)
         suppressWarnings(print(p))
         invisible(dev.off())
