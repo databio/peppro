@@ -1,11 +1,11 @@
 File_mb	784.39	PEPPRO
-Read_type	single	PEPPRO
+Read_type	SINGLE	PEPPRO
 Genome	hg38	PEPPRO
 Raw_reads	10000000	PEPPRO
 Fastq_reads	10000000	PEPPRO
 Reads_with_adapter	4521696.0	PEPPRO
-Uninformative_adapter_reads	49637.0	PEPPRO
-Pct_uninformative_adapter_reads	0.4964	PEPPRO
+Uninformative_adapter_reads	0	PEPPRO
+Pct_uninformative_adapter_reads	0.0	PEPPRO
 Trimmed_reads	9950363	PEPPRO
 Trim_loss_rate	0.5	PEPPRO
 Peak_adapter_insertion_size	34	PEPPRO
@@ -31,5 +31,5 @@ Pause_index	12.25	PEPPRO
 Plus_FRiP	0.39	PEPPRO
 Minus_FRiP	0.39	PEPPRO
 mRNA_contamination	8.02	PEPPRO
-Time	1:03:13	PEPPRO
-Success	02-27-10:27:16	PEPPRO
+Time	0:26:11	PEPPRO
+Success	05-27-11:22:43	PEPPRO

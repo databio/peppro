@@ -1,14 +1,14 @@
 File_mb	2340.86	PEPPRO
-Read_type	paired	PEPPRO
+Read_type	PAIRED	PEPPRO
 Genome	hg38	PEPPRO
 Raw_reads	92628962	PEPPRO
 Fastq_reads	92628962	PEPPRO
 Trimmed_reads	27419170	PEPPRO
 Trim_loss_rate	70.4	PEPPRO
 Reads_with_adapter	34725419.0	PEPPRO
-Uninformative_adapter_reads	18106301.0	PEPPRO
+Uninformative_adapter_reads	0	PEPPRO
 Duplicate_reads	1862033.0	PEPPRO
-Pct_uninformative_adapter_reads	39.0943	PEPPRO
+Pct_uninformative_adapter_reads	0.0	PEPPRO
 Trimmed_reads	54838340	PEPPRO
 Trim_loss_rate	40.8	PEPPRO
 Peak_adapter_insertion_size	20	PEPPRO
@@ -24,7 +24,7 @@ Read_depth	2.98	PEPPRO
 Mitochondrial_reads	711009	PEPPRO
 Maximum_read_length	38	PEPPRO
 Genome_size	3099922541	PEPPRO
-Frac_exp_unique_at_10M	0.8825	PEPPRO
+Frac_exp_unique_at_10M	0.8822	PEPPRO
 NRF	1.0	PEPPRO
 PBC1	9740520.5	PEPPRO
 PBC2	9740520.5	PEPPRO
@@ -35,5 +35,5 @@ Pause_index	33.89	PEPPRO
 Plus_FRiP	0.39	PEPPRO
 Minus_FRiP	0.36	PEPPRO
 mRNA_contamination	1.28	PEPPRO
-Time	3:36:20	PEPPRO
-Success	02-27-13:02:22	PEPPRO
+Time	2:13:13	PEPPRO
+Success	05-27-10:28:24	PEPPRO
