@@ -187,11 +187,15 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
     if read2:
         cutadapt_report = os.path.join(cutadapt_folder, sname + "_R2_cutadapt.txt")
         noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
+        short_fastq = os.path.join(fastq_folder, sname + "_R2_short.fastq")
         fastp_pfx = os.path.join(fastp_folder, sname + "_R2_fastp_adapter")
     else:
         cutadapt_report = os.path.join(cutadapt_folder, sname + "_R1_cutadapt.txt")
         noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
+        short_fastq = os.path.join(fastq_folder, sname + "_R1_short.fastq")
         fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
+    
+    pm.clean_add(short_fastq)
 
     fastp_report_txt = fastp_pfx + ".txt"
     fastp_report_html = fastp_pfx + ".html"
@@ -267,7 +271,9 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             adapter_cmd_chunks.extend([("-a", five_prime)])
         adapter_cmd_chunks.extend([
             fq_file,
-            ("-o", noadap_fastq + ")"),
+            ("-o", noadap_fastq),
+            ("--too-short-output", short_fastq),
+            ")",
             (">", cutadapt_report)
         ])
 
@@ -1038,6 +1044,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     preprocessed_fq2 = os.path.join(fastq_folder, sname + "_R2.fastq")
     noadap_fq1 = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     noadap_fq2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
+    short_fq1 = os.path.join(fastq_folder, sname + "_R1_short.fastq")
+    short_fq2 = os.path.join(fastq_folder, sname + "_R2_short.fastq")
     dedup_fq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
     trimmed_fq1 = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
     trimmed_fq2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
@@ -1092,13 +1100,19 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if args.adapter == "cutadapt":
             report = cutadapt_report
             adapter_term = "Reads with adapters:"
-            too_short_term = "Reads that were too short:"
+            #too_short_term = "Reads that were too short:"
             total_bases_term = "Total basepairs processed:"
 
             ac_cmd = ("grep '" + adapter_term + "' " +
                       report + " | awk '{print $(NF-1)}'")
-            ts_cmd = ("grep '" + too_short_term + "' " +
-                      report + " | awk '{print $(NF-1)}'")
+            # cutadapt version < 2.9
+            #ts_cmd = ("grep '" + too_short_term + "' " +
+            #          report + " | awk '{print $(NF-1)}'")
+            ts_cmd = "wc -l "
+            if read2:
+                ts_cmd += short_fq2
+            else:
+                ts_cmd += short_fq1
             bases = ("grep '" + total_bases_term + "' " +
                      report + " | awk '{print $(NF-1)}'")
             adapter_bases = ("awk '{sum+=$1*$2} END {printf \"%.0f\", sum}' " +
@@ -1144,6 +1158,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             tmp = pm.checkprint(ts_cmd)
             if tmp:
                 ts = float(tmp.replace(',',''))
+                if args.adapter == "cutadapt":
+                    ts = ts/4
             else:
                 ts = 0
             
