@@ -194,8 +194,6 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
         short_fastq = os.path.join(fastq_folder, sname + "_R1_short.fastq")
         fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
-    
-    pm.clean_add(short_fastq)
 
     fastp_report_txt = fastp_pfx + ".txt"
     fastp_report_html = fastp_pfx + ".html"
@@ -1113,6 +1111,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 ts_cmd += short_fq2
             else:
                 ts_cmd += short_fq1
+            ts_cmd += " | awk '{print $1}'"
             bases = ("grep '" + total_bases_term + "' " +
                      report + " | awk '{print $(NF-1)}'")
             adapter_bases = ("awk '{sum+=$1*$2} END {printf \"%.0f\", sum}' " +
@@ -1349,6 +1348,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         cp_cmd = ("cp " + trimmed_fq2 + " " + trimmed_dups_fq2)
         pm.run(cp_cmd, trimmed_dups_fq2,
                follow=plot_fragments(fastq_folder, output_folder))
+        pm.clean_add(short_fq2)
         return trimmed_fq2, trimmed_dups_fq2
     elif not args.complexity and int(args.umi_len) > 0:
         # This trim command DOES need the adapter file...
@@ -1357,12 +1357,11 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                follow=ngstk.check_trim(processed_fastq, False, None,
                                        fastqc_folder=fastqc_folder))
         # This needs to produce the trimmed_fastq file
-        # TODO: trim_command2 doesn't need to produce fastp html files and json files...
-        # TODO: if I'm using seqkit rmdup here, I DON'T NEED the other fastp!!! umi command
         pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
         pm.run([deduplicate_command, trim_command2],
                trimmed_fq1, follow=report_fastq)
         pm.clean_add(noadap_fq1)
+        pm.clean_add(short_fq1)
         pm.clean_add(dedup_fq)
         pm.clean_add(trimmed_fq1)
         return processed_fastq, trimmed_fq1
@@ -1375,6 +1374,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             pm.run(cmd, fastqc_report, 
                    follow=ngstk.check_trim(processed_fastq, False, None,
                                            fastqc_folder=fastqc_folder))
+        pm.clean_add(noadap_fq1)
+        pm.clean_add(short_fq1)
         return processed_fastq
 
     # Put it all together (original included option to not retain intermediates)
