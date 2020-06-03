@@ -1,14 +1,12 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
-## [0.9.8] -- 2020-05-28
-
-### Added
- - Create assets summary for samples and project
- - Add optional scaling of signal tracks
+## [0.9.8] -- 2020-06-03
 
 ### Changed
  - Fix summarizer file path construction
+ - Add minimum version requirements to required software
+ - Update uninformative adapter read calculation
  - Update example output
 
 ## [0.9.7] -- 2020-05-26
