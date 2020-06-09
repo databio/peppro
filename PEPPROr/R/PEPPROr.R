@@ -14,11 +14,11 @@ NULL
 
 ################################################################################
 # FUNCTIONS
-#' A standardized ggplot theme for PEPPRO plots
-#'
-#' @keywords ggplot2 theme
-#' @examples
-#' theme_PEPPRO()
+# A standardized ggplot theme for PEPPRO plots
+#
+# @keywords ggplot2 theme
+# @examples
+# theme_PEPPRO()
 theme_PEPPRO <- function(base_family = "sans", ...){
   theme_classic(base_family = base_family, base_size = 14, ...) +
   theme(
@@ -482,15 +482,15 @@ plotComplexityCurves <- function(ccurves,
 }
 
 
-#' Compute the axis value limit
-#'
-#' This function returns the index of ccurve_TOTAL_READS containing the
-#' closest value to x_max
-#' @param value An axis limit value.
-#' @param ccurve_TOTAL_READS A vector of read counts from a sample.
-#' @keywords preseq limit
-#' @examples
-#' computeLimit()
+# Compute the axis value limit
+#
+# This function returns the index of ccurve_TOTAL_READS containing the
+# closest value to x_max
+# @param value An axis limit value.
+# @param ccurve_TOTAL_READS A vector of read counts from a sample.
+# @keywords preseq limit
+# @examples
+# computeLimit()
 computeLimit <- function(value, ccurve_TOTAL_READS) {
     # This function returns the index of ccurve_TOTAL_READS containing the
     # closest value to x_max
@@ -522,20 +522,20 @@ computeLimit <- function(value, ccurve_TOTAL_READS) {
 }
 
 
-#' Calculate the Fraction of Reads in Features (FRiF)
-#'
-#' This function calculates the fraction of reads in a feature and returns
-#' a modified BED file with the cumulative sum of reads, cumulative size
-#' of covered features, the fraction of reads in those features, and the
-#' number of total features.
-#'
-#' @param bedFile A BED format file
-#' @param total Number of aligned reads (or number of aligned bases)
-#' @param reads If TRUE, we're working with read counts.
-#'              If FALSE, we're working with absolute number of bases
-#' @keywords FRiF
-#' @examples
-#' calcFRiF()
+# Calculate the Fraction of Reads in Features (FRiF)
+#
+# This function calculates the fraction of reads in a feature and returns
+# a modified BED file with the cumulative sum of reads, cumulative size
+# of covered features, the fraction of reads in those features, and the
+# number of total features.
+#
+# @param bedFile A BED format file
+# @param total Number of aligned reads (or number of aligned bases)
+# @param reads If TRUE, we're working with read counts.
+#              If FALSE, we're working with absolute number of bases
+# @keywords FRiF
+# @examples
+# calcFRiF()
 calcFRiF <- function(bedFile, total, reads) {
     colnames(bedFile) <- c("chromosome", "start", "end",
                            "count", "bases", "width", "fraction")
@@ -720,7 +720,7 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
     feature_dist$expected <- as.numeric(feature_dist$expected)
     feature_dist$observed <- as.numeric(labels$val)
     feature_dist$logOE <- log10(feature_dist$observed/feature_dist$expected)
-    feature_dist$logOE <- ifelse(feature_dist$logOE < 0, 0, feature_dist$logOE)
+    #feature_dist$logOE <- ifelse(feature_dist$logOE < 0, 0, feature_dist$logOE)
     feature_dist <- merge(feature_dist, labels, by.x="feature", by.y="name")
     #feature_dist <- feature_dist[order(feature_dist$logOE, decreasing=TRUE),]
     feature_dist <- feature_dist[order(feature_dist$logOE),]
@@ -752,6 +752,10 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                                                       labels$val),
                                         values=labels$color) +
                 labs(color="FRiF") +
+                scale_y_continuous(
+                    breaks=c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0),
+                    labels=c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0)) +
+                coord_cartesian(ylim=c(0,1)) +
                 theme(legend.position="right",
                       legend.justification=c(0.1,0.9),
                       legend.background=element_blank(),
@@ -799,6 +803,10 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
             p <- p + scale_color_manual(labels=paste0(labels$name, ": ",
                                                       labels$val),
                                         values=labels$color) +
+                coord_cartesian(ylim=c(0,1)) +
+                scale_y_continuous(
+                    breaks=c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0),
+                    labels=c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0)) +
                 labs(color="FRiF") +
                 theme(legend.position=c(0.075,0.975),
                       legend.justification=c(0.1,0.9),
@@ -835,6 +843,10 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
                                                       labels$val),
                                         values=labels$color) +
                 labs(color="FRiF") +
+                coord_cartesian(ylim=c(0,1)) +
+                scale_y_continuous(
+                    breaks=c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0),
+                    labels=c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0)) +
                 theme(legend.position="right",
                       legend.justification=c(0.1,0.9),
                       legend.background=element_blank(),
@@ -881,10 +893,10 @@ plotFRiF <- function(sample_name, num_reads, genome_size,
 }
 
 
-#' The function rounds the up to the nearest "nice" number.
-#'
-#' From:
-#' https://stackoverflow.com/questions/6461209/how-to-round-up-to-the-nearest-10-or-100-or-x
+# The function rounds the up to the nearest "nice" number.
+#
+# From:
+# https://stackoverflow.com/questions/6461209/how-to-round-up-to-the-nearest-10-or-100-or-x
 roundUpNice <- function(x, nice=c(1,2,3,4,5,6,7,8,9,10)) {
     if(length(x) != 1) stop("'x' must be of length 1")
     10^floor(log10(x)) * nice[[which(x <= 10^floor(log10(x)) * nice)[[1]]]]
@@ -1174,34 +1186,34 @@ plotFLD <- function(fragL,
     return(p)
 }
 
-#' Return the count of the plot at 95% of the upper limit.
-#'
-#' From:
-#' DeCicco, L. (2018, August 10). Exploring ggplot2 boxplots - 
-#'  Defining limits and adjusting style [Blog post]. 
-#'  Retrieved from https://waterdata.usgs.gov/blog/boxplots/
-#'
-#' @param x A vector of numbers.
-#' @param lim Upper limit.
-#' @keywords limits
-#' @examples
-#' n_fun()
+# Return the count of the plot at 95% of the upper limit.
+#
+# From:
+# DeCicco, L. (2018, August 10). Exploring ggplot2 boxplots - 
+#  Defining limits and adjusting style [Blog post]. 
+#  Retrieved from https://waterdata.usgs.gov/blog/boxplots/
+#
+# @param x A vector of numbers.
+# @param lim Upper limit.
+# @keywords limits
+# @examples
+# n_fun()
 n_fun <- function(x, lim=50) {
     return(data.frame(y = 0.95*log10(lim),
                       label = length(x)))
 }
 
-#' This function forces the y-axis breaks to be on every 10^x.
-#'
-#' From:
-#' DeCicco, L. (2018, August 10). Exploring ggplot2 boxplots - 
-#'  Defining limits and adjusting style [Blog post]. 
-#'  Retrieved from https://waterdata.usgs.gov/blog/boxplots/
-#'
-#' @param x A vector of numbers.
-#' @keywords limits
-#' @examples
-#' prettyLogs()
+# This function forces the y-axis breaks to be on every 10^x.
+#
+# From:
+# DeCicco, L. (2018, August 10). Exploring ggplot2 boxplots - 
+#  Defining limits and adjusting style [Blog post]. 
+#  Retrieved from https://waterdata.usgs.gov/blog/boxplots/
+#
+# @param x A vector of numbers.
+# @keywords limits
+# @examples
+# prettyLogs()
 prettyLogs <- function(x){
     pretty_range    <- range(x[x > 0])
     pretty_logs     <- 10^(-10:10)
@@ -1213,17 +1225,17 @@ prettyLogs <- function(x){
     return(pretty_logs_new)
 }
 
-#' Custom formatting function for the log axis.
-#'
-#' From:
-#' DeCicco, L. (2018, August 10). Exploring ggplot2 boxplots - 
-#'  Defining limits and adjusting style [Blog post]. 
-#'  Retrieved from https://waterdata.usgs.gov/blog/boxplots/
-#'
-#' @param n A vector of numbers.
-#' @keywords limits
-#' @examples
-#' fancyNumbers()
+# Custom formatting function for the log axis.
+#
+# From:
+# DeCicco, L. (2018, August 10). Exploring ggplot2 boxplots - 
+#  Defining limits and adjusting style [Blog post]. 
+#  Retrieved from https://waterdata.usgs.gov/blog/boxplots/
+#
+# @param n A vector of numbers.
+# @keywords limits
+# @examples
+# fancyNumbers()
 fancyNumbers <- function(n){
     nNoNA     <- n[!is.na(n)]
     x         <- gsub(pattern = "1e",replacement = "10^",
@@ -1239,15 +1251,15 @@ fancyNumbers <- function(n){
 }
 
 
-#' Determine which quantile to use as cutoff.
-#'
-#' Modified from: GenomicDistributions (Tessa Danehy)
-#'
-#' @param vec A vector of numbers.
-#' @param baseline A minimum quantile cutoff.
-#' @keywords cutoff quantiles
-#' @examples
-#' calcQuantileCutoff()
+# Determine which quantile to use as cutoff.
+#
+# Modified from: GenomicDistributions (Tessa Danehy)
+#
+# @param vec A vector of numbers.
+# @param baseline A minimum quantile cutoff.
+# @keywords cutoff quantiles
+# @examples
+# calcQuantileCutoff()
 calcQuantileCutoff = function(vec, baseline=1){
   n <- length(vec) # number of observations
   if (n > 1000) {n = 1000}
@@ -1257,17 +1269,17 @@ calcQuantileCutoff = function(vec, baseline=1){
 }
 
 
-#' Calculate histogram binning by quantile.
-#'
-#' Modified from: GenomicDistributions (Tessa Danehy)
-#'
-#' @param vec A vector of numbers.
-#' @param q The quantile to use for cutoffs.
-#' @param bins The number of bins to use for a histogram.
-#' @param transformed Adjust divisions if transformed
-#' @keywords quantiles
-#' @examples
-#' calcDivisions()
+# Calculate histogram binning by quantile.
+#
+# Modified from: GenomicDistributions (Tessa Danehy)
+#
+# @param vec A vector of numbers.
+# @param q The quantile to use for cutoffs.
+# @param bins The number of bins to use for a histogram.
+# @param transformed Adjust divisions if transformed
+# @keywords quantiles
+# @examples
+# calcDivisions()
 calcDivisions = function(vec, q, bins=NULL, transformed=FALSE){
   q = as.numeric(q)
   if(q > 50){
@@ -1292,17 +1304,17 @@ calcDivisions = function(vec, q, bins=NULL, transformed=FALSE){
 }
 
 
-#' Create a character vector of bin labels.
-#'
-#' From: GenomicDistributions (Tessa Danehy)
-#'
-#' @param breakPoints A vector of numbers.
-#' @param digits The number of digits to round to.
-#' @param collapse The character to separate paste values by.
-#' @param infBins Whether to use infinite bins.
-#' @keywords labels
-#' @examples
-#' labelCuts()
+# Create a character vector of bin labels.
+#
+# From: GenomicDistributions (Tessa Danehy)
+#
+# @param breakPoints A vector of numbers.
+# @param digits The number of digits to round to.
+# @param collapse The character to separate paste values by.
+# @param infBins Whether to use infinite bins.
+# @keywords labels
+# @examples
+# labelCuts()
 labelCuts = function(breakPoints, digits=1, collapse="-", infBins=FALSE) {
     labels <- 
         apply(round(cbind(breakPoints[-length(breakPoints)],   
@@ -1317,15 +1329,15 @@ labelCuts = function(breakPoints, digits=1, collapse="-", infBins=FALSE) {
 }
 
 
-#' Create a character vector of bin labels.
-#'
-#' Modified from: GenomicDistributions (Tessa Danehy)
-#'
-#' @param vec A vector (or list of vectors) of numbers.
-#' @param divisions The break points of the distribution
-#' @keywords quantiles
-#' @examples
-#' cutDists()
+# Create a character vector of bin labels.
+#
+# Modified from: GenomicDistributions (Tessa Danehy)
+#
+# @param vec A vector (or list of vectors) of numbers.
+# @param divisions The break points of the distribution
+# @keywords quantiles
+# @examples
+# cutDists()
 cutDists = function(vec, divisions = c(-Inf, -1e6, -1e4, -1000, -100, 0,
                                          100, 1000, 10000, 1e6, Inf)) {
     if (is.list(vec)) {
@@ -2026,14 +2038,14 @@ plotPI <- function(pi, name='pause indicies',
     return(q)
 }
 
-#' Calculate mode(s) of data
-#'
-#' From: https://stackoverflow.com/questions/2547402/is-there-a-built-in-function-for-finding-the-mode
-#' @param x A vector of numbers or characters
-#' @param return_multiple Bool to return multiple modes or first in order
-#' @param na.rm Bool Remove NAs
-#'
-#' @keywords mode
+# Calculate mode(s) of data
+#
+# From: https://stackoverflow.com/questions/2547402/is-there-a-built-in-function-for-finding-the-mode
+# @param x A vector of numbers or characters
+# @param return_multiple Bool to return multiple modes or first in order
+# @param na.rm Bool Remove NAs
+#
+# @keywords mode
 mode <- function(x, return_multiple = TRUE, na.rm = FALSE) {
     if(na.rm){
         x <- na.omit(x)
@@ -2045,24 +2057,24 @@ mode <- function(x, return_multiple = TRUE, na.rm = FALSE) {
 }
 
 
-#' Determine the appropriate abbreviation for large numbers
-#'
-#' Modified From: https://stackoverflow.com/questions/28159936/formatting-large-currency-or-dollar-values-to-millions-billions
-#' @param vec A vector of numbers
-#'
-#' @keywords abbreviation
+# Determine the appropriate abbreviation for large numbers
+#
+# Modified From: https://stackoverflow.com/questions/28159936/formatting-large-currency-or-dollar-values-to-millions-billions
+# @param vec A vector of numbers
+#
+# @keywords abbreviation
 getAbbr <- function(vec) { 
     div <- findInterval(as.numeric(gsub("\\,", "", vec)), c(0, 1e3, 1e6, 1e9, 1e12) )
     return(paste(c("","K","M","B","T")[mode(div)]))
 }
 
 
-#' Determine the appropriate dividing factor for large numbers
-#'
-#' Modified From: https://stackoverflow.com/questions/28159936/formatting-large-currency-or-dollar-values-to-millions-billions
-#' @param vec A vector of numbers
-#'
-#' @keywords abbreviation
+# Determine the appropriate dividing factor for large numbers
+#
+# Modified From: https://stackoverflow.com/questions/28159936/formatting-large-currency-or-dollar-values-to-millions-billions
+# @param vec A vector of numbers
+#
+# @keywords abbreviation
 getFactor <- function(vec) { 
     div <- findInterval(as.numeric(gsub("\\,", "", vec)), c(0, 1e3, 1e6, 1e9, 1e12) )
     return(as.numeric(paste(c(1, 1e3, 1e6, 1e9, 1e12)[mode(div)])))
