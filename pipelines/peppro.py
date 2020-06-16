@@ -185,12 +185,14 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
     fastq_folder = os.path.join(outfolder, "fastq")
 
     if read2:
-        cutadapt_report = os.path.join(cutadapt_folder, sname + "_R2_cutadapt.txt")
+        cutadapt_report = os.path.join(cutadapt_folder,
+            sname + "_R2_cutadapt.txt")
         noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
         short_fastq = os.path.join(fastq_folder, sname + "_R2_short.fastq")
         fastp_pfx = os.path.join(fastp_folder, sname + "_R2_fastp_adapter")
     else:
-        cutadapt_report = os.path.join(cutadapt_folder, sname + "_R1_cutadapt.txt")
+        cutadapt_report = os.path.join(cutadapt_folder,
+            sname + "_R1_cutadapt.txt")
         noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
         short_fastq = os.path.join(fastq_folder, sname + "_R1_short.fastq")
         fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
@@ -242,9 +244,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         ])
         # If calculating library complexity and this is read 1 or single-end,
         # must produce an intermediate file.
-        adapter_cmd_chunks.extend([("-o", noadap_fastq)])  # Must keep intermediates always now
-        # else:
-        #     adapter_cmd_chunks.extend([("--stdout")])
+        adapter_cmd_chunks.extend([("-o", noadap_fastq)])
+        # Must keep intermediates always now
 
         adapter_cmd_chunks.extend([
             (") 2>", fastp_report_txt)
@@ -302,10 +303,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         ])
         # If calculating library complexity and this is read 1 or single-end,
         # must produce an intermediate file.
-        #if not args.complexity and args.umi_len > 0 and not read2 :
-        adapter_cmd_chunks.extend([("-o", noadap_fastq)])  # Must keep intermediates always now
-        # else:
-        #     adapter_cmd_chunks.extend([("--stdout")])
+        adapter_cmd_chunks.extend([("-o", noadap_fastq)])
+        # Must keep intermediates always now
 
         adapter_cmd_chunks.extend([
             (") 2>", fastp_report_txt)
@@ -395,8 +394,6 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
 
     fastq_folder = os.path.join(outfolder, "fastq")
     dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
-    #processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
-    #trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
     processed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
 
     fastp_folder = os.path.join(outfolder, "fastp")    
@@ -496,7 +493,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
         # Trim to max length if specified
         if int(args.max_len) > 0:
             trim_cmd_chunks.extend([
-                ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                ("-l", (str(int(float(args.max_len)) +
+                 int(float(args.umi_len)))))
             ])
 
         # Remove too short reads
@@ -577,8 +575,10 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
         noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
         trimmed_fastq = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
     else:
-        noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
-        trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
+        noadap_fastq = os.path.join(fastq_folder,
+            sname + "_R1_noadap.fastq")
+        trimmed_fastq = os.path.join(fastq_folder,
+            sname + "_R1_processed.fastq")
 
     fastp_folder = os.path.join(outfolder, "fastp")
     if read2:
@@ -710,7 +710,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
         # Trim tp max length if specified
         if int(args.max_len) > 0:
             trim_cmd_chunks.extend([
-                ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                ("-l", (str(int(float(args.max_len)) +
+                 int(float(args.umi_len)))))
             ])
 
         # Remove too short reads
@@ -793,11 +794,15 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
 
     fastq_folder = os.path.join(outfolder, "fastq")
     if read2:
-        noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
-        processed_fastq = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
+        noadap_fastq = os.path.join(fastq_folder,
+            sname + "_R2_noadap.fastq")
+        processed_fastq = os.path.join(fastq_folder,
+            sname + "_R2_trimmed.fastq")
     else:
-        noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
-        processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
+        noadap_fastq = os.path.join(fastq_folder,
+            sname + "_R1_noadap.fastq")
+        processed_fastq = os.path.join(fastq_folder,
+            sname + "_R1_processed.fastq")
 
     fastp_folder = os.path.join(outfolder, "fastp")
     if read2:
@@ -827,20 +832,6 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 "|",
                 (tools.seqtk, "trimfq")
             ]
-
-            # if read2:
-            # # still 'read1' because it's being processed as a SE file
-            #     trim_cmd_chunks.extend([("--umi_loc", "read1")])
-            # else:
-            #     trim_cmd_chunks.extend([("--umi_loc", "read1")])
-
-            # trim_cmd_chunks.extend([
-            #     ("--umi_len", args.umi_len),
-            #     ("--html", umi_report),
-            #     ("--json", umi_json),
-            #     "|",
-            #     (tools.seqtk, "trimfq")
-            # ])
 
             # Trim to max length if specified
             if int(args.max_len) > 0:
@@ -955,7 +946,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([("-f", str(int(float(args.umi_len)) + 1))])
             if int(args.max_len) > 0:
                 trim_cmd_chunks.extend([
-                    ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                    ("-l", (str(int(float(args.max_len)) +
+                     int(float(args.umi_len)))))
                 ])
 
         # Remove too short reads
@@ -1036,7 +1028,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     fastq_folder = os.path.join(outfolder, "fastq")
     fastp_folder = os.path.join(outfolder, "fastp")
     fastqc_folder = os.path.join(outfolder, "fastqc")
-    fastqc_report = os.path.join(fastqc_folder, sname + "_R1_processed_fastqc.html")
+    fastqc_report = os.path.join(fastqc_folder,
+        sname + "_R1_processed_fastqc.html")
 
     preprocessed_fq1 = os.path.join(fastq_folder, sname + "_R1.fastq")
     preprocessed_fq2 = os.path.join(fastq_folder, sname + "_R2.fastq")
@@ -1047,7 +1040,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     dedup_fq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
     trimmed_fq1 = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
     trimmed_fq2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
-    trimmed_dups_fq2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
+    trimmed_dups_fq2 = os.path.join(fastq_folder,
+        sname + "_R2_trimmed_dups.fastq")
     processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
 
     if args.adapter == "cutadapt":
@@ -1079,17 +1073,6 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         trim_command2 = _trim_deduplicated_files(args, tools, fq_file, outfolder)
     else:
         trim_command = _trim_adapter_files(args, tools, read2, fq_file, outfolder)
-
-    # original method included option to not retain intermediates
-    # if read2:
-    #     trim_command = _trim_pipes(args, tools, True, fq_file, outfolder)
-    # elif not args.complexity and int(args.umi_len) > 0:
-    #     deduplicate_command = _deduplicate(args, tools, fq_file, outfolder)
-    #     pm.debug("Dedup command: {}".format(deduplicate_command))
-    #     trim_command = _trim_adapter_files(args, tools, fq_file, outfolder)
-    #     trim_command2 = _trim_deduplicated_files(args, tools, fq_file, outfolder)
-    # else:
-    #     trim_command = _trim_pipes(args, tools, False, fq_file, outfolder)
 
     def report_fastq():
         """
@@ -1377,43 +1360,6 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pm.clean_add(noadap_fq1)
         pm.clean_add(short_fq1)
         return processed_fastq
-
-    # Put it all together (original included option to not retain intermediates)
-    # if read2:
-    #     # cutadapt directs its report to stderr if the command lacks
-    #     # a -o and the actual reads are directed to stdout.
-    #     process_fastq_cmd2 = build_command([
-    #         "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
-    #     pm.debug("process_fastq_cmd2: {}".format(process_fastq_cmd2))
-    #     pm.run(process_fastq_cmd2, trimmed_fastq_R2)
-    #     cp_cmd = ("cp " + trimmed_fq2 + " " + trimmed_dups_fq2)
-    #     pm.run(cp_cmd, trimmed_dups_faq2)
-    #     return trimmed_fastq_R2, trimmed_dups_fastq_R2
-    # else:
-    #     if not args.complexity and int(args.umi_len) > 0:
-    #         # This trim command DOES need the adapter file...
-    #         pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
-    #         pm.run([adapter_command, trim_command], processed_fastq,
-    #                follow=ngstk.check_trim(processed_fastq, False, None,
-    #                                        fastqc_folder=fastqc_folder))
-    #         # This needs to produce the trimmed_fastq file
-    #         # TODO: trim_command2 doesn't need to produce fastp html files and json files...
-    #         # TODO: if I'm using seqkit rmdup here, I DON'T NEED the other fastp!!! umi command
-    #         pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
-    #         pm.run([deduplicate_command, trim_command2],
-    #                trimmed_fastq, follow=report_fastq)
-    #         pm.clean_add(noadap_fq1)
-    #         pm.clean_add(dedup_fq)
-    #         pm.clean_add(trimmed_fq1)
-    #         return processed_fastq, trimmed_fq1
-    #     else:
-    #         pm.debug("\nELSE: trim_command: {} + {}\n".format(adapter_command, trim_command))
-    #         process_fastq_cmd = build_command([
-    #             "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
-    #         pm.run(process_fastq_cmd, processed_fastq,
-    #            follow=ngstk.check_trim(processed_fastq, False, None,
-    #                                    fastqc_folder=fastqc_folder))
-    #         return processed_fastq
 
 
 def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
@@ -3169,9 +3115,10 @@ def main():
                   .format(res.ensembl_tss))
     elif not os.path.exists(res.ensembl_gene_body):
         print("Skipping PI -- Pause index requires 'gene body' annotation file: {}"
-                  .format(res.ensembl_gene_body))
+              .format(res.ensembl_gene_body))
     else:
         pm.timestamp("### Calculate Pause Index (PI)")
+        temp = tempfile.NamedTemporaryFile(dir=QC_folder, delete=False)
         pause_index = os.path.join(QC_folder, args.sample_name +
                                    "_pause_index.bed")
         pause_index_gz = os.path.join(QC_folder, args.sample_name +
@@ -3179,15 +3126,15 @@ def main():
         if not pm.get_stat("Pause_index") or args.new_start:
             # Remove missing chr from PI annotations
             tss_local = os.path.join(QC_folder,
-                                     args.genome_assembly + "_ensembl_tss.bed")
+                args.genome_assembly + "_ensembl_tss.bed")
             body_local = os.path.join(QC_folder,
-                                      args.genome_assembly + "_ensembl_gene_body.bed")
+                args.genome_assembly + "_ensembl_gene_body.bed")
             cmd1 = ("grep -wf " + chr_keep + " " + res.ensembl_tss + " | " +
                     tools.bedtools + " sort -i stdin -faidx " + chr_order + 
                     " > " + tss_local)
-            cmd2 = ("grep -wf " + chr_keep + " " + res.ensembl_gene_body + " | " +
-                    tools.bedtools + " sort -i stdin -faidx " + chr_order + 
-                    " > " + body_local)
+            cmd2 = ("grep -wf " + chr_keep + " " + res.ensembl_gene_body +
+                    " | " + tools.bedtools + " sort -i stdin -faidx " +
+                    chr_order + " > " + body_local)
             pm.run([cmd1,cmd2], [tss_local, body_local], nofail=True)
             pm.clean_add(tss_local)
             pm.clean_add(body_local)
@@ -3213,13 +3160,38 @@ def main():
             pm.run(cmd, body_density, nofail=True)
             pm.clean_add(body_density)
 
-            # Determine pause index
-            cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 2.2 2.3 2.7 " +
-                   TSS_density + " " + body_density +
-                   " | awk -v OFS='\t' '{print $1, $2, $3, $4, ($6/($3-$2))" + 
-                   "/($9/($8-$7)), $5}' | env LC_COLLATE=C sort -k1,1 -k2,2n > " +
-                   pause_index)
+            # Calculate expression and pause indicies
+            cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7" +
+                   " 2.2 2.3 2.7 " + TSS_density + " " + body_density +
+                   " | awk -v OFS='\t' '{ if ($5 == \"+\"){print $1, $2, $8," +
+                   " $4, sqrt((($6+$9)/sqrt(($8-$2)^2))^2), " +
+                   "($6/sqrt(($3-$2)^2))/($9/sqrt(($8-$7)^2)), $5} " +
+                   "else {print $1, $2, $8, $4, " +
+                   "sqrt((($6+$9)/sqrt(($3-$7)^2))^2)," +
+                   "($6/sqrt(($3-$2)^2))/($9/sqrt(($8-$7)^2)), $5}}' " +
+                   "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + temp.name)
             pm.run(cmd, pause_index, nofail=True)
+            temp.close()
+
+            # Calculate median expression
+            cmd = ("awk '{print $5}' " + temp.name + " | sort -n | " +
+                   "awk 'BEGIN{i=0} {s[i]=$1; i++;} " + 
+                   "END{print s[int(NR*0.5-0.5)]}'")
+            median_expr = pm.checkprint(cmd)
+            try:
+                cmd = ("awk -v OFS='\t' '{ if ($5 > " + str(median_expr) +
+                       ") " + "{print $1, $2, $3, $4, $6, $7}}' " + 
+                       temp.name + " > " + pause_index)
+                pm.run(cmd, pause_index, nofail=True)
+            except ZeroDivisionError:
+                # Fall back to using all data to determine pause index
+                cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 " +
+                       "2.2 2.3 2.7 " + TSS_density + " " + body_density +
+                       " | awk -v OFS='\t' '{print $1, $2, $3, $4, " +
+                       "($6/($3-$2))/($9/($8-$7)), $5}' " +
+                       "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + pause_index)
+                pm.run(cmd, pause_index, nofail=True)
+                pass
 
             # Median pause index
             cmd = ("sort -k5,5n " + pause_index +
@@ -3291,42 +3263,6 @@ def main():
                 " -g " + chr_order + " > " + gene_cov)
         pm.run([cmd1, cmd2], gene_cov)
         pm.clean_add(gene_sort)
-
-    ############################################################################
-    #             Plot fragment distribution (for PE data)                     #
-    ############################################################################
-    # DEPRECATED
-    # if args.paired_end:
-    #     pm.timestamp("### Plot fragment distribution")
-    #     frag_len = os.path.join(QC_folder, args.sample_name + "_fragLen.txt")
-    #     frag_dist_tool = tool_path("fragment_length_dist.pl")
-    #     cmd = build_command([tools.perl, frag_dist_tool,
-    #                          mapping_genome_bam, frag_len])
-
-    #     fragL_counts_file = args.sample_name + "_fragCount.txt"
-    #     fragL_count = os.path.join(QC_folder, fragL_counts_file)
-    #     cmd1 = "sort -n  " + frag_len + " | uniq -c  > " + fragL_count
-
-    #     fragL_dis1 = os.path.join(QC_folder, args.sample_name +
-    #                               "_fragLenDistribution.pdf")
-    #     fragL_dis2 = os.path.join(QC_folder, args.sample_name +
-    #                               "_fragLenDistribution.txt")
-
-    #     cmd2 = (tools.Rscript + " " + tool_path("PEPPRO.R"))
-    #     cmd2 += " frag -l " + frag_len + " -c " + fragL_count
-    #     cmd2 += " -p " + fragL_dis1 + " -t " + fragL_dis2
-
-    #     pm.run([cmd, cmd1, cmd2], fragL_dis1, nofail=True)
-    #     pm.clean_add(frag_len)
-    #     pm.clean_add(fragL_count)
-
-    #     fragL_png = os.path.join(QC_folder, args.sample_name +
-    #                              "_fragLenDistribution.png")
-    #     pm.report_object("Fragment distribution", fragL_dis1,
-    #                      anchor_image=fragL_png)
-    # else:
-    #     pass
-    #     # Used to plot adapter distribution here, but moved to cutadapt.
 
     ############################################################################
     #                        Extract genomic features                          #
@@ -3614,36 +3550,6 @@ def main():
             pm.run(cmd, FRiF_PDF, nofail=False)
             pm.report_object("FRiF", FRiF_PDF, anchor_image=FRiF_PNG)
 
-    # Minus (unused as we currently use unstranded feature coverage calculation)
-    # if not os.path.exists(frif_minus_PDF) or args.new_start:
-    #     count_cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
-    #                  param.samtools.params + " -c -F4 " + minus_bam)
-    #     minus_read_count = pm.checkprint(count_cmd)
-    #     minus_read_count = str(minus_read_count).rstrip()
-
-    #     cFRiF_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-    #                "-n", args.sample_name, "-s", str(genome_size).rstrip(),
-    #                "-r", minus_read_count, "-y", "frif",
-    #                "-o", frif_minus_PDF, "--bed"]
-
-    #     FRiF_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-    #                  "-n", args.sample_name, "-s", str(genome_size).rstrip(),
-    #                  "-r", minus_read_count, "-y", "prif",
-    #                  "-o", prif_minus_PDF, "--bed"]
-
-    #     if anno_list_minus:
-    #         for cov in anno_list_minus:
-    #             cFRiF_cmd.append(cov)
-    #             FRiF_cmd.append(cov)
-    #         cmd = build_command(cFRiF_cmd)
-    #         pm.run(cmd, frif_minus_PDF, nofail=False)
-    #         pm.report_object("Minus FRiF", frif_minus_PDF,
-    #                          anchor_image=frif_minus_PNG)
-    #         cmd = build_command(FRiF_cmd)
-    #         pm.run(cmd, prif_minus_PDF, nofail=False)
-    #         pm.report_object("Minus PRiF", prif_minus_PDF,
-    #                          anchor_image=prif_minus_PNG)
-
     ############################################################################
     #                         Report mRNA contamination                        #
     ############################################################################
@@ -3668,8 +3574,8 @@ def main():
             # a single sort fails to sort a 1 bp different start position intron
             cmd2 = ("grep -wf " + chr_keep + " " + res.refgene_intron +
                     " | " + tools.bedtools + " sort -i stdin -faidx " +
-                    chr_order + " | " + tools.bedtools + " sort -i stdin -faidx " +
-                    chr_order + " > " + introns_sort)
+                    chr_order + " | " + tools.bedtools +
+                    " sort -i stdin -faidx " + chr_order + " > " + introns_sort)
             pm.run([cmd1, cmd2], [exons_sort, introns_sort], nofail=True)
             pm.clean_add(exons_sort)
             pm.clean_add(introns_sort)
@@ -3705,12 +3611,14 @@ def main():
                        "strand[$4] = $6; " +
                        "readCount[$4] += $7; " + 
                        "exonCount[$4] += 1; " +
-                       "geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); " +
+                       "geneSizeKB[$4] += " +
+                       "(sqrt(($3-$2+0.00000001)^2)/1000); " +
                        "gene[$4] = $4; " +
                        "chromEnd[$4]=$3; " +
                        "prev4=$4} END " +
                        "{ for (a in readCount) " +
-                       "{ print chrom[a], chromStart[a], chromEnd[a], gene[a], " +
+                       "{ print chrom[a], chromStart[a], " +
+                       "chromEnd[a], gene[a], " +
                        "(readCount[a]/" + str(scaling_factor) +
                        ")/geneSizeKB[a], strand[a]}}' " +
                         exons_cov + " | awk '$5>0' | sort -k4 > " +
@@ -3725,12 +3633,14 @@ def main():
                        "strand[$4] = $6; " +
                        "readCount[$4] += $7; " + 
                        "exonCount[$4] += 1; " +
-                       "geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); " +
+                       "geneSizeKB[$4] += " +
+                       "(sqrt(($3-$2+0.00000001)^2)/1000); " +
                        "gene[$4] = $4; " +
                        "chromEnd[$4]=$3; " +
                        "prev4=$4} END " +
                        "{ for (a in readCount) " +
-                       "{ print chrom[a], chromStart[a], chromEnd[a], gene[a], " +
+                       "{ print chrom[a], chromStart[a], " +
+                       "chromEnd[a], gene[a], " +
                        "(readCount[a]/" + str(scaling_factor) +
                        ")/geneSizeKB[a], strand[a]}}' " +
                         introns_cov + " | awk '$5>0' | sort -k4 > " +
@@ -3817,7 +3727,7 @@ def main():
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd2 += " --tail-edge"
             if args.scale:
-                cmd2 += " --scale " + ar
+                cmd2 += " --scale " + str(ar)
             pm.run([cmd1, cmd2], [plus_exact_bw, plus_smooth_bw])
 
             cmd3 = tools.samtools + " index " + minus_bam
@@ -3831,7 +3741,7 @@ def main():
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd4 += " --tail-edge"
             if args.scale:
-                cmd4 += " --scale " + ar
+                cmd4 += " --scale " + str(ar)
             pm.run([cmd3, cmd4], [minus_exact_bw, minus_smooth_bw])
         else:
             print("Skipping signal track production -- Could not call \'wigToBigWig\'.")
@@ -3865,30 +3775,6 @@ def main():
 
         pm.run([seqtable_cmd, complete_cmd], seqtable_flag)
         pm.clean_add(seqtable)
-
-        # plus_table = os.path.join(
-            # signal_folder, (args.genome_assembly + "_plus_tbl.txt"))
-
-        # table_plus_cmd = build_command([
-            # (tools.seqoutbias, "table"),
-            # seqtable,
-            # plus_bam,
-            # (">", plus_table)
-        # ])
-
-        # minus_table = os.path.join(
-            # signal_folder, (args.genome_assembly + "_minus_tbl.txt"))
-
-        # table_minus_cmd = build_command([
-            # (tools.seqoutbias, "table"),
-            # seqtable,
-            # minus_bam,
-            # (">", minus_table)
-        # ])
-
-        # pm.run([table_plus_cmd, table_minus_cmd], minus_table)
-        # pm.clean_add(plus_table)
-        # pm.clean_add(minus_table)
 
         if args.scale:
             scale_plus_chunks = [
