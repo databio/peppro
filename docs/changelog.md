@@ -1,13 +1,19 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
-## [0.9.8] -- 2020-06-03
+## [0.9.8] -- 2020-06-16
 
 ### Changed
  - Fix summarizer file path construction
  - Add minimum version requirements to required software
  - Update uninformative adapter read calculation
  - Update example output
+ - Update pause index calculation to be inflexible to depth
+ - Fix cFRiF y-axis
+ - Update cutadapt calculations to newer versions of cutadapt
+ - Update resource defaults
+ - Update requirement base versions
+ - Update schema
 
 ## [0.9.7] -- 2020-05-26
 
