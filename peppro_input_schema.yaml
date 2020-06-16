@@ -34,10 +34,10 @@ properties:
           type: string
           description: "Fastq file for read 2 (for paired-end experiments)"
         umi_len:
-          type: integer
+          type: string
           description: "Length of the Unique Molecular Identifier, if any"
         max_len:
-          type: integer
+          type: string
           description: "Specify the maximum read length to trim all reads to"
         adapter:
           type: string
