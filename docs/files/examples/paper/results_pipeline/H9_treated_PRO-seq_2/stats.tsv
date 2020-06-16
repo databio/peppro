@@ -6,9 +6,9 @@ Fastq_reads	114083518	PEPPRO
 Trimmed_reads	28674037	PEPPRO
 Trim_loss_rate	74.87	PEPPRO
 Reads_with_adapter	43984199.0	PEPPRO
-Uninformative_adapter_reads	0	PEPPRO
+Uninformative_adapter_reads	27614116.0	PEPPRO
 Duplicate_reads	2388789.0	PEPPRO
-Pct_uninformative_adapter_reads	0.0	PEPPRO
+Pct_uninformative_adapter_reads	48.4104	PEPPRO
 Trimmed_reads	57348074	PEPPRO
 Trim_loss_rate	49.73	PEPPRO
 Peak_adapter_insertion_size	20	PEPPRO
@@ -31,9 +31,9 @@ PBC2	10123508.0	PEPPRO
 Unmapped_reads	6731776	PEPPRO
 TSS_coding_score	57.4	PEPPRO
 TSS_non-coding_score	16.5	PEPPRO
-Pause_index	70.88	PEPPRO
+Pause_index	59.52	PEPPRO
 Plus_FRiP	0.4	PEPPRO
 Minus_FRiP	0.37	PEPPRO
 mRNA_contamination	1.16	PEPPRO
-Time	2:17:59	PEPPRO
-Success	05-27-10:33:24	PEPPRO
+Time	3:15:23	PEPPRO
+Success	06-15-10:32:40	PEPPRO

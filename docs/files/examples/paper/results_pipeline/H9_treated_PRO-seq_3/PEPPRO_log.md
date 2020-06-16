@@ -1,21 +1,22 @@
 ### Pipeline run code and environment:
 
-*              Command:  `/scratch/jps3dp/tools/databio/peppro/pipelines/peppro.py --sample-name H9_treated_PRO-seq_3 --genome hg38 --input /project/shefflab/data/guertin/fastq/H9_200nM_romidepsin_rep3_PE1.fastq.gz --single-or-paired paired --input2 /project/shefflab/data/guertin/fastq/H9_200nM_romidepsin_rep3_PE2.fastq.gz --protocol PRO --umi-len 8 --prealignments human_rDNA -O /project/shefflab/processed/peppro/paper/dev4/results_pipeline -P 8 -M 16000`
-*         Compute host:  udc-aj38-13c1
+*              Command:  `/scratch/jps3dp/tools/databio//peppro/pipelines/peppro.py --sample-name H9_treated_PRO-seq_3 --genome hg38 --input /project/shefflab/data//guertin/fastq/H9_200nM_romidepsin_rep3_PE1.fastq.gz --single-or-paired PAIRED -O /project/shefflab/processed//peppro/paper/6.11.2020/results_pipeline -P 12 -M 12000 --input2 /project/shefflab/data//guertin/fastq/H9_200nM_romidepsin_rep3_PE2.fastq.gz --protocol PRO --umi-len 8 --scale --prealignments human_rDNA --dirty -R`
+*         Compute host:  udc-ba27-28c0
 *          Working dir:  /sfs/lustre/bahamut/scratch/jps3dp/tools/databio/ppqc
-*            Outfolder:  /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/
-*  Pipeline started at:   (02-27 09:26:35) elapsed: 0.0 _TIME_
+*            Outfolder:  /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/
+*  Pipeline started at:   (06-15 07:17:18) elapsed: 1.0 _TIME_
 
 ### Version log:
 
-*       Python version:  3.6.5
+*       Python version:  3.6.6
 *          Pypiper dir:  `/sfs/qumulo/qhome/jps3dp/.local/lib/python3.6/site-packages/pypiper`
 *      Pypiper version:  0.12.1
 *         Pipeline dir:  `/sfs/lustre/bahamut/scratch/jps3dp/tools/databio/peppro/pipelines`
-*     Pipeline version:  0.9.1
-*        Pipeline hash:  2fe0657f50e41000560af043f4914b3a240296f2
-*      Pipeline branch:  * dev
-*        Pipeline date:  2020-02-27 09:20:39 -0500
+*     Pipeline version:  0.9.8
+*        Pipeline hash:  887a9a85408962dc3ca070dc954e59a5d4d73a10
+*      Pipeline branch:  * master
+*        Pipeline date:  2020-06-09 11:36:49 -0400
+*        Pipeline diff:  40 files changed, 16413 insertions(+), 3702 deletions(-)
 
 ### Arguments passed to pipeline:
 
@@ -24,36 +25,36 @@
 *          `anno_name`:  `None`
 *         `complexity`:  `False`
 *        `config_file`:  `peppro.yaml`
-*              `cores`:  `8`
+*              `cores`:  `12`
 *           `coverage`:  `False`
 *              `dedup`:  `seqkit`
-*              `dirty`:  `False`
+*              `dirty`:  `True`
 *  `ensembl_gene_body`:  `None`
 *        `ensembl_tss`:  `None`
 *          `exon_name`:  `None`
 *       `force_follow`:  `False`
 *    `genome_assembly`:  `hg38`
-*              `input`:  `['/project/shefflab/data/guertin/fastq/H9_200nM_romidepsin_rep3_PE1.fastq.gz']`
-*             `input2`:  `['/project/shefflab/data/guertin/fastq/H9_200nM_romidepsin_rep3_PE2.fastq.gz']`
+*              `input`:  `['/project/shefflab/data//guertin/fastq/H9_200nM_romidepsin_rep3_PE1.fastq.gz']`
+*             `input2`:  `['/project/shefflab/data//guertin/fastq/H9_200nM_romidepsin_rep3_PE2.fastq.gz']`
 *        `intron_name`:  `None`
 *               `keep`:  `False`
 *             `logdev`:  `False`
 *            `max_len`:  `-1`
-*                `mem`:  `16000`
+*                `mem`:  `12000`
 *          `new_start`:  `False`
 *            `no_fifo`:  `False`
-*      `output_parent`:  `/project/shefflab/processed/peppro/paper/dev4/results_pipeline`
+*      `output_parent`:  `/project/shefflab/processed//peppro/paper/6.11.2020/results_pipeline`
 *         `paired_end`:  `True`
 *           `pre_name`:  `None`
 *      `prealignments`:  `['human_rDNA']`
 *         `prioritize`:  `False`
 *           `protocol`:  `PRO`
-*            `recover`:  `False`
+*            `recover`:  `True`
 *        `sample_name`:  `H9_treated_PRO-seq_3`
-*              `scale`:  `False`
+*              `scale`:  `True`
 *        `search_file`:  `None`
 *             `silent`:  `False`
-*   `single_or_paired`:  `paired`
+*   `single_or_paired`:  `PAIRED`
 *                `sob`:  `False`
 *           `testmode`:  `False`
 *            `trimmer`:  `seqtk`
@@ -62,79 +63,79 @@
 
 ----------------------------------------
 
-Local input file: /project/shefflab/data/guertin/fastq/H9_200nM_romidepsin_rep3_PE1.fastq.gz
-Local input file: /project/shefflab/data/guertin/fastq/H9_200nM_romidepsin_rep3_PE2.fastq.gz
+Local input file: /project/shefflab/data//guertin/fastq/H9_200nM_romidepsin_rep3_PE1.fastq.gz
+Local input file: /project/shefflab/data//guertin/fastq/H9_200nM_romidepsin_rep3_PE2.fastq.gz
 
 > `File_mb`	2905.11	PEPPRO	_RES_
 
-> `Read_type`	paired	PEPPRO	_RES_
+> `Read_type`	PAIRED	PEPPRO	_RES_
 
 > `Genome`	hg38	PEPPRO	_RES_
 Detected PRO input
 
-### Merge/link and fastq conversion:  (02-27 09:26:35) elapsed: 0.0 _TIME_
+### Merge/link and fastq conversion:  (06-15 07:17:19) elapsed: 1.0 _TIME_
 
 Number of input file sets: 2
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R1.fastq.gz`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R1.fastq.gz`  
 
-> `ln -sf /project/shefflab/data/guertin/fastq/H9_200nM_romidepsin_rep3_PE1.fastq.gz /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R1.fastq.gz` (230971)
+> `ln -sf /project/shefflab/data//guertin/fastq/H9_200nM_romidepsin_rep3_PE1.fastq.gz /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R1.fastq.gz` (138710)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 0.002GB.  
-  PID: 230971;	Command: ln;	Return code: 0;	Memory used: 0.002GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 0GB.  
+  PID: 138710;	Command: ln;	Return code: 0;	Memory used: 0.0GB
 
-Local input file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R1.fastq.gz'
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R2.fastq.gz`  
+Local input file: '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R1.fastq.gz'
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R2.fastq.gz`  
 
-> `ln -sf /project/shefflab/data/guertin/fastq/H9_200nM_romidepsin_rep3_PE2.fastq.gz /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R2.fastq.gz` (230972)
+> `ln -sf /project/shefflab/data//guertin/fastq/H9_200nM_romidepsin_rep3_PE2.fastq.gz /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R2.fastq.gz` (138713)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 0.002GB.  
-  PID: 230972;	Command: ln;	Return code: 0;	Memory used: 0.0GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 0GB.  
+  PID: 138713;	Command: ln;	Return code: 0;	Memory used: 0.0GB
 
-Local input file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R2.fastq.gz'
+Local input file: '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R2.fastq.gz'
 Found .fastq.gz file
 Found .fastq.gz file
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1.fastq`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2.fastq`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1.fastq`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2.fastq`  
 
-> `pigz -f -p 8 -d -c /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R1.fastq.gz > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1.fastq` (230973)
+> `pigz -f -p 12 -d -c /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R1.fastq.gz > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1.fastq` (138720)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:18. Running peak memory: 0.003GB.  
-  PID: 230973;	Command: pigz;	Return code: 0;	Memory used: 0.003GB
+Command completed. Elapsed time: 0:02:52. Running peak memory: 0.002GB.  
+  PID: 138720;	Command: pigz;	Return code: 0;	Memory used: 0.002GB
 
 
-> `pigz -f -p 8 -d -c /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R2.fastq.gz > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2.fastq` (55430)
+> `pigz -f -p 12 -d -c /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R2.fastq.gz > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2.fastq` (54553)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:58. Running peak memory: 0.003GB.  
-  PID: 55430;	Command: pigz;	Return code: 0;	Memory used: 0.003GB
+Command completed. Elapsed time: 0:01:56. Running peak memory: 0.002GB.  
+  PID: 54553;	Command: pigz;	Return code: 0;	Memory used: 0.002GB
 
 
 > `Raw_reads`	120377388	PEPPRO	_RES_
 
 > `Fastq_reads`	120377388	PEPPRO	_RES_
-['/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R1.fastq.gz', '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R2.fastq.gz']
+['/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R1.fastq.gz', '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/H9_treated_PRO-seq_3_R2.fastq.gz']
 
-### FASTQ processing:  (02-27 09:30:39) elapsed: 244.0 _TIME_
+### FASTQ processing:  (06-15 07:25:41) elapsed: 502.0 _TIME_
 
 
 > `cutadapt --version`
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq`  
 
-> `(cutadapt -j 8 -m 10 -O 1 -a TGGAATTCTCGGGTGCCAAGG /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1.fastq -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq) > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R1_cutadapt.txt` (386169)
+> `(cutadapt -j 12 -m 10 -O 1 -a TGGAATTCTCGGGTGCCAAGG /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1.fastq -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq --too-short-output /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_short.fastq ) > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R1_cutadapt.txt` (3572)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:34. Running peak memory: 0.27GB.  
-  PID: 386169;	Command: cutadapt;	Return code: 0;	Memory used: 0.27GB
+Command completed. Elapsed time: 0:02:51. Running peak memory: 4.399GB.  
+  PID: 3572;	Command: cutadapt;	Return code: 0;	Memory used: 4.399GB
 
 
-> `seqtk trimfq -b 8 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq | seqtk seq -L 10 -r - > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq` (386275,386277)
+> `seqtk trimfq -b 8 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq | seqtk seq -L 10 -r - > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq` (3798,3799)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:40. Running peak memory: 0.27GB.  
-  PID: 386275;	Command: seqtk;	Return code: 0;	Memory used: 0.001GB  
-  PID: 386277;	Command: seqtk;	Return code: 0;	Memory used: 0.003GB
+Command completed. Elapsed time: 0:00:51. Running peak memory: 4.399GB.  
+  PID: 3798;	Command: seqtk;	Return code: 0;	Memory used: 0.001GB  
+  PID: 3799;	Command: seqtk;	Return code: 0;	Memory used: 0.002GB
 
 Evaluating read trimming
 
@@ -143,10 +144,8 @@ Evaluating read trimming
 > `Trim_loss_rate`	73.15	PEPPRO	_RES_
 Targetless command, running...  
 
-> `fastqc --noextract --outdir /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastqc /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq` (386330)
+> `fastqc --noextract --outdir /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastqc /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq` (3889)
 <pre>
-Picked up JAVA_TOOL_OPTIONS: -Xss1280k
-Picked up _JAVA_OPTIONS: -Djava.io.tmpdir=/scratch/jps3dp/tmp
 Started analysis of H9_treated_PRO-seq_3_R1_processed.fastq
 Approx 5% complete for H9_treated_PRO-seq_3_R1_processed.fastq
 Approx 10% complete for H9_treated_PRO-seq_3_R1_processed.fastq
@@ -169,68 +168,68 @@ Approx 90% complete for H9_treated_PRO-seq_3_R1_processed.fastq
 Approx 95% complete for H9_treated_PRO-seq_3_R1_processed.fastq
 Analysis complete for H9_treated_PRO-seq_3_R1_processed.fastq
 </pre>
-Command completed. Elapsed time: 0:01:12. Running peak memory: 0.27GB.  
-  PID: 386330;	Command: fastqc;	Return code: 0;	Memory used: 0.177GB
+Command completed. Elapsed time: 0:01:03. Running peak memory: 4.399GB.  
+  PID: 3889;	Command: fastqc;	Return code: 0;	Memory used: 0.178GB
 
 > `FastQC report r1`	fastqc/H9_treated_PRO-seq_3_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq`  
 
-> `seqkit rmdup --threads 8 --by-seq --ignore-case -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_dedup.fastq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq` (386410)
+> `seqkit rmdup --threads 12 --by-seq --ignore-case -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_dedup.fastq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq` (4233)
 <pre>
 [INFO][0m 4932446 duplicated records removed
 </pre>
-Command completed. Elapsed time: 0:00:58. Running peak memory: 2.026GB.  
-  PID: 386410;	Command: seqkit;	Return code: 0;	Memory used: 2.026GB
+Command completed. Elapsed time: 0:01:20. Running peak memory: 4.399GB.  
+  PID: 4233;	Command: seqkit;	Return code: 0;	Memory used: 2.046GB
 
 
-> `seqtk trimfq -b 8 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_dedup.fastq | seqtk seq -L 10 -r - > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq` (386614,386615)
+> `seqtk trimfq -b 8 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_dedup.fastq | seqtk seq -L 10 -r - > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq` (4357,4358)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:27. Running peak memory: 2.026GB.  
-  PID: 386614;	Command: seqtk;	Return code: 0;	Memory used: 0.001GB  
-  PID: 386615;	Command: seqtk;	Return code: 0;	Memory used: 0.003GB
+Command completed. Elapsed time: 0:00:46. Running peak memory: 4.399GB.  
+  PID: 4357;	Command: seqtk;	Return code: 0;	Memory used: 0.001GB  
+  PID: 4358;	Command: seqtk;	Return code: 0;	Memory used: 0.002GB
 
 
-> `grep 'Reads with adapters:' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R1_cutadapt.txt | awk '{print $(NF-1)}'`
+> `grep 'Reads with adapters:' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R1_cutadapt.txt | awk '{print $(NF-1)}'`
 
 > `Reads_with_adapter`	46004533.0	PEPPRO	_RES_
 
-> `grep 'Total basepairs processed:' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R1_cutadapt.txt | awk '{print $(NF-1)}'`
+> `grep 'Total basepairs processed:' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R1_cutadapt.txt | awk '{print $(NF-1)}'`
 
-> `awk '{sum+=$1*$2} END {printf "%.0f", sum}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R1_cutadapt.txt`
+> `awk '{sum+=$1*$2} END {printf "%.0f", sum}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R1_cutadapt.txt`
 
-> `grep 'Reads that were too short:' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R1_cutadapt.txt | awk '{print $(NF-1)}'`
+> `wc -l /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_short.fastq | awk '{print $1}'`
 
 > `Uninformative_adapter_reads`	26667722.0	PEPPRO	_RES_
 
 > `Duplicate_reads`	4932446.0	PEPPRO	_RES_
 
 > `Pct_uninformative_adapter_reads`	44.3069	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/processed_R1.flag`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/processed_R1.flag`  
 
-> `touch /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/processed_R1.flag` (386757)
+> `touch /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/processed_R1.flag` (4567)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 2.026GB.  
-  PID: 386757;	Command: touch;	Return code: 0;	Memory used: 0.0GB
+Command completed. Elapsed time: 0:00:01. Running peak memory: 4.399GB.  
+  PID: 4567;	Command: touch;	Return code: 0;	Memory used: 0.002GB
 
 
 > `cutadapt --version`
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq`  
 
-> `(cutadapt -j 8 -m 10 -O 1 -a GATCGTCGGACTGTAGAACTCTGAAC /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2.fastq -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq) > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R2_cutadapt.txt` (386759)
+> `(cutadapt -j 12 -m 10 -O 1 -a GATCGTCGGACTGTAGAACTCTGAAC /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2.fastq -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq --too-short-output /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_short.fastq ) > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_R2_cutadapt.txt` (4570)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:24. Running peak memory: 2.026GB.  
-  PID: 386759;	Command: cutadapt;	Return code: 0;	Memory used: 0.265GB
+Command completed. Elapsed time: 0:02:00. Running peak memory: 4.399GB.  
+  PID: 4570;	Command: cutadapt;	Return code: 0;	Memory used: 3.415GB
 
 
-> `seqtk trimfq -b 8 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq | seqtk seq -L 10 -r - > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq` (386852,386853)
+> `seqtk trimfq -b 8 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq | seqtk seq -L 10 -r - > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq` (4947,4948)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:30. Running peak memory: 2.026GB.  
-  PID: 386852;	Command: seqtk;	Return code: 0;	Memory used: 0.001GB  
-  PID: 386853;	Command: seqtk;	Return code: 0;	Memory used: 0.003GB
+Command completed. Elapsed time: 0:00:50. Running peak memory: 4.399GB.  
+  PID: 4947;	Command: seqtk;	Return code: 0;	Memory used: 0.001GB  
+  PID: 4948;	Command: seqtk;	Return code: 0;	Memory used: 0.002GB
 
 Evaluating read trimming
 
@@ -239,10 +238,8 @@ Evaluating read trimming
 > `Trim_loss_rate`	46.3	PEPPRO	_RES_
 Targetless command, running...  
 
-> `fastqc --noextract --outdir /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastqc /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq` (386902)
+> `fastqc --noextract --outdir /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastqc /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq` (5051)
 <pre>
-Picked up JAVA_TOOL_OPTIONS: -Xss1280k
-Picked up _JAVA_OPTIONS: -Djava.io.tmpdir=/scratch/jps3dp/tmp
 Started analysis of H9_treated_PRO-seq_3_R1_processed.fastq
 Approx 5% complete for H9_treated_PRO-seq_3_R1_processed.fastq
 Approx 10% complete for H9_treated_PRO-seq_3_R1_processed.fastq
@@ -265,15 +262,13 @@ Approx 90% complete for H9_treated_PRO-seq_3_R1_processed.fastq
 Approx 95% complete for H9_treated_PRO-seq_3_R1_processed.fastq
 Analysis complete for H9_treated_PRO-seq_3_R1_processed.fastq
 </pre>
-Command completed. Elapsed time: 0:01:13. Running peak memory: 2.026GB.  
-  PID: 386902;	Command: fastqc;	Return code: 0;	Memory used: 0.177GB
+Command completed. Elapsed time: 0:01:02. Running peak memory: 4.399GB.  
+  PID: 5051;	Command: fastqc;	Return code: 0;	Memory used: 0.179GB
 
 > `FastQC report r1`	fastqc/H9_treated_PRO-seq_3_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO	_OBJ_
 Targetless command, running...  
 
-> `fastqc --noextract --outdir /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastqc /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq` (387046)
-Picked up JAVA_TOOL_OPTIONS: -Xss1280k
-Picked up _JAVA_OPTIONS: -Djava.io.tmpdir=/scratch/jps3dp/tmp
+> `fastqc --noextract --outdir /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastqc /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq` (5140)
 <pre>
 Started analysis of H9_treated_PRO-seq_3_R2_trimmed.fastq
 Approx 5% complete for H9_treated_PRO-seq_3_R2_trimmed.fastq
@@ -297,169 +292,171 @@ Approx 90% complete for H9_treated_PRO-seq_3_R2_trimmed.fastq
 Approx 95% complete for H9_treated_PRO-seq_3_R2_trimmed.fastq
 Analysis complete for H9_treated_PRO-seq_3_R2_trimmed.fastq
 </pre>
-Command completed. Elapsed time: 0:01:17. Running peak memory: 2.026GB.  
-  PID: 387046;	Command: fastqc;	Return code: 0;	Memory used: 0.169GB
+Command completed. Elapsed time: 0:01:19. Running peak memory: 4.399GB.  
+  PID: 5140;	Command: fastqc;	Return code: 0;	Memory used: 0.165GB
 
 > `FastQC report r2`	fastqc/H9_treated_PRO-seq_3_R2_trimmed_fastqc.html	FastQC report r2	None	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.histogram`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.histogram`  
 
-> `fastq_pair -t 108339649 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq` (387359)
+> `fastq_pair -t 108339649 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq` (5227)
 <pre>
 Left paired: 33366507		Right paired: 33366507
 Left single: 154465		Right single: 1916320
-Writing the paired reads to /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq.paired.fq and /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq.paired.fq.
-Writing the single reads to /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq.single.fq and /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq.single.fq
+Writing the paired reads to /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq.paired.fq and /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq.paired.fq.
+Writing the single reads to /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq.single.fq and /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq.single.fq
 </pre>
-Command completed. Elapsed time: 0:04:31. Running peak memory: 7.355GB.  
-  PID: 387359;	Command: fastq_pair;	Return code: 0;	Memory used: 7.355GB
+Command completed. Elapsed time: 0:04:36. Running peak memory: 7.355GB.  
+  PID: 5227;	Command: fastq_pair;	Return code: 0;	Memory used: 7.355GB
 
 
-> `flash -q -t 8 --compress-prog=pigz --suffix=gz /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq.paired.fq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq.paired.fq -o H9_treated_PRO-seq_3 -d /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt` (387817)
+> `flash -q -t 12 --compress-prog=pigz --suffix=gz /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_noadap.fastq.paired.fq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_noadap.fastq.paired.fq -o H9_treated_PRO-seq_3 -d /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt` (6033)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:32. Running peak memory: 7.355GB.  
-  PID: 387817;	Command: flash;	Return code: 0;	Memory used: 0.115GB
+Command completed. Elapsed time: 0:01:22. Running peak memory: 7.355GB.  
+  PID: 6033;	Command: flash;	Return code: 0;	Memory used: 0.091GB
 
 
-### Plot adapter insertion distribution (02-27 09:46:37) elapsed: 958.0 _TIME_
+### Plot adapter insertion distribution (06-15 07:45:31) elapsed: 1189.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_adapter_insertion_distribution.pdf`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3_adapter_insertion_distribution.pdf`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R adapt -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt -u 8` (388046)
+> `Rscript /scratch/jps3dp/tools/databio//peppro/tools/PEPPRO.R adapt -i /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt -u 8` (6460)
 <pre>
 Adapter insertion distribution plot completed!
 
 </pre>
 Command completed. Elapsed time: 0:00:06. Running peak memory: 7.355GB.  
-  PID: 388046;	Command: Rscript;	Return code: 0;	Memory used: 0.201GB
+  PID: 6460;	Command: Rscript;	Return code: 0;	Memory used: 0.203GB
 
 > `Adapter insertion distribution`	cutadapt/H9_treated_PRO-seq_3_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/H9_treated_PRO-seq_3_adapter_insertion_distribution.png	PEPPRO	_OBJ_
 Missing stat 'Peak_adapter_insertion_size'
 
-> `awk 'NR>2 {print prev} {prev=$0}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max) {max=$2; len=$1}; max_len=$1} END{print len-8}'`
+> `awk 'NR>2 {print prev} {prev=$0}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max) {max=$2; len=$1}; max_len=$1} END{print len-8}'`
 
 > `Peak_adapter_insertion_size`	20	PEPPRO	_RES_
 Missing stat 'Degradation_ratio'
 
-###  Calculating degradation ratio (02-27 09:46:43) elapsed: 6.0 _TIME_
+###  Calculating degradation ratio (06-15 07:45:37) elapsed: 6.0 _TIME_
 
 
-> `awk '{ if (($1-8) == 10) {status = 1}} END {if (status) {print status} else {print 0}}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`
+> `awk '{ if (($1-8) == 10) {status = 1}} END {if (status) {print status} else {print 0}}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`
 
-> `awk '{ if (($1-8) == 20) {status = 1}} END {if (status) {print status} else {print 0}}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`
+> `awk '{ if (($1-8) == 20) {status = 1}} END {if (status) {print status} else {print 0}}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`
 
-> `awk '{ if (($1-8) == 30) {status = 1}} END {if (status) {print status} else {print 0}}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`
+> `awk '{ if (($1-8) == 30) {status = 1}} END {if (status) {print status} else {print 0}}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`
 
-> `awk '{ if (($1-8) == 40) {status = 1}} END {if (status) {print status} else {print 0}}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`
+> `awk '{ if (($1-8) == 40) {status = 1}} END {if (status) {print status} else {print 0}}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`
 
-> `awk '(($1-8 ) <= 20 && ($1-8 ) >= 10){degradedSum += $2}; (($1-8 ) >= 30 && ($1-8) <= 40){intactSum += $2}  END {if (intactSum < 1) {intactSum = 1} print degradedSum/intactSum}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`
+> `awk '(($1-8 ) <= 20 && ($1-8 ) >= 10){degradedSum += $2}; (($1-8 ) >= 30 && ($1-8) <= 40){intactSum += $2}  END {if (intactSum < 1) {intactSum = 1} print degradedSum/intactSum}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/cutadapt/H9_treated_PRO-seq_3.hist`
 
 > `Degradation_ratio`	0.9116	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq`  
 
-> `cp /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq` (388074)
+> `cp /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq` (6490)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:21. Running peak memory: 7.355GB.  
-  PID: 388074;	Command: cp;	Return code: 0;	Memory used: 0.002GB
+  PID: 6490;	Command: cp;	Return code: 0;	Memory used: 0.002GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/processed_R2.flag`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/processed_R2.flag`  
 
-> `touch /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/processed_R2.flag` (388098)
+> `touch /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/processed_R2.flag` (6516)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 388098;	Command: touch;	Return code: 0;	Memory used: 0.0GB
+  PID: 6516;	Command: touch;	Return code: 0;	Memory used: 0.0GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/repaired.flag`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/repaired.flag`  
 
-> `fastq_pair -t 108339649 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq` (388099)
+> `fastq_pair -t 108339649 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq` (6517)
 <pre>
 Left paired: 32136774		Right paired: 32136774
 Left single: 183685		Right single: 1977423
-Writing the paired reads to /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq.paired.fq and /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq.paired.fq.
-Writing the single reads to /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq.single.fq and /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq.single.fq
+Writing the paired reads to /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq.paired.fq and /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq.paired.fq.
+Writing the single reads to /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq.single.fq and /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq.single.fq
 </pre>
-Command completed. Elapsed time: 0:02:54. Running peak memory: 7.355GB.  
-  PID: 388099;	Command: fastq_pair;	Return code: 0;	Memory used: 7.13GB
+Command completed. Elapsed time: 0:03:57. Running peak memory: 7.355GB.  
+  PID: 6517;	Command: fastq_pair;	Return code: 0;	Memory used: 7.13GB
 
 
-> `mv /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq.paired.fq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq` (388249)
+> `mv /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq.paired.fq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq` (6742)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 388249;	Command: mv;	Return code: 0;	Memory used: 0.002GB
+  PID: 6742;	Command: mv;	Return code: 0;	Memory used: 0.002GB
 
 
-> `mv /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq.paired.fq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq` (388250)
+> `mv /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq.paired.fq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq` (6743)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 388250;	Command: mv;	Return code: 0;	Memory used: 0.001GB
+  PID: 6743;	Command: mv;	Return code: 0;	Memory used: 0.001GB
 
 
-> `touch /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/repaired.flag` (388252)
+> `touch /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/repaired.flag` (6745)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 388252;	Command: touch;	Return code: 0;	Memory used: 0.0GB
+  PID: 6745;	Command: touch;	Return code: 0;	Memory used: 0.0GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/dups_repaired.flag`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/dups_repaired.flag`  
 
-> `fastq_pair -t 108339649 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq` (388253)
+> `fastq_pair -t 108339649 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq` (6746)
 <pre>
 Left paired: 27441885		Right paired: 27441885
 Left single: 119928		Right single: 6672312
-Writing the paired reads to /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq.paired.fq and /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq.paired.fq.
-Writing the single reads to /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq.single.fq and /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq.single.fq
+Writing the paired reads to /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq.paired.fq and /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq.paired.fq.
+Writing the single reads to /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq.single.fq and /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq.single.fq
 </pre>
-Command completed. Elapsed time: 0:01:52. Running peak memory: 7.355GB.  
-  PID: 388253;	Command: fastq_pair;	Return code: 0;	Memory used: 6.597GB
+Command completed. Elapsed time: 0:02:26. Running peak memory: 7.355GB.  
+  PID: 6746;	Command: fastq_pair;	Return code: 0;	Memory used: 5.969GB
 
 
-> `mv /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq.paired.fq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq` (388582)
+> `mv /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq.paired.fq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq` (7165)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
+  PID: 7165;	Command: mv;	Return code: 0;	Memory used: 0.001GB
+
+
+> `mv /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq.paired.fq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq` (7166)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 388582;	Command: mv;	Return code: 0;	Memory used: 0.002GB
+  PID: 7166;	Command: mv;	Return code: 0;	Memory used: 0.001GB
 
 
-> `mv /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq.paired.fq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq` (388583)
+> `touch /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/dups_repaired.flag` (7168)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 388583;	Command: mv;	Return code: 0;	Memory used: 0.001GB
+  PID: 7168;	Command: touch;	Return code: 0;	Memory used: 0.0GB
 
 
-> `touch /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/dups_repaired.flag` (388584)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 388584;	Command: touch;	Return code: 0;	Memory used: 0.0GB
-
-
-### Prealignments (02-27 09:51:52) elapsed: 309.0 _TIME_
+### Prealignments (06-15 07:52:24) elapsed: 407.0 _TIME_
 
 Prealignment assemblies: ['human_rDNA']
 
-### Map to human_rDNA (02-27 09:51:52) elapsed: 0.0 _TIME_
+### Map to human_rDNA (06-15 07:52:24) elapsed: 0.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_bt2`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_bt2`  
 
-> `mkfifo /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_bt2` (388585)
+> `mkfifo /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_bt2` (7169)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 388585;	Command: mkfifo;	Return code: 0;	Memory used: 0.002GB
+  PID: 7169;	Command: mkfifo;	Return code: 0;	Memory used: 0.0GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq.gz`  
+File not added to cleanup: prealignments/human_rDNA_bt2
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq.gz`  
 
-> `perl /scratch/jps3dp/tools/databio/peppro/tools/filter_paired_fq.pl /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_bt2 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R1.fq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq` (388587)
+> `perl /scratch/jps3dp/tools/databio//peppro/tools/filter_paired_fq.pl /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_bt2 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed.fastq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R1.fq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq` (7170)
 <pre>
 </pre>
 
-> `(bowtie2 -p 8 -k 1 -D 20 -R 3 -N 1 -L 20 -i S,1,0.50 -x /scratch/jps3dp/DATA/genomes/human_rDNA/bowtie2_index/default/human_rDNA --rg-id H9_treated_PRO-seq_3 -U /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq --un /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_bt2 2>&1 > /dev/null)`
+> `(bowtie2 -p 12 -k 1 -D 20 -R 3 -N 1 -L 20 -i S,1,0.50 -x /project/shefflab/genomes/human_rDNA/bowtie2_index/default/human_rDNA --rg-id H9_treated_PRO-seq_3 -U /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_processed.fastq --un /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_bt2 2>&1 > /dev/null)`
 not gzipping output
+File not added to cleanup: prealignments/human_rDNA_bt2
 Missing stat 'Aligned_reads_human_rDNA'
 32136774 reads; of these:
   32136774 (100.00%) were unpaired; of these:
@@ -472,32 +469,35 @@ Missing stat 'Aligned_reads_human_rDNA'
 
 > `Alignment_rate_human_rDNA`	10.36	PEPPRO	_RES_
 
-### Map to human_rDNA (02-27 09:55:34) elapsed: 222.0 _TIME_
+### Map to human_rDNA (06-15 07:55:57) elapsed: 214.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_dups_bt2`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_dups_bt2`  
 
-> `mkfifo /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_dups_bt2` (389015)
+> `mkfifo /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_dups_bt2` (7602)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 389015;	Command: mkfifo;	Return code: 0;	Memory used: 0.002GB
+  PID: 7602;	Command: mkfifo;	Return code: 0;	Memory used: 0.0GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq.gz`  
+File not added to cleanup: prealignments/human_rDNA_dups_bt2
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq.gz`  
 
-> `perl /scratch/jps3dp/tools/databio/peppro/tools/filter_paired_fq.pl /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_dups_bt2 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_dups_R1.fq /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_dups_R2.fq` (389016)
+> `perl /scratch/jps3dp/tools/databio//peppro/tools/filter_paired_fq.pl /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_dups_bt2 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R2_trimmed_dups.fastq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_dups_R1.fq /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_dups_R2.fq` (7603)
 <pre>
 </pre>
 
-> `(bowtie2 -p 8 -k 1 -D 20 -R 3 -N 1 -L 20 -i S,1,0.50 -x /scratch/jps3dp/DATA/genomes/human_rDNA/bowtie2_index/default/human_rDNA --rg-id H9_treated_PRO-seq_3 -U /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq --un /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_dups_bt2 2>&1 > /dev/null)`
+> `(bowtie2 -p 12 -k 1 -D 20 -R 3 -N 1 -L 20 -i S,1,0.50 -x /project/shefflab/genomes/human_rDNA/bowtie2_index/default/human_rDNA --rg-id H9_treated_PRO-seq_3 -U /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/fastq/H9_treated_PRO-seq_3_R1_trimmed.fastq --un /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/human_rDNA_dups_bt2 2>&1 > /dev/null)`
 not gzipping output
 3348423 reads skipped
 0 reads lost
+File not added to cleanup: prealignments/human_rDNA_dups_bt2
 
-### Map to genome (02-27 09:59:09) elapsed: 215.0 _TIME_
+### Map to genome (06-15 07:59:20) elapsed: 203.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam`  
+No files match cleanup pattern: /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_fail_qc_dups.bam
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam`  
 
-> `bowtie2 -p 8 --very-sensitive -X 2000 --rg-id H9_treated_PRO-seq_3 -x /scratch/jps3dp/DATA/genomes/hg38/bowtie2_index/default/hg38 --rf -1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R1.fq -2 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq | samtools view -bS - -@ 1  | samtools sort - -@ 1 -T /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/tmpo4n383sx -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam` (389216,389217,389218)
+> `bowtie2 -p 12 --very-sensitive -X 2000 --rg-id H9_treated_PRO-seq_3 -x /project/shefflab/genomes/hg38/bowtie2_index/default/hg38 --rf -1 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R1.fq -2 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq | samtools view -bS - -@ 1  | samtools sort - -@ 1 -T /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/tmpm93otle_ -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam` (7809,7810,7811)
 <pre>
 2663663 reads skipped
 0 reads lost
@@ -516,22 +516,22 @@ Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeli
         4038486 (21.99%) aligned exactly 1 time
         6923343 (37.70%) aligned >1 times
 87.15% overall alignment rate
-[bam_sort_core] merging from 15 files and 1 in-memory blocks...
+[bam_sort_core] merging from 16 files and 1 in-memory blocks...
 </pre>
-Command completed. Elapsed time: 0:59:22. Running peak memory: 7.355GB.  
-  PID: 389216;	Command: bowtie2;	Return code: 0;	Memory used: 3.671GB  
-  PID: 389217;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
-  PID: 389218;	Command: samtools;	Return code: 0;	Memory used: 0.872GB
+Command completed. Elapsed time: 0:48:46. Running peak memory: 7.355GB.  
+  PID: 7810;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
+  PID: 7809;	Command: bowtie2;	Return code: 0;	Memory used: 3.772GB  
+  PID: 7811;	Command: samtools;	Return code: 0;	Memory used: 0.895GB
 
 
-> `samtools view -q 10 -b -@ 8 -U /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_fail_qc.bam /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam` (395254)
+> `samtools view -q 10 -b -@ 12 -U /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_fail_qc.bam /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam` (13121)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:40. Running peak memory: 7.355GB.  
-  PID: 395254;	Command: samtools;	Return code: 0;	Memory used: 0.015GB
+Command completed. Elapsed time: 0:01:35. Running peak memory: 7.355GB.  
+  PID: 13121;	Command: samtools;	Return code: 0;	Memory used: 0.018GB
 
 
-> `samtools depth -b /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam | awk '{counter++;sum+=$3}END{print sum/counter}'`
+> `samtools depth -b /project/shefflab/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam | awk '{counter++;sum+=$3}END{print sum/counter}'`
 
 > `Mapped_reads`	50176577	PEPPRO	_RES_
 
@@ -544,9 +544,9 @@ Command completed. Elapsed time: 0:01:40. Running peak memory: 7.355GB.
 > `Total_efficiency`	17.53	PEPPRO	_RES_
 
 > `Read_depth`	3.98	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam`  
 
-> `bowtie2 -p 8 --very-sensitive -X 2000 --rg-id H9_treated_PRO-seq_3 -x /scratch/jps3dp/DATA/genomes/hg38/bowtie2_index/default/hg38 --rf -1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_dups_R1.fq -2 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_dups_R2.fq | samtools view -bS - -@ 1  | samtools sort - -@ 1 -T /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/tmpo4n383sx -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp_dups.bam` (396711,396717,396718)
+> `bowtie2 -p 12 --very-sensitive -X 2000 --rg-id H9_treated_PRO-seq_3 -x /project/shefflab/genomes/hg38/bowtie2_index/default/hg38 --rf -1 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_dups_R1.fq -2 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_dups_R2.fq | samtools view -bS - -@ 1  | samtools sort - -@ 1 -T /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/tmpm93otle_ -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp_dups.bam` (14710,14711,14712)
 <pre>
 24778222 reads; of these:
   24778222 (100.00%) were paired; of these:
@@ -563,152 +563,160 @@ Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeli
         3533931 (22.96%) aligned exactly 1 time
         5611278 (36.46%) aligned >1 times
 87.40% overall alignment rate
-[bam_sort_core] merging from 13 files and 1 in-memory blocks...
+[bam_sort_core] merging from 14 files and 1 in-memory blocks...
 </pre>
-Command completed. Elapsed time: 0:51:13. Running peak memory: 7.355GB.  
-  PID: 396711;	Command: bowtie2;	Return code: 0;	Memory used: 3.659GB  
-  PID: 396717;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
-  PID: 396718;	Command: samtools;	Return code: 0;	Memory used: 0.872GB
+Command completed. Elapsed time: 0:42:51. Running peak memory: 7.355GB.  
+  PID: 14710;	Command: bowtie2;	Return code: 0;	Memory used: 3.758GB  
+  PID: 14711;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
+  PID: 14712;	Command: samtools;	Return code: 0;	Memory used: 0.895GB
 
 
-> `samtools view -q 10 -b -@ 8 -U /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_fail_qc_dups.bam /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp_dups.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam` (401762)
+> `samtools view -q 10 -b -@ 12 -U /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_fail_qc_dups.bam /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp_dups.bam > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam` (18989)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:01:25. Running peak memory: 7.355GB.  
-  PID: 401762;	Command: samtools;	Return code: 0;	Memory used: 0.018GB
+Command completed. Elapsed time: 0:01:26. Running peak memory: 7.355GB.  
+  PID: 18989;	Command: samtools;	Return code: 0;	Memory used: 0.018GB
 
 
-### Compress all unmapped read files (02-27 12:04:15) elapsed: 7507.0 _TIME_
+### Compress all unmapped read files (06-15 09:46:12) elapsed: 6412.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R1.fq.gz`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq.gz`  
 
-> `pigz -f -p 8 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R1.fq` (401854)
+> `pigz -f -p 12 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq` (19314)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:37. Running peak memory: 7.355GB.  
-  PID: 401854;	Command: pigz;	Return code: 0;	Memory used: 0.01GB
+Command completed. Elapsed time: 0:00:25. Running peak memory: 7.355GB.  
+  PID: 19314;	Command: pigz;	Return code: 0;	Memory used: 0.009GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq.gz`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R1.fq.gz`  
 
-> `pigz -f -p 8 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R2.fq` (401894)
+> `pigz -f -p 12 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/prealignments/H9_treated_PRO-seq_3_human_rDNA_unmap_R1.fq` (19353)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:28. Running peak memory: 7.355GB.  
+  PID: 19353;	Command: pigz;	Return code: 0;	Memory used: 0.009GB
+
+Missing stat 'Mitochondrial_reads'
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam.bai`  
+
+> `samtools index /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam` (19407)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:41. Running peak memory: 7.355GB.  
+  PID: 19407;	Command: samtools;	Return code: 0;	Memory used: 0.009GB
+
+
+> `samtools idxstats /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam | grep -we 'chrM' -we 'chrMT' -we 'M' -we 'MT' -we 'rCRSd' -we 'rCRSd_3k'| cut -f 3`
+
+> `Mitochondrial_reads`	667197	PEPPRO	_RES_
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_noMT.bam`  
+
+> `samtools index /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam` (19473)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:31. Running peak memory: 7.355GB.  
-  PID: 401894;	Command: pigz;	Return code: 0;	Memory used: 0.008GB
-
-Missing stat 'Mitochondrial_reads'
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam.bai`  
-
-> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam` (402145)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:44. Running peak memory: 7.355GB.  
-  PID: 402145;	Command: samtools;	Return code: 0;	Memory used: 0.02GB
+  PID: 19473;	Command: samtools;	Return code: 0;	Memory used: 0.011GB
 
 
-> `samtools idxstats /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam | grep -we 'chrM' -we 'chrMT' -we 'M' -we 'MT' -we 'rCRSd' -we 'rCRSd_3k'| cut -f 3`
-
-> `Mitochondrial_reads`	667197	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_noMT.bam`  
-
-> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam` (402188)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:30. Running peak memory: 7.355GB.  
-  PID: 402188;	Command: samtools;	Return code: 0;	Memory used: 0.011GB
-
-
-> `samtools idxstats /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam | cut -f 1 | grep -vwe 'chrM' -vwe 'chrMT' -vwe 'M' -vwe 'MT' -vwe 'rCRSd' -vwe 'rCRSd_3k'| xargs samtools view -b -@ 8 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_noMT.bam` (402214,402215,402216,402217)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:36. Running peak memory: 7.355GB.  
-  PID: 402214;	Command: samtools;	Return code: 0;	Memory used: 0.005GB  
-  PID: 402216;	Command: grep;	Return code: 0;	Memory used: 0.001GB  
-  PID: 402215;	Command: cut;	Return code: 0;	Memory used: 0.001GB  
-  PID: 402217;	Command: xargs;	Return code: 0;	Memory used: 0.063GB
-
-
-> `mv /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_noMT.bam /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam` (402262)
+> `samtools idxstats /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam | cut -f 1-2 | awk '{print $1, 0, $2}' | grep -vwe 'chrM' -vwe 'chrMT' -vwe 'M' -vwe 'MT' -vwe 'rCRSd' -vwe 'rCRSd_3k' > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/chr_sizes.bed` (19501,19502,19503,19504)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 402262;	Command: mv;	Return code: 0;	Memory used: 0.002GB
+  PID: 19503;	Command: awk;	Return code: 0;	Memory used: 0.0GB  
+  PID: 19501;	Command: samtools;	Return code: 0;	Memory used: 0.006GB  
+  PID: 19504;	Command: grep;	Return code: 0;	Memory used: 0.0GB  
+  PID: 19502;	Command: cut;	Return code: 0;	Memory used: 0.001GB
 
 
-> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam` (402263)
+> `samtools view -L /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/chr_sizes.bed -b -@ 12 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_noMT.bam` (19506)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:30. Running peak memory: 7.355GB.  
-  PID: 402263;	Command: samtools;	Return code: 0;	Memory used: 0.011GB
+Command completed. Elapsed time: 0:00:39. Running peak memory: 7.355GB.  
+  PID: 19506;	Command: samtools;	Return code: 0;	Memory used: 0.019GB
 
 
-### Split BAM file (02-27 12:07:44) elapsed: 209.0 _TIME_
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE2.bam`  
-
-> `samtools view -b -f 64 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam | samtools sort - -@ 8 > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam` (402288,402289)
+> `mv /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_noMT.bam /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam` (19559)
 <pre>
-[bam_sort_core] merging from 0 files and 8 in-memory blocks...
 </pre>
-Command completed. Elapsed time: 0:02:51. Running peak memory: 7.355GB.  
-  PID: 402288;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
-  PID: 402289;	Command: samtools;	Return code: 0;	Memory used: 5.665GB
+Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
+  PID: 19559;	Command: mv;	Return code: 0;	Memory used: 0.002GB
 
 
-> `samtools view -b -f 128 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam | samtools sort - -@ 8 > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE2.bam` (402740,402741)
+> `samtools index /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam` (19560)
 <pre>
-[bam_sort_core] merging from 0 files and 8 in-memory blocks...
 </pre>
-Command completed. Elapsed time: 0:02:21. Running peak memory: 7.355GB.  
-  PID: 402741;	Command: samtools;	Return code: 0;	Memory used: 4.326GB  
-  PID: 402740;	Command: samtools;	Return code: 0;	Memory used: 0.004GB
+Command completed. Elapsed time: 0:00:32. Running peak memory: 7.355GB.  
+  PID: 19560;	Command: samtools;	Return code: 0;	Memory used: 0.01GB
+
+
+### Split BAM file (06-15 09:49:29) elapsed: 197.0 _TIME_
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE2.bam`  
+
+> `samtools view -b -f 64 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam | samtools sort - -@ 12 > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam` (19633,19634)
+<pre>
+[bam_sort_core] merging from 0 files and 12 in-memory blocks...
+</pre>
+Command completed. Elapsed time: 0:02:53. Running peak memory: 7.355GB.  
+  PID: 19633;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
+  PID: 19634;	Command: samtools;	Return code: 0;	Memory used: 6.208GB
+
+
+> `samtools view -b -f 128 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort.bam | samtools sort - -@ 12 > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE2.bam` (20143,20144)
+<pre>
+[bam_sort_core] merging from 0 files and 12 in-memory blocks...
+</pre>
+Command completed. Elapsed time: 0:02:23. Running peak memory: 7.355GB.  
+  PID: 20144;	Command: samtools;	Return code: 0;	Memory used: 4.661GB  
+  PID: 20143;	Command: samtools;	Return code: 0;	Memory used: 0.004GB
 
 Missing stat 'Maximum_read_length'
 
-> `samtools stats /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam | grep '^SN' | cut -f 2- | grep 'maximum length:' | cut -f 2-`
+> `samtools stats /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam | grep '^SN' | cut -f 2- | grep 'maximum length:' | cut -f 2-`
 
 > `Maximum_read_length`	38	PEPPRO	_RES_
 Missing stat 'Genome_size'
 
-> `awk '{sum+=$2} END {printf "%.0f", sum}' /scratch/jps3dp/DATA/genomes/hg38/fasta/default/hg38.chrom.sizes`
+> `awk '{sum+=$2} END {printf "%.0f", sum}' /project/shefflab/genomes/hg38/fasta/default/hg38.chrom.sizes`
 
 > `Genome_size`	3099922541	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp_dups.bam.bai`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp_dups.bam.bai`  
 
-> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp_dups.bam` (402949)
+> `samtools index /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp_dups.bam` (20692)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:33. Running peak memory: 7.355GB.  
-  PID: 402949;	Command: samtools;	Return code: 0;	Memory used: 0.011GB
+Command completed. Elapsed time: 0:00:36. Running peak memory: 7.355GB.  
+  PID: 20692;	Command: samtools;	Return code: 0;	Memory used: 0.01GB
 
 
-> `samtools idxstats /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp_dups.bam | grep -we 'chrM' -we 'chrMT' -we 'M' -we 'MT' -we 'rCRSd' -we 'rCRSd_3k'| cut -f 3`
-Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam`  
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE1.bam`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE2.bam`  
+> `samtools idxstats /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp_dups.bam | grep -we 'chrM' -we 'chrMT' -we 'M' -we 'MT' -we 'rCRSd' -we 'rCRSd_3k'| cut -f 3`
+Target exists: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam`  
+No files match cleanup pattern: /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam.bai
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE1.bam`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE2.bam`  
 
-> `samtools view -b -f 64 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam | samtools sort - -@ 8 > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE1.bam` (402984,402985)
+> `samtools view -b -f 64 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam | samtools sort - -@ 12 > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE1.bam` (20726,20727)
 <pre>
-[bam_sort_core] merging from 0 files and 8 in-memory blocks...
+[bam_sort_core] merging from 0 files and 12 in-memory blocks...
 </pre>
-Command completed. Elapsed time: 0:02:39. Running peak memory: 7.355GB.  
-  PID: 402984;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
-  PID: 402985;	Command: samtools;	Return code: 0;	Memory used: 5.013GB
+Command completed. Elapsed time: 0:02:36. Running peak memory: 7.355GB.  
+  PID: 20726;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
+  PID: 20727;	Command: samtools;	Return code: 0;	Memory used: 5.495GB
 
 
-> `samtools view -b -f 128 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam | samtools sort - -@ 8 > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE2.bam` (403361,403362)
+> `samtools view -b -f 128 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_sort_dups.bam | samtools sort - -@ 12 > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE2.bam` (20945,20946)
 <pre>
-[bam_sort_core] merging from 0 files and 8 in-memory blocks...
+[bam_sort_core] merging from 0 files and 12 in-memory blocks...
 </pre>
-Command completed. Elapsed time: 0:02:09. Running peak memory: 7.355GB.  
-  PID: 403361;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
-  PID: 403362;	Command: samtools;	Return code: 0;	Memory used: 3.993GB
+Command completed. Elapsed time: 0:02:07. Running peak memory: 7.355GB.  
+  PID: 20945;	Command: samtools;	Return code: 0;	Memory used: 0.004GB  
+  PID: 20946;	Command: samtools;	Return code: 0;	Memory used: 4.391GB
 
 
-### Calculate library complexity (02-27 12:19:00) elapsed: 676.0 _TIME_
+### Calculate library complexity (06-15 10:01:09) elapsed: 700.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_out.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_out.txt`  
 
-> `preseq c_curve -v -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_out.txt -B /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE1.bam` (403501)
+> `preseq c_curve -v -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_out.txt -B /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE1.bam` (21422)
 <pre>
 BAM_INPUT
 TOTAL READS     = 20168929
@@ -1060,12 +1068,12 @@ sample size: 18000000
 sample size: 19000000
 sample size: 20000000
 </pre>
-Command completed. Elapsed time: 0:01:42. Running peak memory: 7.355GB.  
-  PID: 403501;	Command: preseq;	Return code: 0;	Memory used: 0.005GB
+Command completed. Elapsed time: 0:01:52. Running peak memory: 7.355GB.  
+  PID: 21422;	Command: preseq;	Return code: 0;	Memory used: 0.005GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_yield.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_yield.txt`  
 
-> `preseq lc_extrap -v -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_yield.txt -B /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE1.bam` (403821)
+> `preseq lc_extrap -v -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_yield.txt -B /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE1.bam` (21625)
 <pre>
 BAM_INPUT
 TOTAL READS     = 20168929
@@ -1398,24 +1406,24 @@ OBSERVED COUNTS (14962)
 
 [ESTIMATING YIELD CURVE]
 [BOOTSTRAPPING HISTOGRAM]
-....................._._.........................................................................._....
+..............................................................................................._.....
 [COMPUTING CONFIDENCE INTERVALS]
 [WRITING OUTPUT]
 </pre>
-Command completed. Elapsed time: 0:01:47. Running peak memory: 7.355GB.  
-  PID: 403821;	Command: preseq;	Return code: 0;	Memory used: 0.011GB
+Command completed. Elapsed time: 0:01:57. Running peak memory: 7.355GB.  
+  PID: 21625;	Command: preseq;	Return code: 0;	Memory used: 0.005GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_counts.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_counts.txt`  
 
-> `echo '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_yield.txt '$(samtools view -c -F 4 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE1.bam)' '$(samtools view -c -F 4 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam) > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_counts.txt` (403921)
+> `echo '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_yield.txt '$(samtools view -c -F 4 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_dups_PE1.bam)' '$(samtools view -c -F 4 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam) > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_counts.txt` (21786)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:29. Running peak memory: 7.355GB.  
-  PID: 403921;	Command: echo;	Return code: 0;	Memory used: 0.006GB
+Command completed. Elapsed time: 0:00:31. Running peak memory: 7.355GB.  
+  PID: 21786;	Command: echo;	Return code: 0;	Memory used: 0.006GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_plot.pdf`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_plot.png`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_plot.pdf`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_plot.png`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R preseq -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_yield.txt -r /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_counts.txt -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_plot` (403954)
+> `Rscript /scratch/jps3dp/tools/databio//peppro/tools/PEPPRO.R preseq -i /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_yield.txt -r /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_counts.txt -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_plot` (22074)
 <pre>
 Processing H9_treated_PRO-seq_3
 INFO: Found real counts for H9_treated_PRO-seq_3 - Total (M): 22.825749 Unique (M): 20.168929
@@ -1424,676 +1432,685 @@ Library complexity plot completed!
 
 </pre>
 Command completed. Elapsed time: 0:00:05. Running peak memory: 7.355GB.  
-  PID: 403954;	Command: Rscript;	Return code: 0;	Memory used: 0.236GB
+  PID: 22074;	Command: Rscript;	Return code: 0;	Memory used: 0.316GB
 
 > `Library complexity`	QC_hg38/H9_treated_PRO-seq_3_preseq_plot.pdf	Library complexity	QC_hg38/H9_treated_PRO-seq_3_preseq_plot.png	PEPPRO	_OBJ_
 Missing stat 'Frac_exp_unique_at_10M'
 
-> `grep -w '10000000' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_yield.txt | awk '{print $2}'`
+> `grep -w '10000000' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_preseq_yield.txt | awk '{print $2}'`
 
 > `Frac_exp_unique_at_10M`	0.7916	PEPPRO	_RES_
 
-### Calculate NRF, PBC1, and PBC2 (02-27 12:23:03) elapsed: 243.0 _TIME_
+### Calculate NRF, PBC1, and PBC2 (06-15 10:05:33) elapsed: 264.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam.bai`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam.bai`  
 
-> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam` (403976)
+> `samtools index /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam` (22092)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:16. Running peak memory: 7.355GB.  
-  PID: 403976;	Command: samtools;	Return code: 0;	Memory used: 0.015GB
+Command completed. Elapsed time: 0:00:17. Running peak memory: 7.355GB.  
+  PID: 22092;	Command: samtools;	Return code: 0;	Memory used: 0.015GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_bamQC.tsv`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_bamQC.tsv`  
 
-> `/scratch/jps3dp/tools/databio/peppro/tools/bamQC.py --silent -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -c 8 -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_bamQC.tsv` (403990)
+> `/scratch/jps3dp/tools/databio//peppro/tools/bamQC.py --silent -i /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -c 12 -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_bamQC.tsv` (22112)
 <pre>
 Configured logger 'root' using pararead v0.6
-Registering input file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam'
-Temporary files will be stored in: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/tmp_H9_treated_PRO-seq_3_PE1_agk0ss84'
-Processing with 8 cores...
+Registering input file: '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam'
+Temporary files will be stored in: '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/tmp_H9_treated_PRO-seq_3_PE1_89bj3hev'
+Processing with 12 cores...
 Discarding 98 chunk(s) of reads: ['chrM', 'chr1_KI270710v1_random', 'chr2_KI270715v1_random', 'chr9_KI270717v1_random', 'chrY_KI270740v1_random', 'chrUn_KI270302v1', 'chrUn_KI270304v1', 'chrUn_KI270303v1', 'chrUn_KI270305v1', 'chrUn_KI270322v1', 'chrUn_KI270320v1', 'chrUn_KI270310v1', 'chrUn_KI270316v1', 'chrUn_KI270315v1', 'chrUn_KI270312v1', 'chrUn_KI270311v1', 'chrUn_KI270317v1', 'chrUn_KI270412v1', 'chrUn_KI270411v1', 'chrUn_KI270414v1', 'chrUn_KI270419v1', 'chrUn_KI270418v1', 'chrUn_KI270420v1', 'chrUn_KI270424v1', 'chrUn_KI270417v1', 'chrUn_KI270422v1', 'chrUn_KI270423v1', 'chrUn_KI270425v1', 'chrUn_KI270429v1', 'chrUn_KI270466v1', 'chrUn_KI270465v1', 'chrUn_KI270467v1', 'chrUn_KI270435v1', 'chrUn_KI270468v1', 'chrUn_KI270510v1', 'chrUn_KI270509v1', 'chrUn_KI270518v1', 'chrUn_KI270508v1', 'chrUn_KI270516v1', 'chrUn_KI270511v1', 'chrUn_KI270515v1', 'chrUn_KI270507v1', 'chrUn_KI270517v1', 'chrUn_KI270529v1', 'chrUn_KI270528v1', 'chrUn_KI270530v1', 'chrUn_KI270539v1', 'chrUn_KI270544v1', 'chrUn_KI270548v1', 'chrUn_KI270583v1', 'chrUn_KI270587v1', 'chrUn_KI270580v1', 'chrUn_KI270581v1', 'chrUn_KI270579v1', 'chrUn_KI270590v1', 'chrUn_KI270582v1', 'chrUn_KI270588v1', 'chrUn_KI270591v1', 'chrUn_KI270330v1', 'chrUn_KI270329v1', 'chrUn_KI270334v1', 'chrUn_KI270335v1', 'chrUn_KI270338v1', 'chrUn_KI270340v1', 'chrUn_KI270363v1', 'chrUn_KI270364v1', 'chrUn_KI270362v1', 'chrUn_KI270366v1', 'chrUn_KI270378v1', 'chrUn_KI270379v1', 'chrUn_KI270389v1', 'chrUn_KI270390v1', 'chrUn_KI270387v1', 'chrUn_KI270395v1', 'chrUn_KI270396v1', 'chrUn_KI270388v1', 'chrUn_KI270394v1', 'chrUn_KI270386v1', 'chrUn_KI270391v1', 'chrUn_KI270383v1', 'chrUn_KI270393v1', 'chrUn_KI270384v1', 'chrUn_KI270392v1', 'chrUn_KI270381v1', 'chrUn_KI270385v1', 'chrUn_KI270382v1', 'chrUn_KI270376v1', 'chrUn_KI270374v1', 'chrUn_KI270372v1', 'chrUn_KI270373v1', 'chrUn_KI270375v1', 'chrUn_KI270371v1', 'chrUn_KI270448v1', 'chrUn_KI270521v1', 'chrUn_GL000226v1', 'chrUn_KI270752v1', 'chrUn_KI270754v1', 'chrUn_KI270755v1']
 Keeping 97 chunk(s) of reads: ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chrX', 'chrY', 'chr1_KI270706v1_random', 'chr1_KI270707v1_random', 'chr1_KI270708v1_random', 'chr1_KI270709v1_random', 'chr1_KI270711v1_random', 'chr1_KI270712v1_random', 'chr1_KI270713v1_random', 'chr1_KI270714v1_random', 'chr2_KI270716v1_random', 'chr3_GL000221v1_random', 'chr4_GL000008v2_random', 'chr5_GL000208v1_random', 'chr9_KI270718v1_random', 'chr9_KI270719v1_random', 'chr9_KI270720v1_random', 'chr11_KI270721v1_random', 'chr14_GL000009v2_random', 'chr14_GL000225v1_random', 'chr14_KI270722v1_random', 'chr14_GL000194v1_random', 'chr14_KI270723v1_random', 'chr14_KI270724v1_random', 'chr14_KI270725v1_random', 'chr14_KI270726v1_random', 'chr15_KI270727v1_random', 'chr16_KI270728v1_random', 'chr17_GL000205v2_random', 'chr17_KI270729v1_random', 'chr17_KI270730v1_random', 'chr22_KI270731v1_random', 'chr22_KI270732v1_random', 'chr22_KI270733v1_random', 'chr22_KI270734v1_random', 'chr22_KI270735v1_random', 'chr22_KI270736v1_random', 'chr22_KI270737v1_random', 'chr22_KI270738v1_random', 'chr22_KI270739v1_random', 'chrUn_KI270442v1', 'chrUn_KI270438v1', 'chrUn_KI270512v1', 'chrUn_KI270519v1', 'chrUn_KI270522v1', 'chrUn_KI270538v1', 'chrUn_KI270589v1', 'chrUn_KI270584v1', 'chrUn_KI270593v1', 'chrUn_KI270333v1', 'chrUn_KI270336v1', 'chrUn_KI270337v1', 'chrUn_GL000195v1', 'chrUn_GL000219v1', 'chrUn_GL000220v1', 'chrUn_GL000224v1', 'chrUn_KI270741v1', 'chrUn_GL000213v1', 'chrUn_KI270743v1', 'chrUn_KI270744v1', 'chrUn_KI270745v1', 'chrUn_KI270746v1', 'chrUn_KI270747v1', 'chrUn_KI270748v1', 'chrUn_KI270749v1', 'chrUn_KI270750v1', 'chrUn_KI270751v1', 'chrUn_KI270753v1', 'chrUn_KI270756v1', 'chrUn_KI270757v1', 'chrUn_GL000214v1', 'chrUn_KI270742v1', 'chrUn_GL000216v2', 'chrUn_GL000218v1', 'chrEBV']
 </pre>
-Command completed. Elapsed time: 0:00:28. Running peak memory: 7.355GB.  
-  PID: 403990;	Command: /scratch/jps3dp/tools/databio/peppro/tools/bamQC.py;	Return code: 0;	Memory used: 0.9GB
+Command completed. Elapsed time: 0:00:24. Running peak memory: 7.355GB.  
+  PID: 22112;	Command: /scratch/jps3dp/tools/databio//peppro/tools/bamQC.py;	Return code: 0;	Memory used: 2.007GB
 
 
-> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "NRF") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_bamQC.tsv`
+> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "NRF") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_bamQC.tsv`
 
-> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "PBC1") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_bamQC.tsv`
+> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "PBC1") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_bamQC.tsv`
 
-> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "PBC2") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_bamQC.tsv`
+> `awk '{ for (i=1; i<=NF; ++i) { if ($i ~ "PBC2") c=i } getline; print $c }' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_bamQC.tsv`
 
 > `NRF`	1.0	PEPPRO	_RES_
 
 > `PBC1`	11412874.5	PEPPRO	_RES_
 
 > `PBC2`	11412874.5	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_unmap.bam`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_unmap.bam`  
 
-> `samtools view -b -@ 8 -f 12  /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_unmap.bam` (404034)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:09. Running peak memory: 7.355GB.  
-  PID: 404034;	Command: samtools;	Return code: 0;	Memory used: 0.008GB
-
-
-> `samtools view -c -f 4 -@ 8 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam`
-
-> `Unmapped_reads`	7400125	PEPPRO	_RES_
-
-### Split BAM by strand (02-27 12:24:04) elapsed: 61.0 _TIME_
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam`  
-
-> `samtools view -bh -F 20 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam` (404077)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:01:11. Running peak memory: 7.355GB.  
-  PID: 404077;	Command: samtools;	Return code: 0;	Memory used: 0.006GB
-
-
-> `samtools view -bh -f 16 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam` (404349)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:01:10. Running peak memory: 7.355GB.  
-  PID: 404349;	Command: samtools;	Return code: 0;	Memory used: 0.006GB
-
-
-### Calculate TSS enrichment (02-27 12:26:25) elapsed: 141.0 _TIME_
-
-Missing stat 'TSS_non-coding_score'
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/plus_TSS.tsv`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/minus_TSS.tsv`  
-
-> `sed -n -e '/[[:space:]]+/w /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/plus_TSS.tsv' -e '/[[:space:]]-/w /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/minus_TSS.tsv' /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_TSS.bed` (404416)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 404416;	Command: sed;	Return code: 0;	Memory used: 0.002GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_plus_TssEnrichment.txt`  
-
-> `/scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/plus_TSS.tsv -p ends -c 8 -z -v -s 6 -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_plus_TssEnrichment.txt` (404417)
+> `samtools view -b -@ 12 -f 12  /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_unmap.bam` (22208)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:10. Running peak memory: 7.355GB.  
-  PID: 404417;	Command: /scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py;	Return code: 0;	Memory used: 0.485GB
+  PID: 22208;	Command: samtools;	Return code: 0;	Memory used: 0.009GB
+
+
+> `samtools view -c -f 4 -@ 12 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_temp.bam`
+
+> `Unmapped_reads`	7400125	PEPPRO	_RES_
+
+### Split BAM by strand (06-15 10:06:33) elapsed: 60.0 _TIME_
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam`  
+
+> `samtools view -bh -F 20 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam` (22277)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:01:17. Running peak memory: 7.355GB.  
+  PID: 22277;	Command: samtools;	Return code: 0;	Memory used: 0.006GB
+
+
+> `samtools view -bh -f 16 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam` (22436)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:01:15. Running peak memory: 7.355GB.  
+  PID: 22436;	Command: samtools;	Return code: 0;	Memory used: 0.006GB
+
+
+### Calculate TSS enrichment (06-15 10:09:05) elapsed: 152.0 _TIME_
+
+Missing stat 'TSS_non-coding_score'
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/plus_TSS.tsv`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/minus_TSS.tsv`  
+
+> `sed -n -e '/[[:space:]]+/w /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/plus_TSS.tsv' -e '/[[:space:]]-/w /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/minus_TSS.tsv' /project/shefflab/genomes/hg38/refgene_anno/default/hg38_TSS.bed` (22531)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
+  PID: 22531;	Command: sed;	Return code: 0;	Memory used: 0.001GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_plus_TssEnrichment.txt`  
+
+> `/scratch/jps3dp/tools/databio//peppro/tools/pyTssEnrichment.py -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/plus_TSS.tsv -p ends -c 12 -z -v -s 6 -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_plus_TssEnrichment.txt` (22532)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:08. Running peak memory: 7.355GB.  
+  PID: 22532;	Command: /scratch/jps3dp/tools/databio//peppro/tools/pyTssEnrichment.py;	Return code: 0;	Memory used: 0.702GB
 
 
 > `TSS_coding_score`	60.1	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_minus_TssEnrichment.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_minus_TssEnrichment.txt`  
 
-> `/scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/minus_TSS.tsv -p ends -c 8 -z -v -s 6 -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_minus_TssEnrichment.txt` (404445)
+> `/scratch/jps3dp/tools/databio//peppro/tools/pyTssEnrichment.py -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/minus_TSS.tsv -p ends -c 12 -z -v -s 6 -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_minus_TssEnrichment.txt` (22565)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:09. Running peak memory: 7.355GB.  
-  PID: 404445;	Command: /scratch/jps3dp/tools/databio/peppro/tools/pyTssEnrichment.py;	Return code: 0;	Memory used: 0.48GB
+Command completed. Elapsed time: 0:00:06. Running peak memory: 7.355GB.  
+  PID: 22565;	Command: /scratch/jps3dp/tools/databio//peppro/tools/pyTssEnrichment.py;	Return code: 0;	Memory used: 0.767GB
 
 
 > `TSS_non-coding_score`	17.8	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_TSSenrichment.pdf`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_TSSenrichment.pdf`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R tss -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_plus_TssEnrichment.txt /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_minus_TssEnrichment.txt` (404472)
+> `Rscript /scratch/jps3dp/tools/databio//peppro/tools/PEPPRO.R tss -i /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_plus_TssEnrichment.txt /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_minus_TssEnrichment.txt` (22599)
 <pre>
 
-Generating TSS plot with /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_plus_TssEnrichment.txt and /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_minus_TssEnrichment.txt
+Generating TSS plot with /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_plus_TssEnrichment.txt and /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_minus_TssEnrichment.txt
+`geom_smooth()` using formula 'y ~ x'
+`geom_smooth()` using formula 'y ~ x'
+`geom_smooth()` using formula 'y ~ x'
+`geom_smooth()` using formula 'y ~ x'
 TSS enrichment plot completed!
 
 </pre>
-Command completed. Elapsed time: 0:00:04. Running peak memory: 7.355GB.  
-  PID: 404472;	Command: Rscript;	Return code: 0;	Memory used: 0.343GB
+Command completed. Elapsed time: 0:00:06. Running peak memory: 7.355GB.  
+  PID: 22599;	Command: Rscript;	Return code: 0;	Memory used: 0.316GB
 
 > `TSS enrichment`	QC_hg38/H9_treated_PRO-seq_3_TSSenrichment.pdf	TSS enrichment	QC_hg38/H9_treated_PRO-seq_3_TSSenrichment.png	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt`  
 
-> `samtools view -H /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam | grep 'SN:' | awk -F':' '{print $2,$3}' | awk -F' ' -v OFS='	' '{print $1,$3}' > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt` (404490,404491,404492,404493)
+> `samtools view -H /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam | grep 'SN:' | awk -F':' '{print $2,$3}' | awk -F' ' -v OFS='	' '{print $1,$3}' > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt` (22622,22623,22624,22625)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 404490;	Command: samtools;	Return code: 0;	Memory used: 0.0GB  
-  PID: 404492;	Command: awk;	Return code: 0;	Memory used: 0.0GB  
-  PID: 404491;	Command: grep;	Return code: 0;	Memory used: 0.0GB  
-  PID: 404493;	Command: awk;	Return code: 0;	Memory used: 0.0GB
+  PID: 22622;	Command: samtools;	Return code: 0;	Memory used: 0.0GB  
+  PID: 22624;	Command: awk;	Return code: 0;	Memory used: 0.0GB  
+  PID: 22623;	Command: grep;	Return code: 0;	Memory used: 0.0GB  
+  PID: 22625;	Command: awk;	Return code: 0;	Memory used: 0.0GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt` (404495)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt` (22627)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 404495;	Command: cut;	Return code: 0;	Memory used: 0.002GB
+  PID: 22627;	Command: cut;	Return code: 0;	Memory used: 0.0GB
 
 
-### Calculate Pause Index (PI) (02-27 12:26:48) elapsed: 23.0 _TIME_
+### Calculate Pause Index (PI) (06-15 10:09:26) elapsed: 21.0 _TIME_
 
 Missing stat 'Pause_index'
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_tss.bed`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_gene_body.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_tss.bed`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_gene_body.bed`  
 
-> `grep -wf /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/ensembl_gtf/default/hg38_ensembl_TSS.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_tss.bed` (404498,404499)
+> `grep -wf /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt /project/shefflab/genomes/hg38/ensembl_gtf/default/hg38_ensembl_TSS.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_tss.bed` (22629,22630)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:02. Running peak memory: 7.355GB.  
-  PID: 404498;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 404499;	Command: bedtools;	Return code: 0;	Memory used: 0.099GB
+  PID: 22629;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
+  PID: 22630;	Command: bedtools;	Return code: 0;	Memory used: 0.093GB
 
 
-> `grep -wf /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/ensembl_gtf/default/hg38_ensembl_gene_body.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_gene_body.bed` (404502,404503)
+> `grep -wf /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt /project/shefflab/genomes/hg38/ensembl_gtf/default/hg38_ensembl_gene_body.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_gene_body.bed` (22633,22634)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 404502;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
-  PID: 404503;	Command: bedtools;	Return code: 0;	Memory used: 0.004GB
+  PID: 22633;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
+  PID: 22634;	Command: bedtools;	Return code: 0;	Memory used: 0.005GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_TSS_density.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_TSS_density.bed`  
 
-> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_tss.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | awk '$7>0' | sort -k4,4 -k7,7nr | sort -k4,4 -u > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_TSS_density.bed` (404505,404506,404507,404508)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:29. Running peak memory: 7.355GB.  
-  PID: 404506;	Command: awk;	Return code: 0;	Memory used: 0.001GB  
-  PID: 404508;	Command: sort;	Return code: 0;	Memory used: 0.003GB  
-  PID: 404505;	Command: bedtools;	Return code: 0;	Memory used: 0.01GB  
-  PID: 404507;	Command: sort;	Return code: 0;	Memory used: 0.005GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_gene_body_density.bed`  
-
-> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_gene_body.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | awk '$7>0' | sort -k4 > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_gene_body_density.bed` (404536,404537,404538)
+> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_tss.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | awk '$7>0' | sort -k4,4 -k7,7nr | sort -k4,4 -u > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_TSS_density.bed` (22636,22637,22638,22639)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:31. Running peak memory: 7.355GB.  
-  PID: 404538;	Command: sort;	Return code: 0;	Memory used: 0.007GB  
-  PID: 404536;	Command: bedtools;	Return code: 0;	Memory used: 0.058GB  
-  PID: 404537;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+  PID: 22637;	Command: awk;	Return code: 0;	Memory used: 0.001GB  
+  PID: 22639;	Command: sort;	Return code: 0;	Memory used: 0.002GB  
+  PID: 22636;	Command: bedtools;	Return code: 0;	Memory used: 0.01GB  
+  PID: 22638;	Command: sort;	Return code: 0;	Memory used: 0.004GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_gene_body_density.bed`  
 
-> `join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 2.2 2.3 2.7 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_TSS_density.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_gene_body_density.bed | awk -v OFS='	' '{print $1, $2, $3, $4, ($6/($3-$2))/($9/($8-$7)), $5}' | env LC_COLLATE=C sort -k1,1 -k2,2n > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed` (404566,404567,404568)
+> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_ensembl_gene_body.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | awk '$7>0' | sort -k4 > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_gene_body_density.bed` (22766,22767,22768)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:36. Running peak memory: 7.355GB.  
+  PID: 22768;	Command: sort;	Return code: 0;	Memory used: 0.004GB  
+  PID: 22766;	Command: bedtools;	Return code: 0;	Memory used: 0.057GB  
+  PID: 22767;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed`  
+
+> `join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 2.2 2.3 2.7 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_TSS_density.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_gene_body_density.bed | awk -v OFS='	' '{ if ($5 == "+"){print $1, $2, $8, $4, sqrt((($6+$9)/sqrt(($8-$2)^2))^2), ($6/sqrt(($3-$2)^2))/($9/sqrt(($8-$7)^2)), $5} else {print $1, $2, $8, $4, sqrt((($6+$9)/sqrt(($3-$7)^2))^2),($6/sqrt(($3-$2)^2))/($9/sqrt(($8-$7)^2)), $5}}' | env LC_COLLATE=C sort -k1,1 -k2,2n > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/tmpq0v5ymlg` (23104,23105,23106)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 404566;	Command: join;	Return code: 0;	Memory used: 0.001GB  
-  PID: 404568;	Command: env;	Return code: 0;	Memory used: 0.006GB  
-  PID: 404567;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+  PID: 23104;	Command: join;	Return code: 0;	Memory used: 0.001GB  
+  PID: 23106;	Command: env;	Return code: 0;	Memory used: 0.004GB  
+  PID: 23105;	Command: awk;	Return code: 0;	Memory used: 0.001GB
 
 
-> `sort -k5,5n /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed | awk ' { a[i++]=$5; } END { x=int((i+1)/2); if (x < (i+1)/2) print (a[x-1]+a[x])/2; else print a[x-1]; }'`
+> `awk '{print $5}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/tmpq0v5ymlg | sort -n | awk 'BEGIN{i=0} {s[i]=$1; i++;} END{print s[int(NR*0.5-0.5)]}'`
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed`  
 
-> `Pause_index`	74.17	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.pdf`  
+> `awk -v OFS='	' '{ if ($5 > 0.0223084) {print $1, $2, $3, $4, $6, $7}}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/tmpq0v5ymlg > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed` (23112)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
+  PID: 23112;	Command: awk;	Return code: 0;	Memory used: 0.002GB
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R pi --annotate -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed` (404574)
+
+> `sort -k5,5n /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed | awk ' { a[i++]=$5; } END { x=int((i+1)/2); if (x < (i+1)/2) print (a[x-1]+a[x])/2; else print a[x-1]; }'`
+
+> `Pause_index`	63.1	PEPPRO	_RES_
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.pdf`  
+
+> `Rscript /scratch/jps3dp/tools/databio//peppro/tools/PEPPRO.R pi --annotate -i /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed` (23117)
 <pre>
 Pause index plot completed!
 
 </pre>
 Command completed. Elapsed time: 0:00:04. Running peak memory: 7.355GB.  
-  PID: 404574;	Command: Rscript;	Return code: 0;	Memory used: 0.366GB
+  PID: 23117;	Command: Rscript;	Return code: 0;	Memory used: 0.317GB
 
 > `Pause index`	QC_hg38/H9_treated_PRO-seq_3_pause_index.pdf	Pause index	QC_hg38/H9_treated_PRO-seq_3_pause_index.png	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed.gz`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed.gz`  
 
-> `pigz -f -p 8 -f /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed` (404592)
+> `pigz -f -p 12 -f /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_pause_index.bed` (23138)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 404592;	Command: pigz;	Return code: 0;	Memory used: 0.005GB
+  PID: 23138;	Command: pigz;	Return code: 0;	Memory used: 0.002GB
 
 
-### Calculate Fraction of Reads in pre-mature mRNA (02-27 12:27:56) elapsed: 67.0 _TIME_
+### Calculate Fraction of Reads in pre-mature mRNA (06-15 10:10:40) elapsed: 74.0 _TIME_
 
 Missing stat 'Plus_FRiP'
 
-> `samtools view -@ 4 -c -L /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam`
+> `samtools view -@ 4 -c -L /project/shefflab/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam`
 21096561.0 8414821
 
 > `Plus_FRiP`	0.4	PEPPRO	_RES_
 Missing stat 'Minus_FRiP'
 
-> `samtools view -@ 4 -c -L /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam`
+> `samtools view -@ 4 -c -L /project/shefflab/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam`
 21096561.0 7977228
 
 > `Minus_FRiP`	0.38	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_gene_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_gene_coverage.bed`  
 
-> `grep -wf /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_gene_sort.bed` (404647,404648)
+> `grep -wf /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt /project/shefflab/genomes/hg38/refgene_anno/default/hg38_pre-mRNA.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_gene_sort.bed` (23249,23250)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 404647;	Command: grep;	Return code: 0;	Memory used: 0.004GB  
-  PID: 404648;	Command: bedtools;	Return code: 0;	Memory used: 0.006GB
+  PID: 23249;	Command: grep;	Return code: 0;	Memory used: 0.004GB  
+  PID: 23250;	Command: bedtools;	Return code: 0;	Memory used: 0.006GB
 
 
-> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_gene_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_gene_coverage.bed` (404651)
+> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_gene_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_gene_coverage.bed` (23252)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:32. Running peak memory: 7.355GB.  
-  PID: 404651;	Command: bedtools;	Return code: 0;	Memory used: 0.061GB
+Command completed. Elapsed time: 0:00:35. Running peak memory: 7.355GB.  
+  PID: 23252;	Command: bedtools;	Return code: 0;	Memory used: 0.06GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed`  
 
-> `ln -sf /scratch/jps3dp/DATA/genomes/hg38/feat_annotation/default/hg38_annotations.bed.gz /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed.gz` (404683)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 404683;	Command: ln;	Return code: 0;	Memory used: 0.002GB
-
-
-> `pigz -f -p 8 -d -c /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed.gz > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed` (404684)
+> `ln -sf /project/shefflab/genomes/hg38/feat_annotation/default/hg38_annotations.bed.gz /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed.gz` (23297)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 404684;	Command: pigz;	Return code: 0;	Memory used: 0.003GB
+  PID: 23297;	Command: ln;	Return code: 0;	Memory used: 0.0GB
 
 
-### Calculate cumulative and terminal fraction of reads in features (cFRiF/FRiF) (02-27 12:29:09) elapsed: 74.0 _TIME_
+> `pigz -f -p 12 -d -c /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed.gz > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed` (23298)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
+  PID: 23298;	Command: pigz;	Return code: 0;	Memory used: 0.002GB
 
 
-> `cut -f 4 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed | sort -u`
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3' UTR`  
+### Calculate cumulative and terminal fraction of reads in features (cFRiF/FRiF) (06-15 10:11:57) elapsed: 77.0 _TIME_
 
-> `awk -F'	' '{print>"/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/"$4}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed` (404692)
+
+> `cut -f 4 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed | sort -u`
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer`  
+
+> `awk -F'	' '{print>"/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/"$4}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/raw/hg38_annotations.bed` (23308)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 404692;	Command: awk;	Return code: 0;	Memory used: 0.002GB
+  PID: 23308;	Command: awk;	Return code: 0;	Memory used: 0.002GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer_sort.bed`  
 
-> `mv "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3' UTR" "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR"` (404694)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 404694;	Command: mv;	Return code: 0;	Memory used: 0.0GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR_sort.bed`  
-
-> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR_sort.bed` (404696,404697,404698,404699)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer_sort.bed` (23310,23311,23312,23313)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 404696;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 404697;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 404699;	Command: bedtools;	Return code: 0;	Memory used: 0.035GB  
-  PID: 404698;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+  PID: 23310;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 23311;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
+  PID: 23313;	Command: bedtools;	Return code: 0;	Memory used: 0.012GB  
+  PID: 23312;	Command: cut;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_plus_coverage.bed` (404701)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:13. Running peak memory: 7.355GB.  
-  PID: 404701;	Command: bedtools;	Return code: 0;	Memory used: 0.012GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_minus_coverage.bed`  
-
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_minus_coverage.bed` (404714)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:13. Running peak memory: 7.355GB.  
-  PID: 404714;	Command: bedtools;	Return code: 0;	Memory used: 0.009GB
-
-Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5' UTR`  
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR`  
-
-> `mv "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5' UTR" "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR"` (404726)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 404726;	Command: mv;	Return code: 0;	Memory used: 0.0GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR_sort.bed`  
-
-> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR_sort.bed` (404727,404728,404729,404730)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 404727;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 404728;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 404730;	Command: bedtools;	Return code: 0;	Memory used: 0.03GB  
-  PID: 404729;	Command: cut;	Return code: 0;	Memory used: 0.001GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_plus_coverage.bed`  
-
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_plus_coverage.bed` (404733)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_plus_coverage.bed` (23316)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:14. Running peak memory: 7.355GB.  
-  PID: 404733;	Command: bedtools;	Return code: 0;	Memory used: 0.01GB
+  PID: 23316;	Command: bedtools;	Return code: 0;	Memory used: 0.008GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_minus_coverage.bed` (404745)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_minus_coverage.bed` (23349)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:14. Running peak memory: 7.355GB.  
-  PID: 404745;	Command: bedtools;	Return code: 0;	Memory used: 0.01GB
+  PID: 23349;	Command: bedtools;	Return code: 0;	Memory used: 0.01GB
 
-Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer`  
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer_sort.bed`  
+Target exists: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_sort.bed`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer_sort.bed` (405003,405004,405005,405006)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_sort.bed` (23365,23366,23367,23368)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
+  PID: 23365;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 23366;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
+  PID: 23368;	Command: bedtools;	Return code: 0;	Memory used: 0.009GB  
+  PID: 23367;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_plus_coverage.bed`  
+
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_plus_coverage.bed` (23370)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:16. Running peak memory: 7.355GB.  
+  PID: 23370;	Command: bedtools;	Return code: 0;	Memory used: 0.023GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_minus_coverage.bed`  
+
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_minus_coverage.bed` (23433)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:15. Running peak memory: 7.355GB.  
+  PID: 23433;	Command: bedtools;	Return code: 0;	Memory used: 0.025GB
+
+Target exists: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter Flanking Region`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region`  
+
+> `mv "/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter Flanking Region" "/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region"` (23508)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
+  PID: 23508;	Command: mv;	Return code: 0;	Memory used: 0.0GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region_sort.bed`  
+
+> `cut -f 1 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region_sort.bed` (23509,23510,23511,23512)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 405003;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 405004;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 405006;	Command: bedtools;	Return code: 0;	Memory used: 0.047GB  
-  PID: 405005;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+  PID: 23509;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 23511;	Command: cut;	Return code: 0;	Memory used: 0.001GB  
+  PID: 23510;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
+  PID: 23512;	Command: bedtools;	Return code: 0;	Memory used: 0.009GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_plus_coverage.bed` (405009)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_plus_coverage.bed` (23514)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:13. Running peak memory: 7.355GB.  
-  PID: 405009;	Command: bedtools;	Return code: 0;	Memory used: 0.007GB
+Command completed. Elapsed time: 0:00:15. Running peak memory: 7.355GB.  
+  PID: 23514;	Command: bedtools;	Return code: 0;	Memory used: 0.011GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Enhancer_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_minus_coverage.bed` (405023)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_minus_coverage.bed` (23545)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:13. Running peak memory: 7.355GB.  
-  PID: 405023;	Command: bedtools;	Return code: 0;	Memory used: 0.009GB
+Command completed. Elapsed time: 0:00:14. Running peak memory: 7.355GB.  
+  PID: 23545;	Command: bedtools;	Return code: 0;	Memory used: 0.013GB
 
-Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon`  
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon_sort.bed`  
+Target exists: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5' UTR`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon_sort.bed` (405036,405037,405038,405039)
+> `mv "/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5' UTR" "/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR"` (23572)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
+  PID: 23572;	Command: mv;	Return code: 0;	Memory used: 0.002GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR_sort.bed`  
+
+> `cut -f 1 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR_sort.bed` (23573,23574,23575,23576)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
+  PID: 23573;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 23574;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
+  PID: 23576;	Command: bedtools;	Return code: 0;	Memory used: 0.011GB  
+  PID: 23575;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_plus_coverage.bed`  
+
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_plus_coverage.bed` (23578)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:15. Running peak memory: 7.355GB.  
+  PID: 23578;	Command: bedtools;	Return code: 0;	Memory used: 0.012GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_minus_coverage.bed`  
+
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/5_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_minus_coverage.bed` (23627)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:14. Running peak memory: 7.355GB.  
+  PID: 23627;	Command: bedtools;	Return code: 0;	Memory used: 0.015GB
+
+Target exists: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3' UTR`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR`  
+
+> `mv "/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3' UTR" "/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR"` (23669)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
+  PID: 23669;	Command: mv;	Return code: 0;	Memory used: 0.0GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR_sort.bed`  
+
+> `cut -f 1 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR_sort.bed` (23670,23671,23672,23673)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
+  PID: 23670;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 23671;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
+  PID: 23673;	Command: bedtools;	Return code: 0;	Memory used: 0.011GB  
+  PID: 23672;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_plus_coverage.bed`  
+
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_plus_coverage.bed` (23675)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:15. Running peak memory: 7.355GB.  
+  PID: 23675;	Command: bedtools;	Return code: 0;	Memory used: 0.013GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_minus_coverage.bed`  
+
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/3_UTR_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_minus_coverage.bed` (23701)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:14. Running peak memory: 7.355GB.  
+  PID: 23701;	Command: bedtools;	Return code: 0;	Memory used: 0.011GB
+
+Target exists: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon_sort.bed`  
+
+> `cut -f 1 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon_sort.bed` (23739,23740,23741,23742)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:03. Running peak memory: 7.355GB.  
-  PID: 405036;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 405037;	Command: grep;	Return code: 0;	Memory used: 0.004GB  
-  PID: 405039;	Command: bedtools;	Return code: 0;	Memory used: 0.162GB  
-  PID: 405038;	Command: cut;	Return code: 0;	Memory used: 0.001GB
+  PID: 23739;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 23740;	Command: grep;	Return code: 0;	Memory used: 0.004GB  
+  PID: 23742;	Command: bedtools;	Return code: 0;	Memory used: 0.158GB  
+  PID: 23741;	Command: cut;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_plus_coverage.bed` (405043)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:15. Running peak memory: 7.355GB.  
-  PID: 405043;	Command: bedtools;	Return code: 0;	Memory used: 0.025GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_minus_coverage.bed`  
-
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_minus_coverage.bed` (405057)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:15. Running peak memory: 7.355GB.  
-  PID: 405057;	Command: bedtools;	Return code: 0;	Memory used: 0.02GB
-
-Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron`  
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron_sort.bed`  
-
-> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron_sort.bed` (405071,405072,405073,405074)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 405071;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 405073;	Command: cut;	Return code: 0;	Memory used: 0.001GB  
-  PID: 405072;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 405074;	Command: bedtools;	Return code: 0;	Memory used: 0.01GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_plus_coverage.bed`  
-
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_plus_coverage.bed` (405077)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_plus_coverage.bed` (23746)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:16. Running peak memory: 7.355GB.  
-  PID: 405077;	Command: bedtools;	Return code: 0;	Memory used: 0.059GB
+  PID: 23746;	Command: bedtools;	Return code: 0;	Memory used: 0.025GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_minus_coverage.bed` (405095)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Exon_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_minus_coverage.bed` (23782)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:16. Running peak memory: 7.355GB.  
-  PID: 405095;	Command: bedtools;	Return code: 0;	Memory used: 0.038GB
+  PID: 23782;	Command: bedtools;	Return code: 0;	Memory used: 0.019GB
 
-Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter`  
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_sort.bed`  
+Target exists: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron_sort.bed`  
 
-> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_sort.bed` (405110,405111,405112,405113)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 405110;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 405111;	Command: grep;	Return code: 0;	Memory used: 0.003GB  
-  PID: 405113;	Command: bedtools;	Return code: 0;	Memory used: 0.006GB  
-  PID: 405112;	Command: cut;	Return code: 0;	Memory used: 0.001GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_plus_coverage.bed`  
-
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_plus_coverage.bed` (405116)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:14. Running peak memory: 7.355GB.  
-  PID: 405116;	Command: bedtools;	Return code: 0;	Memory used: 0.024GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_minus_coverage.bed`  
-
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_minus_coverage.bed` (405129)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:14. Running peak memory: 7.355GB.  
-  PID: 405129;	Command: bedtools;	Return code: 0;	Memory used: 0.025GB
-
-Target exists: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter Flanking Region`  
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region`  
-
-> `mv "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter Flanking Region" "/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region"` (405146)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 405146;	Command: mv;	Return code: 0;	Memory used: 0.001GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region_sort.bed`  
-
-> `cut -f 1 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region_sort.bed` (405147,405148,405149,405150)
+> `cut -f 1 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | grep -wf - /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron | cut -f 1-3 | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron_sort.bed` (23995,23996,23997,23998)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 405147;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
-  PID: 405149;	Command: cut;	Return code: 0;	Memory used: 0.001GB  
-  PID: 405148;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
-  PID: 405150;	Command: bedtools;	Return code: 0;	Memory used: 0.009GB
+  PID: 23995;	Command: cut;	Return code: 0;	Memory used: 0.0GB  
+  PID: 23997;	Command: cut;	Return code: 0;	Memory used: 0.001GB  
+  PID: 23996;	Command: grep;	Return code: 0;	Memory used: 0.002GB  
+  PID: 23998;	Command: bedtools;	Return code: 0;	Memory used: 0.077GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_plus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_plus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_plus_coverage.bed` (405153)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_plus_coverage.bed` (24046)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:14. Running peak memory: 7.355GB.  
-  PID: 405153;	Command: bedtools;	Return code: 0;	Memory used: 0.011GB
+Command completed. Elapsed time: 0:00:17. Running peak memory: 7.355GB.  
+  PID: 24046;	Command: bedtools;	Return code: 0;	Memory used: 0.058GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_minus_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_minus_coverage.bed`  
 
-> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Promoter_Flanking_Region_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_minus_coverage.bed` (405166)
+> `bedtools coverage -sorted  -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/Intron_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_minus_coverage.bed` (24598)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:14. Running peak memory: 7.355GB.  
-  PID: 405166;	Command: bedtools;	Return code: 0;	Memory used: 0.009GB
+Command completed. Elapsed time: 0:00:17. Running peak memory: 7.355GB.  
+  PID: 24598;	Command: bedtools;	Return code: 0;	Memory used: 0.037GB
 
 
-### Plot cFRiF/FRiF (02-27 12:32:36) elapsed: 207.0 _TIME_
+### Plot cFRiF/FRiF (06-15 10:15:40) elapsed: 222.0 _TIME_
 
 
-> `samtools view -@ 8 -q 10 -c -F4 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam`
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_cFRiF.pdf`  
+> `samtools view -@ 12 -q 10 -c -F4 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam`
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_cFRiF.pdf`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R frif -s H9_treated_PRO-seq_3 -z 3099922541 -n 11561442 -y cfrif --reads -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_cFRiF.pdf --bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_plus_coverage.bed` (405200)
+> `Rscript /scratch/jps3dp/tools/databio//peppro/tools/PEPPRO.R frif -s H9_treated_PRO-seq_3 -z 3099922541 -n 11561442 -y cfrif --reads -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_cFRiF.pdf --bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_plus_coverage.bed` (24663)
 <pre>
 Cumulative cfrif plot completed!
 
 </pre>
-Command completed. Elapsed time: 0:00:30. Running peak memory: 7.355GB.  
-  PID: 405200;	Command: Rscript;	Return code: 0;	Memory used: 0.467GB
+Command completed. Elapsed time: 0:00:36. Running peak memory: 7.355GB.  
+  PID: 24663;	Command: Rscript;	Return code: 0;	Memory used: 0.44GB
 
 > `cFRiF`	QC_hg38/H9_treated_PRO-seq_3_cFRiF.pdf	cFRiF	QC_hg38/H9_treated_PRO-seq_3_cFRiF.png	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_FRiF.pdf`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_FRiF.pdf`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R frif -s H9_treated_PRO-seq_3 -z 3099922541 -n 11561442 -y frif --reads -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_FRiF.pdf --bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_plus_coverage.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_plus_coverage.bed` (405240)
+> `Rscript /scratch/jps3dp/tools/databio//peppro/tools/PEPPRO.R frif -s H9_treated_PRO-seq_3 -z 3099922541 -n 11561442 -y frif --reads -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_FRiF.pdf --bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Enhancer_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Promoter_Flanking_Region_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_5_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_3_UTR_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Exon_plus_coverage.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_Intron_plus_coverage.bed` (24726)
 <pre>
 Cumulative frif plot completed!
 
 </pre>
-Command completed. Elapsed time: 0:00:23. Running peak memory: 7.355GB.  
-  PID: 405240;	Command: Rscript;	Return code: 0;	Memory used: 0.467GB
+Command completed. Elapsed time: 0:00:26. Running peak memory: 7.355GB.  
+  PID: 24726;	Command: Rscript;	Return code: 0;	Memory used: 0.448GB
 
 > `FRiF`	QC_hg38/H9_treated_PRO-seq_3_FRiF.pdf	FRiF	QC_hg38/H9_treated_PRO-seq_3_FRiF.png	PEPPRO	_OBJ_
 
-### Calculate mRNA contamination (02-27 12:33:30) elapsed: 55.0 _TIME_
+### Calculate mRNA contamination (06-15 10:16:43) elapsed: 64.0 _TIME_
 
 Missing stat 'mRNA_contamination'
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_exons_sort.bed`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_introns_sort.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_exons_sort.bed`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_introns_sort.bed`  
 
-> `grep -wf /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_exons.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_exons_sort.bed` (405270,405271)
+> `grep -wf /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt /project/shefflab/genomes/hg38/refgene_anno/default/hg38_exons.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_exons_sort.bed` (24785,24786)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:05. Running peak memory: 7.355GB.  
-  PID: 405270;	Command: grep;	Return code: 0;	Memory used: 0.005GB  
-  PID: 405271;	Command: bedtools;	Return code: 0;	Memory used: 0.098GB
+  PID: 24786;	Command: bedtools;	Return code: 0;	Memory used: 0.089GB  
+  PID: 24785;	Command: grep;	Return code: 0;	Memory used: 0.004GB
 
 
-> `grep -wf /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt /scratch/jps3dp/DATA/genomes/hg38/refgene_anno/default/hg38_introns.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_introns_sort.bed` (405277,405278,405279)
+> `grep -wf /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_keep.txt /project/shefflab/genomes/hg38/refgene_anno/default/hg38_introns.bed | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt | bedtools sort -i stdin -faidx /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_introns_sort.bed` (24794,24795,24796)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:05. Running peak memory: 7.355GB.  
-  PID: 405277;	Command: grep;	Return code: 0;	Memory used: 0.005GB  
-  PID: 405279;	Command: bedtools;	Return code: 0;	Memory used: 0.004GB  
-  PID: 405278;	Command: bedtools;	Return code: 0;	Memory used: 0.035GB
+  PID: 24794;	Command: grep;	Return code: 0;	Memory used: 0.005GB  
+  PID: 24796;	Command: bedtools;	Return code: 0;	Memory used: 0.007GB  
+  PID: 24795;	Command: bedtools;	Return code: 0;	Memory used: 0.033GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_coverage.bed`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_coverage.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_coverage.bed`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_coverage.bed`  
 
-> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_exons_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_coverage.bed` (405285)
+> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_exons_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_coverage.bed` (24802)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:27. Running peak memory: 7.355GB.  
-  PID: 405285;	Command: bedtools;	Return code: 0;	Memory used: 0.012GB
+Command completed. Elapsed time: 0:00:28. Running peak memory: 7.355GB.  
+  PID: 24802;	Command: bedtools;	Return code: 0;	Memory used: 0.012GB
 
 
-> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_introns_sort.bed -b /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -g /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_coverage.bed` (405309)
+> `bedtools coverage -sorted -counts -s -a /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/hg38_introns_sort.bed -b /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_PE1.bam -g /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/chr_order.txt > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_coverage.bed` (24831)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:29. Running peak memory: 7.355GB.  
-  PID: 405309;	Command: bedtools;	Return code: 0;	Memory used: 0.037GB
+Command completed. Elapsed time: 0:00:33. Running peak memory: 7.355GB.  
+  PID: 24831;	Command: bedtools;	Return code: 0;	Memory used: 0.036GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_rpkm.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_rpkm.bed`  
 
-> `awk -v OFS='	' '{chrom[$4] = $1; if($4!=prev4) {chromStart[$4] = $2} strand[$4] = $6; readCount[$4] += $7; exonCount[$4] += 1; geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); gene[$4] = $4; chromEnd[$4]=$3; prev4=$4} END { for (a in readCount) { print chrom[a], chromStart[a], chromEnd[a], gene[a], (readCount[a]/21.096561)/geneSizeKB[a], strand[a]}}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_coverage.bed | awk '$5>0' | sort -k4 > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_rpkm.bed` (405338,405339,405340)
-<pre>
-</pre>
-Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 405338;	Command: awk;	Return code: 0;	Memory used: 0.007GB  
-  PID: 405340;	Command: sort;	Return code: 0;	Memory used: 0.007GB  
-  PID: 405339;	Command: awk;	Return code: 0;	Memory used: 0.001GB
-
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_rpkm.bed`  
-
-> `awk -v OFS='	' '{chrom[$4] = $1; if($4!=prev4) {chromStart[$4] = $2} strand[$4] = $6; readCount[$4] += $7; exonCount[$4] += 1; geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); gene[$4] = $4; chromEnd[$4]=$3; prev4=$4} END { for (a in readCount) { print chrom[a], chromStart[a], chromEnd[a], gene[a], (readCount[a]/21.096561)/geneSizeKB[a], strand[a]}}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_coverage.bed | awk '$5>0' | sort -k4 > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_rpkm.bed` (405342,405343,405344)
+> `awk -v OFS='	' '{chrom[$4] = $1; if($4!=prev4) {chromStart[$4] = $2} strand[$4] = $6; readCount[$4] += $7; exonCount[$4] += 1; geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); gene[$4] = $4; chromEnd[$4]=$3; prev4=$4} END { for (a in readCount) { print chrom[a], chromStart[a], chromEnd[a], gene[a], (readCount[a]/21.096561)/geneSizeKB[a], strand[a]}}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_coverage.bed | awk '$5>0' | sort -k4 > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_rpkm.bed` (24968,24969,24970)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
-  PID: 405342;	Command: awk;	Return code: 0;	Memory used: 0.007GB  
-  PID: 405344;	Command: sort;	Return code: 0;	Memory used: 0.006GB  
-  PID: 405343;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+  PID: 24968;	Command: awk;	Return code: 0;	Memory used: 0.009GB  
+  PID: 24970;	Command: sort;	Return code: 0;	Memory used: 0.002GB  
+  PID: 24969;	Command: awk;	Return code: 0;	Memory used: 0.001GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_rpkm.bed`  
 
-> `join --nocheck-order -a1 -a2 -j4 /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_rpkm.bed /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_rpkm.bed | awk -v OFS='	' 'NF==11 {print $7, $8, $9, $1, ($10/$5), $11}' | sort -k1,1 -k2,2n > /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed` (405347,405348,405349)
+> `awk -v OFS='	' '{chrom[$4] = $1; if($4!=prev4) {chromStart[$4] = $2} strand[$4] = $6; readCount[$4] += $7; exonCount[$4] += 1; geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); gene[$4] = $4; chromEnd[$4]=$3; prev4=$4} END { for (a in readCount) { print chrom[a], chromStart[a], chromEnd[a], gene[a], (readCount[a]/21.096561)/geneSizeKB[a], strand[a]}}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_coverage.bed | awk '$5>0' | sort -k4 > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_rpkm.bed` (24972,24973,24974)
+<pre>
+</pre>
+Command completed. Elapsed time: 0:00:01. Running peak memory: 7.355GB.  
+  PID: 24972;	Command: awk;	Return code: 0;	Memory used: 0.008GB  
+  PID: 24974;	Command: sort;	Return code: 0;	Memory used: 0.004GB  
+  PID: 24973;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed`  
+
+> `join --nocheck-order -a1 -a2 -j4 /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_introns_rpkm.bed /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exons_rpkm.bed | awk -v OFS='	' 'NF==11 {print $7, $8, $9, $1, ($10/$5), $11}' | sort -k1,1 -k2,2n > /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed` (24977,24978,24979)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 405347;	Command: join;	Return code: 0;	Memory used: 0.001GB  
-  PID: 405349;	Command: sort;	Return code: 0;	Memory used: 0.007GB  
-  PID: 405348;	Command: awk;	Return code: 0;	Memory used: 0.001GB
+  PID: 24977;	Command: join;	Return code: 0;	Memory used: 0.001GB  
+  PID: 24979;	Command: sort;	Return code: 0;	Memory used: 0.004GB  
+  PID: 24978;	Command: awk;	Return code: 0;	Memory used: 0.001GB
 
 
-> `awk '{print $5}' /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed | sort -n | awk ' { a[i++]=$1; } END { x=int((i+1)/2); if (x < (i+1)/2) print (a[x-1]+a[x])/2; else print a[x-1]; }'`
+> `awk '{print $5}' /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed | sort -n | awk ' { a[i++]=$1; } END { x=int((i+1)/2); if (x < (i+1)/2) print (a[x-1]+a[x])/2; else print a[x-1]; }'`
 
 > `mRNA_contamination`	1.1	PEPPRO	_RES_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_mRNA_contamination.pdf`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_mRNA_contamination.pdf`  
 
-> `Rscript /scratch/jps3dp/tools/databio/peppro/tools/PEPPRO.R mrna -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed --annotate` (405355)
+> `Rscript /scratch/jps3dp/tools/databio//peppro/tools/PEPPRO.R mrna -i /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed --annotate` (24985)
 <pre>
 mRNA contamination plot completed!
 
 </pre>
-Command completed. Elapsed time: 0:00:04. Running peak memory: 7.355GB.  
-  PID: 405355;	Command: Rscript;	Return code: 0;	Memory used: 0.366GB
+Command completed. Elapsed time: 0:00:05. Running peak memory: 7.355GB.  
+  PID: 24985;	Command: Rscript;	Return code: 0;	Memory used: 0.316GB
 
 > `mRNA contamination`	QC_hg38/H9_treated_PRO-seq_3_mRNA_contamination.pdf	mRNA contamination	QC_hg38/H9_treated_PRO-seq_3_mRNA_contamination.png	PEPPRO	_OBJ_
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed.gz`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed.gz`  
 
-> `pigz -f -p 8 -f /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed` (405373)
+> `pigz -f -p 12 -f /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/QC_hg38/H9_treated_PRO-seq_3_exon_intron_ratios.bed` (25006)
 <pre>
 </pre>
 Command completed. Elapsed time: 0:00:00. Running peak memory: 7.355GB.  
-  PID: 405373;	Command: pigz;	Return code: 0;	Memory used: 0.003GB
+  PID: 25006;	Command: pigz;	Return code: 0;	Memory used: 0.003GB
 
 
-### Produce bigWig files (02-27 12:34:42) elapsed: 72.0 _TIME_
+### Produce bigWig files (06-15 10:18:01) elapsed: 78.0 _TIME_
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_exact_body_0-mer.bw`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_smooth_body_0-mer.bw`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_exact_body_0-mer.bw`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_smooth_body_0-mer.bw`  
 
-> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam` (405381)
+> `samtools index /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam` (25014)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:08. Running peak memory: 7.355GB.  
-  PID: 405381;	Command: samtools;	Return code: 0;	Memory used: 0.009GB
+Command completed. Elapsed time: 0:00:09. Running peak memory: 7.355GB.  
+  PID: 25014;	Command: samtools;	Return code: 0;	Memory used: 0.009GB
 
 
-> `/scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -c /scratch/jps3dp/DATA/genomes/hg38/fasta/default/hg38.chrom.sizes -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_exact_body_0-mer.bw -w /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_smooth_body_0-mer.bw -p 5 --variable-step --tail-edge` (405389)
+> `/scratch/jps3dp/tools/databio//peppro/tools/bamSitesToWig.py -i /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam -c /project/shefflab/genomes/hg38/fasta/default/hg38.chrom.sizes -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_exact_body_0-mer.bw -w /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_smooth_body_0-mer.bw -p 8 --variable-step --tail-edge --scale 21096561.0` (25022)
 <pre>
 Cutting parallel chroms in half to accommodate two tracks.
-Registering input file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam'
-Temporary files will be stored in: 'tmp_H9_treated_PRO-seq_3_plus_cuttrace_mwk1151h'
-Processing with 2 cores...
+Registering input file: '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_plus.bam'
+Temporary files will be stored in: 'tmp_H9_treated_PRO-seq_3_plus_cuttrace_mrjp2wis'
+Processing with 4 cores...
 stdin is empty of data
 stdin is empty of data
 Discarding 114 chunk(s) of reads: ['chrM', 'chr1_KI270710v1_random', 'chr1_KI270711v1_random', 'chr2_KI270715v1_random', 'chr2_KI270716v1_random', 'chr3_GL000221v1_random', 'chr9_KI270717v1_random', 'chr9_KI270718v1_random', 'chr22_KI270735v1_random', 'chr22_KI270737v1_random', 'chrY_KI270740v1_random', 'chrUn_KI270302v1', 'chrUn_KI270304v1', 'chrUn_KI270303v1', 'chrUn_KI270305v1', 'chrUn_KI270322v1', 'chrUn_KI270320v1', 'chrUn_KI270310v1', 'chrUn_KI270316v1', 'chrUn_KI270315v1', 'chrUn_KI270312v1', 'chrUn_KI270311v1', 'chrUn_KI270317v1', 'chrUn_KI270412v1', 'chrUn_KI270411v1', 'chrUn_KI270414v1', 'chrUn_KI270419v1', 'chrUn_KI270418v1', 'chrUn_KI270420v1', 'chrUn_KI270424v1', 'chrUn_KI270417v1', 'chrUn_KI270422v1', 'chrUn_KI270423v1', 'chrUn_KI270425v1', 'chrUn_KI270429v1', 'chrUn_KI270466v1', 'chrUn_KI270465v1', 'chrUn_KI270467v1', 'chrUn_KI270435v1', 'chrUn_KI270468v1', 'chrUn_KI270510v1', 'chrUn_KI270509v1', 'chrUn_KI270518v1', 'chrUn_KI270508v1', 'chrUn_KI270516v1', 'chrUn_KI270511v1', 'chrUn_KI270515v1', 'chrUn_KI270507v1', 'chrUn_KI270517v1', 'chrUn_KI270529v1', 'chrUn_KI270528v1', 'chrUn_KI270530v1', 'chrUn_KI270539v1', 'chrUn_KI270544v1', 'chrUn_KI270548v1', 'chrUn_KI270583v1', 'chrUn_KI270587v1', 'chrUn_KI270580v1', 'chrUn_KI270581v1', 'chrUn_KI270579v1', 'chrUn_KI270590v1', 'chrUn_KI270584v1', 'chrUn_KI270582v1', 'chrUn_KI270588v1', 'chrUn_KI270593v1', 'chrUn_KI270591v1', 'chrUn_KI270330v1', 'chrUn_KI270329v1', 'chrUn_KI270334v1', 'chrUn_KI270333v1', 'chrUn_KI270335v1', 'chrUn_KI270338v1', 'chrUn_KI270340v1', 'chrUn_KI270336v1', 'chrUn_KI270337v1', 'chrUn_KI270363v1', 'chrUn_KI270364v1', 'chrUn_KI270362v1', 'chrUn_KI270366v1', 'chrUn_KI270378v1', 'chrUn_KI270379v1', 'chrUn_KI270389v1', 'chrUn_KI270390v1', 'chrUn_KI270387v1', 'chrUn_KI270395v1', 'chrUn_KI270396v1', 'chrUn_KI270388v1', 'chrUn_KI270394v1', 'chrUn_KI270386v1', 'chrUn_KI270391v1', 'chrUn_KI270383v1', 'chrUn_KI270393v1', 'chrUn_KI270384v1', 'chrUn_KI270392v1', 'chrUn_KI270381v1', 'chrUn_KI270385v1', 'chrUn_KI270382v1', 'chrUn_KI270376v1', 'chrUn_KI270374v1', 'chrUn_KI270372v1', 'chrUn_KI270373v1', 'chrUn_KI270375v1', 'chrUn_KI270371v1', 'chrUn_KI270448v1', 'chrUn_KI270521v1', 'chrUn_GL000226v1', 'chrUn_KI270743v1', 'chrUn_KI270745v1', 'chrUn_KI270748v1', 'chrUn_KI270752v1', 'chrUn_KI270753v1', 'chrUn_KI270754v1', 'chrUn_KI270755v1', 'chrUn_KI270756v1']
 Keeping 81 chunk(s) of reads: ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chrX', 'chrY', 'chr1_KI270706v1_random', 'chr1_KI270707v1_random', 'chr1_KI270708v1_random', 'chr1_KI270709v1_random', 'chr1_KI270712v1_random', 'chr1_KI270713v1_random', 'chr1_KI270714v1_random', 'chr4_GL000008v2_random', 'chr5_GL000208v1_random', 'chr9_KI270719v1_random', 'chr9_KI270720v1_random', 'chr11_KI270721v1_random', 'chr14_GL000009v2_random', 'chr14_GL000225v1_random', 'chr14_KI270722v1_random', 'chr14_GL000194v1_random', 'chr14_KI270723v1_random', 'chr14_KI270724v1_random', 'chr14_KI270725v1_random', 'chr14_KI270726v1_random', 'chr15_KI270727v1_random', 'chr16_KI270728v1_random', 'chr17_GL000205v2_random', 'chr17_KI270729v1_random', 'chr17_KI270730v1_random', 'chr22_KI270731v1_random', 'chr22_KI270732v1_random', 'chr22_KI270733v1_random', 'chr22_KI270734v1_random', 'chr22_KI270736v1_random', 'chr22_KI270738v1_random', 'chr22_KI270739v1_random', 'chrUn_KI270442v1', 'chrUn_KI270438v1', 'chrUn_KI270512v1', 'chrUn_KI270519v1', 'chrUn_KI270522v1', 'chrUn_KI270538v1', 'chrUn_KI270589v1', 'chrUn_GL000195v1', 'chrUn_GL000219v1', 'chrUn_GL000220v1', 'chrUn_GL000224v1', 'chrUn_KI270741v1', 'chrUn_GL000213v1', 'chrUn_KI270744v1', 'chrUn_KI270746v1', 'chrUn_KI270747v1', 'chrUn_KI270749v1', 'chrUn_KI270750v1', 'chrUn_KI270751v1', 'chrUn_KI270757v1', 'chrUn_GL000214v1', 'chrUn_KI270742v1', 'chrUn_GL000216v2', 'chrUn_GL000218v1', 'chrEBV']
 Reduce step (merge files)...
-Merging 81 files into output file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_exact_body_0-mer.bw'
-Merging 81 files into output file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_smooth_body_0-mer.bw'
+Merging 81 files into output file: '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_exact_body_0-mer.bw'
+Merging 81 files into output file: '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_plus_smooth_body_0-mer.bw'
 </pre>
-Command completed. Elapsed time: 0:09:31. Running peak memory: 7.355GB.  
-  PID: 405389;	Command: /scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py;	Return code: 0;	Memory used: 2.605GB
+Command completed. Elapsed time: 0:07:31. Running peak memory: 7.355GB.  
+  PID: 25022;	Command: /scratch/jps3dp/tools/databio//peppro/tools/bamSitesToWig.py;	Return code: 0;	Memory used: 2.735GB
 
-Target to produce: `/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_exact_body_0-mer.bw`,`/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_smooth_body_0-mer.bw`  
+Target to produce: `/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_exact_body_0-mer.bw`,`/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_smooth_body_0-mer.bw`  
 
-> `samtools index /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam` (407125)
+> `samtools index /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam` (28234)
 <pre>
 </pre>
-Command completed. Elapsed time: 0:00:08. Running peak memory: 7.355GB.  
-  PID: 407125;	Command: samtools;	Return code: 0;	Memory used: 0.009GB
+Command completed. Elapsed time: 0:00:09. Running peak memory: 7.355GB.  
+  PID: 28234;	Command: samtools;	Return code: 0;	Memory used: 0.009GB
 
 
-> `/scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py -i /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -c /scratch/jps3dp/DATA/genomes/hg38/fasta/default/hg38.chrom.sizes -o /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_exact_body_0-mer.bw -w /project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_smooth_body_0-mer.bw -p 5 --variable-step --tail-edge` (407132)
+> `/scratch/jps3dp/tools/databio//peppro/tools/bamSitesToWig.py -i /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam -c /project/shefflab/genomes/hg38/fasta/default/hg38.chrom.sizes -o /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_exact_body_0-mer.bw -w /project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_smooth_body_0-mer.bw -p 8 --variable-step --tail-edge --scale 21096561.0` (28252)
 <pre>
 Cutting parallel chroms in half to accommodate two tracks.
-Registering input file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam'
-Temporary files will be stored in: 'tmp_H9_treated_PRO-seq_3_minus_cuttrace_6iglan0_'
-Processing with 2 cores...
+Registering input file: '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/aligned_hg38/H9_treated_PRO-seq_3_minus.bam'
+Temporary files will be stored in: 'tmp_H9_treated_PRO-seq_3_minus_cuttrace_5fa0aciy'
+Processing with 4 cores...
 Discarding 109 chunk(s) of reads: ['chrM', 'chr1_KI270707v1_random', 'chr1_KI270709v1_random', 'chr1_KI270710v1_random', 'chr2_KI270715v1_random', 'chr9_KI270717v1_random', 'chr14_KI270723v1_random', 'chr14_KI270724v1_random', 'chr22_KI270731v1_random', 'chr22_KI270732v1_random', 'chr22_KI270739v1_random', 'chrY_KI270740v1_random', 'chrUn_KI270302v1', 'chrUn_KI270304v1', 'chrUn_KI270303v1', 'chrUn_KI270305v1', 'chrUn_KI270322v1', 'chrUn_KI270320v1', 'chrUn_KI270310v1', 'chrUn_KI270316v1', 'chrUn_KI270315v1', 'chrUn_KI270312v1', 'chrUn_KI270311v1', 'chrUn_KI270317v1', 'chrUn_KI270412v1', 'chrUn_KI270411v1', 'chrUn_KI270414v1', 'chrUn_KI270419v1', 'chrUn_KI270418v1', 'chrUn_KI270420v1', 'chrUn_KI270424v1', 'chrUn_KI270417v1', 'chrUn_KI270422v1', 'chrUn_KI270423v1', 'chrUn_KI270425v1', 'chrUn_KI270429v1', 'chrUn_KI270466v1', 'chrUn_KI270465v1', 'chrUn_KI270467v1', 'chrUn_KI270435v1', 'chrUn_KI270468v1', 'chrUn_KI270510v1', 'chrUn_KI270509v1', 'chrUn_KI270518v1', 'chrUn_KI270508v1', 'chrUn_KI270516v1', 'chrUn_KI270522v1', 'chrUn_KI270511v1', 'chrUn_KI270515v1', 'chrUn_KI270507v1', 'chrUn_KI270517v1', 'chrUn_KI270529v1', 'chrUn_KI270528v1', 'chrUn_KI270530v1', 'chrUn_KI270539v1', 'chrUn_KI270538v1', 'chrUn_KI270544v1', 'chrUn_KI270548v1', 'chrUn_KI270583v1', 'chrUn_KI270587v1', 'chrUn_KI270580v1', 'chrUn_KI270581v1', 'chrUn_KI270579v1', 'chrUn_KI270590v1', 'chrUn_KI270582v1', 'chrUn_KI270588v1', 'chrUn_KI270591v1', 'chrUn_KI270330v1', 'chrUn_KI270329v1', 'chrUn_KI270334v1', 'chrUn_KI270335v1', 'chrUn_KI270338v1', 'chrUn_KI270340v1', 'chrUn_KI270363v1', 'chrUn_KI270364v1', 'chrUn_KI270362v1', 'chrUn_KI270366v1', 'chrUn_KI270378v1', 'chrUn_KI270379v1', 'chrUn_KI270389v1', 'chrUn_KI270390v1', 'chrUn_KI270387v1', 'chrUn_KI270395v1', 'chrUn_KI270396v1', 'chrUn_KI270388v1', 'chrUn_KI270394v1', 'chrUn_KI270386v1', 'chrUn_KI270391v1', 'chrUn_KI270383v1', 'chrUn_KI270393v1', 'chrUn_KI270384v1', 'chrUn_KI270392v1', 'chrUn_KI270381v1', 'chrUn_KI270385v1', 'chrUn_KI270382v1', 'chrUn_KI270376v1', 'chrUn_KI270374v1', 'chrUn_KI270372v1', 'chrUn_KI270373v1', 'chrUn_KI270375v1', 'chrUn_KI270371v1', 'chrUn_KI270448v1', 'chrUn_KI270521v1', 'chrUn_GL000226v1', 'chrUn_KI270747v1', 'chrUn_KI270752v1', 'chrUn_KI270754v1', 'chrUn_KI270755v1', 'chrUn_KI270757v1']
 Keeping 86 chunk(s) of reads: ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chrX', 'chrY', 'chr1_KI270706v1_random', 'chr1_KI270708v1_random', 'chr1_KI270711v1_random', 'chr1_KI270712v1_random', 'chr1_KI270713v1_random', 'chr1_KI270714v1_random', 'chr2_KI270716v1_random', 'chr3_GL000221v1_random', 'chr4_GL000008v2_random', 'chr5_GL000208v1_random', 'chr9_KI270718v1_random', 'chr9_KI270719v1_random', 'chr9_KI270720v1_random', 'chr11_KI270721v1_random', 'chr14_GL000009v2_random', 'chr14_GL000225v1_random', 'chr14_KI270722v1_random', 'chr14_GL000194v1_random', 'chr14_KI270725v1_random', 'chr14_KI270726v1_random', 'chr15_KI270727v1_random', 'chr16_KI270728v1_random', 'chr17_GL000205v2_random', 'chr17_KI270729v1_random', 'chr17_KI270730v1_random', 'chr22_KI270733v1_random', 'chr22_KI270734v1_random', 'chr22_KI270735v1_random', 'chr22_KI270736v1_random', 'chr22_KI270737v1_random', 'chr22_KI270738v1_random', 'chrUn_KI270442v1', 'chrUn_KI270438v1', 'chrUn_KI270512v1', 'chrUn_KI270519v1', 'chrUn_KI270589v1', 'chrUn_KI270584v1', 'chrUn_KI270593v1', 'chrUn_KI270333v1', 'chrUn_KI270336v1', 'chrUn_KI270337v1', 'chrUn_GL000195v1', 'chrUn_GL000219v1', 'chrUn_GL000220v1', 'chrUn_GL000224v1', 'chrUn_KI270741v1', 'chrUn_GL000213v1', 'chrUn_KI270743v1', 'chrUn_KI270744v1', 'chrUn_KI270745v1', 'chrUn_KI270746v1', 'chrUn_KI270748v1', 'chrUn_KI270749v1', 'chrUn_KI270750v1', 'chrUn_KI270751v1', 'chrUn_KI270753v1', 'chrUn_KI270756v1', 'chrUn_GL000214v1', 'chrUn_KI270742v1', 'chrUn_GL000216v2', 'chrUn_GL000218v1', 'chrEBV']
 Reduce step (merge files)...
-Merging 86 files into output file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_exact_body_0-mer.bw'
-Merging 86 files into output file: '/project/shefflab/processed/peppro/paper/dev4/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_smooth_body_0-mer.bw'
+Merging 86 files into output file: '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_exact_body_0-mer.bw'
+Merging 86 files into output file: '/project/shefflab/processed/peppro/paper/6.11.2020/results_pipeline/H9_treated_PRO-seq_3/signal_hg38/H9_treated_PRO-seq_3_minus_smooth_body_0-mer.bw'
 </pre>
-Command completed. Elapsed time: 0:09:34. Running peak memory: 7.355GB.  
-  PID: 407132;	Command: /scratch/jps3dp/tools/databio/peppro/tools/bamSitesToWig.py;	Return code: 0;	Memory used: 2.605GB
+Command completed. Elapsed time: 0:07:35. Running peak memory: 7.355GB.  
+  PID: 28252;	Command: /scratch/jps3dp/tools/databio//peppro/tools/bamSitesToWig.py;	Return code: 0;	Memory used: 2.754GB
 
-Starting cleanup: 77 files; 2 conditional files for cleanup
-
-Cleaning up flagged intermediate files. . .
-
-Cleaning up conditional list. . .
 
 ### Pipeline completed. Epilogue
-*        Elapsed time (this run):  3:27:30
-*  Total elapsed time (all runs):  6:39:00
-*         Peak memory (this run):  7.355 GB
-*        Pipeline completed time: 2020-02-27 12:54:05
+*        Elapsed time (this run):  3:16:06
+*  Total elapsed time (all runs):  5:45:59
+*         Peak memory (this run):  7.3549 GB
+*        Pipeline completed time: 2020-06-15 10:33:24

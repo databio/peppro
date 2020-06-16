@@ -1,7 +1,0 @@
-FastQC report r1	fastqc/K562_PRO-seq_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO
-Adapter insertion distribution	cutadapt/K562_PRO-seq_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_PRO-seq_R1_adapter_insertion_distribution.png	PEPPRO
-TSS enrichment	QC_hg38/K562_PRO-seq_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_PRO-seq_TSSenrichment.png	PEPPRO
-Pause index	QC_hg38/K562_PRO-seq_pause_index.pdf	Pause index	QC_hg38/K562_PRO-seq_pause_index.png	PEPPRO
-cFRiF	QC_hg38/K562_PRO-seq_cFRiF.pdf	cFRiF	QC_hg38/K562_PRO-seq_cFRiF.png	PEPPRO
-FRiF	QC_hg38/K562_PRO-seq_FRiF.pdf	FRiF	QC_hg38/K562_PRO-seq_FRiF.png	PEPPRO
-mRNA contamination	QC_hg38/K562_PRO-seq_mRNA_contamination.pdf	mRNA contamination	QC_hg38/K562_PRO-seq_mRNA_contamination.png	PEPPRO

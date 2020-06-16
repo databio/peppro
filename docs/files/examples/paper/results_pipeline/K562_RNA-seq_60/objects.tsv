@@ -1,5 +1,8 @@
 FastQC report r1	fastqc/K562_RNA-seq_60_R1_processed_fastqc.html	FastQC report r1	None	PEPPRO
 Adapter insertion distribution	cutadapt/K562_RNA-seq_60_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_60_R1_adapter_insertion_distribution.png	PEPPRO
+Adapter insertion distribution	cutadapt/K562_RNA-seq_60_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_60_R1_adapter_insertion_distribution.png	PEPPRO
+TSS enrichment	QC_hg38/K562_RNA-seq_60_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_60_TSSenrichment.png	PEPPRO
+Adapter insertion distribution	cutadapt/K562_RNA-seq_60_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/K562_RNA-seq_60_R1_adapter_insertion_distribution.png	PEPPRO
 TSS enrichment	QC_hg38/K562_RNA-seq_60_TSSenrichment.pdf	TSS enrichment	QC_hg38/K562_RNA-seq_60_TSSenrichment.png	PEPPRO
 Pause index	QC_hg38/K562_RNA-seq_60_pause_index.pdf	Pause index	QC_hg38/K562_RNA-seq_60_pause_index.png	PEPPRO
 cFRiF	QC_hg38/K562_RNA-seq_60_cFRiF.pdf	cFRiF	QC_hg38/K562_RNA-seq_60_cFRiF.png	PEPPRO

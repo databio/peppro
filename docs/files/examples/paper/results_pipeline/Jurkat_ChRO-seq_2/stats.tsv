@@ -1,5 +1,5 @@
 File_mb	1914.91	PEPPRO
-Read_type	single	PEPPRO
+Read_type	SINGLE	PEPPRO
 Genome	hg38	PEPPRO
 Raw_reads	49841170	PEPPRO
 Fastq_reads	49841170	PEPPRO
@@ -22,16 +22,16 @@ Read_depth	4.27	PEPPRO
 Mitochondrial_reads	18250	PEPPRO
 Maximum_read_length	70	PEPPRO
 Genome_size	3099922541	PEPPRO
-Frac_exp_unique_at_10M	0.6458	PEPPRO
+Frac_exp_unique_at_10M	0.646	PEPPRO
 NRF	0.53	PEPPRO
 PBC1	0.8	PEPPRO
 PBC2	8.39	PEPPRO
 Unmapped_reads	2435871	PEPPRO
 TSS_coding_score	68.4	PEPPRO
 TSS_non-coding_score	23.2	PEPPRO
-Pause_index	78.33	PEPPRO
+Pause_index	85.85	PEPPRO
 Plus_FRiP	0.36	PEPPRO
 Minus_FRiP	0.35	PEPPRO
 mRNA_contamination	1.2	PEPPRO
-Time	2:17:43	PEPPRO
-Success	02-27-11:42:46	PEPPRO
+Time	1:55:16	PEPPRO
+Success	06-15-09:12:28	PEPPRO
