@@ -14,13 +14,36 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: [h9_treated_pro-seq_1.html](files/examples/paper/PEPPRO_reports/h9_treated_pro-seq_1.html)
     * :fa-file-code-o: [h9_treated_pro-seq_2.html](files/examples/paper/PEPPRO_reports/h9_treated_pro-seq_2.html)
     * :fa-file-code-o: [h9_treated_pro-seq_3.html](files/examples/paper/PEPPRO_reports/h9_treated_pro-seq_3.html)
+    * :fa-file-code-o: [h9_pro-seq_10.html](files/examples/paper/PEPPRO_reports/h9_pro-seq_10.html)
+    * :fa-file-code-o: [h9_pro-seq_20.html](files/examples/paper/PEPPRO_reports/h9_pro-seq_20.html)
+    * :fa-file-code-o: [h9_pro-seq_30.html](files/examples/paper/PEPPRO_reports/h9_pro-seq_30.html)
+    * :fa-file-code-o: [h9_pro-seq_40.html](files/examples/paper/PEPPRO_reports/h9_pro-seq_40.html)
+    * :fa-file-code-o: [h9_pro-seq_50.html](files/examples/paper/PEPPRO_reports/h9_pro-seq_50.html)
+    * :fa-file-code-o: [h9_pro-seq_60.html](files/examples/paper/PEPPRO_reports/h9_pro-seq_60.html)
+    * :fa-file-code-o: [h9_pro-seq_70.html](files/examples/paper/PEPPRO_reports/h9_pro-seq_70.html)
+    * :fa-file-code-o: [h9_pro-seq_80.html](files/examples/paper/PEPPRO_reports/h9_pro-seq_80.html)
+    * :fa-file-code-o: [h9_pro-seq_90.html](files/examples/paper/PEPPRO_reports/h9_pro-seq_90.html)
+    * :fa-file-code-o: [h9_pro-seq_100.html](files/examples/paper/PEPPRO_reports/h9_pro-seq_100.html)
     * :fa-file-code-o: [hek_arf_pro-seq.html](files/examples/paper/PEPPRO_reports/hek_arf_pro-seq.html)
     * :fa-file-code-o: [hek_pro-seq.html](files/examples/paper/PEPPRO_reports/hek_pro-seq.html)
     * :fa-file-code-o: [helas3_gro-seq.html](files/examples/paper/PEPPRO_reports/helas3_gro-seq.html)
     * :fa-file-code-o: [jurkat_chro-seq_1.html](files/examples/paper/PEPPRO_reports/jurkat_chro-seq_1.html)
     * :fa-file-code-o: [jurkat_chro-seq_2.html](files/examples/paper/PEPPRO_reports/jurkat_chro-seq_2.html)
     * :fa-file-code-o: [k562_gro-seq.html](files/examples/paper/PEPPRO_reports/k562_gro-seq.html)
-    * :fa-file-code-o: [k562_pro-seq.html](files/examples/paper/PEPPRO_reports/k562_pro-seq.html)
+    * :fa-file-code-o: [k562_pro-seq_02.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_02.html)
+    * :fa-file-code-o: [k562_pro-seq_04.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_04.html)
+    * :fa-file-code-o: [k562_pro-seq_06.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_06.html)
+    * :fa-file-code-o: [k562_pro-seq_08.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_08.html)
+    * :fa-file-code-o: [k562_pro-seq_10.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_10.html)
+    * :fa-file-code-o: [k562_pro-seq_20.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_20.html)
+    * :fa-file-code-o: [k562_pro-seq_30.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_30.html)
+    * :fa-file-code-o: [k562_pro-seq_40.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_40.html)
+    * :fa-file-code-o: [k562_pro-seq_50.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_50.html)
+    * :fa-file-code-o: [k562_pro-seq_60.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_60.html)
+    * :fa-file-code-o: [k562_pro-seq_70.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_70.html)
+    * :fa-file-code-o: [k562_pro-seq_80.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_80.html)
+    * :fa-file-code-o: [k562_pro-seq_90.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_90.html)
+    * :fa-file-code-o: [k562_pro-seq_100.html](files/examples/paper/PEPPRO_reports/k562_pro-seq_100.html)
     * :fa-file-code-o: [k562_rna-seq_0.html](files/examples/paper/PEPPRO_reports/k562_rna-seq_0.html)
     * :fa-file-code-o: [k562_rna-seq_10.html](files/examples/paper/PEPPRO_reports/k562_rna-seq_10.html)
     * :fa-file-code-o: [k562_rna-seq_20.html](files/examples/paper/PEPPRO_reports/k562_rna-seq_20.html)
@@ -1392,13 +1415,36 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: H9_treated_PRO-seq_1.yaml
     * :fa-file-code-o: H9_treated_PRO-seq_2.yaml
     * :fa-file-code-o: H9_treated_PRO-seq_3.yaml
+    * :fa-file-code-o: H9_PRO-seq_10.yaml
+    * :fa-file-code-o: H9_PRO-seq_20.yaml
+    * :fa-file-code-o: H9_PRO-seq_30.yaml
+    * :fa-file-code-o: H9_PRO-seq_40.yaml
+    * :fa-file-code-o: H9_PRO-seq_50.yaml
+    * :fa-file-code-o: H9_PRO-seq_60.yaml
+    * :fa-file-code-o: H9_PRO-seq_70.yaml
+    * :fa-file-code-o: H9_PRO-seq_80.yaml
+    * :fa-file-code-o: H9_PRO-seq_90.yaml
+    * :fa-file-code-o: H9_PRO-seq_100.yaml
     * :fa-file-code-o: HEK_ARF_PRO-seq.yaml
     * :fa-file-code-o: HEK_PRO-seq.yaml
     * :fa-file-code-o: HelaS3_GRO-seq.yaml
     * :fa-file-code-o: Jurkat_ChRO-seq_1.yaml
     * :fa-file-code-o: Jurkat_ChRO-seq_2.yaml
     * :fa-file-code-o: K562_GRO-seq.yaml
-    * :fa-file-code-o: K562_PRO-seq.yaml
+    * :fa-file-code-o: K562_PRO-seq_02.yaml
+    * :fa-file-code-o: K562_PRO-seq_04.yaml
+    * :fa-file-code-o: K562_PRO-seq_06.yaml
+    * :fa-file-code-o: K562_PRO-seq_08.yaml
+    * :fa-file-code-o: K562_PRO-seq_10.yaml
+    * :fa-file-code-o: K562_PRO-seq_20.yaml
+    * :fa-file-code-o: K562_PRO-seq_30.yaml
+    * :fa-file-code-o: K562_PRO-seq_40.yaml
+    * :fa-file-code-o: K562_PRO-seq_50.yaml
+    * :fa-file-code-o: K562_PRO-seq_60.yaml
+    * :fa-file-code-o: K562_PRO-seq_70.yaml
+    * :fa-file-code-o: K562_PRO-seq_80.yaml
+    * :fa-file-code-o: K562_PRO-seq_90.yaml
+    * :fa-file-code-o: K562_PRO-seq_100.yaml
     * :fa-file-code-o: K562_RNA-seq_10.yaml
     * :fa-file-code-o: K562_RNA-seq_20.yaml
     * :fa-file-code-o: K562_RNA-seq_30.yaml
@@ -1408,6 +1454,7 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: K562_RNA-seq_70.yaml
     * :fa-file-code-o: K562_RNA-seq_80.yaml
     * :fa-file-code-o: K562_RNA-seq_90.yaml
+    * :fa-file-code-o: K562_RNA-seq_100.yaml
     * :fa-file-text-o: peppro_H9_PRO-seq_1.log
     * :fa-file-code-o: peppro_H9_PRO-seq_1.sub
     * :fa-file-text-o: peppro_H9_PRO-seq_2.log
@@ -1420,6 +1467,26 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: peppro_H9_treated_PRO-seq_2.sub
     * :fa-file-text-o: peppro_H9_treated_PRO-seq_3.log
     * :fa-file-code-o: peppro_H9_treated_PRO-seq_3.sub
+    * :fa-file-text-o: peppro_H9_PRO-seq_10.log
+    * :fa-file-code-o: peppro_H9_PRO-seq_10.sub
+    * :fa-file-text-o: peppro_H9_PRO-seq_20.log
+    * :fa-file-code-o: peppro_H9_PRO-seq_20.sub
+    * :fa-file-text-o: peppro_H9_PRO-seq_30.log
+    * :fa-file-code-o: peppro_H9_PRO-seq_30.sub
+    * :fa-file-text-o: peppro_H9_PRO-seq_40.log
+    * :fa-file-code-o: peppro_H9_PRO-seq_40.sub
+    * :fa-file-text-o: peppro_H9_PRO-seq_50.log
+    * :fa-file-code-o: peppro_H9_PRO-seq_50.sub
+    * :fa-file-text-o: peppro_H9_PRO-seq_60.log
+    * :fa-file-code-o: peppro_H9_PRO-seq_60.sub
+    * :fa-file-text-o: peppro_H9_PRO-seq_70.log
+    * :fa-file-code-o: peppro_H9_PRO-seq_70.sub
+    * :fa-file-text-o: peppro_H9_PRO-seq_80.log
+    * :fa-file-code-o: peppro_H9_PRO-seq_80.sub
+    * :fa-file-text-o: peppro_H9_PRO-seq_90.log
+    * :fa-file-code-o: peppro_H9_PRO-seq_90.sub
+    * :fa-file-text-o: peppro_H9_PRO-seq_100.log
+    * :fa-file-code-o: peppro_H9_PRO-seq_100.sub
     * :fa-file-text-o: peppro_HEK_ARF_PRO-seq.log
     * :fa-file-code-o: peppro_HEK_ARF_PRO-seq.sub
     * :fa-file-text-o: peppro_HEK_PRO-seq.log
@@ -1432,8 +1499,34 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: peppro_Jurkat_ChRO-seq_2.sub
     * :fa-file-text-o: peppro_K562_GRO-seq.log
     * :fa-file-code-o: peppro_K562_GRO-seq.sub
-    * :fa-file-text-o: peppro_K562_PRO-seq.log
-    * :fa-file-code-o: peppro_K562_PRO-seq.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_02.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_02.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_04.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_04.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_06.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_06.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_08.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_08.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_10.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_10.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_20.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_20.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_30.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_30.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_40.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_40.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_50.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_50.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_60.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_60.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_70.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_70.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_80.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_80.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_90.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_90.sub
+    * :fa-file-text-o: peppro_K562_PRO-seq_100.log
+    * :fa-file-code-o: peppro_K562_PRO-seq_100.sub
     * :fa-file-text-o: peppro_K562_RNA-seq_10.log
     * :fa-file-code-o: peppro_K562_RNA-seq_10.sub
     * :fa-file-text-o: peppro_K562_RNA-seq_20.log
@@ -1452,10 +1545,17 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-code-o: peppro_K562_RNA-seq_80.sub
     * :fa-file-text-o: peppro_K562_RNA-seq_90.log
     * :fa-file-code-o: peppro_K562_RNA-seq_90.sub
+    * :fa-file-text-o: peppro_K562_RNA-seq_100.log
+    * :fa-file-code-o: peppro_K562_RNA-seq_100.sub
 * ??? danger ":fa-folder-open-o: summary/"
-    * :fa-file-text-o: PEPPRO_countData.csv
+    * :fa-file-code-o: [PEPPRO collator_commands.sh](files/examples/paper/summary/PEPPRO collator_commands.sh)
+    * :fa-file-text-o: PEPPRO collator_completed.flag
+    * :fa-file-text-o: [PEPPRO collator_log.md](files/examples/paper/summary/PEPPRO collator_log.md)
+    * :fa-file-text-o: [PEPPRO collator_profile.tsv](files/examples/paper/summary/PEPPRO collator_profile.tsv)
+    * :fa-file-text-o: [PEPPRO_countData.csv](files/examples/paper/summary/PEPPRO_countData.csv)
     * :fa-file-pdf-o: [PEPPRO_libComplexity.pdf](files/examples/paper/summary/PEPPRO_libComplexity.pdf)
     * :fa-file-image-o: [PEPPRO_libComplexity.png](files/examples/paper/summary/PEPPRO_libComplexity.png)
+* :fa-file-text-o: [PEPPRO_assets_summary.tsv](files/examples/paper/PEPPRO_assets_summary.tsv)
 * :fa-file-text-o: [PEPPRO_stats_summary.tsv](files/examples/paper/PEPPRO_stats_summary.tsv)
-* :fa-file-code-o: [PEPPRO_objs_summary.tsv](files/examples/paper/PEPPRO_objs_summary.tsv)
+* :fa-file-text-o: [PEPPRO_objs_summary.tsv](files/examples/paper/PEPPRO_objs_summary.tsv)
 * :fa-file-code-o: [PEPPRO_summary.html](files/examples/paper/PEPPRO_summary.html)
