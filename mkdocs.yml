@@ -22,6 +22,7 @@ nav:
     - Run PEPPRO on a cluster: 'cluster.md'
     - Run PEPPRO in containers: 'container.md'
     - Configure prealignments: 'prealignments.md'
+    - Configure seqOutBias assets: 'sob.md'
     - Configure UMI: 'umi.md'
     - Detailed install guide: 'detailed_install.md'
     - Use custom reference data: 'annotation.md'

@@ -38,7 +38,7 @@ If you're using `looper` and you'd like to set the `--umi-len` for individual sa
 
 Below we'll go over two examples of customization in the project configuration files.
 
-#### 1: Set a universal `--umi_len` in the project configuration file
+#### 1: Set a universal `--umi-len` in the project configuration file
 
 ```
 name: test
@@ -82,29 +82,16 @@ sample_modifiers:
 
 What do you do if your project doesn't have the same UMI for all samples? This requires a bit more complexity.  Our paper's samples do exactly this, and you can [go check out those configuration files specifically for complete detail](https://github.com/databio/ppqc/).  Here we'll highlight the relevant components.
 
-In our [paper' project configuration file](https://github.com/databio/ppqc/blob/master/peppro_paper.yaml) we use the `implied_columns` feature to create custom arguments based on our [corresponding annotation file](https://github.com/databio/ppqc/blob/master/peppro_paper.csv).  We can include any column of choice, in this case we call it `umi_status`, that includes multiple possible matches. If a sample includes `true_8` in the `umi_status` column, we will pass a `--umi-len 8` to the pipeline.  Conversely, if a sample includes `true_6` in the `umi_status` column, we will pass a `--umi-len 6` to the pipeline. If neither argument is present, we use the default setting of length 0.
+In our [paper' project annotation file](https://github.com/databio/ppqc/blob/master/peppro_paper.csv).  We can include any column of choice, in this case we can simply name a column `umi_len` and set the UMI length on a sample by sample basis. *Note, the column name contains an underscore, `_`, whereas the flag on the command line includes a hyphen, `--umi-len`.*
 
-Here's a snippet of the relevant portion of the configuration files:
-
-- configuration file
+Here's a snippet of the relevant portion of the configuration file:
+- annotation file (`umi_len` column)
 ```
-imply:
-  - if:
-     umi_status: "true_8"
-    then:
-      umi_len: 8
-  - if:
-      umi_status: "true_6"
-    then:
-      umi_len: 6
-```
-- annotation file (umi_status column)
-```
-umi_status
-FALSE
-FALSE
-true_6
-true_8
-true_8
+umi_len
+6
+6
+8
+8
+0
 ```
 
