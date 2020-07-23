@@ -26,11 +26,11 @@ sample_modifiers:
     - if:
         organism: ["human", "Homo sapiens", "Human", "Homo_sapiens"]
       then:
-        genome: hg38
-        prealignments: human_rDNA
-        adapter: cutadapt  # Default
-        dedup: seqkit      # Default
-        trimmer: seqtk     # Default
-        protocol: pro      # Default
-        umi_len: 0         # Default
-        max_len: -1        # Default
+        genome: "hg38"
+        prealignments: "human_rDNA"
+        adapter: "cutadapt" # Default
+        dedup: "seqkit"     # Default
+        trimmer: "seqtk"    # Default
+        protocol: "pro"     # Default
+        umi_len: "0"        # Default
+        max_len: "-1"       # Default
