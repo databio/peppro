@@ -848,62 +848,62 @@ This is an interactive display of exactly what results you'll get as output from
         * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_GRO-seq/PEPPRO_log.md)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_GRO-seq/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_GRO-seq/stats.tsv)
-    * ??? danger ":fa-folder-open-o: K562_PRO-seq/"
+    * ??? danger ":fa-folder-open-o: K562_PRO-seq_100/"
         * ??? danger ":fa-folder-open-o: aligned_hg38/"
-            * :fa-file-o: K562_PRO-seq_fail_qc.bam
-            * :fa-file-o: K562_PRO-seq_sort_dups.bam
-            * :fa-file-o: K562_PRO-seq_sort.bam
-            * :fa-file-o: K562_PRO-seq_PE1.bam
-            * :fa-file-o: K562_PRO-seq_PE1.bam.bai
-            * :fa-file-o: K562_PRO-seq_unmap.bam
-            * :fa-file-o: K562_PRO-seq_plus.bam 
-            * :fa-file-o: K562_PRO-seq_plus.bam.bai
-            * :fa-file-o: K562_PRO-seq_minus.bam 
-            * :fa-file-o: K562_PRO-seq_minus.bam.bai
+            * :fa-file-o: K562_PRO-seq_100_fail_qc.bam
+            * :fa-file-o: K562_PRO-seq_100_sort_dups.bam
+            * :fa-file-o: K562_PRO-seq_100_sort.bam
+            * :fa-file-o: K562_PRO-seq_100_PE1.bam
+            * :fa-file-o: K562_PRO-seq_100_PE1.bam.bai
+            * :fa-file-o: K562_PRO-seq_100_unmap.bam
+            * :fa-file-o: K562_PRO-seq_100_plus.bam 
+            * :fa-file-o: K562_PRO-seq_100_plus.bam.bai
+            * :fa-file-o: K562_PRO-seq_100_minus.bam 
+            * :fa-file-o: K562_PRO-seq_100_minus.bam.bai
         * ??? danger ":fa-folder-open-o: cutadapt/"   
-            * [:fa-file-pdf-o: K562_PRO-seq_R1_adapter_insertion_distribution.pdf](files/examples/paper/results_pipeline/K562_PRO-seq/cutadapt/K562_PRO-seq_R1_adapter_insertion_distribution.pdf)
-            * [:fa-file-image-o: K562_PRO-seq_R1_adapter_insertion_distribution.png](files/examples/paper/results_pipeline/K562_PRO-seq/cutadapt/K562_PRO-seq_R1_adapter_insertion_distribution.png)
-            * :fa-file-text-o: K562_PRO-seq_R1_cutadapt.txt
-            * :fa-file-text-o: K562_PRO-seq.hist
-            * :fa-file-text-o: K562_PRO-seq.histogram
-            * :fa-file-text-o: K562_PRO-seq.extendedFrags.fastq.gz
-            * :fa-file-text-o: K562_PRO-seq.notCombined_1.fastq.gz
+            * [:fa-file-pdf-o: K562_PRO-seq_R1_adapter_insertion_distribution.pdf](files/examples/paper/results_pipeline/K562_PRO-seq_100/cutadapt/K562_PRO-seq_100_R1_adapter_insertion_distribution.pdf)
+            * [:fa-file-image-o: K562_PRO-seq_R1_adapter_insertion_distribution.png](files/examples/paper/results_pipeline/K562_PRO-seq_100/cutadapt/K562_PRO-seq_100_R1_adapter_insertion_distribution.png)
+            * :fa-file-text-o: K562_PRO-seq_100_R1_cutadapt.txt
+            * :fa-file-text-o: K562_PRO-seq_100.hist
+            * :fa-file-text-o: K562_PRO-seq_100.histogram
+            * :fa-file-text-o: K562_PRO-seq_100.extendedFrags.fastq.gz
+            * :fa-file-text-o: K562_PRO-seq_100.notCombined_1.fastq.gz
         * ???+ danger ":fa-folder-open-o: fastq/"
         * ??? danger ":fa-folder-open-o: fastqc/"
-            * :fa-file-code-o: K562_PRO-seq_R1_processed_fastqc.zip
-            * [:fa-file-code-o: K562_PRO-seq_R1_processed_fastqc.html](files/examples/paper/results_pipeline/K562_PRO-seq/fastqc/K562_PRO-seq_R1_processed_fastqc.html)
+            * :fa-file-code-o: K562_PRO-seq_100_R1_processed_fastqc.zip
+            * [:fa-file-code-o: K562_PRO-seq_100_R1_processed_fastqc.html](files/examples/paper/results_pipeline/K562_PRO-seq_100/fastqc/K562_PRO-seq_100_R1_processed_fastqc.html)
         * ??? danger ":fa-folder-open-o: prealignments/"
-            * :fa-file-archive-o: K562_PRO-seq_human_rDNA_unmap_R1.fq.gz
+            * :fa-file-archive-o: K562_PRO-seq_100_human_rDNA_unmap_R1.fq.gz
          * ??? danger ":fa-folder-open-o: QC_hg38/"
-            * :fa-file-o: K562_PRO-seq_bamQC.tsv
-            * :fa-file-o: K562_PRO-seq_exon_intron_ratios.bed.gz
-            * [:fa-file-pdf-o: K562_PRO-seq_cFRiF.pdf](files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_cFRiF.pdf)
-            * [:fa-file-pdf-o: K562_PRO-seq_cFRiF.png](files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_cFRiF.png)
-            * [:fa-file-pdf-o: K562_PRO-seq_mRNA_contamination.pdf](files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_mRNA_contamination.pdf)
-            * [:fa-file-pdf-o: K562_PRO-seq_mRNA_contamination.png](files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_mRNA_contamination.png)
-            * :fa-file-o: K562_PRO-seq_pause_index.bed.gz
-            * [:fa-file-pdf-o: K562_PRO-seq_pause_index.pdf](files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_pause_index.pdf)
-            * [:fa-file-pdf-o: K562_PRO-seq_pause_index.png](files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_pause_index.png)          
-            * [:fa-file-pdf-o: K562_PRO-seq_FRiF.pdf](files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_FRiF.pdf)
-            * [:fa-file-pdf-o: K562_PRO-seq_FRiF.png](files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_FRiF.png)
-            * [:fa-file-pdf-o: K562_PRO-seq_TSSenrichment.pdf](files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_TSSenrichment.pdf)
-            * [:fa-file-pdf-o: K562_PRO-seq_TSSenrichment.png](files/examples/paper/results_pipeline/K562_PRO-seq/QC_hg38/K562_PRO-seq_TSSenrichment.png)
+            * :fa-file-o: K562_PRO-seq_100_bamQC.tsv
+            * :fa-file-o: K562_PRO-seq_100_exon_intron_ratios.bed.gz
+            * [:fa-file-pdf-o: K562_PRO-seq_100_cFRiF.pdf](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_cFRiF.pdf)
+            * [:fa-file-pdf-o: K562_PRO-seq_100_cFRiF.png](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_cFRiF.png)
+            * [:fa-file-pdf-o: K562_PRO-seq_100_mRNA_contamination.pdf](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_mRNA_contamination.pdf)
+            * [:fa-file-pdf-o: K562_PRO-seq_100_mRNA_contamination.png](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_mRNA_contamination.png)
+            * :fa-file-o: K562_PRO-seq_100_pause_index.bed.gz
+            * [:fa-file-pdf-o: K562_PRO-seq_100_pause_index.pdf](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_pause_index.pdf)
+            * [:fa-file-pdf-o: K562_PRO-seq_100_pause_index.png](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_pause_index.png)          
+            * [:fa-file-pdf-o: K562_PRO-seq_100_FRiF.pdf](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_FRiF.pdf)
+            * [:fa-file-pdf-o: K562_PRO-seq_100_FRiF.png](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_FRiF.png)
+            * [:fa-file-pdf-o: K562_PRO-seq_100_TSSenrichment.pdf](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_TSSenrichment.pdf)
+            * [:fa-file-pdf-o: K562_PRO-seq_100_TSSenrichment.png](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_TSSenrichment.png)
         * ??? danger ":fa-folder-open-o: raw/"
-            * :fa-file-archive-o: K562_PRO-seq_r1.fastq.gz
+            * :fa-file-archive-o: K562_PRO-seq_100_r1.fastq.gz
             * :fa-file-archive-o: hg38_annotations.bed.gz 
         * ??? danger ":fa-folder-open-o: signal_hg38/"
-            * :fa-file-o: K562_PRO-seq_gene_coverage.bed
-            * :fa-file-o: K562_PRO-seq_minus_exact_body_0-mer.bw
-            * :fa-file-o: K562_PRO-seq_plus_exact_body_0.bw
-            * :fa-file-o: K562_PRO-seq_minus_smooth_body_0-mer.bw
-            * :fa-file-o: K562_PRO-seq_plus_smooth_body_0.bw 
-        * [:fa-file-text-o: objects.tsv](files/examples/paper/results_pipeline/K562_PRO-seq/objects.tsv) 
+            * :fa-file-o: K562_PRO-seq_100_gene_coverage.bed
+            * :fa-file-o: K562_PRO-seq_100_minus_exact_body_0-mer.bw
+            * :fa-file-o: K562_PRO-seq_100_plus_exact_body_0.bw
+            * :fa-file-o: K562_PRO-seq_100_minus_smooth_body_0-mer.bw
+            * :fa-file-o: K562_PRO-seq_100_plus_smooth_body_0.bw 
+        * [:fa-file-text-o: objects.tsv](files/examples/paper/results_pipeline/K562_PRO-seq_100/objects.tsv) 
         * :fa-file-code-o: PEPPRO_cleanup.sh
-        * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_PRO-seq/PEPPRO_commands.sh)
+        * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_PRO-seq_100/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_PRO-seq/PEPPRO_log.md)
-        * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_PRO-seq/PEPPRO_profile.tsv)
-        * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_PRO-seq/stats.tsv)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_PRO-seq_100/PEPPRO_log.md)
+        * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_PRO-seq_100/PEPPRO_profile.tsv)
+        * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_PRO-seq_100/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_RNA-seq_10/"
         * ??? danger ":fa-folder-open-o: aligned_hg38/"
             * :fa-file-o: K562_RNA-seq_10_fail_qc.bam
