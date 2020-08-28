@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.9.8"
+__version__ = "0.9.9"
 
 from argparse import ArgumentParser
 import os
@@ -14,6 +14,7 @@ import re
 import tempfile
 import tarfile
 import pypiper
+import errno
 from pypiper import build_command
 from refgenconf import RefGenConf as RGC, select_genome_config
 
@@ -1318,12 +1319,48 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 dr = float(degradation_ratio)
                 pm.report_result("Degradation_ratio", round(dr, 4))
 
+    def check_trim(trimmed_fastq, paired_end,
+                   trimmed_fastq_R2=None, fastqc_folder=None):
+        """
+        Evaluate read trimming, and optionally run fastqc.
+        """
+        if read2:
+            trimmed_reads = "Trimmed_reads_R2"
+            loss_rate = "Trim_loss_rate_R2"
+            report = "FastQC report R2"
+        else:
+            trimmed_reads = "Trimmed_reads_R1"
+            loss_rate = "Trim_loss_rate_R1"
+            report = "FastQC report R1"
+        n_trim = float(ngstk.count_reads(trimmed_fastq, paired_end))
+        pm.report_result(trimmed_reads, int(n_trim))
+
+        try:
+            rr = float(pm.get_stat("Raw_reads"))
+        except:
+            print("Can't calculate trim loss rate without raw read result.")
+        else:
+            pm.report_result(loss_rate, round((rr - n_trim) * 100 / rr, 2))
+
+        # Also run a fastqc (if installed/requested)
+        if fastqc_folder:
+            if fastqc_folder and os.path.isabs(fastqc_folder):
+                try:
+                    os.makedirs(fastqc_folder)
+                except OSError as exception:
+                    if exception.errno != errno.EEXIST:
+                        raise
+            cmd = ngstk.fastqc(trimmed_fastq, fastqc_folder)
+            pm.run(cmd, lock_name="trimmed_fastqc", nofail=True)
+            fname, ext = os.path.splitext(os.path.basename(trimmed_fastq))
+            fastqc_html = os.path.join(fastqc_folder, fname + "_fastqc.html")
+            pm.report_object(report, fastqc_html)
 
     # Put it all together
     if read2:
         pm.run([adapter_command, trim_command], trimmed_fq2,
-               follow=ngstk.check_trim(processed_fastq, True, trimmed_fq2,
-                                       fastqc_folder=fastqc_folder))
+               follow=check_trim(processed_fastq, True, trimmed_fq2,
+                                 fastqc_folder=fastqc_folder))
         if args.adapter == "cutadapt":
             output_folder = os.path.join(outfolder, "cutadapt")
         else:
@@ -1337,8 +1374,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         # This trim command DOES need the adapter file...
         pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
         pm.run([adapter_command, trim_command], processed_fastq,
-               follow=ngstk.check_trim(processed_fastq, False, None,
-                                       fastqc_folder=fastqc_folder))
+               follow=check_trim(processed_fastq, False, None,
+                                 fastqc_folder=fastqc_folder))
         # This needs to produce the trimmed_fastq file
         pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
         pm.run([deduplicate_command, trim_command2],
@@ -1355,8 +1392,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if not _itsa_file(fastqc_report) or args.new_start:
             cmd = ("echo '### Calculate the number of trimmed reads'")
             pm.run(cmd, fastqc_report, 
-                   follow=ngstk.check_trim(processed_fastq, False, None,
-                                           fastqc_folder=fastqc_folder))
+                   follow=check_trim(processed_fastq, False, None,
+                                     fastqc_folder=fastqc_folder))
         pm.clean_add(noadap_fq1)
         pm.clean_add(short_fq1)
         return processed_fastq
@@ -1542,7 +1579,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 try:
                     # wrapped in try block in case Trimmed_reads is not reported 
                     # in this pipeline.
-                    tr = float(pm.get_stat("Trimmed_reads"))
+                    tr = float(pm.get_stat("Trimmed_reads_R1"))
                 except:
                     print("Trimmed reads is not reported.")
                 else:
@@ -1893,7 +1930,7 @@ def main():
     tool_list = [v for k,v in tools.items()]    # extract tool list
     tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tool_list]
     tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tool_list]
-    opt_tools = ["fqdedup", "fastx_trimmer", "seqOutBias"]
+    opt_tools = ["fqdedup", "fastx_trimmer", "seqOutBias", "fastqc"]
     if args.trimmer == "fastx":  # update tool call
         if 'fastx' in opt_tools: opt_tools.remove('fastx_trimmer')
 
@@ -2145,7 +2182,7 @@ def main():
 
         # Gut check
         # Processing fastq should have trimmed the reads.
-        tmp = pm.get_stat("Trimmed_reads")
+        tmp = pm.get_stat("Trimmed_reads_R1")
         if tmp:
             tr = float(tmp)
         else:
@@ -2592,7 +2629,7 @@ def main():
         else:
             rr = 0
 
-        tmp = pm.get_stat("Trimmed_reads")
+        tmp = pm.get_stat("Trimmed_reads_R1")
         if tmp:
             tr = float(tmp)
         else:
