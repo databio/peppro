@@ -1319,28 +1319,43 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 dr = float(degradation_ratio)
                 pm.report_result("Degradation_ratio", round(dr, 4))
 
+
     def check_trim(trimmed_fastq, paired_end,
                    trimmed_fastq_R2=None, fastqc_folder=None):
         """
         Evaluate read trimming, and optionally run fastqc.
+        
+        :param str trimmed_fastq: Path to trimmed reads file.
+        :param bool paired_end: Whether the processing is being done with
+            paired-end sequencing data.
+        :param str trimmed_fastq_R2: Path to read 2 file for paired-end case.
+        :param str fastqc_folder: Path to folder within which to place fastqc
+            output files; if unspecified, fastqc will not be run.
+        :return callable: Function to evaluate read trimming and possibly run
+            fastqc.
         """
-        if read2:
-            trimmed_reads = "Trimmed_reads_R2"
-            loss_rate = "Trim_loss_rate_R2"
-            report = "FastQC report R2"
-        else:
-            trimmed_reads = "Trimmed_reads_R1"
-            loss_rate = "Trim_loss_rate_R1"
-            report = "FastQC report R1"
         n_trim = float(ngstk.count_reads(trimmed_fastq, paired_end))
-        pm.report_result(trimmed_reads, int(n_trim))
+        pm.report_result("Trimmed_reads_R1", int(n_trim))
 
         try:
             rr = float(pm.get_stat("Raw_reads"))
         except:
             print("Can't calculate trim loss rate without raw read result.")
         else:
-            pm.report_result(loss_rate, round((rr - n_trim) * 100 / rr, 2))
+            pm.report_result("Trim_loss_rate_R1",
+                             round((rr - n_trim) * 100 / rr, 2))
+
+        if paired_end and trimmed_fastq_R2:
+            n_trim = float(ngstk.count_reads(trimmed_fastq_R2, paired_end))
+            pm.report_result("Trimmed_reads_R2", int(n_trim))
+
+            try:
+                rr = float(pm.get_stat("Raw_reads"))
+            except:
+                print("Can't calculate trim loss rate without raw read result.")
+            else:
+                pm.report_result("Trim_loss_rate_R2",
+                                 round((rr - n_trim) * 100 / rr, 2))
 
         # Also run a fastqc (if installed/requested)
         if fastqc_folder:
@@ -1354,13 +1369,26 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             pm.run(cmd, lock_name="trimmed_fastqc", nofail=True)
             fname, ext = os.path.splitext(os.path.basename(trimmed_fastq))
             fastqc_html = os.path.join(fastqc_folder, fname + "_fastqc.html")
-            pm.report_object(report, fastqc_html)
+            pm.report_object("FastQC report R1", fastqc_html)
+            
+            if paired_end and trimmed_fastq_R2:
+                    cmd = ngstk.fastqc(trimmed_fastq_R2, fastqc_folder)
+                    pm.run(cmd, lock_name="trimmed_fastqc_R2", nofail=True)
+                    fname, ext = os.path.splitext(
+                        os.path.basename(trimmed_fastq_R2))
+                    fastqc_html = os.path.join(
+                        fastqc_folder, fname + "_fastqc.html")
+                    pm.report_object("FastQC report R2", fastqc_html)
 
     # Put it all together
+    paired_end = args.paired_end
     if read2:
-        pm.run([adapter_command, trim_command], trimmed_fq2,
-               follow=check_trim(processed_fastq, True, trimmed_fq2,
-                                 fastqc_folder=fastqc_folder))
+        pm.run([adapter_command, trim_command], trimmed_fq2)
+        if not _itsa_file(fastqc_report) or args.new_start:
+            cmd = ("echo '### Calculated the number of trimmed reads'")
+            pm.run(cmd, fastqc_report, 
+                   follow=check_trim(processed_fastq, paired_end, trimmed_fq2,
+                                     fastqc_folder=fastqc_folder))
         if args.adapter == "cutadapt":
             output_folder = os.path.join(outfolder, "cutadapt")
         else:
@@ -1373,9 +1401,12 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     elif not args.complexity and int(args.umi_len) > 0:
         # This trim command DOES need the adapter file...
         pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
-        pm.run([adapter_command, trim_command], processed_fastq,
-               follow=check_trim(processed_fastq, False, None,
-                                 fastqc_folder=fastqc_folder))
+        pm.run([adapter_command, trim_command], processed_fastq)
+        if not _itsa_file(fastqc_report) or args.new_start:
+            cmd = ("echo '### Calculated the number of trimmed reads'")
+            pm.run(cmd, fastqc_report, 
+                   follow=check_trim(processed_fastq, paired_end, None,
+                                     fastqc_folder=fastqc_folder))
         # This needs to produce the trimmed_fastq file
         pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
         pm.run([deduplicate_command, trim_command2],
@@ -1392,7 +1423,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if not _itsa_file(fastqc_report) or args.new_start:
             cmd = ("echo '### Calculate the number of trimmed reads'")
             pm.run(cmd, fastqc_report, 
-                   follow=check_trim(processed_fastq, False, None,
+                   follow=check_trim(processed_fastq, paired_end, None,
                                      fastqc_folder=fastqc_folder))
         pm.clean_add(noadap_fq1)
         pm.clean_add(short_fq1)
