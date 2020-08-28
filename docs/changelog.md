@@ -1,6 +1,11 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.9.9] -- 2020-08-28
+
+### Changed
+ - Improve clarity of trimmed reads reporting
+
 ## [0.9.8] -- 2020-06-16
 
 ### Changed
