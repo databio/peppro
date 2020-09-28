@@ -1,5 +1,5 @@
 cutadapt>=2.9
-loopercli>=1.2
+looper>=1.2
 numpy
 pandas>=0.20.2
 pararead>=0.7.0
