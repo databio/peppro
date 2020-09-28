@@ -143,9 +143,9 @@ After the pipeline is finished, we can look through the output directory togethe
 ## 6: Generate an `HTML` report using `looper`
 
 Let's take full advantage of `looper` and generate a pipeline `HTML` report that makes all our results easy to view and browse.  If you'd like to skip right to the results and see what it looks like, [check out the tutorial results](files/examples/tutorial/tutorial_summary.html).  Otherwise, let's generate a report ourselves.
-Using our same configuration file we used to run the samples through the pipeline, we'll now employ the `summarize` function of `looper`.
+Using our same configuration file we used to run the samples through the pipeline, we'll now employ the `report` function of `looper`.
 ```
-looper summarize tutorial.yaml
+looper report tutorial.yaml
 ```         
 That's it! Easy, right? `Looper` conveniently provides you with the location where the HTML report is produced.  You may either open the report with your preferred internet browser using the PATH provided, or we can change directories to the report's location and open it there.  Let's go ahead and change into the directory that contains the report.
 ```
