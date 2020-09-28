@@ -25,7 +25,7 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--silent] [--verbosity V]
                  [--coverage] [--keep] [--noFIFO] [--no-complexity]
                  [--prioritize] [-V]
 
-PEPPRO version 0.9.9
+PEPPRO version 0.9.10
 
 optional arguments:
   -h, --help            show this help message and exit
