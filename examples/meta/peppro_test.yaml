@@ -5,8 +5,8 @@ pep_version: 2.0.0
 sample_table: "peppro_test.csv"
 
 looper:
-  output_dir: "$PROCESSED/peppro/peppro_test/"
-  pipeline_interfaces: ["$CODE/peppro/project_pipeline_interface.yaml"]
+  output_dir: "$PROCESSED/peppro/peppro_test/"  # export PROCESSED="/path/to/your_output_folder/"
+  pipeline_interfaces: ["$CODE/peppro/project_pipeline_interface.yaml"]  # export CODE="/path/to/your_tools_folder/"
 
 sample_modifiers:
   append:
@@ -32,5 +32,5 @@ sample_modifiers:
         dedup: "seqkit"     # Default
         trimmer: "seqtk"    # Default
         protocol: "pro"     # Default
-        umi_len: "0"        # Default
-        max_len: "-1"       # Default
+        umi_len: "0"        # Default; no UMI
+        max_len: "-1"       # Default; do NOT trim to a max length
