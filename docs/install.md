@@ -60,7 +60,7 @@ Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it pers
 Next, pull the assets you need. Replace `hg38` in the example below if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md). Download these required assets with this command:
 
 ```console
-refgenie pull -g hg38 -a bowtie2_index ensembl_gtf ensembl_rb refgene_anno feat_annotation 
+refgenie pull -g hg38 -a fasta bowtie2_index ensembl_gtf ensembl_rb refgene_anno feat_annotation 
 ```
 PEPPRO also requires `bowtie2_index` for any pre-alignment genomes:
 
