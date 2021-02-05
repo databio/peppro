@@ -88,7 +88,7 @@ export CODEBASE="/path/to/peppro_tutorial/tools/"
 Fantastic! Now that we have the pipeline and its requirements installed, we're ready to get our reference genome(s).
 
 ## 5: Use `looper` to run the pipeline
-Looper requires a few variables and configuration files to work for the specific user. Let's get those set up now. `Looper` uses [`divvy`](https://divvy.databio.org/) to manage computing resource configuration so that projects and pipelines can easily travel among environments. For more detailed information, [check out the `looper` docs](https://looper.readthedocs.io/en/latest/cluster-computing/). Let's set it up.
+Looper requires a few variables and configuration files to work for the specific user. Let's get those set up now. `Looper` uses [`divvy`](https://divvy.databio.org/) to manage computing resource configuration so that projects and pipelines can easily travel among environments. For more detailed information, [check out the `looper` docs](https://looper.readthedocs.io/en/latest/running-on-a-cluster/). Let's set it up.
 ```
 cd /path/to/peppro_tutorial/
 touch compute_config.yaml
