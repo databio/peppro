@@ -1548,10 +1548,10 @@ This is an interactive display of exactly what results you'll get as output from
     * :fa-file-text-o: peppro_K562_RNA-seq_100.log
     * :fa-file-code-o: peppro_K562_RNA-seq_100.sub
 * ??? danger ":fa-folder-open-o: summary/"
-    * :fa-file-code-o: [PEPPRO collator_commands.sh](files/examples/paper/summary/PEPPRO collator_commands.sh)
-    * :fa-file-text-o: PEPPRO collator_completed.flag
-    * :fa-file-text-o: [PEPPRO collator_log.md](files/examples/paper/summary/PEPPRO collator_log.md)
-    * :fa-file-text-o: [PEPPRO collator_profile.tsv](files/examples/paper/summary/PEPPRO collator_profile.tsv)
+    * :fa-file-code-o: [PEPPRO_collator_commands.sh](files/examples/paper/summary/PEPPRO_collator_commands.sh)
+    * :fa-file-text-o: PEPPRO_collator_completed.flag
+    * :fa-file-text-o: [PEPPRO_collator_log.md](files/examples/paper/summary/PEPPRO_collator_log.md)
+    * :fa-file-text-o: [PEPPRO_collator_profile.tsv](files/examples/paper/summary/PEPPRO_collator_profile.tsv)
     * :fa-file-text-o: [PEPPRO_countData.csv](files/examples/paper/summary/PEPPRO_countData.csv)
     * :fa-file-pdf-o: [PEPPRO_libComplexity.pdf](files/examples/paper/summary/PEPPRO_libComplexity.pdf)
     * :fa-file-image-o: [PEPPRO_libComplexity.png](files/examples/paper/summary/PEPPRO_libComplexity.png)
