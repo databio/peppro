@@ -129,7 +129,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/H9_PRO-seq_1/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_PRO-seq_1/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_PRO-seq_1/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/H9_PRO-seq_1/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/H9_PRO-seq_1/stats.tsv)
     * ??? danger ":fa-folder-open-o: H9_PRO-seq_2/"
@@ -198,7 +198,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/H9_PRO-seq_2/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_PRO-seq_2/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_PRO-seq_2/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/H9_PRO-seq_2/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/H9_PRO-seq_2/stats.tsv)
     * ??? danger ":fa-folder-open-o: H9_PRO-seq_3/"
@@ -267,7 +267,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/H9_PRO-seq_3/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_PRO-seq_3/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_PRO-seq_3/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/H9_PRO-seq_3/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/H9_PRO-seq_3/stats.tsv)
     * ??? danger ":fa-folder-open-o: H9_treated_PRO-seq_1/"
@@ -336,7 +336,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/H9_treated_PRO-seq_1/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_treated_PRO-seq_1/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_treated_PRO-seq_1/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/H9_treated_PRO-seq_1/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/H9_treated_PRO-seq_1/stats.tsv)
     * ??? danger ":fa-folder-open-o: H9_treated_PRO-seq_2/"
@@ -405,7 +405,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/H9_treated_PRO-seq_2/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_treated_PRO-seq_2/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_treated_PRO-seq_2/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/H9_treated_PRO-seq_2/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/H9_treated_PRO-seq_2/stats.tsv)
     * ??? danger ":fa-folder-open-o: H9_treated_PRO-seq_3/"
@@ -474,7 +474,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/H9_treated_PRO-seq_3/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_treated_PRO-seq_3/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/H9_treated_PRO-seq_3/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/H9_treated_PRO-seq_3/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/H9_treated_PRO-seq_3/stats.tsv)
     * ??? danger ":fa-folder-open-o: HEK_ARF_PRO-seq/"
@@ -543,7 +543,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/HEK_ARF_PRO-seq/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/HEK_ARF_PRO-seq/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/HEK_ARF_PRO-seq/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/HEK_ARF_PRO-seq/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/HEK_ARF_PRO-seq/stats.tsv)
     * ??? danger ":fa-folder-open-o: HEK_PRO-seq/"
@@ -611,7 +611,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/HEK_PRO-seq/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/HEK_PRO-seq/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/HEK_PRO-seq/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/HEK_PRO-seq/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/HEK_PRO-seq/stats.tsv)
     * ??? danger ":fa-folder-open-o: HelaS3_GRO-seq/"
@@ -667,7 +667,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/HelaS3_GRO-seq/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/HelaS3_GRO-seq/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/HelaS3_GRO-seq/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/HelaS3_GRO-seq/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/HelaS3_GRO-seq/stats.tsv)
     * ??? danger ":fa-folder-open-o: Jurkat_ChRO-seq_1/"
@@ -728,7 +728,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/Jurkat_ChRO-seq_1/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/Jurkat_ChRO-seq_1/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/Jurkat_ChRO-seq_1/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/Jurkat_ChRO-seq_1/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/Jurkat_ChRO-seq_1/stats.tsv)
     * ??? danger ":fa-folder-open-o: Jurkat_ChRO-seq_2/"
@@ -789,7 +789,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/Jurkat_ChRO-seq_2/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/Jurkat_ChRO-seq_2/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/Jurkat_ChRO-seq_2/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/Jurkat_ChRO-seq_2/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/Jurkat_ChRO-seq_2/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_GRO-seq/"
@@ -845,7 +845,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_GRO-seq/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_GRO-seq/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_GRO-seq/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_GRO-seq/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_GRO-seq/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_PRO-seq_100/"
@@ -901,7 +901,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_PRO-seq_100/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_PRO-seq_100/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_PRO-seq_100/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_PRO-seq_100/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_PRO-seq_100/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_RNA-seq_10/"
@@ -957,7 +957,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_RNA-seq_10/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_10/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_10/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_10/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_10/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_RNA-seq_20/"
@@ -1013,7 +1013,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_RNA-seq_20/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_20/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_20/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_20/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_20/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_RNA-seq_30/"
@@ -1069,7 +1069,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_RNA-seq_30/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_30/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_30/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_30/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_30/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_RNA-seq_40/"
@@ -1125,7 +1125,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_RNA-seq_40/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_40/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_40/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_40/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_40/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_RNA-seq_50/"
@@ -1181,7 +1181,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_RNA-seq_50/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_50/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_50/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_50/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_50/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_RNA-seq_60/"
@@ -1237,7 +1237,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_RNA-seq_60/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_60/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_60/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_60/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_60/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_RNA-seq_70/"
@@ -1293,7 +1293,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_RNA-seq_70/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_70/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_70/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_70/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_70/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_RNA-seq_80/"
@@ -1349,7 +1349,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_RNA-seq_80/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_80/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_80/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_80/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_80/stats.tsv)
     * ??? danger ":fa-folder-open-o: K562_RNA-seq_90/"
@@ -1405,7 +1405,7 @@ This is an interactive display of exactly what results you'll get as output from
         * :fa-file-code-o: PEPPRO_cleanup.sh
         * [:fa-file-code-o: PEPPRO_commands.sh](files/examples/paper/results_pipeline/K562_RNA-seq_90/PEPPRO_commands.sh)
         * :fa-file-o: PEPPRO_completed.flag
-        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_90/PEPPRO_log.md)
+        * [:fa-file-o: PEPPRO_log.md](files/examples/paper/results_pipeline/K562_RNA-seq_90/PEPPRO_log.txt)
         * [:fa-file-text-o: PEPPRO_profile.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_90/PEPPRO_profile.tsv)
         * [:fa-file-text-o: stats.tsv](files/examples/paper/results_pipeline/K562_RNA-seq_90/stats.tsv)
 * ??? danger ":fa-folder-open-o: submission/"
