@@ -45,7 +45,7 @@ That's it! These assets will be automatically detected by PEPPRO if you build th
 
 The pipeline will calculate the fraction (and proportion) of reads in genomic features using the feat_annotation asset, but you can also construct this file yourself.
 
-This annotation file is really just a modified `BED` file, with the chromosomal coordinates and type of feature included.  For example, the [downloadable `hg38_annotations.bed.gz` file](http://big.databio.org/peppro/hg38_annotations.bed.gz) looks like so:
+This annotation file is really just a modified `BED` file, with the chromosomal coordinates and type of feature included.  For example, the [downloadable `hg38_annotations.bed.gz` file](http://big.databio.org/pepatac/hg38_annotations.bed.gz) looks like so:
 
 ```
 chr1	28200	30001	Promoter	.	*
