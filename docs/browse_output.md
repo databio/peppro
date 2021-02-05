@@ -1550,7 +1550,7 @@ This is an interactive display of exactly what results you'll get as output from
 * ??? danger ":fa-folder-open-o: summary/"
     * :fa-file-code-o: [PEPPRO_collator_commands.sh](files/examples/paper/summary/PEPPRO_collator_commands.sh)
     * :fa-file-text-o: PEPPRO_collator_completed.flag
-    * :fa-file-text-o: [PEPPRO_collator_log.md](files/examples/paper/summary/PEPPRO_collator_log.md)
+    * :fa-file-text-o: [PEPPRO_collator_log.md](files/examples/paper/summary/PEPPRO_collator_log.txt)
     * :fa-file-text-o: [PEPPRO_collator_profile.tsv](files/examples/paper/summary/PEPPRO_collator_profile.tsv)
     * :fa-file-text-o: [PEPPRO_countData.csv](files/examples/paper/summary/PEPPRO_countData.csv)
     * :fa-file-pdf-o: [PEPPRO_libComplexity.pdf](files/examples/paper/summary/PEPPRO_libComplexity.pdf)
