@@ -884,7 +884,7 @@ This is an interactive display of exactly what results you'll get as output from
             * :fa-file-o: K562_PRO-seq_100_pause_index.bed.gz
             * [:fa-file-pdf-o: K562_PRO-seq_100_pause_index.pdf](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_pause_index.pdf)
             * [:fa-file-pdf-o: K562_PRO-seq_100_pause_index.png](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_pause_index.png)          
-            * [:fa-file-pdf-o: K562_PRO-seq_100_FRiF.pdf](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_FRiF.pdf)
+            * [:fa-file-pdf-o: K562_PRO-seq_100_FRiF.pdf](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_FRiF.pdf)
             * [:fa-file-pdf-o: K562_PRO-seq_100_FRiF.png](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_FRiF.png)
             * [:fa-file-pdf-o: K562_PRO-seq_100_TSSenrichment.pdf](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_TSSenrichment.pdf)
             * [:fa-file-pdf-o: K562_PRO-seq_100_TSSenrichment.png](files/examples/paper/results_pipeline/K562_PRO-seq_100/QC_hg38/K562_PRO-seq_100_TSSenrichment.png)
