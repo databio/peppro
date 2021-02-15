@@ -5,7 +5,7 @@
 <br></br>
 ---
 
-[![PEP compatible](http://pepkit.github.io/img/PEP-compatible-green.svg)](http://pepkit.github.io)
+[![PEP compatible](http://pepkit.github.io/img/PEP-compatible-green.svg)](http://pep.databio.org)
 
 PEPPRO is a pipeline designed to process PRO-seq (and GRO-seq) data. For more information see: http://peppro.databio.org/
 
