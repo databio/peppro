@@ -203,6 +203,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
     fastp_report_json = fastp_pfx + ".json"
 
     if _itsa_file(res.adapters):
+        pm.info("Using custom adapter file: {}".format(res.adapters))
         five_prime = pm.checkprint("awk '/5prime/{getline; print}' " +
             res.adapters) or "TGGAATTCTCGGGTGCCAAGG"
         three_prime = pm.checkprint("awk '/3prime/{getline; print}' " +
@@ -1062,7 +1063,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     fastp_report_txt = fastp_pfx + ".txt"
     fastp_report_html = fastp_pfx + ".html"
 
-    adapter_command = _remove_adapters(args, tools, res, read2, fq_file, outfolder)
+    adapter_command = _remove_adapters(args, res, tools, read2, fq_file, outfolder)
     pm.debug("Adapter command: {}".format(adapter_command))
     pm.debug("Read2 status: {}".format(read2))
 
@@ -2071,7 +2072,6 @@ def main():
     # Adapter file can be set in the config; if left null, we use a default.
     # Expects headers to include >5prime and >3prime
     res.adapters = res.adapters or tool_path("adapter.fa")
-
     param.outfolder = outfolder
     
     # Report utilized assets
