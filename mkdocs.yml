@@ -24,6 +24,7 @@ nav:
     - Configure prealignments: 'prealignments.md'
     - Configure seqOutBias assets: 'sob.md'
     - Configure UMI: 'umi.md'
+    - Configure custom adapters: 'custom_adapters.md'
     - Detailed install guide: 'detailed_install.md'
     - Use custom reference data: 'annotation.md'
   - Reference: 
