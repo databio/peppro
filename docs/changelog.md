@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.9.11] -- 2021-03-04
+
+### Changed
+ - Fixed error in order of argument terms for _remove_adapters() 
+ 
+### Added
+ - Added documentation for using custom adapters
+
 ## [0.9.10] -- 2020-09-28
 
 ### Changed
