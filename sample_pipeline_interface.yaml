@@ -2,7 +2,7 @@ pipeline_name: PEPPRO
 pipeline_type: sample
 path: pipelines/peppro.py
 input_schema: peppro_input_schema.yaml
-output_schema: peppro_output_schema.yaml
+output_schema: peppro_pipestat_schema.yaml
 command_template: >
   {pipeline.path}
   --sample-name {sample.sample_name}
@@ -35,6 +35,12 @@ command_template: >
   {% if sample.no_fifo is defined %} --noFIFO {% endif %}
   {% if sample.complexity is defined %} --no-complexity {% endif %}
   {% if sample.prioritize is defined %} --prioritize {% endif %}
+  {% if pipeline.pipeline_name is defined %} --pipeline-name {pipeline.pipeline_name} {% endif %}
+  {% if pipestat.namespace is defined %} --pipestat-namespace {pipestat.namespace} {% endif %}
+  {% if pipestat.record_id is defined %} --pipestat-record-id {pipestat.record_id} {% endif %}
+  {% if pipestat.schema is defined %} --pipestat-schema {pipestat.schema} {% endif %}
+  {% if pipestat.results_file is defined %} --pipestat-results-file {pipestat.results_file} {% endif %}
+  {% if pipestat.config is defined %} --pipestat-config {pipestat.config} {% endif %}
 
 compute:
   singularity_image: ${SIMAGES}peppro

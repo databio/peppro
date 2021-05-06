@@ -1,0 +1,12 @@
+database:
+  name: pypiper
+  user: pypiper
+  password: pypiper
+  host: localhost
+  port: 5433
+  dialect: postgresql
+  driver: psycopg2
+
+# Run a postgres DB. For example:
+# docker volume create postgres-data
+# docker run -d --name pypiper-postgres -p 5432:5433 -e POSTGRES_PASSWORD=pypiper -e POSTGRES_USER=pypiper -e POSTGRES_DB=pypiper -v postgres-data:/var/lib/postgresql/data postgres

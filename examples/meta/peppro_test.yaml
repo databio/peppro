@@ -11,6 +11,7 @@ looper:
 sample_modifiers:
   append:
     pipeline_interfaces: ["$CODE/peppro/sample_pipeline_interface.yaml"]
+    pipestat_config: "$CODE/peppro/pipestat_config.yaml"
     #prioritize: True  # Default is FALSE. Pass flag to prioritize features by the order they appear in the feat_annotation asset when calculating FRiF/PRiF
     #sob: True         # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
     #no_scale: True    # Default is FALSE. Pass flag to not scale signal tracks
