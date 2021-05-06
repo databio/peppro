@@ -17,6 +17,7 @@ import pypiper
 import errno
 from pypiper import build_command
 from refgenconf import RefGenConf as RGC, select_genome_config
+from pipestat.exceptions import PipestatDatabaseError
 
 TOOLS_FOLDER = "tools"
 RUNON_SOURCE_PRO = ["PRO", "pro", "PRO-SEQ", "PRO-seq", "proseq", "PROSEQ"]
@@ -35,6 +36,23 @@ BT2_IDX_KEY = "bowtie2_index"
 DEFAULT_UMI_LEN = 0
 DEFAULT_MAX_LEN = -1
 
+def safely_retrieve(pipeline_manager, result_id, default=None):
+    """
+    Safely retrieve a value for a result. 
+    
+    Fall back to a desired default value in case of failure.
+
+    :param pypiper.PipelineManager pipeline_manager: pm with .pipestat 
+        property to retrieve the result from
+    :param str result_id: result identifier to retrieve
+    :param Any defult: a desired default value
+    :return Any: retireved value
+    """
+    try:
+        return pm.pipestat.retrieve(result_identifier=result_id)
+    except PipestatDatabaseError:
+        return default
+
 def parse_arguments():
     """
     Parse command-line arguments passed to the pipeline.
@@ -43,7 +61,7 @@ def parse_arguments():
     ###########################################################################
     parser = ArgumentParser(description='PEPPRO version ' + __version__)
     parser = pypiper.add_pypiper_args(parser, groups=
-        ['pypiper', 'looper', 'ngs'],
+        ['pypiper', 'looper', 'ngs', 'pipestat'],
         required=["input", "genome", "sample-name", "output-parent"])
 
     # Pipeline-specific arguments
@@ -1117,7 +1135,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             adapter_bases = ("grep 'bases trimmed due to adapters:' " +
                              report + " | awk '{print $NF}'")
 
-            pm.report_object("FastP_report", fastp_report_html)
+            # pm.report_object("FastP_report", fastp_report_html)
+            pm.pipestat.report(values={"FastP_report": {"path": mRNApdf, "title": "FastP_report"}})
 
         if _itsa_file(report):
             tmp = pm.checkprint(ac_cmd)
@@ -1125,7 +1144,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 ac = float(tmp.replace(',',''))
             else:
                 ac = 0
-            pm.report_result("Reads_with_adapter", ac)
+            pm.pipestat.report(values={"Reads_with_adapter": ac})    
+            # pm.report_result("Reads_with_adapter", ac)
             
             tmp = pm.checkprint(bases)
             if tmp:
@@ -1147,7 +1167,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             else:
                 ts = 0
             
-            pm.report_result("Uninformative_adapter_reads", round(ts, 2))
+            pm.pipestat.report(values={"Uninformative_adapter_reads": round(ts, 2)})
+            # pm.report_result("Uninformative_adapter_reads", round(ts, 2))
 
             if _itsa_file(noadap_fq1):
                 tr = int(ngstk.count_lines(noadap_fq1).strip())
@@ -1157,12 +1178,14 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             if _itsa_file(dedup_fq):
                 dr = int(ngstk.count_lines(dedup_fq).strip())
                 dups = max(0, (float(tr)/4 - float(dr)/4))
-                pm.report_result("Duplicate_reads", round(dups, 2))
+                pm.pipestat.report(values={"Duplicate_reads": round(dups, 2)})
+                # pm.report_result("Duplicate_reads", round(dups, 2))
 
             if _itsa_file(preprocessed_fq1):
                 pre = int(ngstk.count_lines(preprocessed_fq1).strip())
-                pm.report_result("Pct_uninformative_adapter_reads", 
-                    round(float(100*(ts/(float(pre)/4))), 4))
+                pm.pipestat.report(values={"Pct_uninformative_adapter_reads": round(float(100*(ts/(float(pre)/4))), 4)})
+                # pm.report_result("Pct_uninformative_adapter_reads", 
+                    # round(float(100*(ts/(float(pre)/4))), 4))
         else:
             pm.fail_pipeline("Could not find '{}' to report adapter "
                              "removal statistics.".format(report))
@@ -1197,7 +1220,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         flash_notCombined_fq2 = os.path.join(outfolder,
             args.sample_name + ".notCombined_2.fastq.gz")
 
-        tmp = float(pm.get_stat("Raw_reads"))
+        tmp = float(pm.pipestat.retrieve(None,"Raw_reads"))
         if tmp:
             rr = float(tmp)
         else:
@@ -1236,10 +1259,11 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         else:
             umi_len = 0
         pm.run(cmd, degradation_pdf, nofail=True)
-        pm.report_object("Adapter insertion distribution", degradation_pdf,
-                         anchor_image=degradation_png)
+        # pm.report_object("Adapter insertion distribution", degradation_pdf,
+                        #  anchor_image=degradation_png)
+        pm.pipestat.report(values={"Adapter_insertion_distribution": {"path": degradation_pdf, "thumbnail_path": degradation_png, "title": "Adapter insertion distribution"}})
 
-        if not pm.get_stat('Peak_adapter_insertion_size') or args.new_start:
+        if not safely_retrieve(pm, "Peak_adapter_insertion_size") or args.new_start:
             # Report the peak insertion size
             cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + flash_hist + 
                    " | awk 'BEGIN{max=   0; max_len=0; len=0}{if ($2>0+max)" +
@@ -1248,10 +1272,11 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             adapter_peak = pm.checkprint(cmd)
             if adapter_peak:
                 ap = int(adapter_peak)
-                pm.report_result("Peak_adapter_insertion_size", ap)
+                # pm.report_result("Peak_adapter_insertion_size", ap)
+                pm.pipestat.report(values={"Peak_adapter_insertion_size": ap})
 
         # Report the degradation ratio
-        if not pm.get_stat('Degradation_ratio') or args.new_start:
+        if not pm.pipestat.retrieve(None,'Degradation_ratio') or args.new_start:
             pm.timestamp("###  Calculating degradation ratio")
 
             cmd = ("awk '{ if (($1-" + str(umi_len) + ") == 10) {status = 1}} " + 
@@ -1318,7 +1343,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             degradation_ratio = pm.checkprint(cmd)
             if degradation_ratio:
                 dr = float(degradation_ratio)
-                pm.report_result("Degradation_ratio", round(dr, 4))
+                # pm.report_result("Degradation_ratio", round(dr, 4))
+                pm.pipestat.report(values={"Degradation_ratio": round(dr, 4)})
 
 
     def check_trim(trimmed_fastq, paired_end,
@@ -1336,27 +1362,31 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             fastqc.
         """
         n_trim = float(ngstk.count_reads(trimmed_fastq, paired_end))
-        pm.report_result("Trimmed_reads_R1", int(n_trim))
+        # pm.report_result("Trimmed_reads_R1", int(n_trim))
+        pm.pipestat.report(values={"Trimmed_reads_R1": int(n_trim)})
 
         try:
-            rr = float(pm.get_stat("Raw_reads"))
+            rr = float(pm.pipestat.retrieve(None,"Raw_reads"))
         except:
             print("Can't calculate trim loss rate without raw read result.")
         else:
-            pm.report_result("Trim_loss_rate_R1",
-                             round((rr - n_trim) * 100 / rr, 2))
+            pm.pipestat.report(values={"Trim_loss_rate_R1": round((rr - n_trim) * 100 / rr, 2)})
+            # pm.report_result("Trim_loss_rate_R1", round((rr - n_trim) * 100 / rr, 2))
 
         if paired_end and trimmed_fastq_R2:
             n_trim = float(ngstk.count_reads(trimmed_fastq_R2, paired_end))
-            pm.report_result("Trimmed_reads_R2", int(n_trim))
+            pm.pipestat.report(values={"Trimmed_reads_R2": int(n_trim)})
+            # pm.report_result("Trimmed_reads_R2", int(n_trim))
 
             try:
-                rr = float(pm.get_stat("Raw_reads"))
+                rr = float(pm.pipestat.retrieve(None,"Raw_reads"))
             except:
                 print("Can't calculate trim loss rate without raw read result.")
             else:
-                pm.report_result("Trim_loss_rate_R2",
-                                 round((rr - n_trim) * 100 / rr, 2))
+                pm.pipestat.report(values={"Trim_loss_rate_R2":
+                                 round((rr - n_trim) * 100 / rr, 2)})
+                # pm.report_result("Trim_loss_rate_R2",
+                                #  round((rr - n_trim) * 100 / rr, 2))
 
         # Also run a fastqc (if installed/requested)
         if fastqc_folder:
@@ -1370,7 +1400,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             pm.run(cmd, lock_name="trimmed_fastqc", nofail=True)
             fname, ext = os.path.splitext(os.path.basename(trimmed_fastq))
             fastqc_html = os.path.join(fastqc_folder, fname + "_fastqc.html")
-            pm.report_object("FastQC report R1", fastqc_html)
+            # pm.report_object("FastQC report R1", fastqc_html)
+            pm.pipestat.report(values={"FastQC_report_R1": {"path": fastqc_html, "title": "FastQC report R1"}})
             
             if paired_end and trimmed_fastq_R2:
                     cmd = ngstk.fastqc(trimmed_fastq_R2, fastqc_folder)
@@ -1379,7 +1410,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                         os.path.basename(trimmed_fastq_R2))
                     fastqc_html = os.path.join(
                         fastqc_folder, fname + "_fastqc.html")
-                    pm.report_object("FastQC report R2", fastqc_html)
+                    # pm.report_object("FastQC report R2", fastqc_html)
+                    pm.pipestat.report(values={"FastQC report R2": {"path": fastqc_html, "title": "FastQC report R2"}})
 
     # Put it all together
     paired_end = args.paired_end
@@ -1582,7 +1614,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
         pm.clean_add(out_fastq_tmp)
 
         if not dups:
-            if not pm.get_stat("Aligned_reads_" + assembly_identifier) or args.new_start:
+            if not safely_retrieve(pm, "Aligned_reads_assembly") or args.new_start:
                 if aln_stats:
                     pm.info(aln_stats)  # Log alignment statistics
                     try:
@@ -1607,20 +1639,25 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                     ar = 0
 
                 # report aligned reads
-                pm.report_result("Aligned_reads_" + assembly_identifier, ar)
+                #TODO: the pipestat result identifier cannot be variable
+                # pm.report_result("Aligned_reads_" + assembly_identifier, ar)
+                pm.pipestat.report(values={"Aligned_reads_assembly": ar})
                 try:
                     # wrapped in try block in case Trimmed_reads is not reported 
                     # in this pipeline.
-                    tr = float(pm.get_stat("Trimmed_reads_R1"))
+                    tr = float(pm.pipestat.retrieve(None,"Trimmed_reads_R1"))
                 except:
                     print("Trimmed reads is not reported.")
                 else:
                     res_key = "Alignment_rate_" + assembly_identifier
+                    #TODO: the pipestat result identifier cannot be variable
+                    res_key = "Alignment_rate_assembly"
                     if float(ar) > 0:
-                        pm.report_result(res_key,
-                            round(float(ar) * 100 / float(tr), 2))
+                        # pm.pipestat.report(values={res_key, round(float(ar) * 100 / float(tr), 2))
+                        pm.pipestat.report(values={res_key: round(float(ar) * 100 / float(tr), 2)})
                     else:
                         pm.report_result(res_key, 0)
+                        pm.pipestat.report(values={res_key: 0})
         
         if paired:
             unmap_fq1 = out_fastq_r1
@@ -1948,7 +1985,12 @@ def main():
         os.path.join(args.output_parent, args.sample_name))
     global pm
     pm = pypiper.PipelineManager(
-        name="PEPPRO", outfolder=outfolder, args=args, version=__version__)
+        name="PEPPRO", outfolder=outfolder, args=args, version=__version__, 
+        pipestat_schema=args.pipestat_schema,
+        pipestat_results_file=args.pipestat_results_file,
+        pipestat_record_id=args.pipestat_record_id,
+        pipestat_namespace=args.pipestat_namespace,
+        pipestat_config=args.pipestat_config,)
     global ngstk
     ngstk = pypiper.NGSTk(pm=pm)
 
@@ -2115,12 +2157,19 @@ def main():
     ###########################################################################
     #                      Grab and prepare input files                       #
     ###########################################################################
-    pm.report_result(
-        "File_mb",
-        round(ngstk.get_file_size(
-            [x for x in [args.input, args.input2] if x is not None]), 2))
-    pm.report_result("Read_type", args.single_or_paired)
-    pm.report_result("Genome", args.genome_assembly)
+    # pm.report_result(
+    #     "File_mb",
+    #     round(ngstk.get_file_size([x for x in [args.input, args.input2] if x is not None]), 2)
+    # )
+    # pm.report_result("Read_type", args.single_or_paired)
+    # pm.report_result("Genome", args.genome_assembly)
+
+
+    pm.pipestat.report(values={
+        "File_mb": round(ngstk.get_file_size([x for x in [args.input, args.input2] if x is not None]), 2),
+        "Read_type": args.single_or_paired,
+        "Genome": args.genome_assembly,
+    })
 
     # PRO-seq pipeline
     if args.protocol.lower() in RUNON_SOURCE_GRO:
@@ -2144,7 +2193,7 @@ def main():
     cmd, out_fastq_pre, unaligned_fastq = ngstk.input_to_fastq(
         local_input_files, args.sample_name, args.paired_end, fastq_folder)
 
-    #if not pm.get_stat("Raw_reads") or args.new_start:
+    #if not pm.pipestat.retrieve(None,"Raw_reads") or args.new_start:
     # TODO: improve the skipping of these steps on recovery runs
     #       issue here is that process_fastq is still trying to run
     #       if we skip this step
@@ -2213,7 +2262,7 @@ def main():
 
         # Gut check
         # Processing fastq should have trimmed the reads.
-        tmp = pm.get_stat("Trimmed_reads_R1")
+        tmp = pm.pipestat.retrieve(None,"Trimmed_reads_R1")
         if tmp:
             tr = float(tmp)
         else:
@@ -2232,7 +2281,7 @@ def main():
         r2_repair_single = os.path.join(
             fastq_folder, args.sample_name + "_R2_trimmed.fastq.single.fq")
 
-        tmp = float(pm.get_stat("Raw_reads"))
+        tmp = float(pm.pipestat.retrieve(None,"Raw_reads"))
         if tmp:
             rr = float(tmp)
         else:
@@ -2344,10 +2393,11 @@ def main():
                 umi_len = 0
 
             pm.run(cmd, degradation_pdf, nofail=True)
-            pm.report_object("Adapter insertion distribution", degradation_pdf,
-                             anchor_image=degradation_png)
+            # pm.report_object("Adapter insertion distribution", degradation_pdf,
+            #                  anchor_image=degradation_png)
+            pm.pipestat.report(values={"Adapter_insertion_distribution": {"path": degradation_pdf, "thumbnail_path": degradation_png, "title": "Adapter insertion distribution"}})
 
-            if not pm.get_stat('Peak_adapter_insertion_size') or args.new_start:
+            if not safely_retrieve(pm, "Peak_adapter_insertion_size") or args.new_start:
                 # Determine the peak insertion size
                 cmd = ("awk '/count/,0' " + cutadapt_report +
                        " | awk 'NR>2 {print prev} {prev=$0}'" +
@@ -2358,10 +2408,11 @@ def main():
                 adapter_peak = pm.checkprint(cmd)
                 if adapter_peak:
                     ap = int(adapter_peak)
-                    pm.report_result("Peak_adapter_insertion_size", ap)
+                    # pm.report_result("Peak_adapter_insertion_size", ap)
+                    pm.pipestat.report(values={"Peak_adapter_insertion_size": ap})
 
             # Calculate the degradation ratio
-            if not pm.get_stat('Degradation_ratio') or args.new_start:
+            if not safely_retrieve(pm, "Degradation_ratio") or args.new_start:
                 pm.timestamp("###  Calculating degradation ratio")
 
                 cmd = ("awk 'NR>2 {print prev} {prev=$0}' " + cutadapt_report +
@@ -2429,7 +2480,8 @@ def main():
                 degradation_ratio = pm.checkprint(cmd)
                 if degradation_ratio:
                     dr = float(degradation_ratio)
-                    pm.report_result("Degradation_ratio", round(dr, 4))
+                    pm.pipestat.report(values={"Degradation_ratio": round(dr, 4)})
+                    # pm.report_result("Degradation_ratio", round(dr, 4))
 
     pm.clean_add(fastq_folder, conditional=True)
 
@@ -2440,7 +2492,7 @@ def main():
     pm.timestamp("### Prealignments")
 
     to_compress = []
-    #if not pm.get_stat("Aligned_reads") or args.new_start:
+    #if not pm.pipestat.retrieve(None,"Aligned_reads") or args.new_start:
     if len(args.prealignments) == 0:
         print("You may use `--prealignments` to align to references before "
               "the genome alignment step. See docs.")
@@ -2654,13 +2706,14 @@ def main():
         if args.paired_end:
             ar = float(ar)/2
 
-        tmp = pm.get_stat("Raw_reads")
+
+        tmp = pm.pipestat.retrieve(None,"Raw_reads")
         if tmp:
             rr = float(tmp)
         else:
             rr = 0
 
-        tmp = pm.get_stat("Trimmed_reads_R1")
+        tmp = pm.pipestat.retrieve(None,"Trimmed_reads_R1")
         if tmp:
             tr = float(tmp)
         else:
@@ -2676,16 +2729,23 @@ def main():
                    " | awk '{counter++;sum+=$3}END{print sum/counter}'")
             rd = pm.checkprint(cmd)
 
-        pm.report_result("Mapped_reads", mr)
-        pm.report_result("QC_filtered_reads",
-                         round(float(mr)) - round(float(ar)))
-        pm.report_result("Aligned_reads", ar)
-        pm.report_result("Alignment_rate", round(float(ar) * 100 /
-                         float(tr), 2))
-        pm.report_result("Total_efficiency", round(float(ar) * 100 /
-                         float(rr), 2))
+        # pm.report_result("Mapped_reads", mr)
+        # pm.report_result("QC_filtered_reads", round(float(mr)) - round(float(ar)))
+        # pm.report_result("Aligned_reads", ar)
+        # pm.report_result("Alignment_rate", round(float(ar) * 100 / float(tr), 2))
+        # pm.report_result("Total_efficiency", round(float(ar) * 100 / float(rr), 2))
+
+        pm.pipestat.report(values={
+            "Mapped_reads": mr,
+            "QC_filtered_reads": round(float(mr)) - round(float(ar)),
+            "Aligned_reads": ar,
+            "Alignment_rate": round(float(ar) * 100 / float(tr), 2),
+            "Total_efficiency": round(float(ar) * 100 / float(rr), 2)
+        })
+
         if rd and rd.strip():
-            pm.report_result("Read_depth", round(float(rd), 2))
+            pm.pipestat.report(values={"Read_depth": round(float(rd), 2)})
+            # pm.report_result("Read_depth", round(float(rd), 2))
 
     pm.run([cmd, cmd2], mapping_genome_bam,
            follow=lambda: check_alignment_genome(mapping_genome_bam_temp,
@@ -2718,7 +2778,7 @@ def main():
             pm.clean_add(temp_mapping_index_dups)
             pm.clean_add(mapping_genome_bam_temp_dups)
 
-    if not pm.get_stat("Mitochondrial_reads") or args.new_start:
+    if not pm.pipestat.retrieve(None,"Mitochondrial_reads") or args.new_start:
         # Determine mitochondrial read counts
         if os.path.exists(mapping_genome_bam_temp):
             if not os.path.exists(temp_mapping_index):
@@ -2735,7 +2795,8 @@ def main():
         
             # If there are mitochondrial reads, report and remove them
             if mr and mr.strip():
-                pm.report_result("Mitochondrial_reads", round(float(mr)))
+                pm.pipestat.report(values={"Mitochondrial_reads": round(float(mr))})
+                # pm.report_result("Mitochondrial_reads", round(float(mr)))
                 # Index the sort'ed BAM file first
                 mapping_genome_index = os.path.join(mapping_genome_bam + ".bai")
                 noMT_mapping_genome_bam = os.path.join(
@@ -2778,7 +2839,7 @@ def main():
     #       Determine maximum read length and add seqOutBias resource          #
     ############################################################################
 
-    if not pm.get_stat("Maximum_read_length") or args.new_start:
+    if not pm.pipestat.retrieve(None,"Maximum_read_length") or args.new_start:
         if int(args.max_len) > 0:
             max_len = int(args.max_len)
         elif _itsa_file(mapping_genome_bam):
@@ -2787,9 +2848,10 @@ def main():
             max_len = int(pm.checkprint(cmd))
         else:
             max_len = int(DEFAULT_MAX_LEN)
-        pm.report_result("Maximum_read_length", max_len)
+        # pm.report_result("Maximum_read_length", max_len)
+        pm.pipestat.report(values={"Maximum_read_length": max_len})
     else:
-        max_len = int(pm.get_stat("Maximum_read_length"))
+        max_len = int(pm.pipestat.retrieve(None,"Maximum_read_length"))
 
     # At this point we can check for seqOutBias required indicies.
     # Can't do it earlier because we haven't determined the read_length of 
@@ -2817,13 +2879,14 @@ def main():
         res, rgc = _add_resources(args, res, search_asset)
 
     # Calculate size of genome
-    if not pm.get_stat("Genome_size") or args.new_start:
+    if not pm.pipestat.retrieve(None,"Genome_size") or args.new_start:
         genome_size = int(pm.checkprint(
             ("awk '{sum+=$2} END {printf \"%.0f\", sum}' " +
              res.chrom_sizes)))
-        pm.report_result("Genome_size", genome_size)
+        # pm.report_result("Genome_size", genome_size)
+        pm.pipestat.report(values={"Genome_size": genome_size})
     else:
-        genome_size = int(pm.get_stat("Genome_size"))
+        genome_size = int(pm.pipestat.retrieve(None,"Genome_size"))
 
     ############################################################################
     #                     Calculate library complexity                         #
@@ -2926,18 +2989,18 @@ def main():
 
                 pm.run(cmd, [preseq_pdf, preseq_png])
 
-                pm.report_object("Library complexity", preseq_pdf,
-                                 anchor_image=preseq_png)
-
-                if not pm.get_stat('Frac_exp_unique_at_10M') or args.new_start:
+                # pm.report_object("Library complexity", preseq_pdf,
+                #                  anchor_image=preseq_png)
+                pm.pipestat.report(values={"Library_complexity": {"path": preseq_pdf, "thumbnail_path": preseq_png, "title": "Library complexity"}})
+                if not pm.pipestat.retrieve(None,'Frac_exp_unique_at_10M') or args.new_start:
                     # Report the expected unique at 10M reads
                     cmd = ("grep -w '10000000' " + preseq_yield +
                            " | awk '{print $2}'")
                     expected_unique = pm.checkprint(cmd)
                     if expected_unique:
                         fraction_unique = float(expected_unique)/float(10000000)
-                        pm.report_result("Frac_exp_unique_at_10M",
-                                         round(fraction_unique, 4))
+                        # pm.report_result("Frac_exp_unique_at_10M", round(fraction_unique, 4))
+                        pm.pipestat.report(values={"Frac_exp_unique_at_10M": round(fraction_unique, 4)})
             else:
                 print("Unable to calculate library complexity.")
 
@@ -2979,9 +3042,15 @@ def main():
             pbc1 = 0
             pbc2 = 0
 
-        pm.report_result("NRF", round(float(nrf),2))
-        pm.report_result("PBC1", round(float(pbc1),2))
-        pm.report_result("PBC2", round(float(pbc2), 2))
+        # pm.report_result("NRF", round(float(nrf),2))
+        # pm.report_result("PBC1", round(float(pbc1),2))
+        # pm.report_result("PBC2", round(float(pbc2), 2))
+
+        pm.pipestat.report(values={
+            "NRF": round(float(nrf),2),
+            "PBC1": round(float(pbc1),2),
+            "PBC2": round(float(pbc2), 2),
+        })
 
     pm.run(cmd, bamQC, follow=lambda: report_bam_qc(bamQC))
 
@@ -3051,8 +3120,7 @@ def main():
                                 "_plus_TssEnrichment.txt")
         Tss_minus = os.path.join(QC_folder, args.sample_name +
                                  "_minus_TssEnrichment.txt")
-
-        if not pm.get_stat("TSS_non-coding_score") or args.new_start:
+        if not pm.pipestat.retrieve(None,"TSS_non-coding_score") or args.new_start:
             # Split TSS file
             plus_TSS  = os.path.join(QC_folder, "plus_TSS.tsv")
             minus_TSS = os.path.join(QC_folder, "minus_TSS.tsv")
@@ -3098,9 +3166,11 @@ def main():
                     (sum(normTSS[int(max_index-50):int(max_index+50)])) /
                     (len(normTSS[int(max_index-50):int(max_index+50)])), 1)
 
-                pm.report_result("TSS_coding_score", round(Tss_score, 1))
+                # pm.report_result("TSS_coding_score", round(Tss_score, 1))
+                pm.pipestat.report(values={"TSS_coding_score": round(Tss_score, 1)})
             except ZeroDivisionError:
-                pm.report_result("TSS_coding_score", 0)
+                # pm.report_result("TSS_coding_score", 0)
+                pm.pipestat.report(values={"TSS_coding_score": 0})
                 pass
 
             # Minus TSS enrichment
@@ -3131,9 +3201,11 @@ def main():
                     (sum(normTSS[int(max_index-50):int(max_index+50)])) /
                     (len(normTSS[int(max_index-50):int(max_index+50)])), 1)
 
-                pm.report_result("TSS_non-coding_score", round(Tss_score, 1))
+                # pm.report_result("TSS_non-coding_score", round(Tss_score, 1))
+                pm.pipestat.report(values={"TSS_non-coding_score": round(Tss_score, 1)})
             except ZeroDivisionError:
-                pm.report_result("TSS_non-coding_score", 0)
+                # pm.report_result("TSS_non-coding_score", 0)
+                pm.pipestat.report(values={"TSS_non-coding_score": 0})
                 pass
 
         # Call Rscript to plot TSS Enrichment
@@ -3145,7 +3217,8 @@ def main():
 
         TSS_png = os.path.join(QC_folder,  args.sample_name +
                                "_TSSenrichment.png")
-        pm.report_object("TSS enrichment", TSS_pdf, anchor_image=TSS_png)
+        # pm.report_object("TSS enrichment", TSS_pdf, anchor_image=TSS_png)
+        pm.pipestat.report(values={"TSS_enrichment": {"path": TSS_pdf, "thumbnail_path": TSS_png, "title": "TSS enrichment"}})
 
     ############################################################################
     #                Pause index calculation and plotting                      #
@@ -3191,7 +3264,7 @@ def main():
                                    "_pause_index.bed")
         pause_index_gz = os.path.join(QC_folder, args.sample_name +
                                       "_pause_index.bed.gz")
-        if not pm.get_stat("Pause_index") or args.new_start:
+        if not pm.pipestat.retrieve(None,"Pause_index") or args.new_start:
             # Remove missing chr from PI annotations
             tss_local = os.path.join(QC_folder,
                 args.genome_assembly + "_ensembl_tss.bed")
@@ -3269,7 +3342,8 @@ def main():
             val = pm.checkprint(cmd)
             if val and val.strip():
                 pi = float(val)
-                pm.report_result("Pause_index", round(pi, 2))
+                pm.pipestat.report(values={"Pause_index": round(pi, 2)})
+                # pm.report_result("Pause_index", round(pi, 2))
 
         # Plot pause index distribution
         pi_pdf = os.path.join(QC_folder, args.sample_name +
@@ -3284,7 +3358,9 @@ def main():
         cmd = (tools.Rscript + " " + tool_path("PEPPRO.R") + 
                " pi --annotate -i " + pause_index)
         pm.run(cmd, pi_pdf, nofail=True)
-        pm.report_object("Pause index", pi_pdf, anchor_image=pi_png)
+        # pm.report_object("Pause index", pi_pdf, anchor_image=pi_png)
+        # TODO: had to changed key since it was masked by prev stat
+        pm.pipestat.report(values={"Pause_index_plot": {"path": pi_pdf, "thumbnail_path": pi_png, "title": "TSS Pause_index_plot"}})
 
         if not is_gzipped(pause_index):
             cmd = (ngstk.ziptool + " -f " + pause_index)
@@ -3304,19 +3380,21 @@ def main():
               .format(res.refgene_pre_mRNA))
     else:
         pm.timestamp("### Calculate Fraction of Reads in pre-mature mRNA")
-        if not pm.get_stat('Plus_FRiP') or args.new_start:
+        if not pm.pipestat.retrieve(None,'Plus_FRiP') or args.new_start:
             # Plus
             plus_frip = calc_frip(plus_bam, res.refgene_pre_mRNA,
                                   frip_func=ngstk.simple_frip,
                                   pipeline_manager=pm)
-            pm.report_result("Plus_FRiP", round(plus_frip, 2))
+            pm.pipestat.report(values={"Plus_FRiP": round(plus_frip, 2)})
+            # pm.report_result("Plus_FRiP", round(plus_frip, 2))
 
-        if not pm.get_stat('Minus_FRiP') or args.new_start:
+        if not pm.pipestat.retrieve(None,'Minus_FRiP') or args.new_start:
             # Minus
             minus_frip = calc_frip(minus_bam, res.refgene_pre_mRNA,
                                    frip_func=ngstk.simple_frip,
                                    pipeline_manager=pm)
-            pm.report_result("Minus_FRiP", round(minus_frip, 2))
+            # pm.report_result("Minus_FRiP", round(minus_frip, 2))
+            pm.pipestat.report(values={"Minus_FRiP": round(minus_frip, 2)})
 
         # Calculate gene coverage
         gene_cov = os.path.join(signal_folder,
@@ -3612,11 +3690,13 @@ def main():
                     FRiF_cmd.append(cov)
             cmd = build_command(cFRiF_cmd)
             pm.run(cmd, cFRiF_PDF, nofail=False)
-            pm.report_object("cFRiF", cFRiF_PDF, anchor_image=cFRiF_PNG)
+            pm.pipestat.report(values={"cFRiF": {"path": cFRiF_PDF, "thumbnail_path": cFRiF_PNG, "title": "cFRiF"}})
+            # pm.report_object("cFRiF", cFRiF_PDF, anchor_image=cFRiF_PNG)
 
             cmd = build_command(FRiF_cmd)
             pm.run(cmd, FRiF_PDF, nofail=False)
-            pm.report_object("FRiF", FRiF_PDF, anchor_image=FRiF_PNG)
+            # pm.report_object("FRiF", FRiF_PDF, anchor_image=FRiF_PNG)
+            pm.pipestat.report(values={"FRiF": {"path": FRiF_PDF, "thumbnail_path": FRiF_PNG, "title": "FRiF"}})
 
     ############################################################################
     #                         Report mRNA contamination                        #
@@ -3630,7 +3710,7 @@ def main():
         intron_exon_gz = os.path.join(QC_folder, args.sample_name +
                                       "_exon_intron_ratios.bed.gz")
 
-        if not pm.get_stat("mRNA_contamination") or args.new_start:
+        if not pm.pipestat.retrieve(None,"mRNA_contamination") or args.new_start:
             # Sort exons and introns
             exons_sort = os.path.join(QC_folder, args.genome_assembly +
                                       "_exons_sort.bed")
@@ -3664,7 +3744,7 @@ def main():
             pm.clean_add(introns_cov)
 
             # need Total Reads divided by 1M
-            ar = float(pm.get_stat("Aligned_reads"))
+            ar = float(pm.pipestat.retrieve(None,"Aligned_reads"))
             scaling_factor = float(ar/1000000)
 
             exons_rpkm = os.path.join(QC_folder, args.sample_name +
@@ -3733,7 +3813,8 @@ def main():
                        " if (x < (i+1)/2) print (a[x-1]+a[x])/2;" +
                        " else print a[x-1]; }'")
                 mrna_con = float(pm.checkprint(cmd))
-                pm.report_result("mRNA_contamination", round(mrna_con, 2))
+                # pm.report_result("mRNA_contamination", round(mrna_con, 2))
+                pm.pipestat.report(values={"mRNA_contamination": round(mrna_con, 2)})
 
         # plot mRNA contamination distribution
         mRNApdf = os.path.join(QC_folder,
@@ -3749,7 +3830,8 @@ def main():
                     "-i", intron_exon, "--annotate"]
         cmd = build_command(mRNAplot)
         pm.run(cmd, mRNApdf, nofail=False)
-        pm.report_object("mRNA contamination", mRNApdf, anchor_image=mRNApng)
+        # pm.report_object("mRNA contamination", mRNApdf, anchor_image=mRNApng)
+        pm.pipestat.report(values={"mRNA_contamination_plot": {"path": mRNApdf, "thumbnail_path": mRNApng, "title": "mRNA contamination"}})
 
         if not is_gzipped(intron_exon):
             cmd = (ngstk.ziptool + " -f " + intron_exon)
@@ -3778,7 +3860,7 @@ def main():
         pm.timestamp("### Produce bigWig files")
         
         # need Total Reads divided by 1M
-        ar = float(pm.get_stat("Aligned_reads"))
+        ar = float(pm.pipestat.retrieve(None,"Aligned_reads"))
         scaling_factor = float(ar/1000000)
 
         wig_cmd_callable = ngstk.check_command("wigToBigWig")

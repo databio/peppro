@@ -1,6 +1,7 @@
 # General
 *.pyc
 .~lock*
+.vscode/
 
 # Tests
 .cache/
