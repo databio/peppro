@@ -1,0 +1,160 @@
+cutadapt_report:
+  value: "cutadapt/{sample_name}_cutadapt.txt"
+  type: string
+  description: "Test sample property"
+plus_bw:
+  value: "signal_{genome}/{sample_name}_plus_body_0-mer.bw"
+  type: string
+  description: "Test sample property"
+minus_bw:
+  value: "signal_{genome}/{sample_name}_minus_body_0-mer.bw"
+  type: string
+  description: "Test sample property"
+plus_bam:
+  value: "aligned_{genome}/{sample_name}_plus.bam"
+  type: string
+  description: "Test sample property"
+minus_bam:
+  value: "aligned_{genome}/{sample_name}_minus.bam"
+  type: string
+  description: "Test sample property"
+gene_counts_bed:
+  value: "signal_{genome}/{sample_name}_gene_coverage.bed"
+  type: string
+  description: "Test sample property"
+pause_indicies_bed:
+  value: "QC_{genome}/{sample_name}_pause_index.bed.gz"
+  type: string
+  description: "Test sample property"
+Reads_with_adapter:
+  type: integer
+  description: "Reads_with_adapter"
+Uninformative_adapter_reads:
+  type: integer
+  description: "Uninformative_adapter_reads"
+Duplicate_reads:
+  type: integer
+  description: "Duplicate_reads"
+Pct_uninformative_adapter_reads:
+  type: number
+  description: "Pct_uninformative_adapter_reads"
+Peak_adapter_insertion_size:
+  type: integer
+  description: "Peak_adapter_insertion_size"
+Degradation_ratio:
+  type: number
+  description: "Degradation_ratio"
+Trimmed_reads_R1:
+  type: integer
+  description: "Trimmed_reads_R1"
+Trim_loss_rate_R1:
+  type: number
+  description: "Trim_loss_rate_R1"
+Trimmed_reads_R2:
+  type: integer
+  description: "Trimmed_reads_R2"
+Trim_loss_rate_R2:
+  type: number
+  description: "Trim_loss_rate_R2"
+Aligned_reads_assembly:
+  type: number
+  description: "Aligned_reads_assembly"
+Alignment_rate_assembly:
+  type: number
+  description: "Alignment_rate_assembly"
+File_mb:
+  type: number
+  description: "File_mb"
+Read_type: 
+  type: string # values restricted?
+  description: "Read_type"
+Genome:
+  type: string
+  description: "Genome"
+Mapped_reads:
+  type: integer
+  description: "Mapped_reads"
+QC_filtered_reads:
+  type: number
+  description: "QC_filtered_reads"
+Aligned_reads:
+  type: integer
+  description: "Aligned_reads"
+Alignment_rate:
+  type: number
+  description: "Alignment_rate"
+Total_efficiency: 
+  type: number
+  description: "Total_efficiency"
+Genome_size:
+  type: number
+  description: "Genome_size"
+Maximum_read_length:
+  type: integer
+  description: "Maximum_read_length"
+Mitochondrial_reads:
+  type: integer
+  description: "Mitochondrial_reads"
+Read_depth:
+  type: integer
+  description: "Read_depth"
+Frac_exp_unique_at_10M:
+  type: number
+  description: "Frac_exp_unique_at_10M"
+NRF:
+  type: number
+  description: "NRF"
+PBC1:
+  type: number
+  description: "PBC1"
+PBC2:
+  type: number
+  description: "PBC2"
+TSS_coding_score:
+  type: number
+  description: "TSS_coding_score"
+TSS_non-coding_score:
+  type: number
+  description: "TSS_non-coding_score"
+Pause_index:
+  type: number
+  description: "Pause_index"
+Plus_FRiP:
+  type: number
+  description: "Plus_FRiP"
+Minus_FRiP:
+  type: number
+  description: "Minus_FRiP"
+mRNA_contamination:
+  type: number
+  description: "mRNA_contamination"
+TSS_enrichment:
+  type: image
+  description: "TSS enrichment"
+Pause_index_plot:
+  type: image
+  description: "Pause_index"
+FRiF:
+  type: image
+  description: "FRiF"
+cFRiF:
+  type: image
+  description: "cFRiF"
+mRNA_contamination_plot:
+  type: image
+  description: "mRNA_contamination"
+FastP_report:
+  type: file
+  description: "FastP_report"
+Adapter_insertion_distribution:
+  type: image
+  description: "Adapter_insertion_distribution"
+FastQC_report_R1:
+  type: file
+  description: "FastQC_report_R1"
+FastQC_report_R2:
+  type: file
+  description: "FastQC_report_R2"
+Library_complexity:
+  type: image
+  description: "Library_complexity"
