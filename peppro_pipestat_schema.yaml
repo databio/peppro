@@ -1,3 +1,19 @@
+log:
+  type: file
+  highlight: true
+  description: "The log file of the pipeline run"
+profile:
+  type: file
+  highlight: true
+  description: "The profile of the pipeline run"
+commands:
+  type: file
+  highlight: true
+  description: "The file with shell commands executed by this pipeline"
+version:
+  type: string
+  highlight: true
+  description: "Pipeline version"
 cutadapt_report:
   value: "cutadapt/{sample_name}_cutadapt.txt"
   type: string
@@ -72,13 +88,13 @@ Genome:
   type: string
   description: "Genome"
 Mapped_reads:
-  type: integer
+  type: string
   description: "Mapped_reads"
 QC_filtered_reads:
   type: number
   description: "QC_filtered_reads"
 Aligned_reads:
-  type: integer
+  type: string
   description: "Aligned_reads"
 Alignment_rate:
   type: number
@@ -158,3 +174,18 @@ FastQC_report_R2:
 Library_complexity:
   type: image
   description: "Library_complexity"
+Raw_reads:
+  type: string
+  description: "Raw_reads"
+Fastq_reads:
+  type: integer
+  description: "Fastq_reads"
+PF_reads:
+  type: integer
+  description: "PF_reads"
+Trimmed_reads:
+  type: integer
+  description: "Trimmed_reads"
+Trim_loss_rate:
+  type: number
+  description: "Trim_loss_rate"

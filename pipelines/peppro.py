@@ -1994,6 +1994,15 @@ def main():
     global ngstk
     ngstk = pypiper.NGSTk(pm=pm)
 
+    pm.pipestat.report(
+        values={
+            "log": {"path": pm.pipeline_log_file, "title": "Pipeline log file"},
+            "profile": {"path": pm.pipeline_profile_file, "title": "Pipeline profile file"},
+            "commands": {"path": pm.pipeline_commands_file, "title": "Pipeline commands file"},
+            "version": pm.pl_version
+        }
+    ) 
+
     # Convenience alias
     tools = pm.config.tools
     param = pm.config.parameters
