@@ -6,6 +6,7 @@ site_url: http://peppro.databio.org/en/latest/
 site_logo: img/peppro_logo_gray.svg
 repo_url: https://github.com/databio/peppro/
 #google_analytics: ['UA-127092878-1', 'code.databio.org/peppro']
+paper_link: https://doi.org/10.1186/s13059-021-02349-4
 
 markdown_extensions:
   - fontawesome_markdown  # pip install --user fontawesome-markdown
