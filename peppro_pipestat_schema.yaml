@@ -112,7 +112,7 @@ Mitochondrial_reads:
   type: integer
   description: "Mitochondrial_reads"
 Read_depth:
-  type: integer
+  type: number
   description: "Read_depth"
 Frac_exp_unique_at_10M:
   type: number
