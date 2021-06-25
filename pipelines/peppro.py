@@ -1307,7 +1307,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             outfolder, args.sample_name + ".notCombined_2.fastq.gz"
         )
 
-        tmp = float(pm.pipestat.retrieve(None, "Raw_reads"))
+        tmp = float(safely_retrieve(pm, "Raw_reads"))
         if tmp:
             rr = float(tmp)
         else:
@@ -1406,7 +1406,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 pm.pipestat.report(values={"Peak_adapter_insertion_size": ap})
 
         # Report the degradation ratio
-        if not pm.pipestat.retrieve(None, "Degradation_ratio") or args.new_start:
+        if not safely_retrieve(pm, "Degradation_ratio") or args.new_start:
             pm.timestamp("###  Calculating degradation ratio")
 
             cmd = (
@@ -1526,7 +1526,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         pm.pipestat.report(values={"Trimmed_reads_R1": int(n_trim)})
 
         try:
-            rr = float(pm.pipestat.retrieve(None, "Raw_reads"))
+            rr = float(safely_retrieve(pm, "Raw_reads"))
         except:
             print("Can't calculate trim loss rate without raw read result.")
         else:
@@ -1541,7 +1541,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             # pm.report_result("Trimmed_reads_R2", int(n_trim))
 
             try:
-                rr = float(pm.pipestat.retrieve(None, "Raw_reads"))
+                rr = float(safely_retrieve(pm, "Raw_reads"))
             except:
                 print("Can't calculate trim loss rate without raw read result.")
             else:
@@ -1867,7 +1867,7 @@ def _align_with_bt2(
                 try:
                     # wrapped in try block in case Trimmed_reads is not reported
                     # in this pipeline.
-                    tr = float(pm.pipestat.retrieve(None, "Trimmed_reads_R1"))
+                    tr = float(safely_retrieve(pm, "Trimmed_reads_R1"))
                 except:
                     print("Trimmed reads is not reported.")
                 else:
@@ -2057,7 +2057,7 @@ def calc_frip(
     """
     frip_cmd = frip_func(bamfile, ftfile)
     num_in_reads = pipeline_manager.checkprint(frip_cmd)
-    num_aligned_reads = pipeline_manager.get_stat(aligned_reads_key)
+    num_aligned_reads = safely_retrieve(pipeline_manager, aligned_reads_key)
     print(num_aligned_reads, num_in_reads)
     return float(num_in_reads) / float(num_aligned_reads)
 
@@ -2575,7 +2575,7 @@ def main():
         local_input_files, args.sample_name, args.paired_end, fastq_folder
     )
 
-    # if not pm.pipestat.retrieve(None,"Raw_reads") or args.new_start:
+    # if not safely_retrieve(pm,"Raw_reads") or args.new_start:
     # TODO: improve the skipping of these steps on recovery runs
     #       issue here is that process_fastq is still trying to run
     #       if we skip this step
@@ -2649,7 +2649,7 @@ def main():
 
         # Gut check
         # Processing fastq should have trimmed the reads.
-        tmp = pm.pipestat.retrieve(None, "Trimmed_reads_R1")
+        tmp = safely_retrieve(pm, "Trimmed_reads_R1")
         if tmp:
             tr = float(tmp)
         else:
@@ -2674,7 +2674,7 @@ def main():
             fastq_folder, args.sample_name + "_R2_trimmed.fastq.single.fq"
         )
 
-        tmp = float(pm.pipestat.retrieve(None, "Raw_reads"))
+        tmp = float(safely_retrieve(pm, "Raw_reads"))
         if tmp:
             rr = float(tmp)
         else:
@@ -2982,7 +2982,7 @@ def main():
     pm.timestamp("### Prealignments")
 
     to_compress = []
-    # if not pm.pipestat.retrieve(None,"Aligned_reads") or args.new_start:
+    # if not safely_retrieve(pm,"Aligned_reads") or args.new_start:
     if len(args.prealignments) == 0:
         print(
             "You may use `--prealignments` to align to references before "
@@ -3247,13 +3247,13 @@ def main():
         if args.paired_end:
             ar = float(ar) / 2
 
-        tmp = pm.pipestat.retrieve(None, "Raw_reads")
+        tmp = safely_retrieve(pm, "Raw_reads")
         if tmp:
             rr = float(tmp)
         else:
             rr = 0
 
-        tmp = pm.pipestat.retrieve(None, "Trimmed_reads_R1")
+        tmp = safely_retrieve(pm, "Trimmed_reads_R1")
         if tmp:
             tr = float(tmp)
         else:
@@ -3435,7 +3435,7 @@ def main():
         # pm.report_result("Maximum_read_length", max_len)
         pm.pipestat.report(values={"Maximum_read_length": max_len})
     else:
-        max_len = int(pm.pipestat.retrieve(None, "Maximum_read_length"))
+        max_len = int(safely_retrieve(pm, "Maximum_read_length"))
 
     # At this point we can check for seqOutBias required indicies.
     # Can't do it earlier because we haven't determined the read_length of
@@ -3483,7 +3483,7 @@ def main():
         # pm.report_result("Genome_size", genome_size)
         pm.pipestat.report(values={"Genome_size": genome_size})
     else:
-        genome_size = int(pm.pipestat.retrieve(None, "Genome_size"))
+        genome_size = int(safely_retrieve(pm, "Genome_size"))
 
     ############################################################################
     #                     Calculate library complexity                         #
@@ -3659,7 +3659,7 @@ def main():
                     }
                 )
                 if (
-                    not pm.pipestat.retrieve(None, "Frac_exp_unique_at_10M")
+                    not safely_retrieve(pm, "Frac_exp_unique_at_10M")
                     or args.new_start
                 ):
                     # Report the expected unique at 10M reads
@@ -4171,7 +4171,7 @@ def main():
         )
     else:
         pm.timestamp("### Calculate Fraction of Reads in pre-mature mRNA")
-        if not pm.pipestat.retrieve(None, "Plus_FRiP") or args.new_start:
+        if not safely_retrieve(pm, "Plus_FRiP") or args.new_start:
             # Plus
             plus_frip = calc_frip(
                 plus_bam,
@@ -4182,7 +4182,7 @@ def main():
             pm.pipestat.report(values={"Plus_FRiP": round(plus_frip, 2)})
             # pm.report_result("Plus_FRiP", round(plus_frip, 2))
 
-        if not pm.pipestat.retrieve(None, "Minus_FRiP") or args.new_start:
+        if not safely_retrieve(pm, "Minus_FRiP") or args.new_start:
             # Minus
             minus_frip = calc_frip(
                 minus_bam,
@@ -4623,7 +4623,7 @@ def main():
             QC_folder, args.sample_name + "_exon_intron_ratios.bed.gz"
         )
 
-        if not pm.pipestat.retrieve(None, "mRNA_contamination") or args.new_start:
+        if not safely_retrieve(pm, "mRNA_contamination") or args.new_start:
             # Sort exons and introns
             exons_sort = os.path.join(
                 QC_folder, args.genome_assembly + "_exons_sort.bed"
@@ -4698,7 +4698,7 @@ def main():
             pm.clean_add(introns_cov)
 
             # need Total Reads divided by 1M
-            ar = float(pm.pipestat.retrieve(None, "Aligned_reads"))
+            ar = float(safely_retrieve(pm, "Aligned_reads"))
             scaling_factor = float(ar / 1000000)
 
             exons_rpkm = os.path.join(QC_folder, args.sample_name + "_exons_rpkm.bed")
@@ -4845,7 +4845,7 @@ def main():
         pm.timestamp("### Produce bigWig files")
 
         # need Total Reads divided by 1M
-        ar = float(pm.pipestat.retrieve(None, "Aligned_reads"))
+        ar = float(safely_retrieve(pm, "Aligned_reads"))
         scaling_factor = float(ar / 1000000)
 
         wig_cmd_callable = ngstk.check_command("wigToBigWig")
