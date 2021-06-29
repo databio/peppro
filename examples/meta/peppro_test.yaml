@@ -4,10 +4,10 @@ name: test
 pep_version: 2.0.0
 sample_table: "peppro_test.csv"
 
-pipestat_results_file: "$PROCESSED/michal//peppro/peppro_test/test_project_pipestat_results.yaml"
+pipestat_results_file: "$PROCESSED/peppro/peppro_test/project_pipestat_results.yaml"
 
 looper:
-  output_dir: "$PROCESSED/michal/peppro/peppro_test/"  # export PROCESSED="/path/to/your_output_folder/"
+  output_dir: "$PROCESSED/peppro/peppro_test/"  # export PROCESSED="/path/to/your_output_folder/"
   pipeline_interfaces: ["$CODE/peppro/project_pipeline_interface.yaml"]  # export CODE="/path/to/your_tools_folder/"
 
 sample_modifiers:
@@ -25,7 +25,7 @@ sample_modifiers:
   derive:
     attributes: [read1, pipestat_results_file]
     sources:
-        res_file: "$PROCESSED/michal//peppro/peppro_test/{sample_name}_pipestat_results.yaml"
+        res_file: "$PROCESSED/peppro/peppro_test/{sample_name}_pipestat_results.yaml"
         R1: "$CODE/peppro/examples/data/{file_name_part}_r1.fq.gz"
   imply:
     - if:
