@@ -1,0 +1,22 @@
+log:
+  type: file
+  highlight: true
+  description: "The log file of the pipeline run"
+profile:
+  type: file
+  highlight: true
+  description: "The profile of the pipeline run"
+commands:
+  type: file
+  highlight: true
+  description: "The file with shell commands executed by this pipeline"
+version:
+  type: string
+  highlight: true
+  description: "Pipeline version"
+library_complexity_file:
+  description: "Sample's library complexity on a single plot"
+  type: image
+counts_table:
+  description: "Combines all sample gene count files into a project level gene counts table"
+  type: file
