@@ -2,7 +2,9 @@ pipeline_name: PEPPRO_summarizer
 pipeline_type: project
 path: pipelines/peppro_collator.py
 input_schema: peppro_input_schema.yaml
-output_schema: peppro_output_schema.yaml
+output_schema: peppro_pipestat_project_schema.yaml
+linked_pipeline_interfaces: 
+  - sample_pipeline_interface.yaml
 command_template: >
   looper table {looper.pep_config} &&
   {pipeline.path}
@@ -12,6 +14,12 @@ command_template: >
   -M {compute.mem}
   -n {project.name}
   -r {looper.results_subdir}
+  {% if pipeline.pipeline_name is defined %} --pipeline-name {pipeline.pipeline_name} {% endif %}
+  {% if pipestat.namespace is defined %} --pipestat-namespace {pipestat.namespace} {% endif %}
+  {% if pipestat.record_id is defined %} --pipestat-record-id {pipestat.record_id} {% endif %}
+  {% if pipestat.schema is defined %} --pipestat-schema {pipestat.schema} {% endif %}
+  {% if pipestat.results_file is defined %} --pipestat-results-file {pipestat.results_file} {% endif %}
+  {% if pipestat.config is defined %} --pipestat-config {pipestat.config} {% endif %}
 compute:
   singularity_image: ${SIMAGES}peppro
   docker_image: databio/peppro

@@ -4,14 +4,17 @@ name: test
 pep_version: 2.0.0
 sample_table: "peppro_test.csv"
 
+pipestat_results_file: "$PROCESSED/michal//peppro/peppro_test/test_project_pipestat_results.yaml"
+
 looper:
-  output_dir: "$PROCESSED/peppro/peppro_test/"  # export PROCESSED="/path/to/your_output_folder/"
+  output_dir: "$PROCESSED/michal/peppro/peppro_test/"  # export PROCESSED="/path/to/your_output_folder/"
   pipeline_interfaces: ["$CODE/peppro/project_pipeline_interface.yaml"]  # export CODE="/path/to/your_tools_folder/"
 
 sample_modifiers:
   append:
     pipeline_interfaces: ["$CODE/peppro/sample_pipeline_interface.yaml"]
-    pipestat_config: "$CODE/peppro/pipestat_config.yaml"
+    pipestat_results_file: "res_file"
+    file_name_part: "test"    
     #prioritize: True  # Default is FALSE. Pass flag to prioritize features by the order they appear in the feat_annotation asset when calculating FRiF/PRiF
     #sob: True         # Default is FALSE. Pass flag to use seqOutBias for signal track generation and to incorporate mappability
     #no_scale: True    # Default is FALSE. Pass flag to not scale signal tracks
@@ -20,9 +23,10 @@ sample_modifiers:
     #noFIFO: True      # Default is FALSE. Pass flag to NOT use named pipes during prealignments.
     #complexity: False # Default is TRUE.  Pass flag to disable library complexity calculation. Faster.
   derive:
-    attributes: [read1]
+    attributes: [read1, pipestat_results_file]
     sources:
-        R1: "$CODE/peppro/examples/data/{sample_name}_r1.fq.gz"
+        res_file: "$PROCESSED/michal//peppro/peppro_test/{sample_name}_pipestat_results.yaml"
+        R1: "$CODE/peppro/examples/data/{file_name_part}_r1.fq.gz"
   imply:
     - if:
         organism: ["human", "Homo sapiens", "Human", "Homo_sapiens"]

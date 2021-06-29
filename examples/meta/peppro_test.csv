@@ -1,2 +1,5 @@
 sample_name,organism,protocol,read_type,read1
 test,human,PROSEQ,single,R1
+test1,human,PROSEQ,single,R1
+test2,human,PROSEQ,single,R1
+test3,human,PROSEQ,single,R1

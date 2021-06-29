@@ -2279,7 +2279,10 @@ def main():
 
     pm.pipestat.report(
         values={
-            "log": {"path": pm.pipeline_log_file, "title": "Pipeline log file"},
+            "log": {
+                "path": pm.pipeline_log_file,
+                "title": "Pipeline log file",
+            },
             "profile": {
                 "path": pm.pipeline_profile_file,
                 "title": "Pipeline profile file",
@@ -3658,10 +3661,7 @@ def main():
                         }
                     }
                 )
-                if (
-                    not safely_retrieve(pm, "Frac_exp_unique_at_10M")
-                    or args.new_start
-                ):
+                if not safely_retrieve(pm, "Frac_exp_unique_at_10M") or args.new_start:
                     # Report the expected unique at 10M reads
                     cmd = "grep -w '10000000' " + preseq_yield + " | awk '{print $2}'"
                     expected_unique = pm.checkprint(cmd)
