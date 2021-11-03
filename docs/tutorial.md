@@ -24,8 +24,8 @@ cd tools/
 
 We're going to work with some files a little larger than the test data included in the pipeline so we can see all the features included in a full run of the pipeline.  Go ahead and download the [tutorial_r1.fastq.gz](http://big.databio.org/peppro/fastq/tutorial_r1.fq.gz) and [tutorial_r2.fq.gz](http://big.databio.org/peppro/fastq/tutorial_r2.fq.gz) files. 
 ```console
-wget http://big.databio.org/peppro/tutorial_r1.fq.gz
-wget http://big.databio.org/peppro/tutorial_r2.fq.gz
+wget http://big.databio.org/peppro/fastq/tutorial_r1.fq.gz
+wget http://big.databio.org/peppro/fastq/tutorial_r2.fq.gz
 ```
 
 To simplify the rest of this tutorial, let's put those files in a standard location we'll use for the rest of this guide. 
