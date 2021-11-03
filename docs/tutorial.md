@@ -41,6 +41,7 @@ We're going to use `looper` to analyze our data.  For that, we need to pass loop
 
 You can open the configuration file in your favorite text editor if you'd like to look closer.  For the purposes of the tutorial you may safely move past this step should you choose.
 ```
+cd ../
 nano tutorial.yaml
 ```
 The following is what you should see in that configuration file.
