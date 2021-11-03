@@ -18,6 +18,7 @@ mkdir processed
 mkdir templates
 mkdir tools
 cd tools/
+git clone https://github.com/databio/peppro.git
 ```
 
 ## 2: Download tutorial read files
