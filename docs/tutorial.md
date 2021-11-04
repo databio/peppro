@@ -144,7 +144,7 @@ looper run examples/meta/tutorial.yaml
 ```         
 Congratulations! Your first sample should be running through the pipeline now.  It takes right around 25 minutes for this process to complete using a single core and maxes at about 3.5 GB of memory.
 
-We will also use `looper` to run the project pipeline locally. At the project level we can aggregate all the samples in our project (just 2 in this case) and view everything together.
+We will also use `looper` to run the project pipeline locally. At the project level we can aggregate all the samples in our project (just 1 in this simple case) and view everything together.
 ```
 looper runp examples/meta/tutorial.yaml
 ```
