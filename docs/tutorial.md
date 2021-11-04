@@ -46,25 +46,30 @@ nano tutorial.yaml
 ```
 The following is what you should see in that configuration file.
 ```
-# Run tutorial sample through PEPPRO
+# Run tutorial samples through PEPPRO
 name: tutorial
 
-metadata:
-  sample_annotation: "peppro_tutorial.csv"
-  output_dir: "$PROCESSED/peppro_tutorial"
-  pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
-  
-derived_columns: [read1, read2]
+pep_version: 2.0.0
+sample_table: "tutorial.csv"
 
-data_sources:
-  R1: "$CODE/peppro/examples/data/{sample_name}_r1.fq.gz"
-  R2: "$CODE/peppro/examples/data/{sample_name}_r2.fq.gz"
-  
-implied_columns:
-  organism:
-    human:
-      genome: hg38
-      prealignments: human_rDNA rCRSd
+looper:
+  output_dir: "$PROCESSED/tutorial"  # export PROCESSED="/path/to/your_output_folder/"
+  pipeline_interfaces: ["$CODEBASE/peppro/project_pipeline_interface.yaml"]  # export CODEBASE="/path/to/your_tools_folder/"
+
+sample_modifiers:
+  append:
+    pipeline_interfaces: ["$CODEBASE/peppro/sample_pipeline_interface.yaml"] 
+  derive:
+    attributes: [read1, read2]
+    sources:
+        R1: "$CODEBASE/peppro/examples/data/{sample_name}_r1.fq.gz"
+        R2: "$CODEBASE/peppro/examples/data/{sample_name}_r2.fq.gz"
+  imply:
+    - if:
+        organism: ["human", "Homo sapiens", "Human", "Homo_sapiens"]
+      then:
+        genome: "hg38"
+        prealignments: ["human_rDNA", "rCRSd"]
 ```
 There is also a sample annotation file referenced in our configuration file.  The sample annotation file contains metadata and other information about our sample. Just like before, this file, named `tutorial.csv` has been provided.  You may check it out if you wish, otherwise we're all set.
 If you open `tutorial.csv`, you should see the following:
@@ -129,15 +134,20 @@ echo 'Start time:' `date +'%Y-%m-%d %T'`
 } | tee {LOGFILE} --ignore-interrupts
 ```
 
-Save and close that file, and return to our main tutorial directory.
+Save and close that file, and return to the pipeline repository directory.
 ```
-cd ../
+cd /path/to/peppro_tutorial/tools/peppro/
 ```
-Now, we'll use `looper` to run the sample locally.
+Now, we'll use `looper` to run the sample pipeline locally.
 ```
-looper run tutorial.yaml
+looper run examples/meta/tutorial.yaml
 ```         
 Congratulations! Your first sample should be running through the pipeline now.  It takes right around 25 minutes for this process to complete using a single core and maxes at about 3.5 GB of memory.
+
+We will also use `looper` to run the project pipeline locally. At the project level we can aggregate all the samples in our project (just 2 in this case) and view everything together.
+```
+looper runp examples/meta/tutorial.yaml
+```
 
 After the pipeline is finished, we can look through the output directory together.  We've provided a breakdown of that directory in the [browse output page](browse_output.md).
 
