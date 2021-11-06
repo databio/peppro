@@ -1,0 +1,24 @@
+# Run tutorial samples through PEPPRO
+name: tutorial
+
+pep_version: 2.0.0
+sample_table: "tutorial.csv"
+
+looper:
+  output_dir: "$PROCESSED/tutorial"  # export PROCESSED="/path/to/your_output_folder/"
+  pipeline_interfaces: ["$CODEBASE/peppro/project_pipeline_interface.yaml"]  # export CODEBASE="/path/to/your_tools_folder/"
+
+sample_modifiers:
+  append:
+    pipeline_interfaces: ["$CODEBASE/peppro/sample_pipeline_interface.yaml"] 
+  derive:
+    attributes: [read1, read2]
+    sources:
+        R1: "$CODEBASE/peppro/examples/data/{sample_name}_r1.fq.gz"
+        R2: "$CODEBASE/peppro/examples/data/{sample_name}_r2.fq.gz"
+  imply:
+    - if:
+        organism: ["human", "Homo sapiens", "Human", "Homo_sapiens"]
+      then:
+        genome: "hg38"
+        prealignments: ["human_rDNA", "rCRSd"]

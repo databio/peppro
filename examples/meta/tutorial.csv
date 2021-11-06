@@ -1,0 +1,2 @@
+sample_name,organism,protocol,read_type,read1,read2
+tutorial,human,PROSEQ,paired,R1,R2
