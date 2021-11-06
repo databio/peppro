@@ -98,22 +98,17 @@ Fantastic! Now that we have the pipeline and its requirements installed, we're r
 Looper requires a few variables and configuration files to work for the specific user. Let's get those set up now. `Looper` uses [`divvy`](https://divvy.databio.org/) to manage computing resource configuration so that projects and pipelines can easily travel among environments. For more detailed information, [check out the `looper` docs](https://looper.readthedocs.io/en/latest/running-on-a-cluster/). Let's set it up.
 ```
 cd /path/to/peppro_tutorial/
-touch compute_config.yaml
+export DIVCFG="/path/to/peppro_tutorial/compute_config.yaml"
+divvy init $DIVCFG
 ```
-Open that file in your favorite text editor.  We'll add in the following example for running locally.  You'll need to edit this file further for your own setup and you can [learn more about that in the `looper` docs](https://looper.readthedocs.io/en/latest/index.html).
+You can open that initialized file in your favorite text editor if you want to learn more about its structure.  If you need to edit this file further for your own setup you can [learn more about that in the `looper` docs](https://looper.readthedocs.io/en/latest/index.html).
 ```
 nano compute_config.yaml
-```
-Paste the following into compute_config.yaml
-```
-compute:
+
+compute_packages:
   default:
     submission_template: templates/localhost_template.sub
     submission_command: sh
-```
-Now, let's close and save that file and create an environment variable pointing to our configuration file.
-```
-export DIVCFG="/path/to/peppro_tutorial/compute_config.yaml"
 ```
 (Remember to add `DIVCFG` to your `.bashrc` or `.profile` to ensure it persists).
 The `looper` environment configuration file points to submission template(s) in order to know how to run a samples locally or using cluster resources.  If you'd like to learn more, check out the [`DIVCFG` configuration file and submission templates](https://divvy.databio.org/). We're going to simply setup a local template for the purposes of this tutorial.  You can also easily create [templates for cluster or container use as well](https://github.com/pepkit/divcfg/tree/master/templates)!
@@ -129,9 +124,7 @@ Paste the following into the localhost_template.sub:
 echo 'Compute node:' `hostname`
 echo 'Start time:' `date +'%Y-%m-%d %T'`
 
-{
-{CODE}
-} | tee {LOGFILE} --ignore-interrupts
+{CODE} | tee {LOGFILE}
 ```
 
 Save and close that file, and return to the pipeline repository directory.
