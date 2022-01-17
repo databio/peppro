@@ -1,2 +1,2 @@
-sample_name,organism,library,read_type,read1
+sample_name,organism,protocol,read_type,read1
 test,human,PROSEQ,single,R1

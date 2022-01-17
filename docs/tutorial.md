@@ -18,14 +18,15 @@ mkdir processed
 mkdir templates
 mkdir tools
 cd tools/
+git clone https://github.com/databio/peppro.git
 ```
 
 ## 2: Download tutorial read files
 
-We're going to work with some files a little larger than the test data included in the pipeline so we can see all the features included in a full run of the pipeline.  Go ahead and download the [tutorial_r1.fastq.gz](http://big.databio.org/peppro/tutorial_r1.fq.gz) and [tutorial_r2.fq.gz](http://big.databio.org/peppro/tutorial_r2.fastq.gz) files. 
+We're going to work with some files a little larger than the test data included in the pipeline so we can see all the features included in a full run of the pipeline.  Go ahead and download the [tutorial_r1.fastq.gz](http://big.databio.org/peppro/fastq/tutorial_r1.fq.gz) and [tutorial_r2.fq.gz](http://big.databio.org/peppro/fastq/tutorial_r2.fq.gz) files. 
 ```console
-wget http://big.databio.org/peppro/tutorial_r1.fq.gz
-wget http://big.databio.org/peppro/tutorial_r2.fq.gz
+wget http://big.databio.org/peppro/fastq/tutorial_r1.fq.gz
+wget http://big.databio.org/peppro/fastq/tutorial_r2.fq.gz
 ```
 
 To simplify the rest of this tutorial, let's put those files in a standard location we'll use for the rest of this guide. 
@@ -40,29 +41,35 @@ We're going to use `looper` to analyze our data.  For that, we need to pass loop
 
 You can open the configuration file in your favorite text editor if you'd like to look closer.  For the purposes of the tutorial you may safely move past this step should you choose.
 ```
+cd peppro/examples/meta/
 nano tutorial.yaml
 ```
 The following is what you should see in that configuration file.
 ```
-# Run tutorial sample through PEPPRO
+# Run tutorial samples through PEPPRO
 name: tutorial
 
-metadata:
-  sample_annotation: "peppro_tutorial.csv"
-  output_dir: "$PROCESSED/peppro_tutorial"
-  pipeline_interfaces: "$CODE/peppro/pipeline_interface.yaml" 
-  
-derived_columns: [read1, read2]
+pep_version: 2.0.0
+sample_table: "tutorial.csv"
 
-data_sources:
-  R1: "$CODE/peppro/examples/data/{sample_name}_r1.fq.gz"
-  R2: "$CODE/peppro/examples/data/{sample_name}_r2.fq.gz"
-  
-implied_columns:
-  organism:
-    human:
-      genome: hg38
-      prealignments: human_rDNA rCRSd
+looper:
+  output_dir: "$PROCESSED/tutorial"  # export PROCESSED="/path/to/your_output_folder/"
+  pipeline_interfaces: ["$CODEBASE/peppro/project_pipeline_interface.yaml"]  # export CODEBASE="/path/to/your_tools_folder/"
+
+sample_modifiers:
+  append:
+    pipeline_interfaces: ["$CODEBASE/peppro/sample_pipeline_interface.yaml"] 
+  derive:
+    attributes: [read1, read2]
+    sources:
+        R1: "$CODEBASE/peppro/examples/data/{sample_name}_r1.fq.gz"
+        R2: "$CODEBASE/peppro/examples/data/{sample_name}_r2.fq.gz"
+  imply:
+    - if:
+        organism: ["human", "Homo sapiens", "Human", "Homo_sapiens"]
+      then:
+        genome: "hg38"
+        prealignments: ["human_rDNA", "rCRSd"]
 ```
 There is also a sample annotation file referenced in our configuration file.  The sample annotation file contains metadata and other information about our sample. Just like before, this file, named `tutorial.csv` has been provided.  You may check it out if you wish, otherwise we're all set.
 If you open `tutorial.csv`, you should see the following:
@@ -88,25 +95,20 @@ export CODEBASE="/path/to/peppro_tutorial/tools/"
 Fantastic! Now that we have the pipeline and its requirements installed, we're ready to get our reference genome(s).
 
 ## 5: Use `looper` to run the pipeline
-Looper requires a few variables and configuration files to work for the specific user. Let's get those set up now. `Looper` uses [`divvy`](https://divvy.databio.org/) to manage computing resource configuration so that projects and pipelines can easily travel among environments. For more detailed information, [check out the `looper` docs](https://looper.readthedocs.io/en/latest/cluster-computing/). Let's set it up.
+Looper requires a few variables and configuration files to work for the specific user. Let's get those set up now. `Looper` uses [`divvy`](https://divvy.databio.org/) to manage computing resource configuration so that projects and pipelines can easily travel among environments. For more detailed information, [check out the `looper` docs](https://looper.readthedocs.io/en/latest/running-on-a-cluster/). Let's set it up.
 ```
 cd /path/to/peppro_tutorial/
-touch compute_config.yaml
+export DIVCFG="/path/to/peppro_tutorial/compute_config.yaml"
+divvy init $DIVCFG
 ```
-Open that file in your favorite text editor.  We'll add in the following example for running locally.  You'll need to edit this file further for your own setup and you can [learn more about that in the `looper` docs](https://looper.readthedocs.io/en/latest/index.html).
+You can open that initialized file in your favorite text editor if you want to learn more about its structure.  If you need to edit this file further for your own setup you can [learn more about that in the `looper` docs](https://looper.readthedocs.io/en/latest/index.html).
 ```
 nano compute_config.yaml
-```
-Paste the following into compute_config.yaml
-```
-compute:
+
+compute_packages:
   default:
     submission_template: templates/localhost_template.sub
     submission_command: sh
-```
-Now, let's close and save that file and create an environment variable pointing to our configuration file.
-```
-export DIVCFG="/path/to/peppro_tutorial/compute_config.yaml"
 ```
 (Remember to add `DIVCFG` to your `.bashrc` or `.profile` to ensure it persists).
 The `looper` environment configuration file points to submission template(s) in order to know how to run a samples locally or using cluster resources.  If you'd like to learn more, check out the [`DIVCFG` configuration file and submission templates](https://divvy.databio.org/). We're going to simply setup a local template for the purposes of this tutorial.  You can also easily create [templates for cluster or container use as well](https://github.com/pepkit/divcfg/tree/master/templates)!
@@ -122,30 +124,33 @@ Paste the following into the localhost_template.sub:
 echo 'Compute node:' `hostname`
 echo 'Start time:' `date +'%Y-%m-%d %T'`
 
-{
-{CODE}
-} | tee {LOGFILE} --ignore-interrupts
+{CODE} | tee {LOGFILE}
 ```
 
-Save and close that file, and return to our main tutorial directory.
+Save and close that file, and return to the pipeline repository directory.
 ```
-cd ../
+cd /path/to/peppro_tutorial/tools/peppro/
 ```
-Now, we'll use `looper` to run the sample locally.
+Now, we'll use `looper` to run the sample pipeline locally.
 ```
-looper run tutorial.yaml
+looper run examples/meta/tutorial.yaml
 ```         
 Congratulations! Your first sample should be running through the pipeline now.  It takes right around 25 minutes for this process to complete using a single core and maxes at about 3.5 GB of memory.
 
-After the pipeline is finished, we can look through the output directory together.  We've provided a breakdown of that directory in the [browse output page](/browse_output/).
+We will also use `looper` to run the project pipeline locally. At the project level we can aggregate all the samples in our project (just 1 in this simple case) and view everything together.
+```
+looper runp examples/meta/tutorial.yaml
+```
+
+After the pipeline is finished, we can look through the output directory together.  We've provided a breakdown of that directory in the [browse output page](browse_output.md).
 
 
 ## 6: Generate an `HTML` report using `looper`
 
-Let's take full advantage of `looper` and generate a pipeline `HTML` report that makes all our results easy to view and browse.  If you'd like to skip right to the results and see what it looks like, [check out the tutorial results](../files/examples/tutorial/tutorial_summary.html).  Otherwise, let's generate a report ourselves.
-Using our same configuration file we used to run the samples through the pipeline, we'll now employ the `summarize` function of `looper`.
+Let's take full advantage of `looper` and generate a pipeline `HTML` report that makes all our results easy to view and browse.  If you'd like to skip right to the results and see what it looks like, [check out the tutorial results](files/examples/tutorial/tutorial_summary.html).  Otherwise, let's generate a report ourselves.
+Using our same configuration file we used to run the samples through the pipeline, we'll now employ the `report` function of `looper`.
 ```
-looper summarize tutorial.yaml
+looper report tutorial.yaml
 ```         
 That's it! Easy, right? `Looper` conveniently provides you with the location where the HTML report is produced.  You may either open the report with your preferred internet browser using the PATH provided, or we can change directories to the report's location and open it there.  Let's go ahead and change into the directory that contains the report.
 ```

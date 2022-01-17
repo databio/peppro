@@ -22,3 +22,8 @@
 
 You can download the latest version from the [releases](https://github.com/databio/peppro/releases) page, or find changes listed in the [CHANGELOG](changelog).
 
+## Citing
+
+If you find PEPPRO useful in your research, please cite:
+
+Smith, J.P., Dutta, A.B., Sathyan, K.M. et al. PEPPRO: quality control and processing of nascent RNA profiling data. Genome Biol 22, 155 (2021). [https://doi.org/10.1186/s13059-021-02349-4](https://doi.org/10.1186/s13059-021-02349-4)

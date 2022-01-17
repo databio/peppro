@@ -2,10 +2,11 @@ theme: databio
 
 site_name: peppro
 site_author: Jason Smith
-site_url: http://peppro.databio.org/
+site_url: http://peppro.databio.org/en/latest/
 site_logo: img/peppro_logo_gray.svg
 repo_url: https://github.com/databio/peppro/
 #google_analytics: ['UA-127092878-1', 'code.databio.org/peppro']
+paper_link: https://doi.org/10.1186/s13059-021-02349-4
 
 markdown_extensions:
   - fontawesome_markdown  # pip install --user fontawesome-markdown
@@ -22,7 +23,9 @@ nav:
     - Run PEPPRO on a cluster: 'cluster.md'
     - Run PEPPRO in containers: 'container.md'
     - Configure prealignments: 'prealignments.md'
+    - Configure seqOutBias assets: 'sob.md'
     - Configure UMI: 'umi.md'
+    - Configure custom adapters: 'custom_adapters.md'
     - Detailed install guide: 'detailed_install.md'
     - Use custom reference data: 'annotation.md'
   - Reference: 

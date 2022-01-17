@@ -30,6 +30,8 @@ Rscript -e 'devtools::install_github("pepkit/pepr")'
 Rscript -e 'install.packages("BiocManager")'
 Rscript -e 'BiocManager::install("GenomicRanges")'
 Rscript -e 'devtools::install_github("databio/GenomicDistributions")'
+Rscript -e 'BiocManager::install(c("BSgenome", "GenomicFeatures", "ensembldb"))'
+Rscript -e 'install.packages("http://big.databio.org/GenomicDistributionsData/GenomicDistributionsData_0.0.1.tar.gz", repos=NULL)'
 ```
 
 Then, install the `PEPPRO` package. From the `peppro/` directory:
@@ -58,7 +60,7 @@ Add the `export REFGENIE` line to your `.bashrc` or `.profile` to ensure it pers
 Next, pull the assets you need. Replace `hg38` in the example below if you need to use a different genome assembly. If these assets are not available automatically for your genome of interest, then you'll need to [build them](annotation.md). Download these required assets with this command:
 
 ```console
-refgenie pull -g hg38 -a bowtie2_index ensembl_gtf ensembl_rb refgene_anno feat_annotation 
+refgenie pull -g hg38 -a fasta bowtie2_index ensembl_gtf ensembl_rb refgene_anno feat_annotation 
 ```
 PEPPRO also requires `bowtie2_index` for any pre-alignment genomes:
 
@@ -109,7 +111,7 @@ There are lots of other cool things you can do with looper, like dry runs, summa
 
 ## 5: Configure your project files
 
-To run your own samples, you'll need to organize them in **PEP format**, which is explained in [how to create a PEP](https://pepkit.github.io/docs/home/) and is universal to all pipelines that read PEPs, including `PEPPRO`. To get you started, there are examples you can adapt in the `examples/` folder (*e.g.* [example test PEP](https://github.com/databio/peppro/tree/master/examples/meta/peppro_test.yaml)). In short, you need two files for your project:
+To run your own samples, you'll need to organize them in **PEP format**, which is explained in [how to create a PEP](http://pep.databio.org/en/latest/simple_example/#how-do-i-create-my-own-pep-a-simple-example) and is universal to all pipelines that read PEPs, including `PEPPRO`. To get you started, there are examples you can adapt in the `examples/` folder (*e.g.* [example test PEP](https://github.com/databio/peppro/tree/master/examples/meta/peppro_test.yaml)). In short, you need two files for your project:
 
   1. project config file -- describes output locations, pointers to data, etc.
   2. sample annotation file -- comma-separated value (CSV) list of your samples.

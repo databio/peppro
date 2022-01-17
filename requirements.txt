@@ -1,8 +1,8 @@
-cutadapt
-loopercli
+cutadapt>=2.9
+looper>=1.2
 numpy
-pandas
-pararead
-piper
+pandas>=0.20.2
+pararead>=0.7.0
+piper>=0.12.1
 refgenconf
-refgenie
+refgenie>=0.9.1

@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.9.6"
+__version__ = "0.9.11"
 
 from argparse import ArgumentParser
 import os
@@ -14,6 +14,7 @@ import re
 import tempfile
 import tarfile
 import pypiper
+import errno
 from pypiper import build_command
 from refgenconf import RefGenConf as RGC, select_genome_config
 
@@ -84,8 +85,10 @@ def parse_arguments():
 
     parser.add_argument("--scale", action='store_true',
                         dest="scale", default=False,
-                        help="Scale output with seqOutBias when producing"
-                             " signal tracks.")
+                        help="Scale signal tracks: "
+                             "Default is to scale by read count.\n"
+                             "If using seqOutBias, scales by the expected/"
+                             "observed cut frequency.")
 
     parser.add_argument("--prealignments", default=[], type=str, nargs="+",
                         help="Space-delimited list of reference genomes to "
@@ -183,12 +186,16 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
     fastq_folder = os.path.join(outfolder, "fastq")
 
     if read2:
-        cutadapt_report = os.path.join(cutadapt_folder, sname + "_R2_cutadapt.txt")
+        cutadapt_report = os.path.join(cutadapt_folder,
+            sname + "_R2_cutadapt.txt")
         noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
+        short_fastq = os.path.join(fastq_folder, sname + "_R2_short.fastq")
         fastp_pfx = os.path.join(fastp_folder, sname + "_R2_fastp_adapter")
     else:
-        cutadapt_report = os.path.join(cutadapt_folder, sname + "_R1_cutadapt.txt")
+        cutadapt_report = os.path.join(cutadapt_folder,
+            sname + "_R1_cutadapt.txt")
         noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
+        short_fastq = os.path.join(fastq_folder, sname + "_R1_short.fastq")
         fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
 
     fastp_report_txt = fastp_pfx + ".txt"
@@ -196,6 +203,7 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
     fastp_report_json = fastp_pfx + ".json"
 
     if _itsa_file(res.adapters):
+        pm.info("Using custom adapter file: {}".format(res.adapters))
         five_prime = pm.checkprint("awk '/5prime/{getline; print}' " +
             res.adapters) or "TGGAATTCTCGGGTGCCAAGG"
         three_prime = pm.checkprint("awk '/3prime/{getline; print}' " +
@@ -238,9 +246,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         ])
         # If calculating library complexity and this is read 1 or single-end,
         # must produce an intermediate file.
-        adapter_cmd_chunks.extend([("-o", noadap_fastq)])  # Must keep intermediates always now
-        # else:
-        #     adapter_cmd_chunks.extend([("--stdout")])
+        adapter_cmd_chunks.extend([("-o", noadap_fastq)])
+        # Must keep intermediates always now
 
         adapter_cmd_chunks.extend([
             (") 2>", fastp_report_txt)
@@ -265,7 +272,9 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
             adapter_cmd_chunks.extend([("-a", five_prime)])
         adapter_cmd_chunks.extend([
             fq_file,
-            ("-o", noadap_fastq + ")"),
+            ("-o", noadap_fastq),
+            ("--too-short-output", short_fastq),
+            ")",
             (">", cutadapt_report)
         ])
 
@@ -296,10 +305,8 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
         ])
         # If calculating library complexity and this is read 1 or single-end,
         # must produce an intermediate file.
-        #if not args.complexity and args.umi_len > 0 and not read2 :
-        adapter_cmd_chunks.extend([("-o", noadap_fastq)])  # Must keep intermediates always now
-        # else:
-        #     adapter_cmd_chunks.extend([("--stdout")])
+        adapter_cmd_chunks.extend([("-o", noadap_fastq)])
+        # Must keep intermediates always now
 
         adapter_cmd_chunks.extend([
             (") 2>", fastp_report_txt)
@@ -389,8 +396,6 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
 
     fastq_folder = os.path.join(outfolder, "fastq")
     dedup_fastq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
-    #processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
-    #trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
     processed_fastq = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
 
     fastp_folder = os.path.join(outfolder, "fastp")    
@@ -490,7 +495,8 @@ def _trim_deduplicated_files(args, tools, fq_file, outfolder):
         # Trim to max length if specified
         if int(args.max_len) > 0:
             trim_cmd_chunks.extend([
-                ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                ("-l", (str(int(float(args.max_len)) +
+                 int(float(args.umi_len)))))
             ])
 
         # Remove too short reads
@@ -571,8 +577,10 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
         noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
         trimmed_fastq = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
     else:
-        noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
-        trimmed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
+        noadap_fastq = os.path.join(fastq_folder,
+            sname + "_R1_noadap.fastq")
+        trimmed_fastq = os.path.join(fastq_folder,
+            sname + "_R1_processed.fastq")
 
     fastp_folder = os.path.join(outfolder, "fastp")
     if read2:
@@ -704,7 +712,8 @@ def _trim_adapter_files(args, tools, read2, fq_file, outfolder):
         # Trim tp max length if specified
         if int(args.max_len) > 0:
             trim_cmd_chunks.extend([
-                ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                ("-l", (str(int(float(args.max_len)) +
+                 int(float(args.umi_len)))))
             ])
 
         # Remove too short reads
@@ -787,11 +796,15 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
 
     fastq_folder = os.path.join(outfolder, "fastq")
     if read2:
-        noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
-        processed_fastq = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
+        noadap_fastq = os.path.join(fastq_folder,
+            sname + "_R2_noadap.fastq")
+        processed_fastq = os.path.join(fastq_folder,
+            sname + "_R2_trimmed.fastq")
     else:
-        noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
-        processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
+        noadap_fastq = os.path.join(fastq_folder,
+            sname + "_R1_noadap.fastq")
+        processed_fastq = os.path.join(fastq_folder,
+            sname + "_R1_processed.fastq")
 
     fastp_folder = os.path.join(outfolder, "fastp")
     if read2:
@@ -821,20 +834,6 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
                 "|",
                 (tools.seqtk, "trimfq")
             ]
-
-            # if read2:
-            # # still 'read1' because it's being processed as a SE file
-            #     trim_cmd_chunks.extend([("--umi_loc", "read1")])
-            # else:
-            #     trim_cmd_chunks.extend([("--umi_loc", "read1")])
-
-            # trim_cmd_chunks.extend([
-            #     ("--umi_len", args.umi_len),
-            #     ("--html", umi_report),
-            #     ("--json", umi_json),
-            #     "|",
-            #     (tools.seqtk, "trimfq")
-            # ])
 
             # Trim to max length if specified
             if int(args.max_len) > 0:
@@ -949,7 +948,8 @@ def _trim_pipes(args, tools, read2, fq_file, outfolder):
             trim_cmd_chunks.extend([("-f", str(int(float(args.umi_len)) + 1))])
             if int(args.max_len) > 0:
                 trim_cmd_chunks.extend([
-                    ("-l", (str(int(float(args.max_len)) + int(float(args.umi_len)))))
+                    ("-l", (str(int(float(args.max_len)) +
+                     int(float(args.umi_len)))))
                 ])
 
         # Remove too short reads
@@ -1030,16 +1030,20 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     fastq_folder = os.path.join(outfolder, "fastq")
     fastp_folder = os.path.join(outfolder, "fastp")
     fastqc_folder = os.path.join(outfolder, "fastqc")
-    fastqc_report = os.path.join(fastqc_folder, sname + "_R1_processed_fastqc.html")
+    fastqc_report = os.path.join(fastqc_folder,
+        sname + "_R1_processed_fastqc.html")
 
     preprocessed_fq1 = os.path.join(fastq_folder, sname + "_R1.fastq")
     preprocessed_fq2 = os.path.join(fastq_folder, sname + "_R2.fastq")
     noadap_fq1 = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
     noadap_fq2 = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
+    short_fq1 = os.path.join(fastq_folder, sname + "_R1_short.fastq")
+    short_fq2 = os.path.join(fastq_folder, sname + "_R2_short.fastq")
     dedup_fq = os.path.join(fastq_folder, sname + "_R1_dedup.fastq")
     trimmed_fq1 = os.path.join(fastq_folder, sname + "_R1_trimmed.fastq")
     trimmed_fq2 = os.path.join(fastq_folder, sname + "_R2_trimmed.fastq")
-    trimmed_dups_fq2 = os.path.join(fastq_folder, sname + "_R2_trimmed_dups.fastq")
+    trimmed_dups_fq2 = os.path.join(fastq_folder,
+        sname + "_R2_trimmed_dups.fastq")
     processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
 
     if args.adapter == "cutadapt":
@@ -1059,7 +1063,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     fastp_report_txt = fastp_pfx + ".txt"
     fastp_report_html = fastp_pfx + ".html"
 
-    adapter_command = _remove_adapters(args, tools, res, read2, fq_file, outfolder)
+    adapter_command = _remove_adapters(args, res, tools, read2, fq_file, outfolder)
     pm.debug("Adapter command: {}".format(adapter_command))
     pm.debug("Read2 status: {}".format(read2))
 
@@ -1072,17 +1076,6 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     else:
         trim_command = _trim_adapter_files(args, tools, read2, fq_file, outfolder)
 
-    # original method included option to not retain intermediates
-    # if read2:
-    #     trim_command = _trim_pipes(args, tools, True, fq_file, outfolder)
-    # elif not args.complexity and int(args.umi_len) > 0:
-    #     deduplicate_command = _deduplicate(args, tools, fq_file, outfolder)
-    #     pm.debug("Dedup command: {}".format(deduplicate_command))
-    #     trim_command = _trim_adapter_files(args, tools, fq_file, outfolder)
-    #     trim_command2 = _trim_deduplicated_files(args, tools, fq_file, outfolder)
-    # else:
-    #     trim_command = _trim_pipes(args, tools, False, fq_file, outfolder)
-
     def report_fastq():
         """
         Report QC metrics on intermediate steps of fastq file preparation
@@ -1090,13 +1083,20 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if args.adapter == "cutadapt":
             report = cutadapt_report
             adapter_term = "Reads with adapters:"
-            too_short_term = "Reads that were too short:"
+            #too_short_term = "Reads that were too short:"
             total_bases_term = "Total basepairs processed:"
 
             ac_cmd = ("grep '" + adapter_term + "' " +
                       report + " | awk '{print $(NF-1)}'")
-            ts_cmd = ("grep '" + too_short_term + "' " +
-                      report + " | awk '{print $(NF-1)}'")
+            # cutadapt version < 2.9
+            #ts_cmd = ("grep '" + too_short_term + "' " +
+            #          report + " | awk '{print $(NF-1)}'")
+            ts_cmd = "wc -l "
+            if read2:
+                ts_cmd += short_fq2
+            else:
+                ts_cmd += short_fq1
+            ts_cmd += " | awk '{print $1}'"
             bases = ("grep '" + total_bases_term + "' " +
                      report + " | awk '{print $(NF-1)}'")
             adapter_bases = ("awk '{sum+=$1*$2} END {printf \"%.0f\", sum}' " +
@@ -1142,6 +1142,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
             tmp = pm.checkprint(ts_cmd)
             if tmp:
                 ts = float(tmp.replace(',',''))
+                if args.adapter == "cutadapt":
+                    ts = ts/4
             else:
                 ts = 0
             
@@ -1319,11 +1321,75 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
                 pm.report_result("Degradation_ratio", round(dr, 4))
 
 
+    def check_trim(trimmed_fastq, paired_end,
+                   trimmed_fastq_R2=None, fastqc_folder=None):
+        """
+        Evaluate read trimming, and optionally run fastqc.
+        
+        :param str trimmed_fastq: Path to trimmed reads file.
+        :param bool paired_end: Whether the processing is being done with
+            paired-end sequencing data.
+        :param str trimmed_fastq_R2: Path to read 2 file for paired-end case.
+        :param str fastqc_folder: Path to folder within which to place fastqc
+            output files; if unspecified, fastqc will not be run.
+        :return callable: Function to evaluate read trimming and possibly run
+            fastqc.
+        """
+        n_trim = float(ngstk.count_reads(trimmed_fastq, paired_end))
+        pm.report_result("Trimmed_reads_R1", int(n_trim))
+
+        try:
+            rr = float(pm.get_stat("Raw_reads"))
+        except:
+            print("Can't calculate trim loss rate without raw read result.")
+        else:
+            pm.report_result("Trim_loss_rate_R1",
+                             round((rr - n_trim) * 100 / rr, 2))
+
+        if paired_end and trimmed_fastq_R2:
+            n_trim = float(ngstk.count_reads(trimmed_fastq_R2, paired_end))
+            pm.report_result("Trimmed_reads_R2", int(n_trim))
+
+            try:
+                rr = float(pm.get_stat("Raw_reads"))
+            except:
+                print("Can't calculate trim loss rate without raw read result.")
+            else:
+                pm.report_result("Trim_loss_rate_R2",
+                                 round((rr - n_trim) * 100 / rr, 2))
+
+        # Also run a fastqc (if installed/requested)
+        if fastqc_folder:
+            if fastqc_folder and os.path.isabs(fastqc_folder):
+                try:
+                    os.makedirs(fastqc_folder)
+                except OSError as exception:
+                    if exception.errno != errno.EEXIST:
+                        raise
+            cmd = ngstk.fastqc(trimmed_fastq, fastqc_folder)
+            pm.run(cmd, lock_name="trimmed_fastqc", nofail=True)
+            fname, ext = os.path.splitext(os.path.basename(trimmed_fastq))
+            fastqc_html = os.path.join(fastqc_folder, fname + "_fastqc.html")
+            pm.report_object("FastQC report R1", fastqc_html)
+            
+            if paired_end and trimmed_fastq_R2:
+                    cmd = ngstk.fastqc(trimmed_fastq_R2, fastqc_folder)
+                    pm.run(cmd, lock_name="trimmed_fastqc_R2", nofail=True)
+                    fname, ext = os.path.splitext(
+                        os.path.basename(trimmed_fastq_R2))
+                    fastqc_html = os.path.join(
+                        fastqc_folder, fname + "_fastqc.html")
+                    pm.report_object("FastQC report R2", fastqc_html)
+
     # Put it all together
+    paired_end = args.paired_end
     if read2:
-        pm.run([adapter_command, trim_command], trimmed_fq2,
-               follow=ngstk.check_trim(processed_fastq, True, trimmed_fq2,
-                                       fastqc_folder=fastqc_folder))
+        pm.run([adapter_command, trim_command], trimmed_fq2)
+        if not _itsa_file(fastqc_report) or args.new_start:
+            cmd = ("echo '### Calculated the number of trimmed reads'")
+            pm.run(cmd, fastqc_report, 
+                   follow=check_trim(processed_fastq, paired_end, trimmed_fq2,
+                                     fastqc_folder=fastqc_folder))
         if args.adapter == "cutadapt":
             output_folder = os.path.join(outfolder, "cutadapt")
         else:
@@ -1331,20 +1397,23 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         cp_cmd = ("cp " + trimmed_fq2 + " " + trimmed_dups_fq2)
         pm.run(cp_cmd, trimmed_dups_fq2,
                follow=plot_fragments(fastq_folder, output_folder))
+        pm.clean_add(short_fq2)
         return trimmed_fq2, trimmed_dups_fq2
     elif not args.complexity and int(args.umi_len) > 0:
         # This trim command DOES need the adapter file...
         pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
-        pm.run([adapter_command, trim_command], processed_fastq,
-               follow=ngstk.check_trim(processed_fastq, False, None,
-                                       fastqc_folder=fastqc_folder))
+        pm.run([adapter_command, trim_command], processed_fastq)
+        if not _itsa_file(fastqc_report) or args.new_start:
+            cmd = ("echo '### Calculated the number of trimmed reads'")
+            pm.run(cmd, fastqc_report, 
+                   follow=check_trim(processed_fastq, paired_end, None,
+                                     fastqc_folder=fastqc_folder))
         # This needs to produce the trimmed_fastq file
-        # TODO: trim_command2 doesn't need to produce fastp html files and json files...
-        # TODO: if I'm using seqkit rmdup here, I DON'T NEED the other fastp!!! umi command
         pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
         pm.run([deduplicate_command, trim_command2],
                trimmed_fq1, follow=report_fastq)
         pm.clean_add(noadap_fq1)
+        pm.clean_add(short_fq1)
         pm.clean_add(dedup_fq)
         pm.clean_add(trimmed_fq1)
         return processed_fastq, trimmed_fq1
@@ -1355,46 +1424,11 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         if not _itsa_file(fastqc_report) or args.new_start:
             cmd = ("echo '### Calculate the number of trimmed reads'")
             pm.run(cmd, fastqc_report, 
-                   follow=ngstk.check_trim(processed_fastq, False, None,
-                                           fastqc_folder=fastqc_folder))
+                   follow=check_trim(processed_fastq, paired_end, None,
+                                     fastqc_folder=fastqc_folder))
+        pm.clean_add(noadap_fq1)
+        pm.clean_add(short_fq1)
         return processed_fastq
-
-    # Put it all together (original included option to not retain intermediates)
-    # if read2:
-    #     # cutadapt directs its report to stderr if the command lacks
-    #     # a -o and the actual reads are directed to stdout.
-    #     process_fastq_cmd2 = build_command([
-    #         "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
-    #     pm.debug("process_fastq_cmd2: {}".format(process_fastq_cmd2))
-    #     pm.run(process_fastq_cmd2, trimmed_fastq_R2)
-    #     cp_cmd = ("cp " + trimmed_fq2 + " " + trimmed_dups_fq2)
-    #     pm.run(cp_cmd, trimmed_dups_faq2)
-    #     return trimmed_fastq_R2, trimmed_dups_fastq_R2
-    # else:
-    #     if not args.complexity and int(args.umi_len) > 0:
-    #         # This trim command DOES need the adapter file...
-    #         pm.debug("\ntrim_command1: {} +\n {}\n".format(adapter_command, trim_command))
-    #         pm.run([adapter_command, trim_command], processed_fastq,
-    #                follow=ngstk.check_trim(processed_fastq, False, None,
-    #                                        fastqc_folder=fastqc_folder))
-    #         # This needs to produce the trimmed_fastq file
-    #         # TODO: trim_command2 doesn't need to produce fastp html files and json files...
-    #         # TODO: if I'm using seqkit rmdup here, I DON'T NEED the other fastp!!! umi command
-    #         pm.debug("\ntrim_command2: {} +\n {}\n".format(deduplicate_command, trim_command2))
-    #         pm.run([deduplicate_command, trim_command2],
-    #                trimmed_fastq, follow=report_fastq)
-    #         pm.clean_add(noadap_fq1)
-    #         pm.clean_add(dedup_fq)
-    #         pm.clean_add(trimmed_fq1)
-    #         return processed_fastq, trimmed_fq1
-    #     else:
-    #         pm.debug("\nELSE: trim_command: {} + {}\n".format(adapter_command, trim_command))
-    #         process_fastq_cmd = build_command([
-    #             "(", adapter_command, "|", trim_command, ") 2> ", adapter_report])
-    #         pm.run(process_fastq_cmd, processed_fastq,
-    #            follow=ngstk.check_trim(processed_fastq, False, None,
-    #                                    fastqc_folder=fastqc_folder))
-    #         return processed_fastq
 
 
 def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
@@ -1577,7 +1611,7 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
                 try:
                     # wrapped in try block in case Trimmed_reads is not reported 
                     # in this pipeline.
-                    tr = float(pm.get_stat("Trimmed_reads"))
+                    tr = float(pm.get_stat("Trimmed_reads_R1"))
                 except:
                     print("Trimmed reads is not reported.")
                 else:
@@ -1873,6 +1907,31 @@ def _add_resources(args, res, asset_dict=None):
         return res, rgc
 
 
+def report_message(pm, report_file, message, annotation=None):
+    """
+    Writes a string to provided file in a safe way.
+    
+    :param PipelineManager pm: a pypiper PipelineManager object
+    :param str report_file: name of the output file
+    :param str message: string to write to the output file
+    :param str annotation: By default, the message will be annotated with the
+        pipeline name, so you can tell which pipeline records which stats.
+        If you want, you can change this; use annotation='shared' if you
+        need the stat to be used by another pipeline (using get_stat()).
+    """
+    # Default annotation is current pipeline name.
+    annotation = str(annotation or pm.name)
+
+    message = str(message).strip()
+    
+    message = "{message}\t{annotation}".format(
+        message=message, annotation=annotation)
+
+    # Just to be extra careful, let's lock the file while we we write
+    # in case multiple pipelines write to the same file.
+    pm._safe_write_to_file(report_file, message)
+
+
 ###############################################################################
 def main():
     """
@@ -1881,7 +1940,7 @@ def main():
 
     args = parse_arguments()
 
-    args.paired_end = args.single_or_paired == "paired"
+    args.paired_end = args.single_or_paired.lower() == "paired"
 
     # Initialize, creating global PipelineManager and NGSTk instance for
     # access in ancillary functions outside of main().
@@ -1903,7 +1962,7 @@ def main():
     tool_list = [v for k,v in tools.items()]    # extract tool list
     tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tool_list]
     tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tool_list]
-    opt_tools = ["fqdedup", "fastx_trimmer", "seqOutBias"]
+    opt_tools = ["fqdedup", "fastx_trimmer", "seqOutBias", "fastqc"]
     if args.trimmer == "fastx":  # update tool call
         if 'fastx' in opt_tools: opt_tools.remove('fastx_trimmer')
 
@@ -2013,10 +2072,21 @@ def main():
     # Adapter file can be set in the config; if left null, we use a default.
     # Expects headers to include >5prime and >3prime
     res.adapters = res.adapters or tool_path("adapter.fa")
-
     param.outfolder = outfolder
+    
+    # Report utilized assets
+    assets_file = os.path.join(param.outfolder, "assets.tsv")
+    for asset in res:
+        message = "{}\t{}".format(asset, os.path.expandvars(res[asset]))
+        report_message(pm, assets_file, message)
+        
+    # Report primary genome
+    message = "genome\t{}".format(args.genome_assembly)
+    report_message(pm, assets_file, message)
 
-    # Check that the input file(s) exist before continuing
+    ###########################################################################
+    #          Check that the input file(s) exist before continuing           #
+    ###########################################################################
     if _itsa_file(args.input[0]):
         print("Local input file: " + args.input[0])
     elif _itsa_empty_file(args.input[0]):
@@ -2040,10 +2110,11 @@ def main():
             err_msg = "Could not find: {}"
             pm.fail_pipeline(IOError(err_msg.format(args.input2[0])))
 
-    container = None
+    container = None # legacy
 
     ###########################################################################
-
+    #                      Grab and prepare input files                       #
+    ###########################################################################
     pm.report_result(
         "File_mb",
         round(ngstk.get_file_size(
@@ -2142,7 +2213,7 @@ def main():
 
         # Gut check
         # Processing fastq should have trimmed the reads.
-        tmp = pm.get_stat("Trimmed_reads")
+        tmp = pm.get_stat("Trimmed_reads_R1")
         if tmp:
             tr = float(tmp)
         else:
@@ -2388,7 +2459,8 @@ def main():
                         unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1_dups,
@@ -2396,14 +2468,16 @@ def main():
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
-                        dups=True)
+                        dups=True,
+                        bt2_opts_txt=param.bowtie2_pre.params)
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1,
                         unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1_dups,
@@ -2411,7 +2485,8 @@ def main():
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
-                        dups=True)
+                        dups=True,
+                        bt2_opts_txt=param.bowtie2_pre.params)
 
                 if args.paired_end:
                     to_compress.append(unmap_fq1_dups)
@@ -2428,14 +2503,16 @@ def main():
                         unmap_fq1, unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True,
                         unmap_fq1, unmap_fq2, reference,
                         assembly_bt2=bt2_index,
                         outfolder=param.outfolder,
-                        aligndir="prealignments")
+                        aligndir="prealignments",
+                        bt2_opts_txt=param.bowtie2_pre.params)
                 if args.paired_end:
                     to_compress.append(unmap_fq1)
                     to_compress.append(unmap_fq2)
@@ -2485,8 +2562,12 @@ def main():
 
     mito_name = ["chrM", "chrMT", "M", "MT", "rCRSd", "rCRSd_3k"]
 
-    bt2_options = " --very-sensitive"
-    bt2_options += " -X 2000"
+    if not param.bowtie2.params:
+        bt2_options = " --very-sensitive"
+        if args.paired_end:
+            bt2_options += " -X 2000"
+    else:
+        bt2_options = param.bowtie2.params
 
     # samtools sort needs a temporary directory
     tempdir = tempfile.mkdtemp(dir=map_genome_folder)
@@ -2579,7 +2660,7 @@ def main():
         else:
             rr = 0
 
-        tmp = pm.get_stat("Trimmed_reads")
+        tmp = pm.get_stat("Trimmed_reads_R1")
         if tmp:
             tr = float(tmp)
         else:
@@ -3001,7 +3082,7 @@ def main():
             with open(Tss_plus) as f:
                 floats = list(map(float, f))
             try:
-                # If the TSS enrichment is 0, don't report            
+                # Catch if the TSS score is trying to divide by 0           
                 list_len = 0.05*float(len(floats))
                 normTSS = [x / (sum(floats[1:int(list_len)]) /
                            len(floats[1:int(list_len)])) for x in floats]
@@ -3019,6 +3100,7 @@ def main():
 
                 pm.report_result("TSS_coding_score", round(Tss_score, 1))
             except ZeroDivisionError:
+                pm.report_result("TSS_coding_score", 0)
                 pass
 
             # Minus TSS enrichment
@@ -3051,6 +3133,7 @@ def main():
 
                 pm.report_result("TSS_non-coding_score", round(Tss_score, 1))
             except ZeroDivisionError:
+                pm.report_result("TSS_non-coding_score", 0)
                 pass
 
         # Call Rscript to plot TSS Enrichment
@@ -3100,9 +3183,10 @@ def main():
                   .format(res.ensembl_tss))
     elif not os.path.exists(res.ensembl_gene_body):
         print("Skipping PI -- Pause index requires 'gene body' annotation file: {}"
-                  .format(res.ensembl_gene_body))
+              .format(res.ensembl_gene_body))
     else:
         pm.timestamp("### Calculate Pause Index (PI)")
+        temp = tempfile.NamedTemporaryFile(dir=QC_folder, delete=False)
         pause_index = os.path.join(QC_folder, args.sample_name +
                                    "_pause_index.bed")
         pause_index_gz = os.path.join(QC_folder, args.sample_name +
@@ -3110,15 +3194,15 @@ def main():
         if not pm.get_stat("Pause_index") or args.new_start:
             # Remove missing chr from PI annotations
             tss_local = os.path.join(QC_folder,
-                                     args.genome_assembly + "_ensembl_tss.bed")
+                args.genome_assembly + "_ensembl_tss.bed")
             body_local = os.path.join(QC_folder,
-                                      args.genome_assembly + "_ensembl_gene_body.bed")
+                args.genome_assembly + "_ensembl_gene_body.bed")
             cmd1 = ("grep -wf " + chr_keep + " " + res.ensembl_tss + " | " +
                     tools.bedtools + " sort -i stdin -faidx " + chr_order + 
                     " > " + tss_local)
-            cmd2 = ("grep -wf " + chr_keep + " " + res.ensembl_gene_body + " | " +
-                    tools.bedtools + " sort -i stdin -faidx " + chr_order + 
-                    " > " + body_local)
+            cmd2 = ("grep -wf " + chr_keep + " " + res.ensembl_gene_body +
+                    " | " + tools.bedtools + " sort -i stdin -faidx " +
+                    chr_order + " > " + body_local)
             pm.run([cmd1,cmd2], [tss_local, body_local], nofail=True)
             pm.clean_add(tss_local)
             pm.clean_add(body_local)
@@ -3144,13 +3228,38 @@ def main():
             pm.run(cmd, body_density, nofail=True)
             pm.clean_add(body_density)
 
-            # Determine pause index
-            cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 2.2 2.3 2.7 " +
-                   TSS_density + " " + body_density +
-                   " | awk -v OFS='\t' '{print $1, $2, $3, $4, ($6/($3-$2))" + 
-                   "/($9/($8-$7)), $5}' | env LC_COLLATE=C sort -k1,1 -k2,2n > " +
-                   pause_index)
+            # Calculate expression and pause indicies
+            cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7" +
+                   " 2.2 2.3 2.7 " + TSS_density + " " + body_density +
+                   " | awk -v OFS='\t' '{ if ($5 == \"+\"){print $1, $2, $8," +
+                   " $4, sqrt((($6+$9)/sqrt(($8-$2)^2))^2), " +
+                   "($6/sqrt(($3-$2)^2))/($9/sqrt(($8-$7)^2)), $5} " +
+                   "else {print $1, $2, $8, $4, " +
+                   "sqrt((($6+$9)/sqrt(($3-$7)^2))^2)," +
+                   "($6/sqrt(($3-$2)^2))/($9/sqrt(($8-$7)^2)), $5}}' " +
+                   "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + temp.name)
             pm.run(cmd, pause_index, nofail=True)
+            temp.close()
+
+            # Calculate median expression
+            cmd = ("awk '{print $5}' " + temp.name + " | sort -n | " +
+                   "awk 'BEGIN{i=0} {s[i]=$1; i++;} " + 
+                   "END{print s[int(NR*0.5-0.5)]}'")
+            median_expr = pm.checkprint(cmd)
+            try:
+                cmd = ("awk -v OFS='\t' '{ if ($5 > " + str(median_expr) +
+                       ") " + "{print $1, $2, $3, $4, $6, $7}}' " + 
+                       temp.name + " > " + pause_index)
+                pm.run(cmd, pause_index, nofail=True)
+            except ZeroDivisionError:
+                # Fall back to using all data to determine pause index
+                cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 " +
+                       "2.2 2.3 2.7 " + TSS_density + " " + body_density +
+                       " | awk -v OFS='\t' '{print $1, $2, $3, $4, " +
+                       "($6/($3-$2))/($9/($8-$7)), $5}' " +
+                       "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + pause_index)
+                pm.run(cmd, pause_index, nofail=True)
+                pass
 
             # Median pause index
             cmd = ("sort -k5,5n " + pause_index +
@@ -3224,42 +3333,6 @@ def main():
         pm.clean_add(gene_sort)
 
     ############################################################################
-    #             Plot fragment distribution (for PE data)                     #
-    ############################################################################
-    # DEPRECATED
-    # if args.paired_end:
-    #     pm.timestamp("### Plot fragment distribution")
-    #     frag_len = os.path.join(QC_folder, args.sample_name + "_fragLen.txt")
-    #     frag_dist_tool = tool_path("fragment_length_dist.pl")
-    #     cmd = build_command([tools.perl, frag_dist_tool,
-    #                          mapping_genome_bam, frag_len])
-
-    #     fragL_counts_file = args.sample_name + "_fragCount.txt"
-    #     fragL_count = os.path.join(QC_folder, fragL_counts_file)
-    #     cmd1 = "sort -n  " + frag_len + " | uniq -c  > " + fragL_count
-
-    #     fragL_dis1 = os.path.join(QC_folder, args.sample_name +
-    #                               "_fragLenDistribution.pdf")
-    #     fragL_dis2 = os.path.join(QC_folder, args.sample_name +
-    #                               "_fragLenDistribution.txt")
-
-    #     cmd2 = (tools.Rscript + " " + tool_path("PEPPRO.R"))
-    #     cmd2 += " frag -l " + frag_len + " -c " + fragL_count
-    #     cmd2 += " -p " + fragL_dis1 + " -t " + fragL_dis2
-
-    #     pm.run([cmd, cmd1, cmd2], fragL_dis1, nofail=True)
-    #     pm.clean_add(frag_len)
-    #     pm.clean_add(fragL_count)
-
-    #     fragL_png = os.path.join(QC_folder, args.sample_name +
-    #                              "_fragLenDistribution.png")
-    #     pm.report_object("Fragment distribution", fragL_dis1,
-    #                      anchor_image=fragL_png)
-    # else:
-    #     pass
-    #     # Used to plot adapter distribution here, but moved to cutadapt.
-
-    ############################################################################
     #                        Extract genomic features                          #
     ############################################################################
     # Generate local unzipped annotation file
@@ -3321,6 +3394,17 @@ def main():
                 cmd1 = ("cut -f 4 " + anno_local + " | sort -u")
             ft_list = pm.checkprint(cmd1, shell=True)
             ft_list = ft_list.splitlines()
+            if param.precedence.params:
+                p_list = param.precedence.params.split(",")
+                p_list = [feature.strip() for feature in p_list]
+                if all(feature in ft_list for feature in p_list):
+                    ft_list = p_list
+                else:
+                    pm.warning("The provided precedence list ({}) of features "
+                               "are not all present in your annotation file "
+                               "({})".format(str(p_list), anno_local))
+                    pm.warning("Defaulting to the order of features in "
+                               "{}".format(anno_local))
 
             # Split annotation file on features
             cmd2 = ("awk -F'\t' '{print>\"" + QC_folder + "/\"$4}' " +
@@ -3534,36 +3618,6 @@ def main():
             pm.run(cmd, FRiF_PDF, nofail=False)
             pm.report_object("FRiF", FRiF_PDF, anchor_image=FRiF_PNG)
 
-    # Minus (unused as we currently use unstranded feature coverage calculation)
-    # if not os.path.exists(frif_minus_PDF) or args.new_start:
-    #     count_cmd = (tools.samtools + " view -@ " + str(pm.cores) + " " +
-    #                  param.samtools.params + " -c -F4 " + minus_bam)
-    #     minus_read_count = pm.checkprint(count_cmd)
-    #     minus_read_count = str(minus_read_count).rstrip()
-
-    #     cFRiF_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-    #                "-n", args.sample_name, "-s", str(genome_size).rstrip(),
-    #                "-r", minus_read_count, "-y", "frif",
-    #                "-o", frif_minus_PDF, "--bed"]
-
-    #     FRiF_cmd = [tools.Rscript, tool_path("PEPPRO.R"), "frif",
-    #                  "-n", args.sample_name, "-s", str(genome_size).rstrip(),
-    #                  "-r", minus_read_count, "-y", "prif",
-    #                  "-o", prif_minus_PDF, "--bed"]
-
-    #     if anno_list_minus:
-    #         for cov in anno_list_minus:
-    #             cFRiF_cmd.append(cov)
-    #             FRiF_cmd.append(cov)
-    #         cmd = build_command(cFRiF_cmd)
-    #         pm.run(cmd, frif_minus_PDF, nofail=False)
-    #         pm.report_object("Minus FRiF", frif_minus_PDF,
-    #                          anchor_image=frif_minus_PNG)
-    #         cmd = build_command(FRiF_cmd)
-    #         pm.run(cmd, prif_minus_PDF, nofail=False)
-    #         pm.report_object("Minus PRiF", prif_minus_PDF,
-    #                          anchor_image=prif_minus_PNG)
-
     ############################################################################
     #                         Report mRNA contamination                        #
     ############################################################################
@@ -3588,8 +3642,8 @@ def main():
             # a single sort fails to sort a 1 bp different start position intron
             cmd2 = ("grep -wf " + chr_keep + " " + res.refgene_intron +
                     " | " + tools.bedtools + " sort -i stdin -faidx " +
-                    chr_order + " | " + tools.bedtools + " sort -i stdin -faidx " +
-                    chr_order + " > " + introns_sort)
+                    chr_order + " | " + tools.bedtools +
+                    " sort -i stdin -faidx " + chr_order + " > " + introns_sort)
             pm.run([cmd1, cmd2], [exons_sort, introns_sort], nofail=True)
             pm.clean_add(exons_sort)
             pm.clean_add(introns_sort)
@@ -3625,12 +3679,14 @@ def main():
                        "strand[$4] = $6; " +
                        "readCount[$4] += $7; " + 
                        "exonCount[$4] += 1; " +
-                       "geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); " +
+                       "geneSizeKB[$4] += " +
+                       "(sqrt(($3-$2+0.00000001)^2)/1000); " +
                        "gene[$4] = $4; " +
                        "chromEnd[$4]=$3; " +
                        "prev4=$4} END " +
                        "{ for (a in readCount) " +
-                       "{ print chrom[a], chromStart[a], chromEnd[a], gene[a], " +
+                       "{ print chrom[a], chromStart[a], " +
+                       "chromEnd[a], gene[a], " +
                        "(readCount[a]/" + str(scaling_factor) +
                        ")/geneSizeKB[a], strand[a]}}' " +
                         exons_cov + " | awk '$5>0' | sort -k4 > " +
@@ -3645,12 +3701,14 @@ def main():
                        "strand[$4] = $6; " +
                        "readCount[$4] += $7; " + 
                        "exonCount[$4] += 1; " +
-                       "geneSizeKB[$4] += (sqrt(($3-$2+0.00000001)^2)/1000); " +
+                       "geneSizeKB[$4] += " +
+                       "(sqrt(($3-$2+0.00000001)^2)/1000); " +
                        "gene[$4] = $4; " +
                        "chromEnd[$4]=$3; " +
                        "prev4=$4} END " +
                        "{ for (a in readCount) " +
-                       "{ print chrom[a], chromStart[a], chromEnd[a], gene[a], " +
+                       "{ print chrom[a], chromStart[a], " +
+                       "chromEnd[a], gene[a], " +
                        "(readCount[a]/" + str(scaling_factor) +
                        ")/geneSizeKB[a], strand[a]}}' " +
                         introns_cov + " | awk '$5>0' | sort -k4 > " +
@@ -3718,6 +3776,10 @@ def main():
         # separate strand bigWigs; just convert the BAM's directly with 
         # bamSitesToWig.py which uses UCSC wigToBigWig
         pm.timestamp("### Produce bigWig files")
+        
+        # need Total Reads divided by 1M
+        ar = float(pm.get_stat("Aligned_reads"))
+        scaling_factor = float(ar/1000000)
 
         wig_cmd_callable = ngstk.check_command("wigToBigWig")
 
@@ -3732,6 +3794,8 @@ def main():
             cmd2 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd2 += " --tail-edge"
+            if args.scale:
+                cmd2 += " --scale " + str(ar)
             pm.run([cmd1, cmd2], [plus_exact_bw, plus_smooth_bw])
 
             cmd3 = tools.samtools + " index " + minus_bam
@@ -3744,6 +3808,8 @@ def main():
             cmd4 += " --variable-step"
             if args.protocol.lower() in RUNON_SOURCE_PRO:
                 cmd4 += " --tail-edge"
+            if args.scale:
+                cmd4 += " --scale " + str(ar)
             pm.run([cmd3, cmd4], [minus_exact_bw, minus_smooth_bw])
         else:
             print("Skipping signal track production -- Could not call \'wigToBigWig\'.")
@@ -3759,7 +3825,11 @@ def main():
         pm.timestamp("### Use seqOutBias to produce bigWig files")
 
         seqtable = os.path.join(signal_folder, (args.genome_assembly + ".tbl"))
+        seqtable_flag = os.path.join(signal_folder, "seqtable_complete.flag")
 
+        if not os.path.exists(seqtable_flag) and os.path.exists(seqtable):
+            os.remove(seqtable)
+            
         seqtable_cmd = build_command([
             (tools.seqoutbias, "seqtable"),
             res.fasta,
@@ -3768,33 +3838,11 @@ def main():
             str("--read-size=" + str(max_len)),
             str("--out=" + seqtable)
         ])
+        
+        complete_cmd = "touch " + seqtable_flag
 
-        pm.run(seqtable_cmd, seqtable)
+        pm.run([seqtable_cmd, complete_cmd], seqtable_flag)
         pm.clean_add(seqtable)
-
-        plus_table = os.path.join(
-            signal_folder, (args.genome_assembly + "_plus_tbl.txt"))
-
-        table_plus_cmd = build_command([
-            (tools.seqoutbias, "table"),
-            seqtable,
-            plus_bam,
-            (">", plus_table)
-        ])
-
-        minus_table = os.path.join(
-            signal_folder, (args.genome_assembly + "_minus_tbl.txt"))
-
-        table_minus_cmd = build_command([
-            (tools.seqoutbias, "table"),
-            seqtable,
-            minus_bam,
-            (">", minus_table)
-        ])
-
-        pm.run([table_plus_cmd, table_minus_cmd], minus_table)
-        pm.clean_add(plus_table)
-        pm.clean_add(minus_table)
 
         if args.scale:
             scale_plus_chunks = [

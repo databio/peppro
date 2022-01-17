@@ -1,5 +1,5 @@
 File_mb	3550.33	PEPPRO
-Read_type	single	PEPPRO
+Read_type	SINGLE	PEPPRO
 Genome	hg38	PEPPRO
 Raw_reads	72718941	PEPPRO
 Fastq_reads	72718941	PEPPRO
@@ -27,9 +27,15 @@ PBC2	13.55	PEPPRO
 Unmapped_reads	10809494	PEPPRO
 TSS_coding_score	7.3	PEPPRO
 TSS_non-coding_score	4.1	PEPPRO
-Pause_index	6.18	PEPPRO
+File_mb	3550.33	PEPPRO
+Read_type	SINGLE	PEPPRO
+Genome	hg38	PEPPRO
+File_mb	3550.33	PEPPRO
+Read_type	SINGLE	PEPPRO
+Genome	hg38	PEPPRO
+Pause_index	4.92	PEPPRO
 Plus_FRiP	0.37	PEPPRO
 Minus_FRiP	0.33	PEPPRO
 mRNA_contamination	3.22	PEPPRO
-Time	1:23:01	PEPPRO
-Success	02-27-10:47:33	PEPPRO
+Time	0:16:11	PEPPRO
+Success	06-14-21:30:12	PEPPRO

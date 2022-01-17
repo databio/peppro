@@ -159,13 +159,13 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                required=FALSE, default=500000000,
                                description="Upper x-limit (default 500 million)")
 
-        p <- plotComplexityCurves(ccurves = input,
-                                  coverage = coverage,
-                                  read_length = read_length,
-                                  real_counts_path = real_counts,
-                                  ignore_unique = ign_unique,
-                                  x_min = x_min,
-                                  x_max = x_max)
+        p <- PEPPROr::plotComplexityCurves(ccurves = input,
+                                           coverage = coverage,
+                                           read_length = read_length,
+                                           real_counts_path = real_counts,
+                                           ignore_unique = ign_unique,
+                                           x_min = x_min,
+                                           x_max = x_max)
 
         if (length(input) == 1) {
             # now save the plot
@@ -243,13 +243,13 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                                description="Coverage file(s).")
         #message(paste0("\nbed: ", bed))
 
-        p <- plotFRiF(sample_name = sample_name,
-                      num_reads = as.numeric(num_reads),
-                      genome_size = as.numeric(genome_size),
-                      type = tolower(type),
-                      reads = reads,
-                      output_name = output_name,
-                      bedFile = bed)
+        p <- PEPPROr::plotFRiF(sample_name = sample_name,
+                               num_reads = as.numeric(num_reads),
+                               genome_size = as.numeric(genome_size),
+                               type = tolower(type),
+                               reads = reads,
+                               output_name = output_name,
+                               bedFile = bed)
 
         if (tolower(type) == "both") {
             pdf(file = paste0(tools::file_path_sans_ext(output_name), ".pdf"),
@@ -320,9 +320,9 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         TSSfile     <- opt_get(name = c("input", "i"), required=TRUE, n=inArgs,
                                description="TSS enrichment file.")
 
-        p           <- plotTSS(TSSfile = TSSfile)
+        p           <- PEPPROr::plotTSS(TSSfile = TSSfile)
 
-        sample_name <- sampleName(TSSfile[1])
+        sample_name <- PEPPROr::sampleName(TSSfile[1])
 
         png(filename = paste0(sample_name, "_TSSenrichment.png"),
             width = 275, height = 275)
@@ -372,9 +372,9 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         fragL_txt   <- opt_get(name = c("text", "t"), required=TRUE,
                                description="Fragment length distribution stats file.")
 
-        p <- plotFLD(fragL = fragL,
-                     fragL_count = fragL_count,
-                     fragL_txt = fragL_txt)
+        p <- PEPPROr::plotFLD(fragL = fragL,
+                              fragL_count = fragL_count,
+                              fragL_txt = fragL_txt)
 
         # Save plot to pdf file
         pdf(file=fragL_name, width = 4, height = 4, useDingbats=F)
@@ -425,11 +425,12 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
         annotate <- opt_get(name = c("annotate", "a"), required=FALSE, default=FALSE,
                             description="Display raw and log10-transformed median values on plot.")
 
-        sample_name        <- sampleName(rpkm, 3)
+        sample_name        <- PEPPROr::sampleName(rpkm, 3)
         name               <- basename(sample_name)
-        suppressWarnings(p <- mRNAcontamination(rpkm=rpkm, name=name, raw=raw,
-                                                type=tolower(type),
-                                                annotate=annotate))
+        suppressWarnings(p <- PEPPROr::mRNAcontamination(rpkm=rpkm, name=name,
+                                                         raw=raw,
+                                                         type=tolower(type),
+                                                         annotate=annotate))
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_mRNA_contamination.pdf"),
@@ -483,8 +484,9 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         sample_name        <- sampleName(input)
         name               <- basename(sample_name)
-        suppressWarnings(p <- plotPI(pi=input, name=name, raw=raw,
-                                     type=tolower(type), annotate=annotate))
+        suppressWarnings(p <- PEPPROr::plotPI(pi=input, name=name, raw=raw,
+                                              type=tolower(type),
+                                              annotate=annotate))
 
         # Save plot to pdf file
         pdf(file=paste0(sample_name, "_pause_index.pdf"),
@@ -540,9 +542,9 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
 
         name               <- basename(sampleName(input, num_fields=1))
         #message(name)
-        suppressWarnings(p <- plotCutadapt(input=input, name=name,
-                                           umi_len = umi_len,
-                                           count_factor=factor))
+        suppressWarnings(p <- PEPPROr::plotCutadapt(input=input, name=name,
+                                                    umi_len = umi_len,
+                                                    count_factor=factor))
         sample_name        <- paste(output, name, sep="/")
         #message(sample_name)
 
@@ -596,10 +598,10 @@ if (is.na(subcmd) || grepl("/R", subcmd)) {
                            default = 0,
                            description="UMI length (Default 0).")
 
-        name               <- basename(sampleName(input, num_fields=0))
+        name               <- basename(PEPPROr::sampleName(input, num_fields=0))
         #message(name)
-        suppressWarnings(p <- plotAdapt(input=input, name=name,
-                                        umi_len = umi_len))
+        suppressWarnings(p <- PEPPROr::plotAdapt(input=input, name=name,
+                                                 umi_len = umi_len))
         sample_name        <- paste(output, name, sep="/")
         #message(sample_name)
 

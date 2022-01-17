@@ -31,4 +31,5 @@ anno/mm10_annotations.bed.gz
 anno/mm10_annotations.bed
 anno/mm9_annotations.bed.gz
 anno/mm9_annotations.bed
-
+.DS_Store
+._*

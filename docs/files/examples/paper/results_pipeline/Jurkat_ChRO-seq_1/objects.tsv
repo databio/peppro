@@ -2,6 +2,10 @@ FastQC report r1	fastqc/Jurkat_ChRO-seq_1_R1_processed_fastqc.html	FastQC report
 Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_1_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_1_R1_adapter_insertion_distribution.png	PEPPRO
 Library complexity	QC_hg38/Jurkat_ChRO-seq_1_preseq_plot.pdf	Library complexity	QC_hg38/Jurkat_ChRO-seq_1_preseq_plot.png	PEPPRO
 TSS enrichment	QC_hg38/Jurkat_ChRO-seq_1_TSSenrichment.pdf	TSS enrichment	QC_hg38/Jurkat_ChRO-seq_1_TSSenrichment.png	PEPPRO
+Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_1_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_1_R1_adapter_insertion_distribution.png	PEPPRO
+TSS enrichment	QC_hg38/Jurkat_ChRO-seq_1_TSSenrichment.pdf	TSS enrichment	QC_hg38/Jurkat_ChRO-seq_1_TSSenrichment.png	PEPPRO
+Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_1_R1_adapter_insertion_distribution.pdf	Adapter insertion distribution	cutadapt/Jurkat_ChRO-seq_1_R1_adapter_insertion_distribution.png	PEPPRO
+TSS enrichment	QC_hg38/Jurkat_ChRO-seq_1_TSSenrichment.pdf	TSS enrichment	QC_hg38/Jurkat_ChRO-seq_1_TSSenrichment.png	PEPPRO
 Pause index	QC_hg38/Jurkat_ChRO-seq_1_pause_index.pdf	Pause index	QC_hg38/Jurkat_ChRO-seq_1_pause_index.png	PEPPRO
 cFRiF	QC_hg38/Jurkat_ChRO-seq_1_cFRiF.pdf	cFRiF	QC_hg38/Jurkat_ChRO-seq_1_cFRiF.png	PEPPRO
 FRiF	QC_hg38/Jurkat_ChRO-seq_1_FRiF.pdf	FRiF	QC_hg38/Jurkat_ChRO-seq_1_FRiF.png	PEPPRO

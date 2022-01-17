@@ -1,25 +1,69 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+
+## [0.9.11] -- 2021-03-04
+
+### Changed
+ - Fixed error in order of argument terms for _remove_adapters() 
+ 
+### Added
+ - Added documentation for using custom adapters
+
+## [0.9.10] -- 2020-09-28
+
+### Changed
+ - Changed looper pypi term
+ - Updated documentation to reflect companion software updates
+
+## [0.9.9] -- 2020-08-28
+
+### Changed
+ - Improve clarity of trimmed reads reporting
+
+## [0.9.8] -- 2020-06-16
+
+### Changed
+ - Fix summarizer file path construction
+ - Add minimum version requirements to required software
+ - Update uninformative adapter read calculation
+ - Update example output
+ - Update pause index calculation to be inflexible to depth
+ - Fix cFRiF y-axis
+ - Update cutadapt calculations to newer versions of cutadapt
+ - Update resource defaults
+ - Update requirement base versions
+ - Update schema
+
+## [0.9.7] -- 2020-05-26
+
+### Added
+ - Create assets summary for samples and project
+ - Add optional scaling of signal tracks
+
+### Changed
+ - Update to PEP 2.0 standard
+ - Update docs and examples
+
 ## [0.9.6] -- 2020-03-31
 
-## Changed
+### Changed
  - Fixed refgenie bowtie2 index assignment
 
 ## [0.9.5] -- 2020-03-26
 
-## Changed
+### Changed
  - Updated FRiF calculation to only account for the `count` column
  - Updated FRiF calculation to check if results are empty
 
 ## [0.9.4] -- 2020-03-25
 
-## Changed
+### Changed
  - Updated bowtie2 index checks to be in line with refgenie updates
 
 ## [0.9.3] -- 2020-03-25
 
-## Changed
+### Changed
  - Added checks for correct value return on cutadapt report checks
 
 ## [0.9.2] -- 2020-03-25
