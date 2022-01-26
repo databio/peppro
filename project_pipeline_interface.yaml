@@ -15,7 +15,7 @@ command_template: >
 compute:
   singularity_image: ${SIMAGES}peppro
   docker_image: databio/peppro
-  bulker_crate: databio/peppro
+  bulker_crate: databio/peppro:1.0.1
   size_dependent_variables: resources.tsv
 
 bioconductor:
