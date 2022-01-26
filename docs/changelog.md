@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
  - Updated requirements.txt for package updates
+ - Update bulker crate version
  - Made refgenie optional
  - Updated installation guides for native, containers, multi-container, and conda.
  - Updated detailed installation guide
