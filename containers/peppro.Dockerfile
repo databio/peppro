@@ -5,7 +5,7 @@ FROM phusion/baseimage:master
 LABEL maintainer Jason Smith "jasonsmith@virginia.edu"
 
 # Version info
-LABEL version 0.9.11
+LABEL version 0.10.0
 
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
@@ -15,24 +15,43 @@ RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes \    
     curl \
+    cmake \
     default-jre \
     default-jdk \
     git \
     gsl-bin \
+    libbz2-dev \
     libgsl-dbg \
     libgsl-dev \
     libcommons-math3-java \
     libcurl4-gnutls-dev \ 
     libjbzip2-java \
     libpng-dev \
+    liblua5.1-0-dev \
+    libisal-dev \
+    libdeflate-dev \
     libssl-dev \
     libtbb2 \
     libtbb-dev \
+    libbam-dev \
+    libssl-dev \
+    libtbb2 \
+    libtbb-dev \
+    lua-filesystem-dev \
+    lua-lpeg-dev \
+    lua-md5-dev \
+    libexpat1-dev \
+    libtre-dev \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libsqlite3-dev \
+    libxml2-dev \
     openssl \
     pigz=2.4-1 \
     python3.8 \
     python3-pip \
     python3-dev \
+    software-properties-common \
     build-essential \
     rustc \
     wget \
@@ -82,8 +101,13 @@ RUN Rscript -e "install.packages('argparser')" && \
     Rscript -e "install.packages('xml2')" && \
     Rscript -e "install.packages('roxygen2')" && \
     Rscript -e "install.packages('rversions')" && \
-    Rscript -e "install.packages('devtools')" && \
-    Rscript -e "devtools::install_github('pepkit/pepr')" && \    
+    Rscript -e "install.packages('callr')" && \
+    Rscript -e "install.packages('pkgbuild')" && \
+    Rscript -e "install.packages('rcmdcheck')" && \
+    Rscript -e "install.packages('testthat')" && \
+    Rscript -e "install.packages('devtools')"
+    
+RUN Rscript -e "devtools::install_github('pepkit/pepr')" && \    
     Rscript -e "install.packages('data.table')" && \
     Rscript -e "install.packages('BiocManager')" && \
     Rscript -e "BiocManager::install('GenomicRanges')" && \
@@ -100,7 +124,7 @@ RUN Rscript -e "install.packages('argparser')" && \
     Rscript -e "install.packages('gtable')" && \
     Rscript -e "install.packages('scales')" && \
     Rscript -e "install.packages('stringr')" && \
-    Rscript -e "devtools::install_github('databio/pepprp/PEPPROr/', ref = 'master')"
+    Rscript -e "devtools::install_github('databio/peppro/PEPPROr/', ref = 'master')"
 
 # Install htslib
 WORKDIR /home/src/
@@ -177,6 +201,20 @@ RUN wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/wigToBigWig && \
     ln -s /home/tools/wigToBigWig /usr/bin/ && \
     ln -s /home/tools/bigWigCat /usr/bin/
 
+# Install FLASH
+WORKDIR /home/src/
+RUN wget -O FLASH-1.2.11.tar.gz http://ccb.jhu.edu/software/FLASH/FLASH-1.2.11-Linux-x86_64.tar.gz && \
+    tar xf FLASH-1.2.11.tar.gz && \
+    ln -s /home/src/FLASH-1.2.11-Linux-x86_64/flash /usr/bin/
+
+# Install fastq_pair
+WORKDIR /home/src/
+RUN git clone https://github.com/linsalrob/fastq-pair.git && \
+    cd fastq-pair/ &&\
+    mkdir build && cd build && \
+    cmake /home/src/fastq-pair/ && \
+    make && \
+    make install
 
 # OPTIONAL REQUIREMENTS
 # Install fastqc
@@ -206,6 +244,7 @@ RUN git clone https://github.com/agordon/libgtextutils.git && \
     git clone https://github.com/agordon/fastx_toolkit && \
     cd fastx_toolkit && \
     ./reconf && \
+    sed -i 's/-Werror//g' configure.ac && \
     ./configure && \
     make && \
     make install
@@ -230,6 +269,9 @@ RUN wget -O seqOutBias-v1.3.0.tar.gz 'https://github.com/guertinlab/seqOutBias/a
 ENV PATH=/home/tools/bin:/home/tools/:/home/tools/bin/kentUtils/:/home/src/bowtie2-2.4.2:/home/src/skewer:/home/src/samtools-1.12:/home/src/htslib-1.12:$PATH \
     R_LIBS_USER=/usr/local/lib/R/site-library/ \
     PYTHONPATH=/usr/local/lib/python3.8/dist-packages:$PYTHONPATH
+
+# Set Python3 as python
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 # Define default command
 WORKDIR /home/
