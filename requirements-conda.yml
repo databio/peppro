@@ -61,7 +61,7 @@ dependencies:
   - coverage=6.1.1=py39h3811e60_0
   - cryptography=35.0.0=py39h95dcef6_1
   - curl=7.79.1=h2574ce0_1
-  - cutadapt
+  - cutadapt>=2.9
   - cykhash=1.0.2=py39hf149a3a_2
   - cython=0.29.24=py39he80948d_0
   - fastqc=0.11.9=hdfd78af_1
@@ -393,6 +393,7 @@ dependencies:
     - mygene==3.2.2
     - pandas==1.3.4
     - pararead==0.7.0
+    - piper>=0.12.3
     - pyrsistent==0.18.0
     - pysam==0.17.0
     - pyyaml==6.0
