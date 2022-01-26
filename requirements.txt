@@ -1,8 +1,14 @@
+attmap>=0.13.0
+divvy>=0.6.0
+eido>=0.1.3
 cutadapt>=2.9
-looper>=1.2
-numpy
-pandas>=0.20.2
+looper>=1.3.1
+numpy>=1.17
+pandas>=1.3.4
 pararead>=0.7.0
-piper>=0.12.1
-refgenconf
-refgenie>=0.9.1
+peppy>=0.31.1
+piper>=0.12.3
+refgenconf>=0.7.0
+refgenie>=0.12.1 # Optional v0.9.12+
+ubiquerg>=0.6.1
+yacman>=0.6.7

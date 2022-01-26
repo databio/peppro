@@ -8,24 +8,26 @@
 ```{console}
 usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--silent] [--verbosity V]
                  [--logdev] [-C CONFIG_FILE] -O PARENT_OUTPUT_FOLDER
-                 [-M MEMORY_LIMIT] [-P NUMBER_OF_CORES] -S SAMPLE_NAME -I
-                 INPUT_FILES [INPUT_FILES ...]
-                 [-I2 [INPUT_FILES2 [INPUT_FILES2 ...]]] -G GENOME_ASSEMBLY
-                 [-Q SINGLE_OR_PAIRED]
+                 [-M MEMORY_LIMIT] [-P NUMBER_OF_CORES]
+                 [--pipeline-name PIPELINE_NAME] -S SAMPLE_NAME -I INPUT_FILES
+                 [INPUT_FILES ...] [-I2 [INPUT_FILES2 [INPUT_FILES2 ...]]] -G
+                 GENOME_ASSEMBLY [-Q SINGLE_OR_PAIRED]
                  [--protocol {PRO,pro,PRO-SEQ,PRO-seq,proseq,PROSEQ,GRO,gro,groseq,GROSEQ,GRO-SEQ,GRO-seq}]
                  [--adapter-tool {cutadapt,fastp}]
                  [--dedup-tool {seqkit,fqdedup}]
                  [--trimmer-tool {seqtk,fastx}] [--umi-len UMI_LEN]
                  [--max-len MAX_LEN] [--sob] [--scale]
-                 [--prealignments PREALIGNMENTS [PREALIGNMENTS ...]]
-                 [--TSS-name TSS_NAME] [--pi-tss ENSEMBL_TSS]
+                 [--prealignment-names PREALIGNMENT_NAMES [PREALIGNMENT_NAMES ...]]
+                 [--prealignment-index PREALIGNMENT_INDEX [PREALIGNMENT_INDEX ...]]
+                 --genome-index GENOME_INDEX [--fasta FASTA] --chrom-sizes
+                 CHROM_SIZES [--TSS-name TSS_NAME] [--pi-tss ENSEMBL_TSS]
                  [--pi-body ENSEMBL_GENE_BODY] [--pre-name PRE_NAME]
                  [--anno-name ANNO_NAME] [--exon-name EXON_NAME]
                  [--intron-name INTRON_NAME] [--search-file SEARCH_FILE]
                  [--coverage] [--keep] [--noFIFO] [--no-complexity]
                  [--prioritize] [-V]
 
-PEPPRO version 0.9.11
+PEPPRO version 0.10.0
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -46,6 +48,8 @@ optional arguments:
                         [K|M|G|T].
   -P NUMBER_OF_CORES, --cores NUMBER_OF_CORES
                         Number of cores for parallelized processes
+  --pipeline-name PIPELINE_NAME
+                        Name of the pipeline
   -I2 [INPUT_FILES2 [INPUT_FILES2 ...]], --input2 [INPUT_FILES2 [INPUT_FILES2 ...]]
                         Secondary input files, such as read2
   -Q SINGLE_OR_PAIRED, --single-or-paired SINGLE_OR_PAIRED
@@ -67,9 +71,20 @@ optional arguments:
   --scale               Scale signal tracks: Default is to scale by read
                         count. If using seqOutBias, scales by the
                         expected/observed cut frequency.
-  --prealignments PREALIGNMENTS [PREALIGNMENTS ...]
-                        Space-delimited list of reference genomes to align to
-                        before primary alignment.
+  --prealignment-names PREALIGNMENT_NAMES [PREALIGNMENT_NAMES ...]
+                        Space-delimited list of prealignment genome names to
+                        align to before primary alignment.
+  --prealignment-index PREALIGNMENT_INDEX [PREALIGNMENT_INDEX ...]
+                        Space-delimited list of prealignment genome name and
+                        index files delimited by an equals sign to align to
+                        before primary alignment. e.g.
+                        rCRSd=/path/to/bowtie2_index/.
+  --genome-index GENOME_INDEX
+                        Path to bowtie2 primary genome index file.
+  --fasta FASTA         Path to primary genome fasta file. Required with
+                        --sob.
+  --chrom-sizes CHROM_SIZES
+                        Path to primary genome chromosome sizes file.
   --TSS-name TSS_NAME   file_name of TSS annotation file.
   --pi-tss ENSEMBL_TSS  file_name of pause index TSS annotation file.
   --pi-body ENSEMBL_GENE_BODY
@@ -82,8 +97,9 @@ optional arguments:
   --intron-name INTRON_NAME
                         file_name of intron annotation file.
   --search-file SEARCH_FILE
-                        file_name of read length matched gt tallymer index
-                        search file
+                        Required for seqOutBias (--sob). Path to tallymer
+                        index search file built with the same read length as
+                        the input.
   --coverage            Report library complexity using coverage: reads /
                         (bases in genome / read length)
   --keep                Keep prealignment BAM files

@@ -1,6 +1,20 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.10.0] -- 2022-01-26
+
+### Added
+ - Include single, monolithic style Dockerfile
+ - Added conda install option and guide
+ - Added descriptions of assets used to docs
+
+### Changed
+ - Updated requirements.txt for package updates
+ - Update bulker crate version
+ - Made refgenie optional
+ - Updated installation guides for native, containers, multi-container, and conda.
+ - Updated detailed installation guide
+ - Updated guide for running samples on a cluster
 
 ## [0.9.11] -- 2021-03-04
 

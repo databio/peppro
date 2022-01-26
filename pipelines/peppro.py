@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.9.11"
+__version__ = "0.10.0"
 
 from argparse import ArgumentParser
 import os
@@ -44,7 +44,8 @@ def parse_arguments():
     parser = ArgumentParser(description='PEPPRO version ' + __version__)
     parser = pypiper.add_pypiper_args(parser, groups=
         ['pypiper', 'looper', 'ngs'],
-        required=["input", "genome", "sample-name", "output-parent"])
+        required=["input", "genome", "sample-name", "output-parent",
+                  "chrom_sizes", "genome_index"])
 
     # Pipeline-specific arguments
     parser.add_argument("--protocol", dest="protocol",
@@ -90,9 +91,32 @@ def parse_arguments():
                              "If using seqOutBias, scales by the expected/"
                              "observed cut frequency.")
 
-    parser.add_argument("--prealignments", default=[], type=str, nargs="+",
-                        help="Space-delimited list of reference genomes to "
-                             "align to before primary alignment.")
+    # Prealignment genome assets
+    parser.add_argument("--prealignment-names", default=[], type=str,
+                        nargs="+",
+                        help="Space-delimited list of prealignment genome "
+                             "names to align to before primary alignment.")
+    
+    parser.add_argument("--prealignment-index", default=[], type=str,
+                        nargs="+",
+                        help="Space-delimited list of prealignment genome "
+                             "name and index files delimited by an equals sign "
+                             "to align to before primary alignment. "
+                             "e.g. rCRSd=/path/to/bowtie2_index/.")
+
+    # Genome assets
+    parser.add_argument("--genome-index", default=None, required=True,
+                        dest="genome_index", type=str,
+                        help="Path to bowtie2 primary genome index file.")
+
+    parser.add_argument("--fasta", default=None, required=False,
+                        dest="fasta", type=str,
+                        help="Path to primary genome fasta file. Required "
+                              "with --sob.")
+    
+    parser.add_argument("--chrom-sizes", default=None, required=True,
+                        dest="chrom_sizes", type=str,
+                        help="Path to primary genome chromosome sizes file.")
 
     parser.add_argument("--TSS-name", default=None,
                         dest="TSS_name", type=str,
@@ -124,8 +148,9 @@ def parse_arguments():
 
     parser.add_argument("--search-file", default=None,
                         dest="search_file", type=str,
-                        help="file_name of read length matched gt tallymer "
-                             "index search file")
+                        help="Required for seqOutBias (--sob). "
+                             "Path to tallymer index search file built "
+                             "with the same read length as the input.")
 
     parser.add_argument("--coverage", action='store_true', default=False,
                         dest="coverage",
@@ -1958,7 +1983,9 @@ def main():
     res   = pm.config.resources
     #sstructure = pm.sample_structure  # maybe possible in the future?
 
-    # Check that the required tools are callable by the pipeline
+    ############################################################################
+    #                Confirm required tools are all callable                   #
+    ############################################################################
     tool_list = [v for k,v in tools.items()]    # extract tool list
     tool_list = [t.replace('fastx', 'fastx_trimmer') for t in tool_list]
     tool_list = [t.replace('seqoutbias', 'seqOutBias') for t in tool_list]
@@ -1979,106 +2006,97 @@ def main():
         pm.fail_pipeline(RuntimeError(err_msg))
 
     if args.input2 and not args.paired_end:
-        err_msg = "Incompatible settings: You specified single-end, but provided --input2."
+        err_msg = (f"Incompatible settings: You specified single-end, "
+                   f"but provided --input2.")
         pm.fail_pipeline(RuntimeError(err_msg))
 
-    # Set up reference resource according to genome prefix.
-    check_list = [
-        {"asset_name":"fasta", "seek_key":"chrom_sizes",
-         "tag_name":"default", "arg":None, "user_arg":None,
-         "required":True},
-        {"asset_name":"fasta", "seek_key":None,
-         "tag_name":"default", "arg":None, "user_arg":None,
-         "required":True},
-        {"asset_name":BT2_IDX_KEY, "seek_key":None,
-         "tag_name":"default", "arg":None, "user_arg":None,
-         "required":True}
-    ]
-    # If user specifies TSS file, use that instead of the refgenie asset
-    if not (args.TSS_name):
-        check_list.append(
-            {"asset_name":"refgene_anno", "seek_key":"refgene_tss",
-             "tag_name":"default", "arg":"TSS_name", "user_arg":"TSS-name",
-             "required":False}
-        )
-    # If user specifies a custom pause index TSS file, use that instead
-    if not (args.ensembl_tss):
-        check_list.append(
-            {"asset_name":"ensembl_gtf", "seek_key":"ensembl_tss",
-             "tag_name":"default", "arg":"ensembl_tss", "user_arg":"pi-tss",
-             "required":False}
-        )
-    # If user specifies a custom pause index gene body file, use that instead
-    if not (args.ensembl_gene_body):
-        check_list.append(
-            {"asset_name":"ensembl_gtf", "seek_key":"ensembl_gene_body",
-             "tag_name":"default", "arg":"ensembl_gene_body",
-             "user_arg":"pi-body", "required":False}
-        )
-    # If user specifies a custom premature RNA file, use that instead
-    if not (args.pre_name):
-        check_list.append(
-            {"asset_name":"refgene_anno", "seek_key":"refgene_pre_mRNA",
-             "tag_name":"default", "arg":"pre_name", "user_arg":"pre-name",
-             "required":False}
-        )
-    # If user specifies feature annotation file,
-    # use that instead of the refgenie managed asset
-    if not (args.anno_name):
-        check_list.append(
-            {"asset_name":"feat_annotation", "seek_key":"feat_annotation",
-            "tag_name":"default", "arg":"anno_name", "user_arg":"anno-name",
-            "required":False}
-        )
-    # If user specifies a custom exon file, use that instead
-    if not (args.exon_name):
-        check_list.append(
-            {"asset_name":"refgene_anno", "seek_key":"refgene_exon",
-             "tag_name":"default", "arg":"exon_name", "user_arg":"exon-name",
-             "required":False}
-        )
-    # If user specifies a custom intron file, use that instead
-    if not (args.intron_name):
-        check_list.append(
-            {"asset_name":"refgene_anno", "seek_key":"refgene_intron",
-             "tag_name":"default", "arg":"intron_name",
-             "user_arg":"intron-name", "required":False}
-        )
-    res, rgc = _add_resources(args, res, check_list)
+    ############################################################################
+    #                       Set up reference resources                         #
+    ############################################################################
 
-    # If the user specifies optional files, add those to our resources
-    if ((args.TSS_name) and os.path.isfile(args.TSS_name) and
+    # Add prealignment genome annotation files to resources
+    if args.prealignment_index:
+        pm.debug(f"prealignments: {args.prealignment_index}")
+        res.prealignment_index = args.prealignment_index
+    
+    # Add primary genome annotation files to resources
+    res.genome_index = args.genome_index
+
+    if res.genome_index.endswith("."):
+        # Replace last occurrence of . with genome name
+        res.genome_index = os.path.abspath((
+            res.genome_index[:res.genome_index.rfind(".")] + 
+            args.genome_assembly)
+        )
+    pm.debug(f"primary genome index: {args.genome_index}")
+    
+    if (args.chrom_sizes and os.path.isfile(args.chrom_sizes) and
+            os.stat(args.chrom_sizes).st_size > 0):
+        res.chrom_sizes = os.path.abspath(args.chrom_sizes)
+
+    # Add optional files to resources
+    if args.sob and not args.search_file:
+        err_msg = (f"You specified --sob but did not include the path to"
+                   f"the tallymer index search file. Specify this with"
+                   f"--search-file <path to search file>")
+        pm.fail_pipeline(RuntimeError(err_msg))
+    if args.sob and not args.fasta:
+        err_msg = (f"You specified --sob but did not include the path to"
+                   f"the genome fasta file. Specify this with"
+                   f"--fasta <path to fasta file>")
+        pm.fail_pipeline(RuntimeError(err_msg))
+    if (args.fasta and os.path.isfile(args.fasta) and
+            os.stat(args.fasta).st_size > 0):
+        res.fasta = os.path.abspath(args.fasta)
+    if (args.search_file and os.path.isfile(args.search_file) and
+            os.stat(args.search_file).st_size > 0):
+        res.search_file = os.path.abspath(args.search_file)
+    if (args.TSS_name and os.path.isfile(args.TSS_name) and
             os.stat(args.TSS_name).st_size > 0):
-        res.refgene_tss = args.TSS_name
-    if ((args.ensembl_tss) and os.path.isfile(args.ensembl_tss) and
-            os.stat(args.ensembl_tss).st_size > 0):
-        res.ensembl_tss = args.ensembl_tss
-    if ((args.ensembl_gene_body) and os.path.isfile(args.ensembl_gene_body) and
-            os.stat(args.ensembl_gene_body).st_size > 0):
-        res.ensembl_gene_body = args.ensembl_gene_body
-    if ((args.pre_name) and os.path.isfile(args.pre_name) and
-            os.stat(args.pre_name).st_size > 0):
-        res.refgene_pre_mRNA = args.pre_name
-    if ((args.anno_name) and os.path.isfile(args.anno_name) and
+        res.refgene_tss = os.path.abspath(args.TSS_name)
+    if (args.anno_name and os.path.isfile(args.anno_name) and
             os.stat(args.anno_name).st_size > 0):
-        res.feat_annotation = args.anno_name
-    if ((args.exon_name) and os.path.isfile(args.exon_name) and
+        res.feat_annotation = os.path.abspath(args.anno_name)  
+    if (args.ensembl_tss and os.path.isfile(args.ensembl_tss) and
+            os.stat(args.ensembl_tss).st_size > 0):
+        res.ensembl_tss = os.path.abspath(args.ensembl_tss)
+    if (args.ensembl_gene_body and os.path.isfile(args.ensembl_gene_body) and
+            os.stat(args.ensembl_gene_body).st_size > 0):
+        res.ensembl_gene_body = os.path.abspath(args.ensembl_gene_body)
+    if (args.pre_name and os.path.isfile(args.pre_name) and
+            os.stat(args.pre_name).st_size > 0):
+        res.pre_name = os.path.abspath(args.pre_name)
+    if (args.exon_name and os.path.isfile(args.exon_name) and
             os.stat(args.exon_name).st_size > 0):
-        res.refgene_exon = args.exon_name
-    if ((args.intron_name) and os.path.isfile(args.intron_name) and
+        res.exon_name = os.path.abspath(args.exon_name)    
+    if (args.intron_name and os.path.isfile(args.intron_name) and
             os.stat(args.intron_name).st_size > 0):
-        res.refgene_intron = args.intron_name
+        res.intron_name = os.path.abspath(args.intron_name)    
 
     # Adapter file can be set in the config; if left null, we use a default.
     # Expects headers to include >5prime and >3prime
     res.adapters = res.adapters or tool_path("adapter.fa")
     param.outfolder = outfolder
-    
+
     # Report utilized assets
     assets_file = os.path.join(param.outfolder, "assets.tsv")
+    pm.debug(f"res: {res}")
     for asset in res:
-        message = "{}\t{}".format(asset, os.path.expandvars(res[asset]))
-        report_message(pm, assets_file, message)
+        if isinstance(res[asset], list):
+            for a in res[asset]:
+                if a is not None:
+                    message = "{}\t{}".format(asset, os.path.expandvars(a))
+                    pm.debug(message)
+                    report_message(pm, assets_file, message)
+        else:
+            if asset is not None:
+                message = "{}\t{}".format(
+                    asset, os.path.expandvars(res[asset]))
+                pm.debug(message)
+                report_message(pm, assets_file, message)
+
+    if not args.prealignment_index:
+        res.prealignment_index = None
         
     # Report primary genome
     message = "genome\t{}".format(args.genome_assembly)
@@ -2109,8 +2127,6 @@ def main():
             # The read1 file does not exist
             err_msg = "Could not find: {}"
             pm.fail_pipeline(IOError(err_msg.format(args.input2[0])))
-
-    container = None # legacy
 
     ###########################################################################
     #                      Grab and prepare input files                       #
@@ -2440,32 +2456,35 @@ def main():
     pm.timestamp("### Prealignments")
 
     to_compress = []
-    #if not pm.get_stat("Aligned_reads") or args.new_start:
-    if len(args.prealignments) == 0:
-        print("You may use `--prealignments` to align to references before "
-              "the genome alignment step. See docs.")
+    if res.prealignment_index is None or len(res.prealignment_index) == 0:
+        print("You may use `--prealignment-index` to align to references "
+              "before the genome alignment step. "
+              "See http://peppro.databio.org/en/latest/ for documentation.")
+
     else:
-        print("Prealignment assemblies: " + str(args.prealignments))
         # Loop through any prealignment references and map to them sequentially
-        for reference in args.prealignments:
-            bt2_index = rgc.seek(reference, BT2_IDX_KEY)
-            if not bt2_index.endswith(reference):
-                bt2_index = os.path.join(
-                    rgc.seek(reference, BT2_IDX_KEY), reference)
+        for reference in res.prealignment_index:
+            pm.debug(f"prealignment reference: {reference}")
+            #res.genome_index = rgc.seek(reference, BT2_IDX_KEY) # DEPRECATED
+            genome, genome_index = reference.split('=')
+            if genome_index.endswith("."):
+                # Replace last occurrence of . with genome name
+                genome_index = genome_index[:genome_index.rfind(".")] + genome
+                genome_index = os.path.abspath(genome_index)
             if not args.complexity and int(args.umi_len) > 0:
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1,
-                        unmap_fq2, reference,
-                        assembly_bt2=bt2_index,
+                        unmap_fq2, genome,
+                        assembly_bt2=genome_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         bt2_opts_txt=param.bowtie2_pre.params)
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, False, unmap_fq1_dups,
-                        unmap_fq2_dups, reference,
-                        assembly_bt2=bt2_index,
+                        unmap_fq2_dups, genome,
+                        assembly_bt2=genome_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         dups=True,
@@ -2473,16 +2492,16 @@ def main():
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1,
-                        unmap_fq2, reference,
-                        assembly_bt2=bt2_index,
+                        unmap_fq2, genome,
+                        assembly_bt2=genome_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         bt2_opts_txt=param.bowtie2_pre.params)
 
                     unmap_fq1_dups, unmap_fq2_dups = _align_with_bt2(
                         args, tools, args.paired_end, True, unmap_fq1_dups,
-                        unmap_fq2_dups, reference,
-                        assembly_bt2=bt2_index,
+                        unmap_fq2_dups, genome,
+                        assembly_bt2=genome_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         dups=True,
@@ -2500,16 +2519,16 @@ def main():
                 if args.no_fifo:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, False,
-                        unmap_fq1, unmap_fq2, reference,
-                        assembly_bt2=bt2_index,
+                        unmap_fq1, unmap_fq2, genome,
+                        assembly_bt2=genome_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         bt2_opts_txt=param.bowtie2_pre.params)
                 else:
                     unmap_fq1, unmap_fq2 = _align_with_bt2(
                         args, tools, args.paired_end, True,
-                        unmap_fq1, unmap_fq2, reference,
-                        assembly_bt2=bt2_index,
+                        unmap_fq1, unmap_fq2, genome,
+                        assembly_bt2=genome_index,
                         outfolder=param.outfolder,
                         aligndir="prealignments",
                         bt2_opts_txt=param.bowtie2_pre.params)
@@ -2578,12 +2597,7 @@ def main():
     unmap_fq1_gz = unmap_fq1 + ".gz"
     unmap_fq2_gz = unmap_fq2 + ".gz"
 
-    bt2_index = rgc.seek(args.genome_assembly, BT2_IDX_KEY)
-    if not bt2_index.endswith(args.genome_assembly):
-        bt2_index = os.path.join(
-            rgc.seek(args.genome_assembly, BT2_IDX_KEY),
-                     args.genome_assembly)
-
+    # res.genome_index = rgc.seek(args.genome_assembly, BT2_IDX_KEY)  # DEPRECATED
     if _itsa_file(unmap_fq1_gz) and not _itsa_file(unmap_fq1):
         cmd = (ngstk.ziptool + " -d " + unmap_fq1_gz)
         pm.run(cmd, mapping_genome_bam)
@@ -2597,7 +2611,7 @@ def main():
     cmd = tools.bowtie2 + " -p " + str(pm.cores)
     cmd += bt2_options
     cmd += " --rg-id " + args.sample_name
-    cmd += " -x " + bt2_index
+    cmd += " -x " + res.genome_index
     if args.paired_end:
         cmd += " --rf -1 " + unmap_fq1 + " -2 " + unmap_fq2
     else:
@@ -2620,7 +2634,7 @@ def main():
         cmd_dups = tools.bowtie2 + " -p " + str(pm.cores)
         cmd_dups += bt2_options
         cmd_dups += " --rg-id " + args.sample_name
-        cmd_dups += " -x " + bt2_index
+        cmd_dups += " -x " + res.genome_index
         if args.paired_end:
             cmd_dups += " --rf -1 " + unmap_fq1_dups + " -2 " + unmap_fq2_dups
         else:
@@ -2666,9 +2680,9 @@ def main():
         else:
             tr = 0
 
-        if os.path.exists(res.refgene_pre_mRNA):
+        if os.path.exists(res.pre_name):
             cmd = (tools.samtools + " depth -b " +
-                   res.refgene_pre_mRNA + " " + bam +
+                   res.pre_name + " " + bam +
                    " | awk '{counter++;sum+=$3}END{print sum/counter}'")
             rd = pm.checkprint(cmd)
         else:
@@ -2706,7 +2720,7 @@ def main():
                 unmapped_fq = unmapped_fq + ".gz"
                 pm.run(cmd, unmapped_fq)
 
-    if not args.prealignments and os.path.exists(mapping_genome_bam_temp):
+    if not args.prealignment_names and os.path.exists(mapping_genome_bam_temp):
         # Index the temporary bam file
         cmd = tools.samtools + " index " + mapping_genome_bam_temp
         pm.run(cmd, temp_mapping_index)
@@ -2788,33 +2802,14 @@ def main():
         else:
             max_len = int(DEFAULT_MAX_LEN)
         pm.report_result("Maximum_read_length", max_len)
+        pm.info(f"If args.sob is set, the args.search_file asset must be built "
+                f"using this read length: {max_len}."
+                f"See: https://refgenie.databio.org/en/latest/available_assets/#tallymer_index")
     else:
         max_len = int(pm.get_stat("Maximum_read_length"))
-
-    # At this point we can check for seqOutBias required indicies.
-    # Can't do it earlier because we haven't determined the read_length of 
-    # interest for mappability purposes.
-    if args.sob:
-        pm.debug("max_len: {}".format(max_len))  # DEBUG
-        if not args.search_file:
-            if max_len == DEFAULT_MAX_LEN:
-                search_asset = [{"asset_name":"tallymer_index",
-                                 "seek_key":"search_file",
-                                 "tag_name":"default",
-                                 "arg":"search_file",
-                                 "user_arg":"search-file",
-                                 "required":True}]
-            else:
-                search_asset = [{"asset_name":"tallymer_index",
-                                 "seek_key":"search_file",
-                                 "tag_name":max_len,
-                                 "arg":"search_file",
-                                 "user_arg":"search-file",
-                                 "required":True}]
-        elif ((args.search_file) and os.path.isfile(args.search_file) and
-                os.stat(args.search_file).st_size > 0):
-            res.search_file = args.search_file
-        res, rgc = _add_resources(args, res, search_asset)
+        pm.info(f"If args.sob is set, the args.search_file asset must be built "
+                f"using this read length: {max_len}."
+                f"See: https://refgenie.databio.org/en/latest/available_assets/#tallymer_index")
 
     # Calculate size of genome
     if not pm.get_stat("Genome_size") or args.new_start:
@@ -3298,22 +3293,22 @@ def main():
         param.outfolder, "signal_" + args.genome_assembly)
     ngstk.make_dir(signal_folder)
 
-    if not os.path.exists(res.refgene_pre_mRNA):
+    if not os.path.exists(res.pre_name):
         print("Skipping FRiP and gene coverage calculation which require the "
               "pre-mRNA annotation file: {}"
-              .format(res.refgene_pre_mRNA))
+              .format(res.pre_name))
     else:
         pm.timestamp("### Calculate Fraction of Reads in pre-mature mRNA")
         if not pm.get_stat('Plus_FRiP') or args.new_start:
             # Plus
-            plus_frip = calc_frip(plus_bam, res.refgene_pre_mRNA,
+            plus_frip = calc_frip(plus_bam, res.pre_name,
                                   frip_func=ngstk.simple_frip,
                                   pipeline_manager=pm)
             pm.report_result("Plus_FRiP", round(plus_frip, 2))
 
         if not pm.get_stat('Minus_FRiP') or args.new_start:
             # Minus
-            minus_frip = calc_frip(minus_bam, res.refgene_pre_mRNA,
+            minus_frip = calc_frip(minus_bam, res.pre_name,
                                    frip_func=ngstk.simple_frip,
                                    pipeline_manager=pm)
             pm.report_result("Minus_FRiP", round(minus_frip, 2))
@@ -3323,7 +3318,7 @@ def main():
                                 args.sample_name + "_gene_coverage.bed")
         gene_sort = os.path.join(QC_folder, args.genome_assembly +
                                  "_gene_sort.bed")
-        cmd1 = ("grep -wf " + chr_keep + " " + res.refgene_pre_mRNA +
+        cmd1 = ("grep -wf " + chr_keep + " " + res.pre_name +
                 " | " + tools.bedtools + " sort -i stdin -faidx " +
                 chr_order + " > " + gene_sort)
         cmd2 = (tools.bedtools + " coverage -sorted -counts -s -a " +
@@ -3621,8 +3616,8 @@ def main():
     ############################################################################
     #                         Report mRNA contamination                        #
     ############################################################################
-    if (os.path.exists(res.refgene_exon) and
-        os.path.exists(res.refgene_intron)):
+    if (os.path.exists(res.exon_name) and
+        os.path.exists(res.intron_name)):
 
         pm.timestamp("### Calculate mRNA contamination")
         intron_exon = os.path.join(QC_folder, args.sample_name +
@@ -3636,11 +3631,11 @@ def main():
                                       "_exons_sort.bed")
             introns_sort = os.path.join(QC_folder, args.genome_assembly +
                                         "_introns_sort.bed")
-            cmd1 = ("grep -wf " + chr_keep + " " + res.refgene_exon +
+            cmd1 = ("grep -wf " + chr_keep + " " + res.exon_name +
                     " | " + tools.bedtools + " sort -i stdin -faidx " +
                     chr_order + " > " + exons_sort)
             # a single sort fails to sort a 1 bp different start position intron
-            cmd2 = ("grep -wf " + chr_keep + " " + res.refgene_intron +
+            cmd2 = ("grep -wf " + chr_keep + " " + res.intron_name +
                     " | " + tools.bedtools + " sort -i stdin -faidx " +
                     chr_order + " | " + tools.bedtools +
                     " sort -i stdin -faidx " + chr_order + " > " + introns_sort)
@@ -3759,9 +3754,6 @@ def main():
     ############################################################################
     #                             Produce BigWigs                              #
     ############################################################################
-    genome_fq = rgc.seek(args.genome_assembly,
-                              asset_name="fasta",
-                              seek_key="fasta")
     plus_exact_bw = os.path.join(
         signal_folder, args.sample_name + "_plus_exact_body_0-mer.bw")
     plus_smooth_bw = os.path.join(
