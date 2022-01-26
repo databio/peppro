@@ -1,6 +1,6 @@
 theme: databio
 
-site_name: peppro
+site_name: PEPPRO
 site_author: Jason Smith
 site_url: http://peppro.databio.org/en/latest/
 site_logo: img/peppro_logo_gray.svg
@@ -19,14 +19,15 @@ nav:
     - Install and run: 'install.md'
     - Extended tutorial: 'tutorial.md'
   - How-to Guides:
-    - Run PEPPRO directly: 'run_direct.md'
-    - Run PEPPRO on a cluster: 'cluster.md'
-    - Run PEPPRO in containers: 'container.md'
+    - Run using bulker: 'run-bulker.md'
+    - Run using containers: 'run-container.md'
+    - Run using conda: 'run-conda.md'
+    - Run natively: 'detailed-install.md'
+    - Configure assets: 'assets.md'
     - Configure prealignments: 'prealignments.md'
     - Configure seqOutBias assets: 'sob.md'
     - Configure UMI: 'umi.md'
     - Configure custom adapters: 'custom_adapters.md'
-    - Detailed install guide: 'detailed_install.md'
     - Use custom reference data: 'annotation.md'
   - Reference: 
     - FAQ: 'faq.md'
