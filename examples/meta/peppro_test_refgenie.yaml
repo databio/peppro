@@ -10,7 +10,7 @@ looper:
 
 sample_modifiers:
   append:
-    pipeline_interfaces: ../../sample_pipeline_interface.yaml # PATH to the directory where looper will 
+    pipeline_interfaces: ../../sample_pipeline_interface.yaml # PATH to the directory where looper will  
   derive:
     attributes: [read1]
     sources:
