@@ -10,7 +10,7 @@ pipelines/peppro.py --single-or-paired single \
   --genome-index default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4 \
   --chrom-sizes default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4.chrom.sizes \
   --sample-name test \
-  --input examples/data/test_r1.fastq.gz \
+  --input examples/data/test_r1.fq.gz \
   -O peppro_test/
 ```
 
