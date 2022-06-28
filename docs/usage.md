@@ -8,10 +8,10 @@
 ```{console}
 usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--silent] [--verbosity V]
                  [--logdev] [-C CONFIG_FILE] -O PARENT_OUTPUT_FOLDER
-                 [-M MEMORY_LIMIT] [-P NUMBER_OF_CORES]
-                 [--pipeline-name PIPELINE_NAME] -S SAMPLE_NAME -I INPUT_FILES
-                 [INPUT_FILES ...] [-I2 [INPUT_FILES2 [INPUT_FILES2 ...]]] -G
-                 GENOME_ASSEMBLY [-Q SINGLE_OR_PAIRED]
+                 [-M MEMORY_LIMIT] [-P NUMBER_OF_CORES] -S SAMPLE_NAME -I
+                 INPUT_FILES [INPUT_FILES ...]
+                 [-I2 [INPUT_FILES2 [INPUT_FILES2 ...]]] -G GENOME_ASSEMBLY
+                 [-Q SINGLE_OR_PAIRED]
                  [--protocol {PRO,pro,PRO-SEQ,PRO-seq,proseq,PROSEQ,GRO,gro,groseq,GROSEQ,GRO-SEQ,GRO-seq}]
                  [--adapter-tool {cutadapt,fastp}]
                  [--dedup-tool {seqkit,fqdedup}]
@@ -24,10 +24,10 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--silent] [--verbosity V]
                  [--pi-body ENSEMBL_GENE_BODY] [--pre-name PRE_NAME]
                  [--anno-name ANNO_NAME] [--exon-name EXON_NAME]
                  [--intron-name INTRON_NAME] [--search-file SEARCH_FILE]
-                 [--coverage] [--keep] [--noFIFO] [--no-complexity]
-                 [--prioritize] [-V]
+                 [--coverage] [--keep] [--keep-mito] [--noFIFO]
+                 [--no-complexity] [--prioritize] [-V]
 
-PEPPRO version 0.10.0
+PEPPRO version 0.10.1
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -48,8 +48,6 @@ optional arguments:
                         [K|M|G|T].
   -P NUMBER_OF_CORES, --cores NUMBER_OF_CORES
                         Number of cores for parallelized processes
-  --pipeline-name PIPELINE_NAME
-                        Name of the pipeline
   -I2 [INPUT_FILES2 [INPUT_FILES2 ...]], --input2 [INPUT_FILES2 [INPUT_FILES2 ...]]
                         Secondary input files, such as read2
   -Q SINGLE_OR_PAIRED, --single-or-paired SINGLE_OR_PAIRED
@@ -102,7 +100,8 @@ optional arguments:
                         the input.
   --coverage            Report library complexity using coverage: reads /
                         (bases in genome / read length)
-  --keep                Keep prealignment BAM files
+  --keep                Keep prealignment BAM files.
+  --keep-mito           Keep mitochondrial aligning reads.
   --noFIFO              Do NOT use named pipes during prealignments.
   --no-complexity       Disable library complexity calculation (faster).
   --prioritize          Plot cFRiF/FRiF using mutually exclusive priority
