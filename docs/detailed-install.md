@@ -186,7 +186,7 @@ Rscript -e 'devtools::install_github("pepkit/pepr")'
 Rscript -e 'install.packages("BiocManager")'
 Rscript -e 'BiocManager::install("GenomicRanges")'
 Rscript -e 'devtools::install_github("databio/GenomicDistributions")'
-wget http://big.databio.org/GenomicDistributionsData/GenomicDistributionsData_0.0.2.tar.gz"
+wget "http://big.databio.org/GenomicDistributionsData/GenomicDistributionsData_0.0.2.tar.gz"
 Rscript -e 'install.packages("GenomicDistributionsData_0.0.2.tar.gz", type="source", repos=NULL)'
 Rscript -e 'devtools::install(file.path("PEPPROr/"), dependencies=TRUE, repos="https://cloud.r-project.org/")'
 ```
