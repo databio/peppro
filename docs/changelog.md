@@ -1,6 +1,11 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.10.1] -- 2022-06-28
+
+### Added
+ - Add ability to keep mitochondrial reads in downstream analysis
+
 ## [0.10.0] -- 2022-01-26
 
 ### Added
