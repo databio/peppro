@@ -38,6 +38,7 @@ command_template: >
   {% if sample.search_file is defined %} --search-file { sample.search_file } {% elif refgenie[sample.genome].tallymer_index is defined %} --search-file { refgenie[sample.genome].tallymer_index.search_file } {% endif %}
   {% if sample.coverage is defined %} --coverage {% endif %}
   {% if sample.keep is defined %} --keep {% endif %}
+  {% if sample.keep_mito is defined %} --keep-mito {% endif %}
   {% if sample.no_fifo is defined %} --noFIFO {% endif %}
   {% if sample.complexity is defined %} --no-complexity {% endif %}
   {% if sample.prioritize is defined %} --prioritize {% endif %}

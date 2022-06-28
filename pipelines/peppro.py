@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.10.0"
+__version__ = "0.10.1"
 
 from argparse import ArgumentParser
 import os
@@ -159,7 +159,11 @@ def parse_arguments():
 
     parser.add_argument("--keep", action='store_true', default=False,
                         dest="keep",
-                        help="Keep prealignment BAM files")
+                        help="Keep prealignment BAM files.")
+
+    parser.add_argument("--keep-mito", action='store_true', default=False,
+                        dest="keep_mito",
+                        help="Keep mitochondrial aligning reads.")
 
     parser.add_argument("--noFIFO", action='store_true', default=False,
                         dest="no_fifo",
@@ -2746,8 +2750,7 @@ def main():
                 cmd += " -we '" + name + "'"
             cmd += "| cut -f 3"
             mr = pm.checkprint(cmd)
-        
-            # If there are mitochondrial reads, report and remove them
+            # If there are mitochondrial reads, by default remove them
             if mr and mr.strip():
                 pm.report_result("Mitochondrial_reads", round(float(mr)))
                 # Index the sort'ed BAM file first
@@ -2758,9 +2761,12 @@ def main():
 
                 cmd1 = tools.samtools + " index " + mapping_genome_bam
                 cmd2 = (tools.samtools + " idxstats " + mapping_genome_bam +
-                        " | cut -f 1-2 | awk '{print $1, 0, $2}' | grep")
-                for name in mito_name:
-                    cmd2 += " -vwe '" + name + "'"
+                        " | cut -f 1-2 | awk '{print $1, 0, $2}' ")
+                # If keeping mt reads, skip this step
+                if not args.keep_mito:
+                    cmd2 += " | grep "
+                    for name in mito_name:
+                        cmd2 += " -vwe '" + name + "'"
                 cmd2 += (" > " + chr_bed)
                 cmd3 = (tools.samtools + " view -L " + chr_bed + " -b -@ " +
                         str(pm.cores) + " " + mapping_genome_bam + " > " +
@@ -2858,10 +2864,12 @@ def main():
 
                     cmd1 = tools.samtools + " index " + mapping_genome_bam_dups
                     cmd2 = (tools.samtools + " idxstats " +
-                            mapping_genome_bam_dups + " | cut -f 1 | grep")
-                    for name in mito_name:
-                        cmd2 += " -vwe '" + name + "'"
-                    cmd2 += ("| xargs " + tools.samtools + " view -b -@ " +
+                            mapping_genome_bam_dups + " | cut -f 1 ")
+                    if not args.keep_mito:
+                        cmd2 += " | grep "
+                        for name in mito_name:
+                            cmd2 += " -vwe '" + name + "'"
+                    cmd2 += (" | xargs " + tools.samtools + " view -b -@ " +
                              str(pm.cores) + " " + mapping_genome_bam_dups +
                              " > " + noMT_mapping_genome_bam_dups)
                     cmd3 = ("mv " + noMT_mapping_genome_bam_dups + " " +
