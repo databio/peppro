@@ -1,0 +1,24 @@
+# Run tutorial samples through PEPPRO
+name: PEPPRO_tutorial
+
+pep_version: 2.0.0
+sample_table: tutorial.csv
+
+looper:
+  output_dir: "${TUTORIAL}/processed/peppro/tutorial" 
+  pipeline_interfaces: "${TUTORIAL}/tools/peppro/project_pipeline_interface.yaml"
+
+sample_modifiers:
+  append:
+    pipeline_interfaces: "${TUTORIAL}/tools/peppro/sample_pipeline_interface.yaml"
+  derive:
+    attributes: [read1, read2]
+    sources:
+        R1: "${TUTORIAL}/tools/peppro/examples/data/{sample_name}_r1.fq.gz"
+        R2: "${TUTORIAL}/tools/peppro/examples/data/{sample_name}_r2.fq.gz"
+  imply:
+    - if:
+        organism: ["human", "Homo sapiens", "Human", "Homo_sapiens"]
+      then:
+        genome: "hg38"
+        prealignment_names: ["human_rDNA"]

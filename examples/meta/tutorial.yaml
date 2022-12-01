@@ -1,24 +1,34 @@
 # Run tutorial samples through PEPPRO
-name: tutorial
+name: PEPPRO_tutorial
 
 pep_version: 2.0.0
 sample_table: tutorial.csv
 
 looper:
-  output_dir: "$PROCESSED/tutorial" 
-  pipeline_interfaces: ["$CODEBASE/peppro/project_pipeline_interface.yaml"] 
+  output_dir: ${TUTORIAL}/processed/peppro/tutorial
+  pipeline_interfaces: ${TUTORIAL}/tools/peppro/project_pipeline_interface.yaml
 
 sample_modifiers:
   append:
-    pipeline_interfaces: ["$CODEBASE/peppro/sample_pipeline_interface.yaml"] 
+    pipeline_interfaces: ${TUTORIAL}/tools/peppro/sample_pipeline_interface.yaml
   derive:
     attributes: [read1, read2]
     sources:
-        R1: "$CODEBASE/peppro/examples/data/{sample_name}_r1.fq.gz"
-        R2: "$CODEBASE/peppro/examples/data/{sample_name}_r2.fq.gz"
+        R1: "${TUTORIAL}/tools/peppro/examples/data/{sample_name}_r1.fq.gz"
+        R2: "${TUTORIAL}/tools/peppro/examples/data/{sample_name}_r2.fq.gz"
   imply:
     - if:
         organism: ["human", "Homo sapiens", "Human", "Homo_sapiens"]
       then:
-        genome: "hg38"
-        prealignments: ["human_rDNA"]
+        genome: hg38
+        fasta: default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4.fa
+        genome_index: default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4
+        chrom_sizes: default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4.chrom.sizes
+        prealignment_index: [human_rDNA=default/b769bcf2deaf9d061d94f2007a0e956249905c64653cb5c8]
+        TSS_name: default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4_TSS.bed
+        anno_name: default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4.annotation.bed.gz
+        pre_name: default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4_pre-mRNA.bed
+        exon_name: default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4_exons.bed
+        intron_name: default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4_introns.bed
+        pi_tss: default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4_ensembl_TSS.bed
+        pi_body: default/2230c535660fb4774114bfa966a62f823fdb6d21acf138d4_ensembl_gene_body.bed 
