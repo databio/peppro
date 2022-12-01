@@ -286,7 +286,6 @@ tar xvf human_rDNA.bowtie2_index.tgz
 
 cd default/
 wget http://big.databio.org/peppro/hg38_annotations.bed.gz
-mv hg38_annotations.bed.gz 2230c535660fb4774114bfa966a62f823fdb6d21acf138d4.annotation.bed.gz
 cd ../
 ```
 
