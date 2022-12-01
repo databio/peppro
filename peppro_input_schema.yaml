@@ -53,25 +53,25 @@ properties:
           enum: ["seqtk", "fastx"]
         TSS_name:
           type: string
-          description: "TSS annotation file (by default uses Refgenie asset)"
-        ensembl_tss:
+          description: "TSS annotation file (by default uses Refgenie refgene_anno asset)"
+        pi_tss:
           type: string
-          description: "Pause index TSS annotation file (by default uses Refgenie asset)"
-        ensembl_gene_body:
+          description: "Pause index TSS annotation file (by default uses Refgenie ensembl_gft asset)"
+        pi_body:
           type: string
-          description: "Pause index gene body annotation file (by default uses Refgenie asset)"
+          description: "Pause index gene body annotation file (by default uses Refgenie ensembl_gft asset)"
         pre_name:
           type: string
-          description: "Premature mRNA annotation file (by default uses Refgenie asset)"
+          description: "Premature mRNA annotation file (by default uses Refgenie refgene_anno asset)"
         anno_name:
           type: string
           description: "Genomic partitions annotation file (by default uses Refgenie asset)"
         intron_name:
           type: string
-          description: "Introns annotation file (by default uses Refgenie asset)"
+          description: "Introns annotation file (by default uses Refgenie refgene_anno asset)"
         exon_name:
           type: string
-          description: "Exons annotation file (by default uses Refgenie asset)"
+          description: "Exons annotation file (by default uses Refgenie refgene_anno asset)"
         search_file:
           type: string
           description: "GenomeTools Tallymer read-length matched index search file (by default uses Refgenie asset)"
