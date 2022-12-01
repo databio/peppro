@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.10.1"
+__version__ = "0.10.2"
 
 from argparse import ArgumentParser
 import os
@@ -123,11 +123,11 @@ def parse_arguments():
                         help="file_name of TSS annotation file.")
 
     parser.add_argument("--pi-tss", default=None,
-                        dest="ensembl_tss", type=str,
+                        dest="pi_tss", type=str,
                         help="file_name of pause index TSS annotation file.")
 
     parser.add_argument("--pi-body", default=None,
-                        dest="ensembl_gene_body", type=str,
+                        dest="pi_body", type=str,
                         help="file_name of pause index gene body annotation file.")
 
     parser.add_argument("--pre-name", default=None,
@@ -2061,12 +2061,12 @@ def main():
     if (args.anno_name and os.path.isfile(args.anno_name) and
             os.stat(args.anno_name).st_size > 0):
         res.feat_annotation = os.path.abspath(args.anno_name)  
-    if (args.ensembl_tss and os.path.isfile(args.ensembl_tss) and
-            os.stat(args.ensembl_tss).st_size > 0):
-        res.ensembl_tss = os.path.abspath(args.ensembl_tss)
-    if (args.ensembl_gene_body and os.path.isfile(args.ensembl_gene_body) and
-            os.stat(args.ensembl_gene_body).st_size > 0):
-        res.ensembl_gene_body = os.path.abspath(args.ensembl_gene_body)
+    if (args.pi_tss and os.path.isfile(args.pi_tss) and
+            os.stat(args.pi_tss).st_size > 0):
+        res.pi_tss = os.path.abspath(args.pi_tss)
+    if (args.pi_body and os.path.isfile(args.pi_body) and
+            os.stat(args.pi_body).st_size > 0):
+        res.pi_body = os.path.abspath(args.pi_body)
     if (args.pre_name and os.path.isfile(args.pre_name) and
             os.stat(args.pre_name).st_size > 0):
         res.pre_name = os.path.abspath(args.pre_name)
@@ -3177,16 +3177,16 @@ def main():
             pm.clean_add(chr_order)
             pm.clean_add(chr_keep)
 
-    if not os.path.exists(res.ensembl_tss):
-        if not os.path.exists(res.ensembl_gene_body):
+    if not os.path.exists(res.pi_tss):
+        if not os.path.exists(res.pi_body):
             print("Skipping PI -- Pause index requires 'TSS' and 'gene body' annotation files: {} and {}"
-                  .format(res.ensembl_tss, res.ensembl_gene_body))
+                  .format(res.pi_tss, res.pi_body))
         else:
             print("Skipping PI -- Pause index requires 'TSS' annotation file: {}"
-                  .format(res.ensembl_tss))
-    elif not os.path.exists(res.ensembl_gene_body):
+                  .format(res.pi_tss))
+    elif not os.path.exists(res.pi_body):
         print("Skipping PI -- Pause index requires 'gene body' annotation file: {}"
-              .format(res.ensembl_gene_body))
+              .format(res.pi_body))
     else:
         pm.timestamp("### Calculate Pause Index (PI)")
         temp = tempfile.NamedTemporaryFile(dir=QC_folder, delete=False)
@@ -3194,16 +3194,17 @@ def main():
                                    "_pause_index.bed")
         pause_index_gz = os.path.join(QC_folder, args.sample_name +
                                       "_pause_index.bed.gz")
-        if not pm.get_stat("Pause_index") or args.new_start:
+        if (not (pm.get_stat("Pause_index") and os.path.exists(pause_index) or
+                os.path.exists(pause_index_gz)) or args.new_start):
             # Remove missing chr from PI annotations
             tss_local = os.path.join(QC_folder,
-                args.genome_assembly + "_ensembl_tss.bed")
+                args.genome_assembly + "_pi_tss.bed")
             body_local = os.path.join(QC_folder,
-                args.genome_assembly + "_ensembl_gene_body.bed")
-            cmd1 = ("grep -wf " + chr_keep + " " + res.ensembl_tss + " | " +
+                args.genome_assembly + "_pi_body.bed")
+            cmd1 = ("grep -wf " + chr_keep + " " + res.pi_tss + " | " +
                     tools.bedtools + " sort -i stdin -faidx " + chr_order + 
                     " > " + tss_local)
-            cmd2 = ("grep -wf " + chr_keep + " " + res.ensembl_gene_body +
+            cmd2 = ("grep -wf " + chr_keep + " " + res.pi_body +
                     " | " + tools.bedtools + " sort -i stdin -faidx " +
                     chr_order + " > " + body_local)
             pm.run([cmd1,cmd2], [tss_local, body_local], nofail=True)
@@ -3232,17 +3233,55 @@ def main():
             pm.clean_add(body_density)
 
             # Calculate expression and pause indicies
-            cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7" +
-                   " 2.2 2.3 2.7 " + TSS_density + " " + body_density +
-                   " | awk -v OFS='\t' '{ if ($5 == \"+\"){print $1, $2, $8," +
-                   " $4, sqrt((($6+$9)/sqrt(($8-$2)^2))^2), " +
-                   "($6/sqrt(($3-$2)^2))/($9/sqrt(($8-$7)^2)), $5} " +
-                   "else {print $1, $2, $8, $4, " +
-                   "sqrt((($6+$9)/sqrt(($3-$7)^2))^2)," +
-                   "($6/sqrt(($3-$2)^2))/($9/sqrt(($8-$7)^2)), $5}}' " +
-                   "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + temp.name)
-            pm.run(cmd, pause_index, nofail=True)
+            # MacOS `join` is not equivalent to linux `join`
+            # recreate using `awk`            
+            # cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7" +
+                   # " 2.2 2.3 2.7 " + TSS_density + " " + body_density +
+                   # " | awk -v OFS='\t' '{ if ($5 == \"+\"){print $1, $2, $8," +
+                   # " $4, sqrt((($6+$9)/sqrt(($8-$2)^2))^2), " +
+                   # "($6/sqrt(($3-$2)^2))/($9/sqrt(($8-$7)^2)), $5} " +
+                   # "else {print $1, $2, $8, $4, " +
+                   # "sqrt((($6+$9)/sqrt(($3-$7)^2))^2)," +
+                   # "($6/sqrt(($3-$2)^2))/($9/sqrt(($8-$7)^2)), $5}}' " +
+                   # "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + temp.name)
+            shared_body_density = os.path.join(QC_folder, args.sample_name +
+                                               "_gene_body_shared_density.bed")
+            shared_TSS_density = os.path.join(QC_folder, args.sample_name +
+                                              "_TSS_shared_density.bed")
+            PI_all_genes = os.path.join(QC_folder, args.sample_name +
+                                        "_PI_all_genes.txt")
+            PI_shared_genes = os.path.join(QC_folder, args.sample_name +
+                                           "_PI_shared_genes.txt")
+            cmd1 = ("cat " + TSS_density + " " + body_density +
+                    " | awk '{print $4}' > " + PI_all_genes)
+            cmd2 = ("awk -F';' '$1 in first{print first[$1] $0; " + 
+                    "first[$1]=\"\"; next} {first[$1]=$0 ORS}' " + 
+                    PI_all_genes + " | awk '!NF {print;next}; !($0 in a)" + 
+                    " {a[$0];print}' > " + PI_shared_genes)
+            cmd3 = ("awk -F '\t' 'NR==FNR {id[$1]; next} $4 in id' " + 
+                    PI_shared_genes + " " + TSS_density + " > " + 
+                    shared_TSS_density)
+            cmd4 = ("awk -F '\t' 'NR==FNR {id[$1]; next} $4 in id' " + 
+                    PI_shared_genes + " " + body_density + " > " + 
+                    shared_body_density)
+            cmd5 = ("awk 'BEGIN{FS=OFS=\"\t\"} FNR>0 && " + 
+                    "FNR==NR{a[$4]=$4 OFS $0; next} " + 
+                    "FNR>0{print $0,a[$4]?a[$4]:\"\t\"}' " +
+                    shared_TSS_density + " " + shared_body_density +
+                    " | awk -v OFS='\t' '{ if ($6 == \"+\")" + 
+                    "{print $9, $10, $3, $4," + 
+                    "sqrt((($15+$7)/sqrt(($3-$10)^2))^2)," + 
+                    "($15/sqrt(($11-$10)^2))/($7/sqrt(($3-$2)^2)), $6} " + 
+                    "else {print $9, $10, $3, $12," + 
+                    "sqrt((($15+$7)/sqrt(($10-$2)^2))^2)," + 
+                    "($15/sqrt(($11-$10)^2))/($7/sqrt(($3-$2)^2)), $6}}' " +
+                    "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + temp.name)
+            pm.run([cmd1, cmd2, cmd3, cmd4, cmd5], pause_index, nofail=True)
             temp.close()
+            pm.clean_add(shared_body_density)
+            pm.clean_add(shared_TSS_density)
+            pm.clean_add(PI_all_genes)
+            pm.clean_add(PI_shared_genes)
 
             # Calculate median expression
             cmd = ("awk '{print $5}' " + temp.name + " | sort -n | " +
@@ -3256,12 +3295,32 @@ def main():
                 pm.run(cmd, pause_index, nofail=True)
             except ZeroDivisionError:
                 # Fall back to using all data to determine pause index
-                cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 " +
-                       "2.2 2.3 2.7 " + TSS_density + " " + body_density +
-                       " | awk -v OFS='\t' '{print $1, $2, $3, $4, " +
-                       "($6/($3-$2))/($9/($8-$7)), $5}' " +
-                       "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + pause_index)
-                pm.run(cmd, pause_index, nofail=True)
+                # cmd = ("join --nocheck-order -j4 -o 1.1 1.2 1.3 1.4 1.6 1.7 " +
+                       # "2.2 2.3 2.7 " + TSS_density + " " + body_density +
+                       # " | awk -v OFS='\t' '{print $1, $2, $3, $4, " +
+                       # "($6/($3-$2))/($9/($8-$7)), $5}' " +
+                       # "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + pause_index)
+                cmd1 = ("cat " + TSS_density + " " + body_density +
+                    " | awk '{print $4}' > " + PI_all_genes)
+                cmd2 = ("awk -F';' '$1 in first{print first[$1] $0; " + 
+                        "first[$1]=\"\"; next} {first[$1]=$0 ORS}' " + 
+                        PI_all_genes + " | awk '!NF {print;next}; !($0 in a)" + 
+                        " {a[$0];print}' > " + PI_shared_genes)
+                cmd3 = ("awk -F '\t' 'NR==FNR {id[$1]; next} $4 in id' " + 
+                        PI_shared_genes + " " + TSS_density + " > " + 
+                        shared_TSS_density)
+                cmd4 = ("awk -F '\t' 'NR==FNR {id[$1]; next} $4 in id' " + 
+                        PI_shared_genes + " " + body_density + " > " + 
+                        shared_body_density)
+                cmd5 = ("awk 'BEGIN{FS=OFS=\"\t\"} FNR>0 && " + 
+                        "FNR==NR{a[$4]=$4 OFS $0; next} " + 
+                        "FNR>0{print $0,a[$4]?a[$4]:\"\t\"}'" +
+                        shared_TSS_density + " " + shared_body_density +
+                        " | awk -v OFS='\t' '{ if ($6 == \"+\")" + 
+                        "{print $9, $10, $11, $12," +
+                        "($15/($11-$10))/($7/($3-$2)), $14}' " +
+                        "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + temp.name)       
+                pm.run([cmd1, cmd2, cmd3, cmd4, cmd5], pause_index, nofail=True)
                 pass
 
             # Median pause index
@@ -3674,7 +3733,14 @@ def main():
                                       "_exons_rpkm.bed")
             introns_rpkm = os.path.join(QC_folder, args.sample_name +
                                         "_introns_rpkm.bed")
-
+            all_genes = os.path.join(QC_folder, args.sample_name +
+                                     "_all_genes.txt")
+            shared_genes = os.path.join(QC_folder, args.sample_name +
+                                        "_shared_genes.txt")
+            shared_exons = os.path.join(QC_folder, args.sample_name +
+                                        "_shared_exons.bed")
+            shared_introns = os.path.join(QC_folder, args.sample_name +
+                                          "_shared_introns.bed")
             # determine exonic RPKM for individual genes
             if os.path.exists(exons_cov):
                 cmd = ("awk -v OFS='\t' '{chrom[$4] = $1; " +
@@ -3720,13 +3786,38 @@ def main():
                 pm.clean_add(introns_rpkm)
 
             # join intron, exon RPKM on gene name and calculate ratio
+            # MacOS `join` is not equivalent to linux `join`
+            # recreate using `awk`
             if os.path.exists(exons_rpkm) and os.path.exists(introns_rpkm):
-                cmd = ("join --nocheck-order -a1 -a2 -j4 " +
-                       introns_rpkm + " " + exons_rpkm + " | " +
-                       "awk -v OFS='\t' " +
-                       "'NF==11 {print $7, $8, $9, $1, ($10/$5), $11}'" +
-                       " | sort -k1,1 -k2,2n > " + intron_exon)
-                pm.run(cmd, intron_exon, nofail=True)
+                # cmd = ("join --nocheck-order -a1 -a2 -j4 " +
+                       # introns_rpkm + " " + exons_rpkm + " | " +
+                       # "awk -v OFS='\t' " +
+                       # "'NF==11 {print $7, $8, $9, $1, ($10/$5), $11}'" +
+                       # " | sort -k1,1 -k2,2n > " + intron_exon)
+                # get all gene names
+                cmd1 = ("cat " + exons_rpkm + " " + introns_rpkm +
+                        " | awk '{print $4}' > " + all_genes)
+                cmd2 = ("awk -F';' '$1 in first{print first[$1] $0; " + 
+                        "first[$1]=\"\"; next} {first[$1]=$0 ORS}' " + 
+                        all_genes + " | awk '!NF {print;next}; !($0 in a) " + 
+                        "{a[$0];print}' > " + shared_genes)
+                cmd3 = ("awk -F '\t' 'NR==FNR {id[$1]; next} $4 in id' " +
+                        shared_genes + " " + exons_rpkm + " > " + shared_exons)
+                cmd4 = ("awk -F '\t' 'NR==FNR {id[$1]; next} $4 in id' " +
+                        shared_genes + " " + introns_rpkm + " > " +
+                        shared_introns)
+                cmd5 = ("awk 'BEGIN{FS=OFS=\"\t\"} FNR>0 && " + 
+                        "FNR==NR{a[$4]=$4 OFS $0; next} " + 
+                        "FNR>0{print $0,a[$4]?a[$4]:\"\t\"}' " +
+                        shared_exons + " " + shared_introns + 
+                        " | awk 'BEGIN { OFS=\"\t\" } " + 
+                        "{print $8, $9, $10, $11, ($12/$5), $13}' " + 
+                        "| sort -k1,1 -k2,2n > " + intron_exon)
+                pm.run([cmd1, cmd2, cmd3, cmd4, cmd5], intron_exon, nofail=True)
+                pm.clean_add(all_genes)
+                pm.clean_add(shared_genes)
+                pm.clean_add(shared_exons)
+                pm.clean_add(shared_introns)
 
             # report median ratio
             if os.path.exists(intron_exon):
