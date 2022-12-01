@@ -1,6 +1,16 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.10.2] -- 2022-11-30
+
+### Added
+ - Updated tutorial docs and configuration files
+
+### Changed
+ - Switched `join` commands to series of `awk` commands for MacOS compatibility
+ - updated pause index command arguments to match target output to improve interpretability
+
+
 ## [0.10.1] -- 2022-06-28
 
 ### Added
@@ -17,7 +27,7 @@ All notable changes to this project will be documented in this file.
  - Updated requirements.txt for package updates
  - Update bulker crate version
  - Made refgenie optional
- - Updated installation guides for native, containers, multi-container, and conda.
+ - Updated installation guides for native, containers, multi-container, and conda
  - Updated detailed installation guide
  - Updated guide for running samples on a cluster
 
