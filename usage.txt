@@ -12,14 +12,14 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--silent] [--verbosity V]
                  [--prealignment-names PREALIGNMENT_NAMES [PREALIGNMENT_NAMES ...]]
                  [--prealignment-index PREALIGNMENT_INDEX [PREALIGNMENT_INDEX ...]]
                  --genome-index GENOME_INDEX [--fasta FASTA] --chrom-sizes
-                 CHROM_SIZES [--TSS-name TSS_NAME] [--pi-tss ENSEMBL_TSS]
-                 [--pi-body ENSEMBL_GENE_BODY] [--pre-name PRE_NAME]
+                 CHROM_SIZES [--TSS-name TSS_NAME] [--pi-tss PI_TSS]
+                 [--pi-body PI_BODY] [--pre-name PRE_NAME]
                  [--anno-name ANNO_NAME] [--exon-name EXON_NAME]
                  [--intron-name INTRON_NAME] [--search-file SEARCH_FILE]
                  [--coverage] [--keep] [--keep-mito] [--noFIFO]
                  [--no-complexity] [--prioritize] [-V]
 
-PEPPRO version 0.10.1
+PEPPRO version 0.10.2
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -76,9 +76,8 @@ optional arguments:
   --chrom-sizes CHROM_SIZES
                         Path to primary genome chromosome sizes file.
   --TSS-name TSS_NAME   file_name of TSS annotation file.
-  --pi-tss ENSEMBL_TSS  file_name of pause index TSS annotation file.
-  --pi-body ENSEMBL_GENE_BODY
-                        file_name of pause index gene body annotation file.
+  --pi-tss PI_TSS       file_name of pause index TSS annotation file.
+  --pi-body PI_BODY     file_name of pause index gene body annotation file.
   --pre-name PRE_NAME   file_name of pre-mRNA annotation file.
   --anno-name ANNO_NAME
                         file_name of genomic annotation file.
