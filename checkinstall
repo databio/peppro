@@ -114,7 +114,8 @@ fi
 if [ -f "requirements.txt" ]; then
     REQS="requirements.txt"
 else
-    REQS=$(curl https://raw.githubusercontent.com/databio/peppro/master/requirements.txt)
+    curl https://raw.githubusercontent.com/databio/peppro/master/requirements.txt --silent --output requirements.txt && mv requirements.txt curl_requirements.txt
+    REQS="curl_requirements.txt"
 fi
 
 while IFS= read -r line; do
@@ -177,6 +178,10 @@ while IFS= read -r line; do
     fi
 done < $REQS
 
+if [ -f "curl_requirements.txt" ]; then
+    rm "curl_requirements.txt"
+fi
+
 # Check tool installation
 declare -a requiredCommands=("perl" "awk" "grep" "sed" "bedtools" "bigWigCat" "wigToBigWig" "bowtie2" "fastp" "fastq_pair" "flash" "preseq" "samtools" "seqtk" "seqkit" "Rscript")
 
@@ -205,7 +210,7 @@ else
     fi
 fi
 
-declare -a requiredRPackages=("optigrab" "devtools" "GenomicDistributions" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
+declare -a requiredRPackages=("argparser" "optigrab" "devtools" "GenomicDistributions" "GenomicDistributionsData" "R.utils" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
 for package in ${requiredRPackages[@]}; do
     cmd=$(echo "Rscript -e 'library(\"$package\")'")
     packageInstalled=$(eval $cmd 2>&1)
@@ -259,7 +264,8 @@ else
     if [ -f "requirements.txt" ]; then
         REQS="requirements.txt"
     else
-        REQS=$(curl https://raw.githubusercontent.com/databio/peppro/master/requirements.txt)
+        curl https://raw.githubusercontent.com/databio/peppro/master/requirements.txt --silent --output curl_requirements.txt && mv requirements.txt curl_requirements.txt
+        REQS="curl_requirements.txt"
     fi
 
     while IFS= read -r line; do
@@ -321,6 +327,10 @@ else
         fi
     done < $REQS
 
+    if [ -f "curl_requirements.txt" ]; then
+        rm "curl_requirements.txt"
+    fi
+
     # Check tool installation
     declare -a requiredCommands=("perl" "awk" "grep" "sed" "bedtools" "bigWigCat" "wigToBigWig" "bowtie2" "fastp" "fastq_pair" "flash" "preseq" "samtools" "seqtk" "seqkit" "Rscript")
 
@@ -349,7 +359,7 @@ else
         fi
     fi
 
-    declare -a requiredRPackages=("optigrab" "devtools" "GenomicDistributions" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
+    declare -a requiredRPackages=("optigrab" "devtools" "argparser" "R.utils" "GenomicDistributions" "GenomicDistributionsData" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
     for package in ${requiredRPackages[@]}; do
         cmd=$(echo "Rscript -e 'library(\"$package\")'")
         packageInstalled=$(eval $cmd 2>&1)
@@ -415,8 +425,10 @@ else
         IFACE="sample_pipeline_interface.yaml"
         CRATE=$(cat $IFACE | grep 'bulker_crate' | tr " " "\n" | tail -n 1)
     else
-        IFACE=$(curl https://raw.githubusercontent.com/databio/peppro/master/sample_pipeline_interface.yaml)
+        curl https://raw.githubusercontent.com/databio/peppro/master/sample_pipeline_interface.yaml --silent --output sample_pipeline_interface.yaml && mv sample_pipeline_interface.yaml curl_sample_pipeline_interface.yaml
+        IFACE="$CWD/curl_sample_pipeline_interface.yaml"
         CRATE=$(echo $IFACE | tr " " "\n" | grep -A1 'bulker_crate' | tail -n 1)
+        rm "$IFACE"
     fi
 
     yes n | bulker load $CRATE
@@ -429,7 +441,8 @@ else
     if [ -f "$CWD/pipelines/peppro.py" ]; then
         PIPELINE="$CWD/pipelines/peppro.py"
     else
-        PIPELINE=$(curl https://raw.githubusercontent.com/databio/peppro/master/pipelines/peppro.py)
+        curl https://raw.githubusercontent.com/databio/peppro/master/pipelines/peppro.py --silent --output peppro.py && mv peppro.py curl_peppro.py
+        PIPELINE="$CWD/curl_peppro.py"
     fi
 
     CMD_CHECK=$(bulker run ${CRATE} $PIPELINE --help)
@@ -442,6 +455,10 @@ else
         echo $(warn "WARNING: Could not activate the bulker crate, ${CRATE}. Check out https://bulker.databio.org/en/latest/install/.")
         printf "\n"
         BULKER_INSTALL=1
+    fi
+    
+    if [ -f "$CWD/curl_peppro.py" ]; then
+        rm "$CWD/curl_peppro.py"
     fi
 fi
 

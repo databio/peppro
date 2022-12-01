@@ -17,5 +17,5 @@ After setting up your environment to run `PEPPRO`, you can confirm which means o
 
 or from the web:
 ```console
-curl -sSL https://raw.githubusercontent.com/databio/peppro/checkinstall | bash
+curl -sSL https://raw.githubusercontent.com/databio/peppro/master/checkinstall | bash
 ```

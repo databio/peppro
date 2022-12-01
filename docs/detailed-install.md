@@ -172,22 +172,31 @@ That should do it!
 
 `PEPPRO` uses `R` to generate quality control plots.  These are technically **optional** and the pipeline will run without them, but you would not get any QC plots.  If you need to but don't have [R installed, you can follow these instructions](https://cran.r-project.org/doc/manuals/r-release/R-admin.html).  We'll use and install the necessary packages in this example.  Here is the list of required packages:
 
- - [data.table (v1.14.2)](https://cran.r-project.org/package=data.table)
- - [devtools (v2.4.3)](https://cran.r-project.org/web/packages/devtools/index.html)
- - [GenomicDistributions (v1.3.2)](http://code.databio.org/GenomicDistributions/index.html)
- - [ggplot2 (v3.3.5)](https://cran.r-project.org/package=ggplot2)
- - [pepr (v0.4.0)](http://code.databio.org/pepr/)
- - [optigrab (v0.9.2.1)](https://cran.r-project.org/web/packages/optigrab/index.html)
+ - [argparser (>= v0.7.1)](https://cran.r-project.org/web/packages/argparser/index.html)
+ - [BiocManager (>= 1.30.19)](https://www.bioconductor.org/install/)
+ - [data.table (>= v1.14.2)](https://cran.r-project.org/package=data.table)
+ - [devtools (>= v2.4.3)](https://cran.r-project.org/web/packages/devtools/index.html)
+ - [GenomicDistributions (>= v1.6.0)](https://bioconductor.org/packages/release/bioc/html/GenomicDistributions.html)
+ - [GenomicDistributionsData (>= v1.6.0)](https://bioconductor.org/packages/release/data/experiment/html/GenomicDistributionsData.html)
+ - [GenomicRanges (>= v1.50.1)](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html)
+ - [ggplot2 (>= v3.4.0)](https://cran.r-project.org/package=ggplot2)
+ - [optigrab (>= v0.9.2.1)](https://cran.r-project.org/web/packages/optigrab/index.html)
+ - [pepr (>= v0.4.0)](https://cran.r-project.org/web/packages/pepr/index.html)
+ - [R.utils (>= v2.12.2)](https://cran.r-project.org/web/packages/R.utils/index.html)
 
 To install the needed packages, enter the following command in the pipeline folder:
 ```console
 Rscript -e 'install.packages("devtools")'
-Rscript -e 'devtools::install_github("pepkit/pepr")'
+Rscript -e 'install.packages("data.table")'
+Rscript -e 'install.packages("argparser")'
+Rscript -e 'install.packages("optigrab")'
+Rscript -e 'install.packages("R.utils")'
+Rscript -e 'install.packages("ggplot2")'
+Rscript -e 'install.packages("pepr")'
 Rscript -e 'install.packages("BiocManager")'
 Rscript -e 'BiocManager::install("GenomicRanges")'
-Rscript -e 'devtools::install_github("databio/GenomicDistributions")'
-wget "http://big.databio.org/GenomicDistributionsData/GenomicDistributionsData_0.0.2.tar.gz"
-Rscript -e 'install.packages("GenomicDistributionsData_0.0.2.tar.gz", type="source", repos=NULL)'
+Rscript -e 'BiocManager::install("GenomicDistributions")'
+Rscript -e 'BiocManager::install("GenomicDistributionsData")'
 Rscript -e 'devtools::install(file.path("PEPPROr/"), dependencies=TRUE, repos="https://cloud.r-project.org/")'
 ```
 
@@ -223,7 +232,7 @@ Next, pull the assets you need. Replace `hg38` in the example below if you need 
 refgenie pull hg38/fasta hg38/bowtie2_index hg38/refgene_anno hg38/ensembl_gtf hg38/ensembl_rb
 refgenie build hg38/feat_annotation
 ```
-PEPPRO also requires `bowtie2_index` for any pre-alignment genomes:
+PEPPRO also requires a `fasta` and `bowtie2_index` asset for any pre-alignment genomes:
 
 ```console
 refgenie pull human_rDNA/fasta human_rDNA/bowtie2_index

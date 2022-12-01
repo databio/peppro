@@ -3,13 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [0.10.2] -- 2022-11-30
 
-### Added
- - Updated tutorial docs and configuration files
-
 ### Changed
  - Switched `join` commands to series of `awk` commands for MacOS compatibility
  - updated pause index command arguments to match target output to improve interpretability
-
+ - update checkinstall requirements
+ - Updated tutorial docs and configuration files
 
 ## [0.10.1] -- 2022-06-28
 
