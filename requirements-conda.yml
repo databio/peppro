@@ -383,7 +383,7 @@ dependencies:
     - biothings-client==0.2.6
     - certifi==2021.10.8
     - charset-normalizer==2.0.7
-    - codecov==2.1.12
+    - codecov==2.1.13
     - divvy==0.6.0
     - eido==0.1.5
     - hypothesis==4.38.0
