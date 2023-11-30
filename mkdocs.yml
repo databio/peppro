@@ -9,7 +9,6 @@ repo_url: https://github.com/databio/peppro/
 paper_link: https://doi.org/10.1186/s13059-021-02349-4
 
 markdown_extensions:
-  - fontawesome_markdown  # pip install --user fontawesome-markdown
   - pymdownx.details  # pip install --user pymdown-extensions
 
 nav:
@@ -44,8 +43,3 @@ plugins:
       usage_cmds:
         -"$CODEBASE/databio/peppro/pipelines/peppro.py --help
 
-navbar:
-  right:
-  - text: Software & Data
-    icon: fa-code fa-lg
-    href: http://databio.org/software/
