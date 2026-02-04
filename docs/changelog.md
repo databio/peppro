@@ -1,6 +1,36 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.11.0] -- 2026-02-04
+
+### Added
+
+ - Full pipestat integration for pipeline results reporting
+ - Support for looper report command to generate HTML summary reports
+ - Support for looper runp project-level pipeline execution
+ - New pipestat-compatible JSON Schema output schema (peppro_output_schema.yaml)
+
+### Changed
+
+ - Updated PipelineManager initialization to include pipestat_schema and pipestat_record_identifier parameters for native pipestat support
+ - Migrated to Looper 2.0+ pipeline interface format with nested sample_interface structure
+ - Updated pipeline interfaces to use Jinja2 templating with looper.piface_dir for portable paths
+ - Bumped minimum dependency versions:
+   - looper>=2.0.0
+   - pipestat>=0.6.0
+   - piper>=0.14.0 (pypiper)
+   - peppy>=0.40.0
+   - Python >=3.9,<3.14
+
+### Fixed
+
+ - PEPPROr R package: Replaced deprecated optigrab dependency with custom base R argument parsing functions
+ - Corrected result type definitions in output schema to match pipeline reporting (e.g., numeric types for statistics)
+
+### Removed
+
+ - Removed legacy Looper 1.x pipeline interface format
+
 ## [0.10.2] -- 2022-11-30
 
 ### Changed

@@ -54,10 +54,10 @@ refgenie pull human_rDNA/fasta human_rDNA/bowtie2_index
 
 ## 3. Download tutorial read files
 
-We're going to work with some files a little larger than the test data included in the pipeline so we can see all the features included in a full run of the pipeline.  Go ahead and download the [tutorial_r1.fastq.gz](http://big.databio.org/peppro/fastq/tutorial_r1.fq.gz) and [tutorial_r2.fq.gz](http://big.databio.org/peppro/fastq/tutorial_r2.fq.gz) files. 
+We're going to work with some files a little larger than the test data included in the pipeline so we can see all the features included in a full run of the pipeline.  Go ahead and download the [tutorial_r1.fastq.gz](https://virginia.box.com/s/iqnu4j55a3m5kyksfyadbzj17pqu1lvt) and [tutorial_r2.fq.gz](https://virginia.box.com/s/wa5ncixn13dxxs50q6m8qz6moftqwuj5) files. 
 ```console
-wget http://big.databio.org/peppro/fastq/tutorial_r1.fq.gz
-wget http://big.databio.org/peppro/fastq/tutorial_r2.fq.gz
+curl -L https://virginia.box.com/shared/static/iqnu4j55a3m5kyksfyadbzj17pqu1lvt --output tutorial_r1.fq.gz
+curl -L https://virginia.box.com/shared/static/wa5ncixn13dxxs50q6m8qz6moftqwuj5 --output tutorial_r2.fq.gz
 ```
 
 To simplify the rest of this tutorial, let's put those files in a standard location we'll use for the rest of this guide. 
@@ -78,18 +78,14 @@ nano tutorial_refgenie.yaml
 The following is what you should see in that configuration file.
 ```console
 # Run tutorial samples through PEPPRO
+# Use with .looper.yaml configuration file
+# This config uses refgenie for genome assets
 name: PEPPRO_tutorial
 
 pep_version: 2.0.0
 sample_table: tutorial.csv
 
-looper:
-  output_dir: "${TUTORIAL}/processed/peppro/tutorial" 
-  pipeline_interfaces: "${TUTORIAL}/tools/peppro/project_pipeline_interface.yaml"]
-
 sample_modifiers:
-  append:
-    pipeline_interfaces: "${TUTORIAL}/tools/peppro/sample_pipeline_interface.yaml"
   derive:
     attributes: [read1, read2]
     sources:
@@ -102,7 +98,22 @@ sample_modifiers:
         genome: "hg38"
         prealignment_names: ["human_rDNA"]
 ```
-There is also a sample annotation file referenced in our configuration file.  The sample annotation file contains metadata and other information about our sample. Just like before, this file, named [`tutorial.csv`](https://github.com/databio/peppro/blob/master/examples/meta/tutorial.csv) has been provided.  You may check it out if you wish, otherwise we're all set.
+And the tutorial's `.looper.yaml` file:
+```console
+# Looper 2.0 configuration for PEPPRO tutorial
+pep_config: tutorial_refgenie.yaml  # Use tutorial.yaml for hardcoded paths
+
+output_dir: "${TUTORIAL}/processed/peppro/tutorial"
+
+pipeline_interfaces:
+  - "${TUTORIAL}/tools/peppro/sample_pipeline_interface.yaml"
+  - "${TUTORIAL}/tools/peppro/project_pipeline_interface.yaml"
+
+pipestat:
+  results_file_path: "${TUTORIAL}/processed/peppro/tutorial/results_pipeline/{record_identifier}/stats.yaml"
+```
+
+There is also a sample annotation file referenced in our configuration file.  The sample annotation file contains metadata and other information about our sample. Just like before, this file, named [`tutorial.csv`](https://github.com/databio/peppro/blob/master/examples/meta/tutorial/tutorial.csv) has been provided.  You may check it out if you wish, otherwise we're all set.
 
 If you choose to open `tutorial.csv`, you should see the following:
 ```console
@@ -168,13 +179,13 @@ cd ${TUTORIAL}/tools/peppro/
 
 Now, we'll use `looper` to run the sample pipeline locally.
 ```console
-looper run examples/meta/tutorial_refgenie.yaml
+looper run -c examples/meta/tutorial/.looper.yaml
 ```         
 Congratulations! Your first sample should be running through the pipeline now.  It takes right around 25 minutes for this process to complete using a single core and maxes at about 3.5 GB of memory.
 
 We will also use `looper` to run the project pipeline locally. At the project level we can aggregate all the samples in our project (just 1 in this simple case) and view everything together.
 ```console
-looper runp examples/meta/tutorial_refgenie.yaml
+looper runp -c examples/meta/tutorial/.looper.yaml
 ```
 
 After the pipeline is finished, we can look through the output directory together.  We've provided a breakdown of that directory in the [browse output page](browse_output.md).
@@ -184,12 +195,12 @@ After the pipeline is finished, we can look through the output directory togethe
 Let's take full advantage of `looper` and generate a pipeline `HTML` report that makes all our results easy to view and browse.  If you'd like to skip right to the results and see what it looks like, [check out the tutorial results](files/examples/tutorial/PEPPRO_tutorial_summary.html).  Otherwise, let's generate a report ourselves.
 Using our same configuration file we used to run the samples through the pipeline, we'll now employ the `report` function of `looper`.
 ```console
-looper report examples/meta/tutorial_refgenie.yaml
+looper report -c examples/meta/tutorial/.looper.yaml
 ```         
 That's it! Easy, right? `Looper` conveniently provides you with the location where the HTML report is produced.  You may either open the report with your preferred internet browser using the PATH provided, or we can change directories to the report's location and open it there.  Let's go ahead and change into the directory that contains the report.
 ```console
-cd ${TUTORIAL}/processed/peppro/tutorial/
-firefox PEPPRO_tutorial_summary.html
+cd ${TUTORIAL}/processed/peppro/tutorial/reports/PEPPRO/
+firefox index.html
 ```          
 The `HTML` report contains a summary page that integrates the project level summary table and any project level objects.  The status page lists all the samples in this project along with their current status, a link to their log files, the time it took to run the sample and the peak memory used during the run.  The objects page provides links to separate pages for each object type.  On each object page, all the individual samples' objects are provided.  Similarly, the samples page contains links to individual pages for each sample.  The sample pages list the individual summary statistics for that sample as well as links to log files, command logs, and summary files.  The sample pages also provide links and thumbnails for any individual objects generated for that sample.  Of course, all of these files are present in the sample directory, but the report provides easy access to them all.
 
@@ -227,10 +238,10 @@ Success! If you had any issues, feel free to [reach out to us with questions](co
 
 ## 2: Download tutorial read files
 
-We're going to work with some files a little larger than the test data included in the pipeline so we can see all the features included in a full run of the pipeline.  Go ahead and download the [tutorial_r1.fastq.gz](http://big.databio.org/peppro/fastq/tutorial_r1.fq.gz) and [tutorial_r2.fq.gz](http://big.databio.org/peppro/fastq/tutorial_r2.fq.gz) files. 
+We're going to work with some files a little larger than the test data included in the pipeline so we can see all the features included in a full run of the pipeline.  Go ahead and download the [tutorial_r1.fastq.gz](https://virginia.box.com/s/iqnu4j55a3m5kyksfyadbzj17pqu1lvt) and [tutorial_r2.fq.gz](https://virginia.box.com/s/wa5ncixn13dxxs50q6m8qz6moftqwuj5) files. 
 ```console
-wget http://big.databio.org/peppro/fastq/tutorial_r1.fq.gz
-wget http://big.databio.org/peppro/fastq/tutorial_r2.fq.gz
+curl -L https://virginia.box.com/shared/static/iqnu4j55a3m5kyksfyadbzj17pqu1lvt --output tutorial_r1.fq.gz
+curl -L https://virginia.box.com/shared/static/wa5ncixn13dxxs50q6m8qz6moftqwuj5 --output tutorial_r2.fq.gz
 ```
 
 To simplify the rest of this tutorial, let's put those files in a standard location we'll use for the rest of this guide. 
@@ -400,14 +411,14 @@ cd ${TUTORIAL}/tools/peppro/
 
 Now, we'll use `looper` to run the sample pipeline locally.
 ```console
-looper run examples/meta/tutorial.yaml
+looper run -c examples/meta/tutorial/tutorial.yaml
 ```         
 Congratulations! Your first sample should be running through the pipeline now.  It takes right around 25 minutes for this process to complete using a single core and maxes at about 3.5 GB of memory.
 
 ## 6: Use `looper` to run the project level pipeline
 The pipeline also includes project level analyses that work on all samples concurrently.  This allows for analyses that require output produced by individual sample analysis. We'll run the project analysis much like we run the sample analysis:
 ```console
-looper runp examples/meta/tutorial.yaml
+looper runp -c examples/meta/tutorial/tutorial.yaml
 ```
 This should take about a minute on the tutorial sample and will generate a `summary/` directory containing project level output in the parent project directory. 
 
@@ -417,11 +428,11 @@ Let's take full advantage of `looper` and generate a pipeline `HTML` report that
 
 Using our same configuration file we used to run the samples through the pipeline, we'll now employ the `report` function of `looper`.
 ```console
-looper report examples/meta/tutorial.yaml
+looper report -c examples/meta/tutorial/tutorial.yaml
 ```         
 That's it! Easy, right? `Looper` conveniently provides you with the location where the HTML report is produced.  You may either open the report with your preferred internet browser using the PATH returned with `looper report`, or we can change directories to the report's location and open it there.  Let's go ahead and change into the directory that contains the report.
 ```console
-cd $TUTORIAL/processed/peppro/tutorial
-firefox PEPPRO_tutorial_summary.html
+cd $TUTORIAL/processed/peppro/tutorial/reports/PEPPRO
+firefox index.html
 ```          
 The `HTML` report contains a summary page that integrates the project level summary table and any project level objects including: raw aligned reads, percent aligned reads, TSS enrichment scores, and library complexity plots.  The status page lists all the samples in this project along with their current status, a link to their log files, the time it took to run the sample and the peak memory used during the run.  The objects page provides links to separate pages for each object type.  On each object page, all the individual samples' objects are provided.  Similarly, the samples page contains links to individual pages for each sample.  The sample pages list the individual summary statistics for that sample as well as links to log files, command logs, and summary files.  The sample pages also provide links and thumbnails for any individual objects generated for that sample.  Of course, all of these files are present in the sample directory, but the report provides easy access to them all.
