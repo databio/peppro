@@ -5,7 +5,7 @@ PEPPRO Collator - Run-on sequencing project-level pipeline
 
 __author__ = ["Michal Stolarczyk", "Jason Smith"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.0.3"
+__version__ = "0.2.0"
 
 from argparse import ArgumentParser
 import os
@@ -46,8 +46,12 @@ def main():
     args = parse_arguments()
     outfolder = os.path.abspath(os.path.join(args.output_parent, "summary"))
 
+    # pm = pypiper.PipelineManager(name="PEPPRO collator", outfolder=outfolder,
+                                 # args=args, version=__version__)
     pm = pypiper.PipelineManager(name="PEPPRO collator", outfolder=outfolder,
-                                 args=args, version=__version__)
+        pipestat_record_identifier="summary",
+        pipestat_pipeline_type="project",
+        args=args, version=__version__)
 
     #pm.info("args: {}\n".format(args))
 

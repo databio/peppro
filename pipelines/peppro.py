@@ -5,7 +5,7 @@ PEPPRO - Run-on sequencing pipeline
 
 __author__ = ["Jason Smith", "Nathan Sheffield", "Mike Guertin"]
 __email__ = "jasonsmith@virginia.edu"
-__version__ = "0.10.2"
+__version__ = "0.11.0"
 
 from argparse import ArgumentParser
 import os
@@ -1976,8 +1976,13 @@ def main():
     outfolder = os.path.abspath(
         os.path.join(args.output_parent, args.sample_name))
     global pm
+    # pm = pypiper.PipelineManager(
+        # name="PEPPRO", outfolder=outfolder, args=args, version=__version__)
     pm = pypiper.PipelineManager(
-        name="PEPPRO", outfolder=outfolder, args=args, version=__version__)
+        name="PEPPRO", outfolder=outfolder,
+        pipestat_record_identifier=args.sample_name,
+        pipestat_schema="peppro_output_schema.yaml",
+        args=args, version=__version__)
     global ngstk
     ngstk = pypiper.NGSTk(pm=pm)
 
@@ -2694,10 +2699,10 @@ def main():
                    " | awk '{counter++;sum+=$3}END{print sum/counter}'")
             rd = pm.checkprint(cmd)
 
-        pm.report_result("Mapped_reads", mr)
+        pm.report_result("Mapped_reads", round(float(mr)))
         pm.report_result("QC_filtered_reads",
                          round(float(mr)) - round(float(ar)))
-        pm.report_result("Aligned_reads", ar)
+        pm.report_result("Aligned_reads", round(float(ar)))
         pm.report_result("Alignment_rate", round(float(ar) * 100 /
                          float(tr), 2))
         pm.report_result("Total_efficiency", round(float(ar) * 100 /
@@ -3477,7 +3482,8 @@ def main():
                     for pos, anno in enumerate(ft_list):
                         # working files
                         anno_file = os.path.join(QC_folder, str(anno))
-                        valid_name = str(re.sub('[^\w_.)( -]', '', anno).strip().replace(' ', '_'))
+                        #valid_name = str(re.sub('[^\w_.)( -]', '', anno).strip().replace(' ', '_'))
+                        valid_name = str(re.sub(r'[^\w_.)( -]', '', anno).strip().replace(' ', '_'))
                         file_name = os.path.join(QC_folder, valid_name)
                         anno_sort = os.path.join(QC_folder,
                                                  valid_name + "_sort.bed")
@@ -3571,7 +3577,7 @@ def main():
                     for pos, anno in enumerate(ft_list):
                         # working files
                         anno_file = os.path.join(QC_folder, str(anno))
-                        valid_name = str(re.sub('[^\w_.)( -]', '', anno).strip().replace(' ', '_'))
+                        valid_name = str(re.sub(r'[^\w_.)( -]', '', anno).strip().replace(' ', '_'))
                         file_name = os.path.join(QC_folder, valid_name)
                         anno_sort = os.path.join(QC_folder,
                                                  valid_name + "_sort.bed")
