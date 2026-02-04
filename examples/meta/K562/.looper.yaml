@@ -1,0 +1,11 @@
+# Looper 2.0 configuration for K562 PEPPRO example
+pep_config: K562_example.yaml
+
+output_dir: "$PROCESSED/pro_example/"
+
+pipeline_interfaces:
+  - "$CODE/peppro/sample_pipeline_interface.yaml"
+  - "$CODE/peppro/project_pipeline_interface.yaml"
+
+pipestat:
+  results_file_path: "$PROCESSED/pro_example/results_pipeline/{record_identifier}/stats.yaml"
