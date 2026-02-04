@@ -1,9 +1,11 @@
+/project/gomezlab/code/.conda/envs/peppro/lib/python3.13/site-packages/refgenconf/refgenconf.py:24: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import iter_entry_points
 usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--silent] [--verbosity V]
                  [--logdev] [-C CONFIG_FILE] -O PARENT_OUTPUT_FOLDER
-                 [-M MEMORY_LIMIT] [-P NUMBER_OF_CORES] -S SAMPLE_NAME -I
-                 INPUT_FILES [INPUT_FILES ...]
-                 [-I2 [INPUT_FILES2 [INPUT_FILES2 ...]]] -G GENOME_ASSEMBLY
-                 [-Q SINGLE_OR_PAIRED]
+                 [-M MEMORY_LIMIT] [-P NUMBER_OF_CORES]
+                 [--pipeline-name PIPELINE_NAME] -S SAMPLE_NAME
+                 -I INPUT_FILES [INPUT_FILES ...] [-I2 [INPUT_FILES2 ...]]
+                 -G GENOME_ASSEMBLY [-Q SINGLE_OR_PAIRED]
                  [--protocol {PRO,pro,PRO-SEQ,PRO-seq,proseq,PROSEQ,GRO,gro,groseq,GROSEQ,GRO-SEQ,GRO-seq}]
                  [--adapter-tool {cutadapt,fastp}]
                  [--dedup-tool {seqkit,fqdedup}]
@@ -11,17 +13,17 @@ usage: peppro.py [-h] [-R] [-N] [-D] [-F] [-T] [--silent] [--verbosity V]
                  [--max-len MAX_LEN] [--sob] [--scale]
                  [--prealignment-names PREALIGNMENT_NAMES [PREALIGNMENT_NAMES ...]]
                  [--prealignment-index PREALIGNMENT_INDEX [PREALIGNMENT_INDEX ...]]
-                 --genome-index GENOME_INDEX [--fasta FASTA] --chrom-sizes
-                 CHROM_SIZES [--TSS-name TSS_NAME] [--pi-tss PI_TSS]
-                 [--pi-body PI_BODY] [--pre-name PRE_NAME]
+                 --genome-index GENOME_INDEX [--fasta FASTA]
+                 --chrom-sizes CHROM_SIZES [--TSS-name TSS_NAME]
+                 [--pi-tss PI_TSS] [--pi-body PI_BODY] [--pre-name PRE_NAME]
                  [--anno-name ANNO_NAME] [--exon-name EXON_NAME]
                  [--intron-name INTRON_NAME] [--search-file SEARCH_FILE]
                  [--coverage] [--keep] [--keep-mito] [--noFIFO]
                  [--no-complexity] [--prioritize] [-V]
 
-PEPPRO version 0.10.2
+PEPPRO version 0.12.0
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -R, --recover         Overwrite locks to recover from previous failed run
   -N, --new-start       Overwrite all results to start a fresh run
@@ -31,18 +33,20 @@ optional arguments:
   --silent              Silence logging. Overrides verbosity.
   --verbosity V         Set logging level (1-5 or logging module level name)
   --logdev              Expand content of logging message format.
-  -C CONFIG_FILE, --config CONFIG_FILE
+  -C, --config CONFIG_FILE
                         Pipeline configuration file (YAML). Relative paths are
                         with respect to the pipeline script.
-  -M MEMORY_LIMIT, --mem MEMORY_LIMIT
+  -M, --mem MEMORY_LIMIT
                         Memory limit for processes accepting such. Default
                         units are megabytes unless specified using the suffix
                         [K|M|G|T].
-  -P NUMBER_OF_CORES, --cores NUMBER_OF_CORES
+  -P, --cores NUMBER_OF_CORES
                         Number of cores for parallelized processes
-  -I2 [INPUT_FILES2 [INPUT_FILES2 ...]], --input2 [INPUT_FILES2 [INPUT_FILES2 ...]]
+  --pipeline-name PIPELINE_NAME
+                        Name of the pipeline
+  -I2, --input2 [INPUT_FILES2 ...]
                         Secondary input files, such as read2
-  -Q SINGLE_OR_PAIRED, --single-or-paired SINGLE_OR_PAIRED
+  -Q, --single-or-paired SINGLE_OR_PAIRED
                         Single- or paired-end sequencing protocol
   --protocol {PRO,pro,PRO-SEQ,PRO-seq,proseq,PROSEQ,GRO,gro,groseq,GROSEQ,GRO-SEQ,GRO-seq}
                         Run on sequencing type.
@@ -101,11 +105,11 @@ optional arguments:
   -V, --version         show program's version number and exit
 
 required named arguments:
-  -O PARENT_OUTPUT_FOLDER, --output-parent PARENT_OUTPUT_FOLDER
+  -O, --output-parent PARENT_OUTPUT_FOLDER
                         Parent output directory of project
-  -S SAMPLE_NAME, --sample-name SAMPLE_NAME
+  -S, --sample-name SAMPLE_NAME
                         Name for sample to run
-  -I INPUT_FILES [INPUT_FILES ...], --input INPUT_FILES [INPUT_FILES ...]
+  -I, --input INPUT_FILES [INPUT_FILES ...]
                         One or more primary input files
-  -G GENOME_ASSEMBLY, --genome GENOME_ASSEMBLY
+  -G, --genome GENOME_ASSEMBLY
                         Identifier for genome assembly
