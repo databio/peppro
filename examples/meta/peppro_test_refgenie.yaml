@@ -1,16 +1,11 @@
-# Run test sample through PEPPRO
+# Run test sample through PEPPRO using Refgenie for genome assets
+# Use with .looper.yaml configuration file
 name: test
 
 pep_version: 2.0.0
 sample_table: peppro_test.csv
 
-looper:
-  output_dir: peppro_test
-  pipeline_interfaces: ../../project_pipeline_interface.yaml  # PATH to the directory where looper will find the pipeline repository. 
-
 sample_modifiers:
-  append:
-    pipeline_interfaces: ../../sample_pipeline_interface.yaml # PATH to the directory where looper will  
   derive:
     attributes: [read1]
     sources:
