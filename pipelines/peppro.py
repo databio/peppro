@@ -43,7 +43,7 @@ def parse_arguments():
     ###########################################################################
     parser = ArgumentParser(description='PEPPRO version ' + __version__)
     parser = pypiper.add_pypiper_args(parser, groups=
-        ['pypiper', 'looper', 'ngs'],
+        ['pypiper', 'looper', 'ngs', 'pipestat'],
         required=["input", "genome", "sample-name", "output-parent",
                   "chrom_sizes", "genome_index"])
 
@@ -1976,12 +1976,10 @@ def main():
     outfolder = os.path.abspath(
         os.path.join(args.output_parent, args.sample_name))
     global pm
-    # pm = pypiper.PipelineManager(
-        # name="PEPPRO", outfolder=outfolder, args=args, version=__version__)
     pm = pypiper.PipelineManager(
         name="PEPPRO", outfolder=outfolder,
         pipestat_record_identifier=args.sample_name,
-        pipestat_schema="peppro_output_schema.yaml",
+        pipestat_pipeline_type="sample",
         args=args, version=__version__)
     global ngstk
     ngstk = pypiper.NGSTk(pm=pm)
