@@ -89,14 +89,19 @@ NATIVE_INSTALL=0
 
 # Check Python
 if ! is_executable "python"; then
-    echo $(warn "WARNING: PEPPRO requires python 3.0 or greater. Install python and checkinstall again.")
+    echo $(warn "WARNING: PEPPRO requires python >=3.9,<3.14. Install python and checkinstall again.")
     printf "\n"
     NATIVE_INSTALL=1
     BULKER_INSTALL=1
 else
-    ver=$(python -V 2>&1 | sed 's/.* \([0-9]\).\([0-9]\).*/\1\2/')
-    if [ "$ver" -lt "30" ]; then
-        echo $(warn "WARNING: PEPPRO requires python 3.0 or greater. Update python and checkinstall again.")
+    ver=$(python -V 2>&1 | sed 's/.* \([0-9]\).\([0-9]*\).*/\1\2/')
+    if [ "$ver" -lt "39" ]; then
+        echo $(warn "WARNING: PEPPRO requires python >=3.9,<3.14. Update python and checkinstall again.")
+        printf "\n"
+        NATIVE_INSTALL=1
+        BULKER_INSTALL=1
+    elif [ "$ver" -ge "314" ]; then
+        echo $(warn "WARNING: PEPPRO requires python >=3.9,<3.14. Looper 2.x is incompatible with Python 3.14+.")
         printf "\n"
         NATIVE_INSTALL=1
         BULKER_INSTALL=1
@@ -197,20 +202,20 @@ done
 
 ## Check R packages
 if ! is_executable "R"; then
-    echo $(warn "WARNING: PEPPRO requires R 3.5 or greater. Install R and checkinstall again.")
+    echo $(warn "WARNING: PEPPRO requires R 4.0 or greater. Install R and checkinstall again.")
     printf "\n"
     NATIVE_INSTALL=1
 else
     rVer=$(R --version 2>&1 | grep 'R version' | awk '{print $3}')
     rVer=$(echo "${rVer//.}")
-    if [ "$rVer" -lt "350" ]; then
-        echo $(warn "WARNING: Please update R to >=3.5 and checkinstall again.")
+    if [ "$rVer" -lt "400" ]; then
+        echo $(warn "WARNING: PEPPRO requires R 4.0 or greater. Update R and checkinstall again.")
         printf "\n"
         NATIVE_INSTALL=1
     fi
 fi
 
-declare -a requiredRPackages=("argparser" "optigrab" "devtools" "GenomicDistributions" "GenomicDistributionsData" "R.utils" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
+declare -a requiredRPackages=("argparser" "devtools" "GenomicDistributions" "GenomicDistributionsData" "R.utils" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
 for package in ${requiredRPackages[@]}; do
     cmd=$(echo "Rscript -e 'library(\"$package\")'")
     packageInstalled=$(eval $cmd 2>&1)
@@ -226,45 +231,35 @@ done
 ################################################################################
 echo -e "-----------------------------------------------------------"
 echo -e "Checking conda installation...                             "
+
 CONDA_INSTALL=0
 
 if ! is_executable "conda"; then
-    echo $(warn "WARNING: Install conda to use conda environments and checkinstall again.")
+    echo $(warn "WARNING: conda not installed, skipping conda check.")
     printf "\n"
     CONDA_INSTALL=1
 else
-    eval "$(conda shell.bash hook)"
-    conda activate peppro
-
-    unset PYTHONPATH
-    unset R_LIBS
-
-    # Check Python
-    if ! is_executable "python"; then
-        echo $(warn "WARNING: PEPPRO requires python 3.0 or greater. Install python and checkinstall again.")
-        printf "\n"
-        CONDA_INSTALL=1
+    CONDA_CNAME="peppro"
+    CONDA_ENVS=$(conda env list)
+    
+    if echo "$CONDA_ENVS" | grep -q "$CONDA_CNAME"; then
+        echo -e $(success "SUCCESS: Found conda environment named, $CONDA_CNAME.")
     else
-        #echo "which python: $(which python)"
-        ver=$(python -V 2>&1 | sed 's/.* \([0-9]\).\([0-9]\).*/\1\2/')
-        if [ "$ver" -lt "30" ]; then
-            echo $(warn "WARNING: PEPPRO requires python 3.0 or greater. Update python and checkinstall again.")
-            printf "\n"
-            CONDA_INSTALL=1
-        fi
-    fi
-
-    # Check Python packages
-    if ! is_executable "pip"; then
-        echo $(warn "WARNING: PEPPRO requires pip. Please install pip and checkinstall again.")
+        echo $(warn "WARNING: Could not find a conda environment named, $CONDA_CNAME. Checkinstall expects to find one, skipping conda check.")
         printf "\n"
         CONDA_INSTALL=1
     fi
-
+    
+    CURR_CONDA=$(echo $CONDA_DEFAULT_ENV)
+    
+    if ! [[ "$CURR_CONDA" == "$CONDA_CNAME" ]]; then
+        conda activate $CONDA_CNAME 2>/dev/null
+    fi
+    
     if [ -f "requirements.txt" ]; then
         REQS="requirements.txt"
     else
-        curl https://raw.githubusercontent.com/databio/peppro/master/requirements.txt --silent --output curl_requirements.txt && mv requirements.txt curl_requirements.txt
+        curl https://raw.githubusercontent.com/databio/peppro/master/requirements.txt --silent --output requirements.txt && mv requirements.txt curl_requirements.txt
         REQS="curl_requirements.txt"
     fi
 
@@ -346,20 +341,20 @@ else
 
     ## Check R packages
     if ! is_executable "R"; then
-        echo $(warn "WARNING: PEPPRO requires R 3.5 or greater.\n Please install R>=3.5 and checkinstall again.")
+        echo $(warn "WARNING: PEPPRO requires R 4.0 or greater.\n Please install R>=4.0 and checkinstall again.")
         printf "\n"
         exit 1
     else
         rVer=$(R --version 2>&1 | grep 'R version' | awk '{print $3}')
         rVer=$(echo "${rVer//.}")
-        if [ "$rVer" -lt "350" ]; then
-            echo $(warn "WARNING: PEPPRO requires R 3.5 or greater. Update R and checkinstall again.")
+        if [ "$rVer" -lt "400" ]; then
+            echo $(warn "WARNING: PEPPRO requires R 4.0 or greater. Update R and checkinstall again.")
             printf "\n"
             CONDA_INSTALL=1
         fi
     fi
 
-    declare -a requiredRPackages=("optigrab" "devtools" "argparser" "R.utils" "GenomicDistributions" "GenomicDistributionsData" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
+    declare -a requiredRPackages=("devtools" "argparser" "R.utils" "GenomicDistributions" "GenomicDistributionsData" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
     for package in ${requiredRPackages[@]}; do
         cmd=$(echo "Rscript -e 'library(\"$package\")'")
         packageInstalled=$(eval $cmd 2>&1)
