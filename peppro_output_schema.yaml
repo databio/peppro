@@ -322,6 +322,12 @@ properties:
             type: string
           title:
             type: string
+      Time:
+        type: string
+        description: "time"
+      Success:
+        type: string
+        description: "success"
 $defs:
   file:
     type: object
