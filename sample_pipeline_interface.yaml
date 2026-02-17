@@ -41,10 +41,10 @@ sample_interface:
     {% if sample.no_fifo is defined %} --noFIFO {% endif %}
     {% if sample.complexity is defined %} --no-complexity {% endif %}
     {% if sample.prioritize is defined %} --prioritize {% endif %}
+    --pipestat-config {pipestat.config_file}
 
 compute:
-  singularity_image: ${SIMAGES}peppro
-  docker_image: databio/peppro
+  conda_env: peppro
   bulker_crate: databio/peppro:1.0.1
   size_dependent_variables: resources.tsv
 

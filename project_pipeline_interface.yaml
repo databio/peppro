@@ -10,10 +10,9 @@ project_interface:
     -M {compute.mem}
     -n {project.name}
     -r {looper.results_subdir}
+    --pipestat-config {pipestat.config_file}
 
 compute:
-  singularity_image: ${SIMAGES}peppro
-  docker_image: databio/peppro
   bulker_crate: databio/peppro:1.0.1
   size_dependent_variables: resources.tsv
 
