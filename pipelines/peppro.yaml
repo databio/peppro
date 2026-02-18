@@ -42,6 +42,9 @@ parameters:  # parameters passed to bioinformatic tools, subclassed by tool
     # pipeline default: --very-sensitive -X 2000
     # --very-sensitive: -D 20 -R 3 -N 0 -L 20 -i S,1,0.50
     # -X 2000: paired-end maximum fragment length
+    orientation: "--rf"
+    # --rf: reverse-forward (default; reverse-stranded PRO-seq/GRO-seq)
+    # --fr: forward-reverse (forward-stranded libraries)
   samtools:
     params: "-q 10"
     # -q: skip alignments with MAPQ < 10.

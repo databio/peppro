@@ -2609,6 +2609,8 @@ def main():
     else:
         bt2_options = param.bowtie2.params
 
+    bt2_orientation = getattr(param.bowtie2, 'orientation', '--rf') or '--rf'
+
     # samtools sort needs a temporary directory
     tempdir = tempfile.mkdtemp(dir=map_genome_folder)
     os.chmod(tempdir, 0o771)
@@ -2634,7 +2636,7 @@ def main():
     cmd += " --rg-id " + args.sample_name
     cmd += " -x " + res.genome_index
     if args.paired_end:
-        cmd += " --rf -1 " + unmap_fq1 + " -2 " + unmap_fq2
+        cmd += " " + bt2_orientation + " -1 " + unmap_fq1 + " -2 " + unmap_fq2
     else:
         cmd += " -U " + unmap_fq1
     cmd += " | " + tools.samtools + " view -bS - -@ 1 "
@@ -2657,7 +2659,7 @@ def main():
         cmd_dups += " --rg-id " + args.sample_name
         cmd_dups += " -x " + res.genome_index
         if args.paired_end:
-            cmd_dups += " --rf -1 " + unmap_fq1_dups + " -2 " + unmap_fq2_dups
+            cmd_dups += " " + bt2_orientation + " -1 " + unmap_fq1_dups + " -2 " + unmap_fq2_dups
         else:
             cmd_dups += " -U " + unmap_fq1_dups
         cmd_dups += " | " + tools.samtools + " view -bS - -@ 1 "
@@ -2809,7 +2811,12 @@ def main():
                 " | " + tools.samtools + " sort - -@ " + str(pm.cores) +
                 " > " + mapping_pe2_bam)
         pm.run([cmd1, cmd2], [mapping_pe1_bam, mapping_pe2_bam])
-        mapping_genome_bam = mapping_pe1_bam
+        # --rf (reverse-forward): nascent RNA signal is on PE1
+        # --fr (forward-reverse): nascent RNA signal is on PE2
+        if bt2_orientation == "--fr":
+            mapping_genome_bam = mapping_pe2_bam
+        else:
+            mapping_genome_bam = mapping_pe1_bam
 
     ############################################################################
     #       Determine maximum read length and add seqOutBias resource          #
@@ -3038,11 +3045,20 @@ def main():
     minus_bam = os.path.join(
         map_genome_folder, args.sample_name + "_minus.bam")
     
+    # --rf (reverse-forward): forward-mapped reads = plus strand nascent RNA
+    # --fr (forward-reverse): reverse-mapped reads = plus strand nascent RNA
+    if bt2_orientation == "--fr":
+        plus_flag = ("-f", 16)
+        minus_flag = ("-F", 20)
+    else:
+        plus_flag = ("-F", 20)
+        minus_flag = ("-f", 16)
+
     cmd1 = build_command([
         tools.samtools,
         "view",
         "-bh",
-        ("-F", 20),
+        plus_flag,
         mapping_genome_bam,
         (">", plus_bam)
     ])
@@ -3051,7 +3067,7 @@ def main():
         tools.samtools,
         "view",
         "-bh",
-        ("-f", 16),
+        minus_flag,
         mapping_genome_bam,
         (">", minus_bam)
     ])
