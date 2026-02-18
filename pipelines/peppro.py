@@ -1081,7 +1081,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
 
     if args.adapter == "cutadapt":
-        adapter_report = _cutadapt_report_path(outfolder, sname, read2)
+        cutadapt_report = _cutadapt_report_path(outfolder, sname, read2)
+        adapter_report = cutadapt_report
     else:
         adapter_report = os.path.join(fastqc_folder,
                                       sname + "_R1_rmAdapter.txt")
