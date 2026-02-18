@@ -102,41 +102,26 @@ class CutTracer(pararead.ParaReadProcessor):
 
         cutsToWig = os.path.join(os.path.dirname(__file__), "cutsToWig.pl")
 
-        cmd1 = ("sort -n | perl " + cutsToWig + " " + str(chrom_size) +
-                " " + str(self.variable_step) + " " + str(self.scale))
-        cmd2 = ("wigToBigWig -clip -fixedSummaries -keepAllChromosomes stdin " +
-                self.chrom_sizes_file + " " + chromOutFileBw)
-        _LOGGER.debug("  cutsToWigProcess: " + cmd1)
-        _LOGGER.debug("  wigToBigWigProcess: " + cmd2)
-
         if self.exactbw:
+            tmpWigFile = chromOutFile + "_exact.wig"
+            cmd1 = ("sort -n | perl " + cutsToWig + " " + str(chrom_size) +
+                    " " + str(self.variable_step) + " " + str(self.scale) +
+                    " > " + tmpWigFile)
             cutsToWigProcess = subprocess.Popen(cmd1, shell=True,
-                stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-            wigToBigWigProcess = subprocess.Popen(
-                ['wigToBigWig', '-clip', '-fixedSummaries',
-                 '-keepAllChromosomes', 'stdin',
-                 self.chrom_sizes_file, chromOutFileBw],
-                 stdin=cutsToWigProcess.stdout)
+                stdin=subprocess.PIPE)
 
         if self.smoothbw:
             cutsToWigSm = os.path.join(os.path.dirname(__file__),
                                        "smoothWig.pl")
             chromOutFileBwSm = chromOutFile + "_smooth.bw"
             tmpFile = chromOutFile + "_cuts.txt"
+            tmpWigFileSm = chromOutFile + "_smooth.wig"
             cmd1 = ("sort -n | tee " + tmpFile + " | perl " + cutsToWigSm +
                     " " + str(chrom_size) + " " +  str(self.smooth_length) +
                     " " + str(self.step_size) + " " + str(self.variable_step) +
-                    " " + str(self.scale))
-            cmd2 = ("wigToBigWig -clip -fixedSummaries " +
-                    "-keepAllChromosomes stdin " + self.chrom_sizes_file +
-                    " " + chromOutFileBwSm)
+                    " " + str(self.scale) + " > " + tmpWigFileSm)
             cutsToWigProcessSm = subprocess.Popen(cmd1, shell=True,
-                stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-            wigToBigWigProcessSm = subprocess.Popen(
-                ['wigToBigWig', '-clip', '-fixedSummaries',
-                 '-keepAllChromosomes', 'stdin',
-                 self.chrom_sizes_file, chromOutFileBwSm],
-                 stdin=cutsToWigProcessSm.stdout)
+                stdin=subprocess.PIPE)
 
         if self.bedout:
             chromOutFileBed = chromOutFile + ".bed"
@@ -240,18 +225,26 @@ class CutTracer(pararead.ParaReadProcessor):
             # Clean up processes
             if self.exactbw:
                 cutsToWigProcess.stdin.close()
-                _LOGGER.debug("Encoding exact bigwig for " + chrom + 
-                              " (last read position:" + str(read.pos) + ")...")
-                wigToBigWigProcess.communicate()
+                cutsToWigProcess.wait()
+                _LOGGER.debug("Encoding exact bigwig for " + chrom + "...")
+                subprocess.call(['wigToBigWig', '-clip', '-fixedSummaries',
+                                 '-keepAllChromosomes', tmpWigFile,
+                                 self.chrom_sizes_file, chromOutFileBw])
+                if os.path.exists(tmpWigFile):
+                    os.remove(tmpWigFile)
 
             if self.bedout:
                 bedOut.close()
 
             if self.smoothbw:
                 cutsToWigProcessSm.stdin.close()
-                _LOGGER.debug("Encoding smooth bigwig for " + chrom +
-                              " (last read position:" + str(read.pos) + ")...")
-                wigToBigWigProcessSm.communicate()
+                cutsToWigProcessSm.wait()
+                _LOGGER.debug("Encoding smooth bigwig for " + chrom + "...")
+                subprocess.call(['wigToBigWig', '-clip', '-fixedSummaries',
+                                 '-keepAllChromosomes', tmpWigFileSm,
+                                 self.chrom_sizes_file, chromOutFileBwSm])
+                if os.path.exists(tmpWigFileSm):
+                    os.remove(tmpWigFileSm)
 
         except StopIteration as e:
             print("StopIteration error for chrom ", chrom, ": ", e)
