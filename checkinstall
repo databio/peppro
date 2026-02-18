@@ -29,8 +29,12 @@ trim() {
     printf '%s' "$var"
 }
 
+CONDA_RUN=()
+
 is_executable() {
-    if [ -x "$(command -v $1)" ]; then
+    if [ "${#CONDA_RUN[@]}" -gt 0 ]; then
+        "${CONDA_RUN[@]}" which "$1" > /dev/null 2>&1
+    elif [ -x "$(command -v $1)" ]; then
         return 0
     else
         return 1
@@ -38,7 +42,7 @@ is_executable() {
 }
 
 pip_show() {
-    if pip show -q $1; then
+    if "${CONDA_RUN[@]}" pip show -q $1 2>/dev/null; then
         return 0
     else
         return 1
@@ -259,8 +263,10 @@ else
 
     CURR_CONDA=$(echo $CONDA_DEFAULT_ENV)
 
-    if ! [[ "$CURR_CONDA" == "$CONDA_CNAME" ]]; then
-        conda activate $CONDA_CNAME 2>/dev/null
+    if [[ "$CURR_CONDA" == "$CONDA_CNAME" ]]; then
+        CONDA_RUN=()
+    else
+        CONDA_RUN=(conda run --no-capture-output -n "$CONDA_CNAME")
     fi
     
     if [ -f "requirements.txt" ]; then
@@ -290,10 +296,10 @@ else
             CONDA_INSTALL=1
         else
             if [ $package == "cutadapt" ]; then
-                installed=$(cutadapt --version)
+                installed=$("${CONDA_RUN[@]}" cutadapt --version)
                 installed=$(trim ${installed})
             else
-                installed=$(pip show ${package} | grep -iw 'Version' | awk -F':' '{print $2}' | tr -d '\n')
+                installed=$("${CONDA_RUN[@]}" pip show ${package} | grep -iw 'Version' | awk -F':' '{print $2}' | tr -d '\n')
                 installed=$(trim ${installed})
             fi
             IFS='.' read -r -a installed_version <<< "$installed"
@@ -352,7 +358,7 @@ else
         printf "\n"
         exit 1
     else
-        rVer=$(R --version 2>&1 | grep 'R version' | awk '{print $3}')
+        rVer=$("${CONDA_RUN[@]}" R --version 2>&1 | grep 'R version' | awk '{print $3}')
         rVer=$(echo "${rVer//.}")
         if [ "$rVer" -lt "400" ]; then
             echo $(warn "WARNING: PEPPRO requires R 4.0 or greater. Update R and checkinstall again.")
@@ -363,8 +369,7 @@ else
 
     declare -a requiredRPackages=("devtools" "argparser" "R.utils" "GenomicDistributions" "GenomicDistributionsData" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
     for package in ${requiredRPackages[@]}; do
-        cmd=$(echo "Rscript -e 'library(\"$package\")'")
-        packageInstalled=$(eval $cmd 2>&1)
+        packageInstalled=$("${CONDA_RUN[@]}" Rscript -e "library('$package')" 2>&1)
         if [[ "$packageInstalled" == *Error* ]]; then
             echo $(warn "WARNING: Please install the R package, $package, and checkinstall again.")
             printf "\n"
@@ -374,7 +379,7 @@ else
         fi
     done
 
-    conda deactivate
+    CONDA_RUN=()
 fi
 
 ################################################################################
