@@ -1917,21 +1917,29 @@ def _add_resources(args, res, asset_dict=None):
                     "config file or point directly to the file using the noted "
                     "command-line arguments:")
 
+        def _fmt_asset(x, include_arg=False):
+            sk = x["seek_key"] or x["asset_name"]
+            tn = x["tag_name"] or "default"
+            s = "{}.{}:{}".format(x["asset_name"], sk, tn)
+            if include_arg and x.get("user_arg"):
+                s += " (--{})".format(x["user_arg"])
+            return s
+
         if len(key_errors) > 0:
             if required_list:
                 err_msg = "Required assets missing from REFGENIE config file: {}"
-                pm.fail_pipeline(IOError(err_msg.format(", ".join(["{asset_name}.{seek_key}:{tag_name}".format(**x) for x in required_list]))))
+                pm.fail_pipeline(IOError(err_msg.format(", ".join([_fmt_asset(x) for x in required_list]))))
             else:
                 warning_msg = "Optional assets missing from REFGENIE config file: {}"
-                pm.info(warning_msg.format(", ".join(["{asset_name}.{seek_key}:{tag_name}".format(**x) for x in key_errors])))
+                pm.info(warning_msg.format(", ".join([_fmt_asset(x) for x in key_errors])))
 
         if len(exist_errors) > 0:
             if required_list:
                 err_msg = "Required assets not existing: {}"
-                pm.fail_pipeline(IOError(err_msg.format(", ".join(["{asset_name}.{seek_key}:{tag_name} (--{user_arg})".format(**x) for x in required_list]))))
+                pm.fail_pipeline(IOError(err_msg.format(", ".join([_fmt_asset(x, include_arg=True) for x in required_list]))))
             else:
                 warning_msg = "Optional assets not existing: {}"
-                pm.info(warning_msg.format(", ".join(["{asset_name}.{seek_key}:{tag_name} (--{user_arg})".format(**x) for x in exist_errors])))
+                pm.info(warning_msg.format(", ".join([_fmt_asset(x, include_arg=True) for x in exist_errors])))
 
         return res, rgc
 
