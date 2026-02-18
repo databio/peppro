@@ -1412,12 +1412,9 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     # Put it all together
     paired_end = args.paired_end
     if read2:
-        pm.run([adapter_command, trim_command], trimmed_fq2)
-        if not _itsa_file(fastqc_report) or args.new_start:
-            cmd = ("echo '### Calculated the number of trimmed reads'")
-            pm.run(cmd, fastqc_report, 
-                   follow=check_trim(processed_fastq, paired_end, trimmed_fq2,
-                                     fastqc_folder=fastqc_folder))
+        pm.run([adapter_command, trim_command], trimmed_fq2,
+               follow=check_trim(processed_fastq, paired_end, trimmed_fq2,
+                                 fastqc_folder=fastqc_folder))
         if args.adapter == "cutadapt":
             output_folder = os.path.join(outfolder, "cutadapt")
         else:
