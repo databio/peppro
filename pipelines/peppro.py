@@ -3267,17 +3267,19 @@ def main():
             cmd4 = ("awk -F '\t' 'NR==FNR {id[$1]; next} $4 in id' " + 
                     PI_shared_genes + " " + body_density + " > " + 
                     shared_body_density)
-            cmd5 = ("awk 'BEGIN{FS=OFS=\"\t\"} FNR>0 && " + 
-                    "FNR==NR{a[$4]=$4 OFS $0; next} " + 
+            cmd5 = ("awk 'BEGIN{FS=OFS=\"\t\"} FNR>0 && " +
+                    "FNR==NR{a[$4]=$4 OFS $0; next} " +
                     "FNR>0{print $0,a[$4]?a[$4]:\"\t\"}' " +
                     shared_TSS_density + " " + shared_body_density +
-                    " | awk -v OFS='\t' '{ if ($6 == \"+\")" + 
-                    "{print $9, $10, $3, $4," + 
-                    "sqrt((($15+$7)/sqrt(($3-$10)^2))^2)," + 
-                    "($15/sqrt(($11-$10)^2))/($7/sqrt(($3-$2)^2)), $6} " + 
-                    "else {print $9, $10, $3, $12," + 
-                    "sqrt((($15+$7)/sqrt(($10-$2)^2))^2)," + 
-                    "($15/sqrt(($11-$10)^2))/($7/sqrt(($3-$2)^2)), $6}}' " +
+                    " | awk -v OFS='\t' '{ if ($6 == \"+\")" +
+                    "{ if ($3!=$10 && $11!=$10 && $3!=$2)" +
+                    "{print $9, $10, $3, $4," +
+                    "sqrt((($15+$7)/sqrt(($3-$10)^2))^2)," +
+                    "($15/sqrt(($11-$10)^2))/($7/sqrt(($3-$2)^2)), $6}}" +
+                    " else { if ($10!=$2 && $11!=$10 && $3!=$2)" +
+                    "{print $9, $10, $3, $12," +
+                    "sqrt((($15+$7)/sqrt(($10-$2)^2))^2)," +
+                    "($15/sqrt(($11-$10)^2))/($7/sqrt(($3-$2)^2)), $6}}}' " +
                     "| env LC_COLLATE=C sort -k1,1 -k2,2n > " + temp.name)
             pm.run([cmd1, cmd2, cmd3, cmd4, cmd5], pause_index, nofail=True)
             temp.close()
