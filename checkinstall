@@ -74,7 +74,7 @@ BASE_REQS=0
 declare -a requiredPkgs=("looper")
 
 for package in ${requiredPkgs[@]}; do
-    if ! pip_show $package; then
+    if ! pip_show $package && ! is_executable $package; then
         echo $(fail "ERROR: PEPPRO requires the Python package, $package. Try pip install $package.")
         printf "\n"
         exit 1
@@ -265,6 +265,8 @@ else
 
     if [[ "$CURR_CONDA" == "$CONDA_CNAME" ]]; then
         CONDA_RUN=()
+    elif [[ "$CONDA_CNAME" == /* ]]; then
+        CONDA_RUN=(conda run --no-capture-output -p "$CONDA_CNAME")
     else
         CONDA_RUN=(conda run --no-capture-output -n "$CONDA_CNAME")
     fi
