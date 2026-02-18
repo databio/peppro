@@ -191,6 +191,13 @@ def parse_arguments():
     return args
 
 
+def _cutadapt_report_path(outfolder, sample_name, read2):
+    """Return the path to the cutadapt report for the given sample."""
+    cutadapt_folder = os.path.join(outfolder, "cutadapt")
+    suffix = "_R2_cutadapt.txt" if read2 else "_R1_cutadapt.txt"
+    return os.path.join(cutadapt_folder, sample_name + suffix)
+
+
 def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
     """
     A helper function to build a command for adapter removal.
@@ -214,15 +221,13 @@ def _remove_adapters(args, res, tools, read2, fq_file, outfolder):
     fastp_folder = os.path.join(outfolder, "fastp")
     fastq_folder = os.path.join(outfolder, "fastq")
 
+    cutadapt_report = _cutadapt_report_path(outfolder, sname, read2)
+
     if read2:
-        cutadapt_report = os.path.join(cutadapt_folder,
-            sname + "_R2_cutadapt.txt")
         noadap_fastq = os.path.join(fastq_folder, sname + "_R2_noadap.fastq")
         short_fastq = os.path.join(fastq_folder, sname + "_R2_short.fastq")
         fastp_pfx = os.path.join(fastp_folder, sname + "_R2_fastp_adapter")
     else:
-        cutadapt_report = os.path.join(cutadapt_folder,
-            sname + "_R1_cutadapt.txt")
         noadap_fastq = os.path.join(fastq_folder, sname + "_R1_noadap.fastq")
         short_fastq = os.path.join(fastq_folder, sname + "_R1_short.fastq")
         fastp_pfx = os.path.join(fastp_folder, sname + "_R1_fastp_adapter")
@@ -1076,14 +1081,7 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
     processed_fastq = os.path.join(fastq_folder, sname + "_R1_processed.fastq")
 
     if args.adapter == "cutadapt":
-        cutadapt_folder = os.path.join(outfolder, "cutadapt")
-        if read2:
-            cutadapt_report = os.path.join(cutadapt_folder,
-                                         sname + "_R2_cutadapt.txt")
-        else:
-            cutadapt_report = os.path.join(cutadapt_folder,
-                                           sname + "_R1_cutadapt.txt")
-        adapter_report = cutadapt_report
+        adapter_report = _cutadapt_report_path(outfolder, sname, read2)
     else:
         adapter_report = os.path.join(fastqc_folder,
                                       sname + "_R1_rmAdapter.txt")
@@ -2206,8 +2204,8 @@ def main():
     unmap_fq2_dups = out_fastq_pre + '_unmap_dups_R2.fq'
 
     cutadapt_folder = os.path.join(outfolder, "cutadapt")
-    cutadapt_report = os.path.join(cutadapt_folder,
-                                   args.sample_name + "_R1_cutadapt.txt")
+    # SE-only degradation analysis uses R1 report; PE degradation is handled earlier
+    cutadapt_report = _cutadapt_report_path(outfolder, args.sample_name, False)
 
     processed_target_R1 = os.path.join(fastq_folder, "processed_R1.flag")
     processed_target_R2 = os.path.join(fastq_folder, "processed_R2.flag")
