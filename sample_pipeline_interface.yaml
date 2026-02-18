@@ -41,11 +41,12 @@ sample_interface:
     {% if sample.no_fifo is defined %} --noFIFO {% endif %}
     {% if sample.complexity is defined %} --no-complexity {% endif %}
     {% if sample.prioritize is defined %} --prioritize {% endif %}
+    {% if sample.config_file is defined %} -C {sample.config_file} {% endif %}
     --pipestat-config {pipestat.config_file}
 
 compute:
   conda_env: peppro
-  bulker_crate: databio/peppro:1.0.1
+  bulker_crate: databio/peppro:1.0.11
   size_dependent_variables: resources.tsv
 
 var_templates:
