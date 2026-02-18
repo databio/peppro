@@ -12,7 +12,7 @@ sample_interface:
     -P {compute.cores}
     -M {compute.mem}
     {% if sample.read2 is defined %} --input2 {sample.read2} {% endif %}
-    {% if sample.protocol is defined %} --protocol {sample.protocol} {% endif %}
+    --protocol {sample.protocol}
     {% if sample.adapter is defined %} --adapter-tool {sample.adapter} {% endif %}
     {% if sample.dedup is defined %} --dedup-tool {sample.dedup} {% endif %}
     {% if sample.trimmer is defined %} --trimmer-tool {sample.trimmer} {% endif %}

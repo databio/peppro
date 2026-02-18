@@ -49,7 +49,7 @@ def parse_arguments():
 
     # Pipeline-specific arguments
     parser.add_argument("--protocol", dest="protocol",
-                        default="pro", choices=RUNON_SOURCE,
+                        default=None, choices=RUNON_SOURCE,
                         help="Run on sequencing type.")
 
     parser.add_argument("--adapter-tool", dest="adapter",
@@ -2018,6 +2018,12 @@ def main():
 
     if not _check_commands(tool_list, opt_tools):
         err_msg = "Missing required tools. See message above."
+        pm.fail_pipeline(RuntimeError(err_msg))
+
+    if args.protocol is None:
+        err_msg = ("--protocol is required. Set 'protocol' in your sample "
+                   "sheet or pass --protocol with one of: {}.".format(
+                       ", ".join(RUNON_SOURCE)))
         pm.fail_pipeline(RuntimeError(err_msg))
 
     if args.input2 and not args.paired_end:
