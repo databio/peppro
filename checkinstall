@@ -3,8 +3,8 @@
 # PEPPRO pipeline installation check
 #
 
-if [ $# -gt 0 ] ; then
-  echo "Usage: checkinstall"
+if [ $# -gt 1 ] ; then
+  echo "Usage: checkinstall [conda_env_name]"
   exit 1
 fi
 
@@ -239,9 +239,16 @@ if ! is_executable "conda"; then
     printf "\n"
     CONDA_INSTALL=1
 else
-    CONDA_CNAME="peppro"
+    if [ $# -eq 1 ]; then
+        CONDA_CNAME="$1"
+    elif [ -n "$CONDA_DEFAULT_ENV" ] && [ "$CONDA_DEFAULT_ENV" != "base" ]; then
+        CONDA_CNAME="$CONDA_DEFAULT_ENV"
+    else
+        CONDA_CNAME="peppro"
+    fi
+
     CONDA_ENVS=$(conda env list)
-    
+
     if echo "$CONDA_ENVS" | grep -q "$CONDA_CNAME"; then
         echo -e $(success "SUCCESS: Found conda environment named, $CONDA_CNAME.")
     else
@@ -249,9 +256,9 @@ else
         printf "\n"
         CONDA_INSTALL=1
     fi
-    
+
     CURR_CONDA=$(echo $CONDA_DEFAULT_ENV)
-    
+
     if ! [[ "$CURR_CONDA" == "$CONDA_CNAME" ]]; then
         conda activate $CONDA_CNAME 2>/dev/null
     fi
