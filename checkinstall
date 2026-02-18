@@ -219,7 +219,7 @@ else
     fi
 fi
 
-declare -a requiredRPackages=("argparser" "devtools" "GenomicDistributions" "GenomicDistributionsData" "R.utils" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
+declare -a requiredRPackages=("argparser" "devtools" "GenomicDistributions" "GenomicDistributionsData" "R.utils" "PEPPROr" "data.table" "pepr" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
 for package in ${requiredRPackages[@]}; do
     cmd=$(echo "Rscript -e 'library(\"$package\")'")
     packageInstalled=$(eval $cmd 2>&1)
@@ -369,7 +369,7 @@ else
         fi
     fi
 
-    declare -a requiredRPackages=("devtools" "argparser" "R.utils" "GenomicDistributions" "GenomicDistributionsData" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
+    declare -a requiredRPackages=("devtools" "argparser" "R.utils" "GenomicDistributions" "GenomicDistributionsData" "PEPPROr" "data.table" "pepr" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
     for package in ${requiredRPackages[@]}; do
         packageInstalled=$("${CONDA_RUN[@]}" Rscript -e "library('$package')" 2>&1)
         if [[ "$packageInstalled" == *Error* ]]; then
