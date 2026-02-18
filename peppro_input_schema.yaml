@@ -99,6 +99,9 @@ properties:
         prioritize:
           type: boolean
           description: "Plot cFRiF/FRiF using mutually exclusive priority ranked features based on the order of feature appearance in the feature annotation asset"
+        config_file:
+          type: string
+          description: "Path to a custom pipeline configuration file (peppro.yaml)"
       required:
         - sample_name
         - protocol
