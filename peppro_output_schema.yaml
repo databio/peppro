@@ -1,8 +1,8 @@
+pipeline_name: PEPPRO
 title: PEPPRO output schema
 description: A pipeline that uses pipestat to report sample and project level results.
 type: object
 properties:
-  pipeline_name: PEPPRO
   samples:
     type: array
     items:
