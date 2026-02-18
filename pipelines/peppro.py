@@ -1867,7 +1867,7 @@ def _add_resources(args, res, asset_dict=None):
     required_list = []
 
     # Check that bowtie2 indicies exist for specified prealignments
-    for reference in args.prealignments:
+    for reference in args.prealignment_names:
         for asset in [BT2_IDX_KEY]:
             try:
                 res[asset] = rgc.seek(reference, asset)

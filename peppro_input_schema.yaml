@@ -20,9 +20,12 @@ properties:
         genome:
           type: string
           description: "Refgenie genome registry identifier"
-        prealignments:
+        prealignment_names:
           type: ["string", "array"]
-          descrption: "Refgenie genome registry identifiers"
+          description: "Refgenie genome registry identifiers for prealignment genomes"
+        prealignment_index:
+          type: ["string", "array"]
+          description: "Prealignment genome name and bowtie2 index path pairs (e.g. rCRSd=/path/to/index)"
         read_type:
           type: string
           description: "Is this single or paired-end data?"
