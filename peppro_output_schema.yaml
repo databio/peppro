@@ -303,6 +303,7 @@ properties:
           type: string
           description: "success"
   project:
+    pipeline_name: PEPPRO_collator
     type: object
     properties:
       library_complexity_file:
