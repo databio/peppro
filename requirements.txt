@@ -1,5 +1,5 @@
 # Requires Python >=3.9,<3.14 (looper 2.x incompatible with Python 3.14+)
-setuptools>=68.0  # provides pkg_resources; no longer bundled with Python 3.12+
+setuptools>=68.0,<81 # provides pkg_resources; no longer bundled with Python 3.12+
 attmap>=0.13.0
 cutadapt>=2.9
 divvy>=0.6.0
