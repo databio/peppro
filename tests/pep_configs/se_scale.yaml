@@ -1,0 +1,17 @@
+# SE PRO-seq with --scale flag (scaled bigWig output)
+name: peppro_test_se_scale
+pep_version: 2.0.0
+sample_table: se_scale.csv
+
+sample_modifiers:
+  derive:
+    attributes: [read1]
+    sources:
+      R1: "tests/data/test_R1.fastq.gz"
+  imply:
+    - if:
+        organism: ["human"]
+      then:
+        genome: hg38
+        prealignment_names: ["human_rDNA"]
+        no_bw: "true"

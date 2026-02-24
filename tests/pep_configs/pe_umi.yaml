@@ -1,0 +1,20 @@
+# PE PRO-seq with 8-nt UMI, dedup with seqkit
+name: peppro_test_pe_umi
+pep_version: 2.0.0
+sample_table: pe_umi.csv
+
+sample_modifiers:
+  derive:
+    attributes: [read1, read2]
+    sources:
+      R1_umi: "tests/data/test_R1_umi.fastq.gz"
+      R2: "tests/data/test_R2.fastq.gz"
+  append:
+    umi_len: "8"
+  imply:
+    - if:
+        organism: ["human"]
+      then:
+        genome: hg38
+        prealignment_names: ["human_rDNA"]
+        no_bw: "true"

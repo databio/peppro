@@ -1,0 +1,10 @@
+pep_config: "../pep_configs/se_fastx.yaml"
+
+output_dir: "${HOME}/peppro_test_se_fastx"
+
+pipeline_interfaces:
+  - "../../sample_pipeline_interface.yaml"
+  - "../../project_pipeline_interface.yaml"
+
+pipestat:
+  results_file_path: "${HOME}/peppro_test_se_fastx/results_pipeline/{record_identifier}/stats.yaml"

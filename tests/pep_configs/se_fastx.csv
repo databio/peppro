@@ -1,0 +1,2 @@
+sample_name,organism,protocol,read_type,read1,trimmer
+se_fastx,human,PROSEQ,single,R1,fastx

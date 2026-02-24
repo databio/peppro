@@ -40,6 +40,7 @@ sample_interface:
     {% if sample.keep_mito is defined %} --keep-mito {% endif %}
     {% if sample.no_fifo is defined %} --noFIFO {% endif %}
     {% if sample.complexity is defined %} --no-complexity {% endif %}
+    {% if sample.no_bw is defined %} --no-bw {% endif %}
     {% if sample.prioritize is defined %} --prioritize {% endif %}
     {% if sample.config_file is defined %} -C {sample.config_file} {% endif %}
     --pipestat-config {pipestat.config_file}

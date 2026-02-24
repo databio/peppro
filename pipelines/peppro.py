@@ -173,6 +173,10 @@ def parse_arguments():
                         dest="complexity",
                         help="Disable library complexity calculation (faster).")
 
+    parser.add_argument("--no-bw", action='store_true', default=False,
+                        dest="no_bw",
+                        help="Skip bigWig signal track generation (faster, for testing).")
+
     parser.add_argument("--prioritize", action='store_true', default=False,
                         dest="prioritize",
                         help="Plot cFRiF/FRiF using mutually exclusive priority"
@@ -3906,8 +3910,10 @@ def main():
         signal_folder, args.sample_name + "_minus_exact_body_0-mer.bw")
     minus_smooth_bw = os.path.join(
         signal_folder, args.sample_name + "_minus_smooth_body_0-mer.bw")
-    
-    if not args.sob:
+
+    if args.no_bw:
+        pm.timestamp("### Skipping bigWig generation (--no-bw)")
+    elif not args.sob:
         # If not scaling we don't need to use seqOutBias to generate the
         # separate strand bigWigs; just convert the BAM's directly with 
         # bamSitesToWig.py which uses UCSC wigToBigWig

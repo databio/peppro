@@ -1,0 +1,2 @@
+sample_name,organism,protocol,read_type,read1,coverage
+se_coverage,human,PROSEQ,single,R1,true
