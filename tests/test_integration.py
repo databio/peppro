@@ -67,7 +67,9 @@ def run_looper(looper_cfg, recover=False):
     """
     cmd = ["looper", "run", "-c", looper_cfg, "-p", "local"]
     if recover:
-        cmd.append("--recover")
+        # looper 2.1+ removed --recover; pass pypiper's -R flag via --command-extra.
+        # Use --command-extra=-R (not -x -R) so argparse doesn't mistake -R for a flag.
+        cmd.append("--command-extra=-R")
     return subprocess.run(
         cmd,
         capture_output=True,
@@ -269,6 +271,10 @@ class Test_se_fastx(PepproIntegrationBase):
         assert_stats_keys(load_stats(self.sample_dir), CORE_STATS)
 
 
+@pytest.mark.skipif(
+    shutil.which("fqdedup") is None,
+    reason="fqdedup not installed",
+)
 class Test_se_fqdedup(PepproIntegrationBase):
     """SE PRO-seq with 8-nt UMI, dedup with fqdedup."""
 
