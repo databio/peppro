@@ -307,7 +307,7 @@ class Test_se_no_complexity(PepproIntegrationBase):
 
     def test_no_preseq_output(self):
         """Library complexity output should NOT be generated when skipped."""
-        preseq = glob.glob(os.path.join(self.sample_dir, "QC_hg38", "*complexity*"))
+        preseq = glob.glob(os.path.join(self.sample_dir, "QC_hg38", "*preseq*"))
         assert not preseq, "Preseq output unexpectedly generated with --no-complexity"
 
 
