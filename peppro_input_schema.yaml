@@ -79,25 +79,25 @@ properties:
           type: string
           description: "GenomeTools Tallymer read-length matched index search file (by default uses Refgenie asset)"
         sob:
-          type: boolean
+          type: ["boolean", "string"]
           description: "Use seqOutBias to generate signal tracks"
         scale:
-          type: boolean
+          type: ["boolean", "string"]
           description: "Scale signal tracks"
         coverage:
-          type: boolean
+          type: ["boolean", "string"]
           description: "Report library complexity using coverage: reads / (bases in genome / read length)"
         keep:
-          type: boolean
+          type: ["boolean", "string"]
           description: "Keep prealignment BAM files"
         noFIFO:
-          type: boolean
+          type: ["boolean", "string"]
           description: "Do NOT use named pipes during prealignments"
         complexity:
-          type: boolean
+          type: ["boolean", "string"]
           description: "Disable library complexity calculation (faster)"
         prioritize:
-          type: boolean
+          type: ["boolean", "string"]
           description: "Plot cFRiF/FRiF using mutually exclusive priority ranked features based on the order of feature appearance in the feature annotation asset"
         config_file:
           type: string
