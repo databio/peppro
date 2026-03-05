@@ -47,7 +47,7 @@ sample_interface:
 
 compute:
   conda_env: peppro
-  bulker_crate: databio/peppro:1.0.11
+  bulker_crate: databio/peppro:1.0.12
   size_dependent_variables: resources.tsv
 
 var_templates:
