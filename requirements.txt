@@ -1,4 +1,5 @@
 # Requires Python >=3.9,<3.14 (looper 2.x incompatible with Python 3.14+)
+# WARNING: pypiper's PyPI package is "piper" (NOT "pypiper", which is unrelated)
 setuptools>=68.0,<81 # provides pkg_resources; no longer bundled with Python 3.12+
 attmap>=0.13.0
 cutadapt>=2.9

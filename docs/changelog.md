@@ -1,42 +1,19 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
-## [0.11.1] -- 2026-02-17
-
-### Fixed
-
- - smoothWig.pl v2.0.0: Fix off-by-one errors in smoothing window calculation and boundary handling
- - bamSitesToWig.py v0.4.0: Fix coordinate conversion from 0-based BAM to 1-based wiggle format
-
-## [0.11.0] -- 2026-02-04
-
-### Added
-
- - Full pipestat integration for pipeline results reporting
- - Support for looper report command to generate HTML summary reports
- - Support for looper runp project-level pipeline execution
- - New pipestat-compatible JSON Schema output schema (peppro_output_schema.yaml)
+## [0.11.0] -- 2026-03-06
 
 ### Changed
 
- - Updated PipelineManager initialization to include pipestat_schema and pipestat_record_identifier parameters for native pipestat support
- - Migrated to Looper 2.0+ pipeline interface format with nested sample_interface structure
- - Updated pipeline interfaces to use Jinja2 templating with looper.piface_dir for portable paths
- - Bumped minimum dependency versions:
-   - looper>=2.0.0
-   - pipestat>=0.6.0
-   - piper>=0.14.0 (pypiper)
-   - peppy>=0.40.0
-   - Python >=3.9,<3.14
+ - Migrated to looper 2.x / pipestat stack (looper>=2.1.0, pipestat>=0.13.1, piper>=0.15.1)
+ - Native pipestat integration for results reporting
+ - Updated pipeline interfaces to looper 2.x format with Jinja2 templating
 
 ### Fixed
 
- - PEPPROr R package: Replaced deprecated optigrab dependency with custom base R argument parsing functions
- - Corrected result type definitions in output schema to match pipeline reporting (e.g., numeric types for statistics)
-
-### Removed
-
- - Removed legacy Looper 1.x pipeline interface format
+ - Off-by-one errors in smoothWig.pl smoothing window and boundary handling
+ - Coordinate conversion in bamSitesToWig.py (0-based BAM to 1-based wiggle)
+ - PEPPROr R package: replaced deprecated optigrab with base R argument parsing
 
 ## [0.10.2] -- 2022-11-30
 

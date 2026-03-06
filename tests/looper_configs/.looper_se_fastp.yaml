@@ -7,4 +7,4 @@ pipeline_interfaces:
   - "../../project_pipeline_interface.yaml"
 
 pipestat:
-  results_file_path: "${HOME}/peppro_test_se_fastp/results_pipeline/{record_identifier}/stats.yaml"
+  results_file_path: "${HOME}/peppro_test_se_fastp/results_pipeline/stats.yaml"

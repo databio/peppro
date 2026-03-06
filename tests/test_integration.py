@@ -1,20 +1,28 @@
 """
 Integration tests for PEPPRO — runs the full pipeline for each test scenario.
 
+IMPORTANT: Use the wrapper script, which activates bulker for bioinformatics tools:
+
+    bash tests/scripts/test-integration.sh
+
+Or manually activate bulker first, then run pytest:
+
+    bulker activate databio/peppro:1.1.0
+    RUN_INTEGRATION_TESTS=true pytest tests/test_integration.py -v
+    bulker deactivate
+
+NOTE: The pypiper PyPI package is "piper" (NOT "pypiper", which is unrelated).
+
 Prerequisites:
   - $REFGENIE set to a refgenie config with hg38 and human_rDNA assets
-  - All bioinformatics tools installed (cutadapt, fastp, seqtk, fastx,
-    seqkit, fqdedup, bowtie2, samtools, bedtools, fastqc, preseq, R, etc.)
+  - bulker crate databio/peppro:1.1.0 (provides samtools, bowtie2, etc.)
   - RUN_INTEGRATION_TESTS=true environment variable set
 
-Run from the repository root:
-    RUN_INTEGRATION_TESTS=true pytest tests/test_integration.py -v
-
 To run a single scenario:
-    RUN_INTEGRATION_TESTS=true pytest tests/test_integration.py -v -k se_basic
+    bash tests/scripts/test-integration.sh -k se_basic
 
 Keep output directories for debugging:
-    KEEP_TEST_OUTPUTS=true RUN_INTEGRATION_TESTS=true pytest tests/test_integration.py -v
+    bash tests/scripts/test-integration.sh --keep-test-outputs
 """
 
 import glob
@@ -37,7 +45,8 @@ KEEP_TEST_OUTPUTS = os.environ.get("KEEP_TEST_OUTPUTS", "").lower() in (
 
 pytestmark = pytest.mark.skipif(
     not INTEGRATION_ENABLED,
-    reason="Set RUN_INTEGRATION_TESTS=true to run integration tests",
+    reason="Set RUN_INTEGRATION_TESTS=true to run integration tests. "
+           "Use: bash tests/scripts/test-integration.sh (activates bulker for bio tools)",
 )
 
 # ---------------------------------------------------------------------------
@@ -79,32 +88,46 @@ def run_looper(looper_cfg, recover=False):
 
 
 def assert_pipeline_succeeded(result, sample_dir):
-    """Assert looper exited 0 and the pipeline log shows no failure."""
+    """Assert looper exited 0 and the pipeline actually completed."""
     assert result.returncode == 0, (
         f"looper exited {result.returncode}\n"
         f"STDOUT:\n{result.stdout[-3000:]}\n"
         f"STDERR:\n{result.stderr[-3000:]}"
     )
+
+    # Check that the pipeline log exists and does not indicate failure
     log = os.path.join(sample_dir, "PEPPRO_log.md")
-    if os.path.exists(log):
-        assert "Pipeline failed" not in open(log).read(), (
-            f"Pipeline log indicates failure:\n{open(log).read()[-2000:]}"
-        )
+    assert os.path.exists(log), (
+        f"Pipeline log not found at {log}\n"
+        f"STDOUT:\n{result.stdout[-3000:]}\n"
+        f"STDERR:\n{result.stderr[-3000:]}"
+    )
+    log_content = open(log).read()
+    assert "Pipeline failed" not in log_content, (
+        f"Pipeline log indicates failure:\n{log_content[-2000:]}"
+    )
+
+    # Check that looper/pipestat did not report errors in stdout/stderr
+    combined_output = result.stdout + result.stderr
+    assert "Traceback (most recent call last)" not in combined_output, (
+        f"Traceback found in looper output:\n{combined_output[-3000:]}"
+    )
 
 
-def load_stats(sample_dir):
+def load_stats(output_dir, sample_name):
     """Load pipestat stats.yaml for a completed sample run.
 
-    pipestat writes: PEPPRO.sample.<record_identifier>.<metric>
+    pipestat writes results to a single flat file:
+      <output_dir>/stats.yaml
+    with structure: PEPPRO.sample.<record_identifier>.<metric>
     Returns the flat metrics dict for the sample.
     """
-    path = os.path.join(sample_dir, "stats.yaml")
+    path = os.path.join(output_dir, "stats.yaml")
     if not os.path.exists(path):
         return {}
     with open(path) as f:
         data = yaml.safe_load(f) or {}
     # Navigate PEPPRO -> sample -> <record_identifier>
-    sample_name = os.path.basename(sample_dir)
     try:
         return data["PEPPRO"]["sample"][sample_name]
     except (KeyError, TypeError):
@@ -142,8 +165,10 @@ class PepproIntegrationBase:
     def setup_class(cls):
         cls.output_dir = scenario_output_dir(cls.SCENARIO)
         cls.sample_dir = os.path.join(cls.output_dir, cls.SAMPLE)
-        # Create output_dir before running looper so it can write the
-        # pipestat_config_PEPPRO.yaml file there before the pipeline starts.
+        # Clean any stale output from previous runs, then create fresh.
+        parent = os.path.dirname(cls.output_dir)
+        if os.path.exists(parent):
+            shutil.rmtree(parent)
         os.makedirs(cls.output_dir, exist_ok=True)
         cfg = os.path.join(LOOPER_CFG_DIR, f".looper_{cls.SCENARIO}.yaml")
         cls.result = run_looper(cfg)
@@ -170,14 +195,14 @@ class Test_se_basic(PepproIntegrationBase):
         assert_pipeline_succeeded(self.result, self.sample_dir)
 
     def test_core_outputs_exist(self):
-        assert glob.glob(os.path.join(self.sample_dir, "stats.yaml")), \
-            f"stats.yaml missing in {self.sample_dir}"
+        assert glob.glob(os.path.join(self.output_dir, "stats.yaml")), \
+            f"stats.yaml missing in {self.output_dir}"
 
     def test_core_stats_reported(self):
-        assert_stats_keys(load_stats(self.sample_dir), CORE_STATS)
+        assert_stats_keys(load_stats(self.output_dir, self.SAMPLE), CORE_STATS)
 
     def test_tss_score_reported(self):
-        assert "TSS_coding_score" in load_stats(self.sample_dir)
+        assert "TSS_coding_score" in load_stats(self.output_dir, self.SAMPLE)
 
 
 class Test_pe_basic(PepproIntegrationBase):
@@ -191,7 +216,7 @@ class Test_pe_basic(PepproIntegrationBase):
 
     def test_r2_trimmed_stats_reported(self):
         """PE-specific: Trimmed_reads_R2 and Trim_loss_rate_R2 must be present."""
-        assert_stats_keys(load_stats(self.sample_dir), ["Trimmed_reads_R2", "Trim_loss_rate_R2"])
+        assert_stats_keys(load_stats(self.output_dir, self.SAMPLE), ["Trimmed_reads_R2", "Trim_loss_rate_R2"])
 
     def test_adapter_insertion_plot(self):
         """PE-only: adapter insertion distribution PDF should be generated."""
@@ -228,7 +253,7 @@ class Test_se_umi(PepproIntegrationBase):
         assert_pipeline_succeeded(self.result, self.sample_dir)
 
     def test_duplicate_reads_reported(self):
-        assert "Duplicate_reads" in load_stats(self.sample_dir)
+        assert "Duplicate_reads" in load_stats(self.output_dir, self.SAMPLE)
 
 
 class Test_pe_umi(PepproIntegrationBase):
@@ -241,7 +266,7 @@ class Test_pe_umi(PepproIntegrationBase):
         assert_pipeline_succeeded(self.result, self.sample_dir)
 
     def test_r2_trimmed_stats_reported(self):
-        assert_stats_keys(load_stats(self.sample_dir), ["Trimmed_reads_R2", "Duplicate_reads"])
+        assert_stats_keys(load_stats(self.output_dir, self.SAMPLE), ["Trimmed_reads_R2", "Duplicate_reads"])
 
 
 class Test_se_fastp(PepproIntegrationBase):
@@ -268,7 +293,7 @@ class Test_se_fastx(PepproIntegrationBase):
         assert_pipeline_succeeded(self.result, self.sample_dir)
 
     def test_core_stats_reported(self):
-        assert_stats_keys(load_stats(self.sample_dir), CORE_STATS)
+        assert_stats_keys(load_stats(self.output_dir, self.SAMPLE), CORE_STATS)
 
 
 @pytest.mark.skipif(
@@ -285,7 +310,7 @@ class Test_se_fqdedup(PepproIntegrationBase):
         assert_pipeline_succeeded(self.result, self.sample_dir)
 
     def test_duplicate_reads_reported(self):
-        assert "Duplicate_reads" in load_stats(self.sample_dir)
+        assert "Duplicate_reads" in load_stats(self.output_dir, self.SAMPLE)
 
 
 class Test_se_scale(PepproIntegrationBase):
@@ -299,7 +324,7 @@ class Test_se_scale(PepproIntegrationBase):
 
     def test_scale_stats_reported(self):
         """--scale passes through to bamSitesToWig; verify pipeline completes and reports stats."""
-        assert_stats_keys(load_stats(self.sample_dir), CORE_STATS)
+        assert_stats_keys(load_stats(self.output_dir, self.SAMPLE), CORE_STATS)
 
 
 class Test_se_no_complexity(PepproIntegrationBase):
@@ -327,7 +352,7 @@ class Test_se_nofifo(PepproIntegrationBase):
         assert_pipeline_succeeded(self.result, self.sample_dir)
 
     def test_core_stats_reported(self):
-        assert_stats_keys(load_stats(self.sample_dir), CORE_STATS)
+        assert_stats_keys(load_stats(self.output_dir, self.SAMPLE), CORE_STATS)
 
 
 class Test_se_coverage(PepproIntegrationBase):
@@ -340,7 +365,7 @@ class Test_se_coverage(PepproIntegrationBase):
         assert_pipeline_succeeded(self.result, self.sample_dir)
 
     def test_core_stats_reported(self):
-        assert_stats_keys(load_stats(self.sample_dir), CORE_STATS)
+        assert_stats_keys(load_stats(self.output_dir, self.SAMPLE), CORE_STATS)
 
 
 # ===========================================================================
@@ -363,6 +388,8 @@ class Test_recovery:
 
     @classmethod
     def setup_class(cls):
+        if os.path.exists(cls.OUTPUT_DIR):
+            shutil.rmtree(cls.OUTPUT_DIR)
         os.makedirs(cls.OUTPUT_DIR, exist_ok=True)
         cls.sample_dir = os.path.join(cls.OUTPUT_DIR, "results_pipeline", cls.SAMPLE)
 

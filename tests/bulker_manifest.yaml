@@ -1,12 +1,13 @@
 manifest:
   name: peppro
-  version: 1.0.12
+  version: 1.1.0
   imports:
   - bulker/alpine:default
   - bulker/coreutils:default
   host_commands:
   - python3
   - perl
+  - fqdedup
   commands:
   - command: bedtools
     docker_args: "-i"
@@ -18,22 +19,22 @@ manifest:
   - command: fastp
     docker_image: quay.io/biocontainers/fastp:0.23.4--hadf994f_3
   - command: fastq_pair
-    docker_image: quay.io/biocontainers/fastq-pair:1.0--h577a1d6_4
+    docker_image: quay.io/biocontainers/fastq-pair:1.0--h503566f_6
   - command: fastqc
     docker_image: quay.io/biocontainers/fastqc:0.12.1--hdfd78af_0
   - command: fastx_trimmer
     docker_image: quay.io/biocontainers/fastx_toolkit:0.0.14--he1b5a44_8
+  - command: fastx_reverse_complement
+    docker_image: quay.io/biocontainers/fastx_toolkit:0.0.14--he1b5a44_8
   - command: flash
-    docker_image: quay.io/biocontainers/flash:1.2.11--h5bf99c6_6
-  - command: fqdedup
-    docker_image: databio/fqdedup:latest
+    docker_image: databio/flashz
   - command: java
     docker_image: openjdk
     docker_args: "-i"
   - command: bigWigCat
     docker_image: quay.io/biocontainers/ucsc-bigwigcat:377--h0b8a92a_2
   - command: wigToBigWig
-    docker_image: quay.io/biocontainers/ucsc-wigtobigwig:377--h0b8a92a_3
+    docker_image: quay.io/biocontainers/ucsc-wigtobigwig:377--h0b8a92a_2
   - command: picard
     docker_image: quay.io/biocontainers/picard:2.27.5--hdfd78af_0
   - command: pigz

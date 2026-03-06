@@ -92,17 +92,23 @@ The integration tests require a machine with all PEPPRO dependencies installed a
 
 ### Running integration tests
 
-Tests run with `-p local` (divvy local compute package) so the pipeline
-executes inline on the current node rather than being submitted to a job
-scheduler. Run integration tests from a compute node or interactive session
-if your cluster policy prohibits CPU-intensive work on login nodes.
+**Important notes:**
+
+- The PyPI package for pypiper is **`piper`** (not `pypiper`, which is an unrelated package).
+- Bioinformatics tools (samtools, bowtie2, etc.) are provided via bulker. The wrapper script handles this automatically, or you can use `bulker activate` / `bulker exec` directly.
+- Tests run with `-p local` (divvy local compute package) so the pipeline executes inline rather than being submitted to a job scheduler.
 
 ```bash
-# Enable integration tests
-export RUN_INTEGRATION_TESTS=true
+# Recommended: use the wrapper script (runs pytest via bulker exec)
+bash tests/scripts/test-integration.sh
+
+# Or manually: activate bulker, then run pytest
+bulker activate databio/peppro:1.1.0
+RUN_INTEGRATION_TESTS=true pytest tests/test_integration.py -v
+bulker deactivate
 
 # Run a specific scenario
-pytest tests/test_integration.py -v -k se_basic
+bash tests/scripts/test-integration.sh -k se_basic
 
 # Via Makefile targets
 make test-se          # All SE scenarios

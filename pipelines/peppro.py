@@ -35,6 +35,14 @@ BT2_IDX_KEY = "bowtie2_index"
 DEFAULT_UMI_LEN = 0
 DEFAULT_MAX_LEN = -1
 
+def _get_stat_float(pm, stat_name, default=0.0):
+    """Read a pipeline stat and convert to float, returning default if missing."""
+    val = pm.get_stat(stat_name)
+    if val is None:
+        return default
+    return float(val)
+
+
 def parse_arguments():
     """
     Parse command-line arguments passed to the pipeline.
@@ -1229,12 +1237,8 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         flash_notCombined_fq2 = os.path.join(outfolder,
             args.sample_name + ".notCombined_2.fastq.gz")
 
-        tmp = float(pm.get_stat("Raw_reads"))
-        if tmp:
-            rr = float(tmp)
-        else:
-            rr = 0
-        if (rr < 1):
+        rr = _get_stat_float(pm, "Raw_reads", default=0.0)
+        if rr < 1:
             pm.fail_pipeline(RuntimeError("Raw_reads were not reported. "
                 "Check output ({})".format(param.outfolder)))
 
@@ -1370,25 +1374,23 @@ def _process_fastq(args, tools, res, read2, fq_file, outfolder):
         n_trim = float(ngstk.count_reads(trimmed_fastq, paired_end))
         pm.report_result("Trimmed_reads_R1", int(n_trim))
 
-        try:
-            rr = float(pm.get_stat("Raw_reads"))
-        except:
-            print("Can't calculate trim loss rate without raw read result.")
-        else:
+        rr = _get_stat_float(pm, "Raw_reads", default=0.0)
+        if rr > 0:
             pm.report_result("Trim_loss_rate_R1",
                              round((rr - n_trim) * 100 / rr, 2))
+        else:
+            print("Can't calculate trim loss rate without raw read result.")
 
         if paired_end and trimmed_fastq_R2:
             n_trim = float(ngstk.count_reads(trimmed_fastq_R2, paired_end))
             pm.report_result("Trimmed_reads_R2", int(n_trim))
 
-            try:
-                rr = float(pm.get_stat("Raw_reads"))
-            except:
-                print("Can't calculate trim loss rate without raw read result.")
-            else:
+            rr = _get_stat_float(pm, "Raw_reads", default=0.0)
+            if rr > 0:
                 pm.report_result("Trim_loss_rate_R2",
                                  round((rr - n_trim) * 100 / rr, 2))
+            else:
+                print("Can't calculate trim loss rate without raw read result.")
 
         # Also run a fastqc (if installed/requested)
         if fastqc_folder:
@@ -1637,19 +1639,16 @@ def _align_with_bt2(args, tools, paired, useFIFO, unmap_fq1, unmap_fq2,
 
                 # report aligned reads
                 pm.report_result("Aligned_reads_" + assembly_identifier, ar)
-                try:
-                    # wrapped in try block in case Trimmed_reads is not reported 
-                    # in this pipeline.
-                    tr = float(pm.get_stat("Trimmed_reads_R1"))
-                except:
-                    print("Trimmed reads is not reported.")
-                else:
+                tr = _get_stat_float(pm, "Trimmed_reads_R1", default=0.0)
+                if tr > 0:
                     res_key = "Alignment_rate_" + assembly_identifier
                     if float(ar) > 0:
                         pm.report_result(res_key,
                             round(float(ar) * 100 / float(tr), 2))
                     else:
                         pm.report_result(res_key, 0)
+                else:
+                    print("Trimmed reads is not reported.")
         
         if paired:
             unmap_fq1 = out_fastq_r1
@@ -2282,12 +2281,8 @@ def main():
         r2_repair_single = os.path.join(
             fastq_folder, args.sample_name + "_R2_trimmed.fastq.single.fq")
 
-        tmp = float(pm.get_stat("Raw_reads"))
-        if tmp:
-            rr = float(tmp)
-        else:
-            rr = 0
-        if (rr < 1):
+        rr = _get_stat_float(pm, "Raw_reads", default=0.0)
+        if rr < 1:
             pm.fail_pipeline(RuntimeError("Raw_reads were not reported. Check output ({})".format(param.outfolder)))
 
         if args.adapter == "fastp" and int(args.umi_len) > 0:
@@ -2704,17 +2699,8 @@ def main():
         if args.paired_end:
             ar = float(ar)/2
 
-        tmp = pm.get_stat("Raw_reads")
-        if tmp:
-            rr = float(tmp)
-        else:
-            rr = 0
-
-        tmp = pm.get_stat("Trimmed_reads_R1")
-        if tmp:
-            tr = float(tmp)
-        else:
-            tr = 0
+        rr = _get_stat_float(pm, "Raw_reads", default=0.0)
+        tr = _get_stat_float(pm, "Trimmed_reads_R1", default=0.0)
 
         if os.path.exists(res.pre_name):
             cmd = (tools.samtools + " depth -b " +
@@ -2730,10 +2716,16 @@ def main():
         pm.report_result("QC_filtered_reads",
                          round(float(mr)) - round(float(ar)))
         pm.report_result("Aligned_reads", round(float(ar)))
-        pm.report_result("Alignment_rate", round(float(ar) * 100 /
-                         float(tr), 2))
-        pm.report_result("Total_efficiency", round(float(ar) * 100 /
-                         float(rr), 2))
+        if tr > 0:
+            pm.report_result("Alignment_rate", round(float(ar) * 100 /
+                             float(tr), 2))
+        else:
+            pm.info("Skipping Alignment_rate: Trimmed_reads_R1 is 0 or missing")
+        if rr > 0:
+            pm.report_result("Total_efficiency", round(float(ar) * 100 /
+                             float(rr), 2))
+        else:
+            pm.info("Skipping Total_efficiency: Raw_reads is 0 or missing")
         if rd and rd.strip():
             pm.report_result("Read_depth", round(float(rd), 2))
 
@@ -3775,7 +3767,7 @@ def main():
             pm.clean_add(introns_cov)
 
             # need Total Reads divided by 1M
-            ar = float(pm.get_stat("Aligned_reads"))
+            ar = _get_stat_float(pm, "Aligned_reads", default=0.0)
             scaling_factor = float(ar/1000000)
 
             exons_rpkm = os.path.join(QC_folder, args.sample_name +
@@ -3920,7 +3912,7 @@ def main():
         pm.timestamp("### Produce bigWig files")
         
         # need Total Reads divided by 1M
-        ar = float(pm.get_stat("Aligned_reads"))
+        ar = _get_stat_float(pm, "Aligned_reads", default=0.0)
         scaling_factor = float(ar/1000000)
 
         wig_cmd_callable = ngstk.check_command("wigToBigWig")

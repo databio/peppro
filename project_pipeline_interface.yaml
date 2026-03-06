@@ -13,7 +13,7 @@ project_interface:
     --pipestat-config {pipestat.config_file}
 
 compute:
-  bulker_crate: databio/peppro:1.0.12
+  bulker_crate: databio/peppro:1.1.0
   size_dependent_variables: resources.tsv
 
 bioconductor:

@@ -15,7 +15,7 @@ tools:  # absolute paths to required tools
   bigWigCat: bigWigCat
   wigToBigWig: wigToBigWig
   # for PyPiper NGTSK
-  picard: ${PICARD}
+  picard: picard
   # optional tools
   fqdedup: fqdedup
   fastx: fastx
