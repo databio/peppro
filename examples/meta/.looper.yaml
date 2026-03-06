@@ -1,0 +1,13 @@
+# Looper configuration file for PEPPRO
+# Place this file in your project directory and run: looper run
+
+pep_config: peppro_test_refgenie.yaml  # Path to your PEP config file
+
+output_dir: "peppro_test"  # Output directory for results
+
+pipeline_interfaces:
+  - ../../sample_pipeline_interface.yaml
+  - ../../project_pipeline_interface.yaml
+
+pipestat:
+  results_file_path: "peppro_test/results_pipeline/{record_identifier}/stats.yaml"

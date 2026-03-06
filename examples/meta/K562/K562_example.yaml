@@ -1,16 +1,11 @@
 # Run K562_example sample through PEPPRO
+# Use with .looper.yaml configuration file
 name: K562_example
 
 pep_version: 2.0.0
 sample_table: "K562_example.csv"
 
-looper:
-  output_dir: "$PROCESSED/pro_example/"
-  pipeline_interfaces: ["$CODE/peppro/project_pipeline_interface.yaml"]
-
 sample_modifiers:
-  append:
-    pipeline_interfaces: ["$CODE/peppro/sample_pipeline_interface.yaml"]
   derive:
     attributes: [read1, read2]
     sources:
@@ -20,4 +15,4 @@ sample_modifiers:
         organism: ["human", "Homo sapiens", "Human", "Homo_sapiens"]
       then:
         genome: hg38
-        prealignments: human_rDNA
+        prealignment_names: ["human_rDNA"]

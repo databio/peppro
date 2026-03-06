@@ -1,0 +1,2 @@
+sample_name,organism,protocol,read_type,read1,no_fifo
+se_nofifo,human,PROSEQ,single,R1,true

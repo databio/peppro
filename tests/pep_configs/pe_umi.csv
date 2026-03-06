@@ -1,0 +1,2 @@
+sample_name,organism,protocol,read_type,read1,read2
+pe_umi,human,PROSEQ,paired,R1_umi,R2

@@ -2361,7 +2361,7 @@ calcCountsTable = function(project, results_subdir) {
 #' @export
 createAssetsSummary <- function(project, output_dir, results_subdir) {
     # Convenience
-    project_name <- config(project)$name
+    project_name <- pepr::config(project)$name
     
     # Create assets_summary file
     project_samples <- pepr::sampleTable(project)$sample_name

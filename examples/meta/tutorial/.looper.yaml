@@ -1,0 +1,11 @@
+# Looper 2.0 configuration for PEPPRO tutorial
+pep_config: tutorial_refgenie.yaml  # Use tutorial.yaml for hardcoded paths
+
+output_dir: "${TUTORIAL}/processed/peppro/tutorial"
+
+pipeline_interfaces:
+  - "${TUTORIAL}/peppro/sample_pipeline_interface.yaml"
+  - "${TUTORIAL}/peppro/project_pipeline_interface.yaml"
+
+pipestat:
+  results_file_path: "${TUTORIAL}/processed/peppro/tutorial/results_pipeline/{record_identifier}/stats.yaml"

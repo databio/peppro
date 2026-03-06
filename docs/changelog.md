@@ -1,6 +1,20 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+## [0.11.0] -- 2026-03-06
+
+### Changed
+
+ - Migrated to looper 2.x / pipestat stack (looper>=2.1.0, pipestat>=0.13.1, piper>=0.15.1)
+ - Native pipestat integration for results reporting
+ - Updated pipeline interfaces to looper 2.x format with Jinja2 templating
+
+### Fixed
+
+ - Off-by-one errors in smoothWig.pl smoothing window and boundary handling
+ - Coordinate conversion in bamSitesToWig.py (0-based BAM to 1-based wiggle)
+ - PEPPROr R package: replaced deprecated optigrab with base R argument parsing
+
 ## [0.10.2] -- 2022-11-30
 
 ### Changed

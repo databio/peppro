@@ -1,0 +1,17 @@
+# SE GRO-seq protocol
+name: peppro_test_se_groseq
+pep_version: 2.0.0
+sample_table: se_groseq.csv
+
+sample_modifiers:
+  derive:
+    attributes: [read1]
+    sources:
+      R1: "tests/data/test_R1.fastq.gz"
+  imply:
+    - if:
+        organism: ["human"]
+      then:
+        genome: hg38
+        prealignment_names: ["human_rDNA"]
+        no_bw: "true"

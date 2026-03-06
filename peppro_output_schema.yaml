@@ -1,46 +1,355 @@
-description: objects produced by PEPPRO pipeline.
+pipeline_name: PEPPRO
+title: PEPPRO output schema
+description: A pipeline that uses pipestat to report sample and project level results.
+type: object
 properties:
+  pipeline_name: PEPPRO
   samples:
     type: array
     items:
       type: object
       properties:
-        cutadapt_report: 
-          path: "cutadapt/{sample_name}_cutadapt.txt"
+        File_mb:
+          type: number
+          description: "size of file"
+        Read_type:
           type: string
-          description: "Test sample property"
-        plus_bw: 
-          path: "signal_{genome}/{sample_name}_plus_body_0-mer.bw"
+          description: "read_type"
+        Genome:
           type: string
-          description: "Test sample property"
-        minus_bw: 
-          path: "signal_{genome}/{sample_name}_minus_body_0-mer.bw"
+          description: "e.g. hg38"
+        Genome_size:
+          type: number
+          description: "The number of bases in a genome"
+        Raw_reads:
           type: string
-          description: "Test sample property"
-        plus_bam: 
-          path: "aligned_{genome}/{sample_name}_plus.bam"
+          description: "raw reads"
+        Fastq_reads:
+          type: number
+          description: "fastq_reads"
+        Reads_with_adapter:
+          type: number
+          description: "Number of reads with adapter sequence"
+        Uninformative_adapter_reads:
+          type: number
+          description: "Number of reads that are adapter-adapter ligation products"
+        Pct_uninformative_adapter_reads:
+          type: number
+          description: "Percentage of reads that are adapter-adapter ligation products"
+        Trimmed_reads_R1:
+          type: number
+          description: "Number of reads that were trimmed from Read1 data"
+        Trim_loss_rate_R1:
+          type: number
+          description: "The amount of loss due to trimming of Read1 data"
+        Trimmed_reads_R2:
+          type: number
+          description: "Number of reads that were trimmed from Read2 data"
+        Trim_loss_rate_R2:
+          type: number
+          description: "The amount of loss due to trimming of Read2 data"
+        FastQC report R1:
+          title: "FastQC report R1"
+          description: "FastQC report R1"
+          type: object
+          object_type: file
+          properties:
+            path:
+              type: string
+            thumbnail_path:
+              type: ["string", "null"]
+            title:
+              type: string
+          required:
+            - path
+            - title
+        FastQC report R2:
+          title: "FastQC report R2"
+          description: "FastQC report R2"
+          type: object
+          object_type: file
+          properties:
+            path:
+              type: string
+            thumbnail_path:
+              type: ["string", "null"]
+            title:
+              type: string
+          required:
+            - path
+            - title
+        Adapter insertion distribution:
+          title: "Adapter insertion distribution"
+          description: "Adapter insertion distribution"
+          type: object
+          object_type: image
+          properties:
+            path:
+              type: string
+            thumbnail_path:
+              type: ["string", "null"]
+            title:
+              type: string
+          required:
+            - path
+            - thumbnail_path
+            - title
+        Peak_adapter_insertion_size:
+          type: number
+          description: "The most frequent adapter insertion size"
+        Degradation_ratio:
+          type: number
+          description: "Measure of the RNA integrity. Libraries with a ratio < 1 should be considered high quality"
+        Aligned_reads_human_rDNA:
+          type: number
+          description: "Number of reads aligned to the human ribosomal DNA sequence"
+        Alignment_rate_human_rDNA:
+          type: number
+          description: "Percentage of reads aligned to the human ribosomal DNA sequence"
+        Mapped_reads:
+          type: number
+          description: "The number of mapped reads"
+        Unmapped_reads:
+          type: number
+          description: "The number of unmapped reads"
+        QC_filtered_reads:
+          type: number
+          description: "QC_filtered_reads"
+        Aligned_reads:
+          type: number
+          description: "Number of reads aligned to primary genome"
+        Alignment_rate:
+          type: number
+          description: "Alignment rate to primary genome"
+        Read_depth:
+          type: number
+          description: "Libraries with at least 75% of reads unique at a sequencing depth of 10 million can be considered high quality"
+        Total_efficiency:
+          type: number
+          description: "Alignment efficiency"
+        Mitochondrial_reads:
+          type: number
+          description: "Number of reads aligned to mitochondrial sequence"
+        Maximum_read_length:
+          type: number
+          description: "The maximum length of a read"
+        NRF:
+          type: number
+          description: "NRF (Non-Redundant Fraction) measures the ratio of uniquely mapped reads to the total number of mapped reads as a quality control metric for library complexity"
+        PBC1:
+          type: number
+          description: "PBC1 (PCR Bottleneck Coefficient 1) is a quality control metric used to measure library complexity and identify potential over-amplification"
+        PBC2:
+          type: number
+          description: "PBC2 (PCR Bottleneck Coefficient 2) is a quality control metric used to evaluate the complexity of a library and estimate the extent of PCR duplication"
+        TSS enrichment:
+          title: "TSS enrichment distribution"
+          description: "TSS enrichment distribution"
+          type: object
+          object_type: image
+          properties:
+            path:
+              type: string
+            thumbnail_path:
+              type: ["string", "null"]
+            title:
+              type: string
+          required:
+            - path
+            - thumbnail_path
+            - title
+        TSS_coding_score:
+          type: number
+          description: "Assessment of run-on efficiency for the coding strand. The normalized TSS enrichment score is the ratio of the average coverage in 100-bp windows, with the numerator centered at the TSS peak summit and the denominator in the background at the edge of the 2000-bp window."
+        TSS_non-coding_score:
+          type: number
+          description: "Assessment of run-on efficiency for the non-coding strand. The normalized TSS enrichment score is the ratio of the average coverage in 100-bp windows, with the numerator centered at the TSS peak summit and the denominator in the background at the edge of the 2000-bp window."
+        Pause_index:
+          type: number
+          description: "Pause indices are calculated as the ratio of read density in the promoter proximal region versus read density in the gene body. For genes with multiple TSSs, the pause window is defined as the region +20-120 bases from each identified TSS per gene. We determine the read density at every annotated pause window per gene and identify the predominant, singular pause window as the pause window with the greatest density. This singular pause window is used to calculate and reported as the overall pause index."
+        Pause index:
+          title: "Pause index distribution"
+          description: "Pause index distribution"
+          type: object
+          object_type: image
+          properties:
+            path:
+              type: string
+            thumbnail_path:
+              type: ["string", "null"]
+            title:
+              type: string
+          required:
+            - path
+            - thumbnail_path
+            - title
+        cFRiF:
+          title: "cFRiF"
+          description: "cFRiF"
+          type: object
+          object_type: image
+          properties:
+            path:
+              type: string
+            thumbnail_path:
+              type: ["string", "null"]
+            title:
+              type: string
+          required:
+            - path
+            - thumbnail_path
+            - title
+        FRiF:
+          title: "FRiF"
+          description: "FRiF"
+          type: object
+          object_type: image
+          properties:
+            path:
+              type: string
+            thumbnail_path:
+              type: ["string", "null"]
+            title:
+              type: string
+          required:
+            - path
+            - thumbnail_path
+            - title
+        Plus_FRiP:
+          type: number
+          description: "The fraction of reads in peaks for the plus strand"
+        Minus_FRiP:
+          type: number
+          description: "The fraction of reads in peaks for the minus strand"
+        mRNA_contamination:
+          type: number
+          description: "A measure of mRNA contamination (i.e. nascent RNA purity) in the sample. Represents the exon to intron read density ratio. A nascent RNA sequencing library without polymerase pausing would have a ratio of exon density to intron density of ≈1. Because promoter-proximal pausing inflates this ratio, PEPPRO excludes the first exon from this calculation. In testing, the median exon-intron ratio is between 1.0 and 1.8 for high quality libraries."
+        mRNA contamination:
+          title: "mRNA contamination distribution"
+          description: "mRNA contamination distribution"
+          type: object
+          object_type: image
+          properties:
+            path:
+              type: string
+            thumbnail_path:
+              type: ["string", "null"]
+            title:
+              type: string
+          required:
+            - path
+            - thumbnail_path
+            - title
+        cutadapt_report:
+          type: object
+          description: "Cutadapt adapter trimming report"
+          properties:
+            path:
+              type: string
+            title:
+              type: string
+        plus_bw:
+          type: object
+          description: "Plus strand signal bigWig file"
+          properties:
+            path:
+              type: string
+            title:
+              type: string
+        minus_bw:
+          type: object
+          description: "Minus strand signal bigWig file"
+          properties:
+            path:
+              type: string
+            title:
+              type: string
+        plus_bam:
+          type: object
+          description: "Plus strand aligned BAM file"
+          properties:
+            path:
+              type: string
+            title:
+              type: string
+        minus_bam:
+          type: object
+          description: "Minus strand aligned BAM file"
+          properties:
+            path:
+              type: string
+            title:
+              type: string
+        gene_counts_bed:
+          type: object
+          description: "Gene coverage BED file"
+          properties:
+            path:
+              type: string
+            title:
+              type: string
+        pause_indicies_bed:
+          type: object
+          description: "Pause index BED file"
+          properties:
+            path:
+              type: string
+            title:
+              type: string
+        Time:
           type: string
-          description: "Test sample property"
-        minus_bam: 
-          path: "aligned_{genome}/{sample_name}_minus.bam"
+          description: "time"
+        Success:
           type: string
-          description: "Test sample property"
-        gene_counts_bed: 
-          path: "signal_{genome}/{sample_name}_gene_coverage.bed"
-          type: string
-          description: "Test sample property"
-        pause_indicies_bed: 
-          path: "QC_{genome}/{sample_name}_pause_index.bed.gz"
-          type: string
-          description: "Test sample property"
-  library_complexity_file:
-    title: "Library complexity file"
-    description: "Plots each sample's library complexity on a single plot."
-    thumbnail_path: "summary/{name}_libComplexity.png"
-    path: "summary/{name}_libComplexity.pdf"
-    type: image
-  counts_table:
-    title: "Gene counts table"
-    description: "Combines all sample gene count files into a project level gene counts table."
-    path: "summary/{name}_countData.csv"
-    type: link
+          description: "success"
+  project:
+    pipeline_name: PEPPRO_collator
+    type: object
+    properties:
+      library_complexity_file:
+        type: object
+        description: "Library complexity plot comparing all samples"
+        properties:
+          path:
+            type: string
+          title:
+            type: string
+          thumbnail_path:
+            type: string
+      counts_table:
+        type: object
+        description: "Combined gene counts table for all samples"
+        properties:
+          path:
+            type: string
+          title:
+            type: string
+      Time:
+        type: string
+        description: "time"
+      Success:
+        type: string
+        description: "success"
+$defs:
+  file:
+    type: object
+    properties:
+      path:
+        type: string
+      title:
+        type: string
+    required:
+      - path
+      - title
+  image:
+    type: object
+    properties:
+      path:
+        type: string
+      title:
+        type: string
+      thumbnail_path:
+        type: string
+    required:
+      - path
+      - title

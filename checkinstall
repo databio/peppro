@@ -3,8 +3,8 @@
 # PEPPRO pipeline installation check
 #
 
-if [ $# -gt 0 ] ; then
-  echo "Usage: checkinstall"
+if [ $# -gt 1 ] ; then
+  echo "Usage: checkinstall [conda_env_name]"
   exit 1
 fi
 
@@ -29,8 +29,12 @@ trim() {
     printf '%s' "$var"
 }
 
+CONDA_RUN=()
+
 is_executable() {
-    if [ -x "$(command -v $1)" ]; then
+    if [ "${#CONDA_RUN[@]}" -gt 0 ]; then
+        "${CONDA_RUN[@]}" which "$1" > /dev/null 2>&1
+    elif [ -x "$(command -v $1)" ]; then
         return 0
     else
         return 1
@@ -38,7 +42,7 @@ is_executable() {
 }
 
 pip_show() {
-    if pip show -q $1; then
+    if "${CONDA_RUN[@]}" pip show -q $1 2>/dev/null; then
         return 0
     else
         return 1
@@ -70,7 +74,7 @@ BASE_REQS=0
 declare -a requiredPkgs=("looper")
 
 for package in ${requiredPkgs[@]}; do
-    if ! pip_show $package; then
+    if ! pip_show $package && ! is_executable $package; then
         echo $(fail "ERROR: PEPPRO requires the Python package, $package. Try pip install $package.")
         printf "\n"
         exit 1
@@ -89,14 +93,19 @@ NATIVE_INSTALL=0
 
 # Check Python
 if ! is_executable "python"; then
-    echo $(warn "WARNING: PEPPRO requires python 3.0 or greater. Install python and checkinstall again.")
+    echo $(warn "WARNING: PEPPRO requires python >=3.9,<3.14. Install python and checkinstall again.")
     printf "\n"
     NATIVE_INSTALL=1
     BULKER_INSTALL=1
 else
-    ver=$(python -V 2>&1 | sed 's/.* \([0-9]\).\([0-9]\).*/\1\2/')
-    if [ "$ver" -lt "30" ]; then
-        echo $(warn "WARNING: PEPPRO requires python 3.0 or greater. Update python and checkinstall again.")
+    ver=$(python -V 2>&1 | sed 's/.* \([0-9]\).\([0-9]*\).*/\1\2/')
+    if [ "$ver" -lt "39" ]; then
+        echo $(warn "WARNING: PEPPRO requires python >=3.9,<3.14. Update python and checkinstall again.")
+        printf "\n"
+        NATIVE_INSTALL=1
+        BULKER_INSTALL=1
+    elif [ "$ver" -ge "314" ]; then
+        echo $(warn "WARNING: PEPPRO requires python >=3.9,<3.14. Looper 2.x is incompatible with Python 3.14+.")
         printf "\n"
         NATIVE_INSTALL=1
         BULKER_INSTALL=1
@@ -197,20 +206,20 @@ done
 
 ## Check R packages
 if ! is_executable "R"; then
-    echo $(warn "WARNING: PEPPRO requires R 3.5 or greater. Install R and checkinstall again.")
+    echo $(warn "WARNING: PEPPRO requires R 4.0 or greater. Install R and checkinstall again.")
     printf "\n"
     NATIVE_INSTALL=1
 else
     rVer=$(R --version 2>&1 | grep 'R version' | awk '{print $3}')
     rVer=$(echo "${rVer//.}")
-    if [ "$rVer" -lt "350" ]; then
-        echo $(warn "WARNING: Please update R to >=3.5 and checkinstall again.")
+    if [ "$rVer" -lt "400" ]; then
+        echo $(warn "WARNING: PEPPRO requires R 4.0 or greater. Update R and checkinstall again.")
         printf "\n"
         NATIVE_INSTALL=1
     fi
 fi
 
-declare -a requiredRPackages=("argparser" "optigrab" "devtools" "GenomicDistributions" "GenomicDistributionsData" "R.utils" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
+declare -a requiredRPackages=("argparser" "devtools" "GenomicDistributions" "GenomicDistributionsData" "R.utils" "PEPPROr" "data.table" "pepr" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
 for package in ${requiredRPackages[@]}; do
     cmd=$(echo "Rscript -e 'library(\"$package\")'")
     packageInstalled=$(eval $cmd 2>&1)
@@ -226,45 +235,46 @@ done
 ################################################################################
 echo -e "-----------------------------------------------------------"
 echo -e "Checking conda installation...                             "
+
 CONDA_INSTALL=0
 
 if ! is_executable "conda"; then
-    echo $(warn "WARNING: Install conda to use conda environments and checkinstall again.")
+    echo $(warn "WARNING: conda not installed, skipping conda check.")
     printf "\n"
     CONDA_INSTALL=1
 else
-    eval "$(conda shell.bash hook)"
-    conda activate peppro
-
-    unset PYTHONPATH
-    unset R_LIBS
-
-    # Check Python
-    if ! is_executable "python"; then
-        echo $(warn "WARNING: PEPPRO requires python 3.0 or greater. Install python and checkinstall again.")
-        printf "\n"
-        CONDA_INSTALL=1
+    if [ $# -eq 1 ]; then
+        CONDA_CNAME="$1"
+    elif [ -n "$CONDA_DEFAULT_ENV" ] && [ "$CONDA_DEFAULT_ENV" != "base" ]; then
+        CONDA_CNAME="$CONDA_DEFAULT_ENV"
     else
-        #echo "which python: $(which python)"
-        ver=$(python -V 2>&1 | sed 's/.* \([0-9]\).\([0-9]\).*/\1\2/')
-        if [ "$ver" -lt "30" ]; then
-            echo $(warn "WARNING: PEPPRO requires python 3.0 or greater. Update python and checkinstall again.")
-            printf "\n"
-            CONDA_INSTALL=1
-        fi
+        CONDA_CNAME="peppro"
     fi
 
-    # Check Python packages
-    if ! is_executable "pip"; then
-        echo $(warn "WARNING: PEPPRO requires pip. Please install pip and checkinstall again.")
+    CONDA_ENVS=$(conda env list)
+
+    if echo "$CONDA_ENVS" | grep -q "$CONDA_CNAME"; then
+        echo -e $(success "SUCCESS: Found conda environment named, $CONDA_CNAME.")
+    else
+        echo $(warn "WARNING: Could not find a conda environment named, $CONDA_CNAME. Checkinstall expects to find one, skipping conda check.")
         printf "\n"
         CONDA_INSTALL=1
     fi
 
+    CURR_CONDA=$(echo $CONDA_DEFAULT_ENV)
+
+    if [[ "$CURR_CONDA" == "$CONDA_CNAME" ]]; then
+        CONDA_RUN=()
+    elif [[ "$CONDA_CNAME" == /* ]]; then
+        CONDA_RUN=(conda run --no-capture-output -p "$CONDA_CNAME")
+    else
+        CONDA_RUN=(conda run --no-capture-output -n "$CONDA_CNAME")
+    fi
+    
     if [ -f "requirements.txt" ]; then
         REQS="requirements.txt"
     else
-        curl https://raw.githubusercontent.com/databio/peppro/master/requirements.txt --silent --output curl_requirements.txt && mv requirements.txt curl_requirements.txt
+        curl https://raw.githubusercontent.com/databio/peppro/master/requirements.txt --silent --output requirements.txt && mv requirements.txt curl_requirements.txt
         REQS="curl_requirements.txt"
     fi
 
@@ -288,10 +298,10 @@ else
             CONDA_INSTALL=1
         else
             if [ $package == "cutadapt" ]; then
-                installed=$(cutadapt --version)
+                installed=$("${CONDA_RUN[@]}" cutadapt --version)
                 installed=$(trim ${installed})
             else
-                installed=$(pip show ${package} | grep -iw 'Version' | awk -F':' '{print $2}' | tr -d '\n')
+                installed=$("${CONDA_RUN[@]}" pip show ${package} | grep -iw 'Version' | awk -F':' '{print $2}' | tr -d '\n')
                 installed=$(trim ${installed})
             fi
             IFS='.' read -r -a installed_version <<< "$installed"
@@ -346,23 +356,22 @@ else
 
     ## Check R packages
     if ! is_executable "R"; then
-        echo $(warn "WARNING: PEPPRO requires R 3.5 or greater.\n Please install R>=3.5 and checkinstall again.")
+        echo $(warn "WARNING: PEPPRO requires R 4.0 or greater.\n Please install R>=4.0 and checkinstall again.")
         printf "\n"
         exit 1
     else
-        rVer=$(R --version 2>&1 | grep 'R version' | awk '{print $3}')
+        rVer=$("${CONDA_RUN[@]}" R --version 2>&1 | grep 'R version' | awk '{print $3}')
         rVer=$(echo "${rVer//.}")
-        if [ "$rVer" -lt "350" ]; then
-            echo $(warn "WARNING: PEPPRO requires R 3.5 or greater. Update R and checkinstall again.")
+        if [ "$rVer" -lt "400" ]; then
+            echo $(warn "WARNING: PEPPRO requires R 4.0 or greater. Update R and checkinstall again.")
             printf "\n"
             CONDA_INSTALL=1
         fi
     fi
 
-    declare -a requiredRPackages=("optigrab" "devtools" "argparser" "R.utils" "GenomicDistributions" "GenomicDistributionsData" "PEPPROr" "data.table" "pepr" "gplots" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
+    declare -a requiredRPackages=("devtools" "argparser" "R.utils" "GenomicDistributions" "GenomicDistributionsData" "PEPPROr" "data.table" "pepr" "grid" "ggplot2" "scales" "IRanges" "GenomicRanges")
     for package in ${requiredRPackages[@]}; do
-        cmd=$(echo "Rscript -e 'library(\"$package\")'")
-        packageInstalled=$(eval $cmd 2>&1)
+        packageInstalled=$("${CONDA_RUN[@]}" Rscript -e "library('$package')" 2>&1)
         if [[ "$packageInstalled" == *Error* ]]; then
             echo $(warn "WARNING: Please install the R package, $package, and checkinstall again.")
             printf "\n"
@@ -372,7 +381,7 @@ else
         fi
     done
 
-    conda deactivate
+    CONDA_RUN=()
 fi
 
 ################################################################################

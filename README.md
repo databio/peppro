@@ -9,6 +9,30 @@
 
 PEPPRO is a pipeline designed to process PRO-seq (and GRO-seq) data. For more information see: http://peppro.databio.org/
 
+## Install
+
+```bash
+pip install piper pipestat looper
+```
+
+**Note:** The pypiper PyPI package is `piper` (not `pypiper`, which is an unrelated package).
+
+## Testing
+
+Unit tests need no special setup:
+
+```bash
+pytest tests/test_unit.py -v
+```
+
+Integration tests require bioinformatics tools via [bulker](https://bulker.io). Use the wrapper script:
+
+```bash
+bash tests/scripts/test-integration.sh
+```
+
+This runs `bulker exec databio/peppro:1.1.0` to provide samtools, bowtie2, bedtools, etc. Do NOT run integration tests without bulker — they will fail with missing tools.
+
 ## Docs
 
 Develop docs with:

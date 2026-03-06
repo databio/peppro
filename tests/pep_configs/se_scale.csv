@@ -1,0 +1,2 @@
+sample_name,organism,protocol,read_type,read1,scale
+se_scale,human,PROSEQ,single,R1,true

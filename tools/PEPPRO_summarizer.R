@@ -86,7 +86,7 @@ pep <- argv$config
 # Load the project
 prj <- invisible(suppressWarnings(pepr::Project(pep)))
 # Convenience
-project_name <- config(prj)$name
+project_name <- pepr::config(prj)$name
 
 # Set the output directory
 summary_dir <- suppressMessages(file.path(argv$output, "summary"))

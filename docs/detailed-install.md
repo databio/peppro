@@ -2,7 +2,7 @@
 
 This guide walks you through the minutiae of how to install each prerequisite component.  We'll presume you're installing this in a Linux environment.  If not the case, you'll need to go to each tool's respective site to find alternative installation approaches and options.
 
-You have several options for installing the software prerequisites: 1) use a container, either [a single container](run-container.md) or with a [multi-container environment manager](run-bulker.md), in which case you need only either `docker` or `singularity`; 2) [install via `conda`](run-conda.md) or 3) install all prerequisites natively. We'll install everything natively in this guide. 
+You have several options for installing the software prerequisites: 1) use a container with a [multi-container environment manager](run-bulker.md), in which case you need only either `docker` or `singularity`; 2) [install via `conda`](run-conda.md) or 3) install all prerequisites natively. We'll install everything natively in this guide. 
 
 ## 1. Install required software
 
@@ -180,7 +180,6 @@ That should do it!
  - [GenomicDistributionsData (>= v1.6.0)](https://bioconductor.org/packages/release/data/experiment/html/GenomicDistributionsData.html)
  - [GenomicRanges (>= v1.50.1)](https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html)
  - [ggplot2 (>= v3.4.0)](https://cran.r-project.org/package=ggplot2)
- - [optigrab (>= v0.9.2.1)](https://cran.r-project.org/web/packages/optigrab/index.html)
  - [pepr (>= v0.4.0)](https://cran.r-project.org/web/packages/pepr/index.html)
  - [R.utils (>= v2.12.2)](https://cran.r-project.org/web/packages/R.utils/index.html)
 
@@ -189,7 +188,6 @@ To install the needed packages, enter the following command in the pipeline fold
 Rscript -e 'install.packages("devtools")'
 Rscript -e 'install.packages("data.table")'
 Rscript -e 'install.packages("argparser")'
-Rscript -e 'install.packages("optigrab")'
 Rscript -e 'install.packages("R.utils")'
 Rscript -e 'install.packages("ggplot2")'
 Rscript -e 'install.packages("pepr")'

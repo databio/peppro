@@ -1,0 +1,81 @@
+name: Tests
+
+on:
+  push:
+    branches: [master, dev, looper-update]
+  pull_request:
+    branches: [master, dev]
+  workflow_dispatch:
+    inputs:
+      run_integration:
+        description: "Run integration tests (requires self-hosted runner)"
+        required: false
+        default: "false"
+
+jobs:
+  # --------------------------------------------------------------------------
+  # Tier 1: Unit tests — no genome data or bioinformatics tools required.
+  # Runs on every push and pull request.
+  # --------------------------------------------------------------------------
+  unit-tests:
+    name: Unit tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt pytest
+
+      - name: Run unit tests
+        run: pytest tests/test_unit.py -v --tb=short
+
+  # --------------------------------------------------------------------------
+  # Tier 2: Integration tests — full pipeline runs.
+  # Requires a self-hosted runner with genome indices and tools installed.
+  # Triggered manually via workflow_dispatch or by setting
+  # RUN_INTEGRATION_TESTS=true in the environment.
+  # --------------------------------------------------------------------------
+  integration-tests:
+    name: Integration tests (${{ matrix.scenario }})
+    if: >
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.run_integration == 'true'
+    runs-on: self-hosted
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario:
+          - se_basic
+          - pe_basic
+          - se_groseq
+          - se_umi
+          - pe_umi
+          - se_fastp
+          - se_fastx
+          - se_fqdedup
+          - se_scale
+          - se_no_complexity
+          - se_nofifo
+          - se_coverage
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt pytest
+
+      - name: Run integration test for ${{ matrix.scenario }}
+        env:
+          RUN_INTEGRATION_TESTS: "true"
+        run: >
+          pytest tests/test_integration.py -v --tb=short
+          -k "${{ matrix.scenario }}"

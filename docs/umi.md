@@ -4,7 +4,7 @@ By default, the pipeline assumes there is *not* a UMI. In other words, the param
 
 ## Specify a UMI length 
 
-There are three approaches for specifying the `umi_len` parameter for your samples.
+There are two approaches for specifying the `umi_len` parameter for your samples.
 
 ### 1: Pass the `--umi-len` parameter at the command line
 
@@ -20,19 +20,7 @@ For example:
   -O $HOME/peppro_example/
 ```
 
-### 2: Pass the `--umi-len` parameter to the pipeline using `looper`
-
-If you're running `PEPPRO` with `looper`, you can also pass any number of additional arguments to `looper` that will be automatically passed to the pipeline.  
-For example:
-```
-looper run examples/meta/peppro_test.yaml -d \
-  --package slurm \
-  --umi-len 8
-```
-
-In this case, `looper` will automatically pass the `--umi-len 8` argument to each sample in the `peppro_test.yaml` file.
-
-### 3: Specify a `--umi-len` argument in the project configuration file
+### 2: Specify a `--umi-len` argument in the project configuration file
 
 If you're using `looper` and you'd like to set the `--umi-len` for individual samples that is entirely possible with some customization to the configuration and annotation files.  For a real life example, check out the [`peppro_paper.yaml`](https://github.com/databio/ppqc/blob/master/peppro_paper.yaml) and [`peppro_paper.csv`](https://github.com/databio/ppqc/blob/master/peppro_paper.csv) project files.
 

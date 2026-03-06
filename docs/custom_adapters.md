@@ -13,3 +13,26 @@ TGGAATTCTCGGGTGCCAAGG
 >3prime
 GATCGTCGGACTGTAGAACTCTGAAC
 ```
+
+## Using a custom pipeline configuration file with looper
+
+If you want to use a custom `peppro.yaml` without modifying the original, specify the path via the `config_file` attribute in your project configuration file or sample sheet. This is passed to the pipeline as the `-C` argument.
+
+### Apply to all samples (project-wide)
+
+Add `config_file` under `sample_modifiers.append` in your project config:
+
+```yaml
+sample_modifiers:
+  append:
+    config_file: /path/to/my_peppro.yaml
+```
+
+### Apply to individual samples
+
+Add a `config_file` column to your sample sheet CSV:
+
+```
+sample_name,genome,protocol,read1,config_file
+my_sample,hg38,PRO,/path/to/reads.fq.gz,/path/to/my_peppro.yaml
+```

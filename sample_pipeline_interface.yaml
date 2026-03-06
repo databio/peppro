@@ -1,59 +1,62 @@
 pipeline_name: PEPPRO
-pipeline_type: sample
-path: pipelines/peppro.py
 input_schema: peppro_input_schema.yaml
 output_schema: peppro_output_schema.yaml
-command_template: >
-  {pipeline.path}
-  --sample-name {sample.sample_name}
-  --genome {sample.genome}
-  --input {sample.read1}
-  --single-or-paired {sample.read_type}
-  -O {looper.results_subdir}
-  -P {compute.cores}
-  -M {compute.mem}
-  {% if sample.read2 is defined %} --input2 {sample.read2} {% endif %}
-  {% if sample.protocol is defined %} --protocol {sample.protocol} {% endif %}
-  {% if sample.adapter is defined %} --adapter-tool {sample.adapter} {% endif %}
-  {% if sample.dedup is defined %} --dedup-tool {sample.dedup} {% endif %}
-  {% if sample.trimmer is defined %} --trimmer-tool {sample.trimmer} {% endif %}
-  {% if sample.umi_len is defined %} --umi-len {sample.umi_len} {% endif %}
-  {% if sample.max_len is defined %} --max-len {sample.max_len} {% endif %}
-  {% if sample.sob is defined %} --sob {% endif %}
-  {% if sample.scale is defined %} --scale {% endif %}
-  {% if sample.genome_index is defined %} --genome-index { sample.genome_index } {% elif refgenie[sample.genome].bowtie2_index is defined %} --genome-index { refgenie[sample.genome].bowtie2_index.dir } {% endif %}
-  {% if sample.chrom_sizes is defined %} --chrom-sizes { sample.chrom_sizes } {% elif refgenie[sample.genome].fasta is defined %} --chrom-sizes { refgenie[sample.genome].fasta.chrom_sizes } {% endif %} 
-  {% if sample.prealignment_index is defined %} --prealignment-index { sample.prealignment_index } {% endif %}
-  {% if sample.prealignment_names is defined %} --prealignment-index {% for p in sample.prealignment_names %} { p ~ '=' ~ refgenie[p].bowtie2_index.dir } {% endfor %} {% endif %}
-  {% if sample.TSS_name is defined %} --TSS-name { sample.TSS_name } {% elif refgenie[sample.genome].refgene_anno is defined %} --TSS-name { refgenie[sample.genome].refgene_anno.refgene_tss } {% endif %}
-  {% if sample.pi_tss is defined %} --pi-tss { sample.pi_tss } {% elif refgenie[sample.genome].ensembl_gtf is defined %} --pi-tss { refgenie[sample.genome].ensembl_gtf.ensembl_tss } {% endif %}
-  {% if sample.pi_body is defined %} --pi-body { sample.pi_body } {% elif refgenie[sample.genome].ensembl_gtf is defined %} --pi-body { refgenie[sample.genome].ensembl_gtf.ensembl_gene_body } {% endif %}
-  {% if sample.pre_name is defined %} --pre-name { sample.pre_name } {% elif refgenie[sample.genome].refgene_anno is defined %} --pre-name { refgenie[sample.genome].refgene_anno.refgene_pre_mRNA } {% endif %}
-  {% if sample.exon_name is defined %} --exon-name { sample.exon_name } {% elif refgenie[sample.genome].refgene_anno is defined %} --exon-name { refgenie[sample.genome].refgene_anno.refgene_exon } {% endif %}
-  {% if sample.intron_name is defined %} --intron-name { sample.intron_name } {% elif refgenie[sample.genome].refgene_anno is defined %} --intron-name { refgenie[sample.genome].refgene_anno.refgene_intron } {% endif %} 
-  {% if sample.anno_name is defined %} --anno-name { sample.anno_name } {% elif refgenie[sample.genome].feat_annotation is defined %} --anno-name { refgenie[sample.genome].feat_annotation.feat_annotation } {% endif %}
-  {% if sample.sob is defined %} {% if refgenie[sample.genome].tallymer_index is defined %} --search-file { refgenie[sample.genome].tallymer_index.search_file } {% endif %} {% endif %}
-  {% if sample.sob is defined %} {% if refgenie[sample.genome].fasta is defined %} --fasta { refgenie[sample.genome].fasta.fasta } {% endif %} {% endif %}
-  {% if sample.fasta is defined %} --fasta { sample.fasta } {% elif refgenie[sample.genome].fasta is defined %} --fasta { refgenie[sample.genome].fasta.fasta } {% endif %}
-  {% if sample.search_file is defined %} --search-file { sample.search_file } {% elif refgenie[sample.genome].tallymer_index is defined %} --search-file { refgenie[sample.genome].tallymer_index.search_file } {% endif %}
-  {% if sample.coverage is defined %} --coverage {% endif %}
-  {% if sample.keep is defined %} --keep {% endif %}
-  {% if sample.keep_mito is defined %} --keep-mito {% endif %}
-  {% if sample.no_fifo is defined %} --noFIFO {% endif %}
-  {% if sample.complexity is defined %} --no-complexity {% endif %}
-  {% if sample.prioritize is defined %} --prioritize {% endif %}
+sample_interface:
+  command_template: >
+    {looper.piface_dir}/pipelines/peppro.py
+    --sample-name {sample.sample_name}
+    --genome {sample.genome}
+    --input {sample.read1}
+    --single-or-paired {sample.read_type}
+    -O {looper.results_subdir}
+    -P {compute.cores}
+    -M {compute.mem}
+    {% if sample.read2 is defined %} --input2 {sample.read2} {% endif %}
+    --protocol {sample.protocol}
+    {% if sample.adapter is defined %} --adapter-tool {sample.adapter} {% endif %}
+    {% if sample.dedup is defined %} --dedup-tool {sample.dedup} {% endif %}
+    {% if sample.trimmer is defined %} --trimmer-tool {sample.trimmer} {% endif %}
+    {% if sample.umi_len is defined %} --umi-len {sample.umi_len} {% endif %}
+    {% if sample.max_len is defined %} --max-len {sample.max_len} {% endif %}
+    {% if sample.sob is defined %} --sob {% endif %}
+    {% if sample.scale is defined %} --scale {% endif %}
+    {% if sample.genome_index is defined %} --genome-index { sample.genome_index } {% elif refgenie[sample.genome].bowtie2_index is defined %} --genome-index { refgenie[sample.genome].bowtie2_index.dir } {% endif %}
+    {% if sample.chrom_sizes is defined %} --chrom-sizes { sample.chrom_sizes } {% elif refgenie[sample.genome].fasta is defined %} --chrom-sizes { refgenie[sample.genome].fasta.chrom_sizes } {% endif %}
+    {% if sample.prealignment_index is defined %} --prealignment-index { sample.prealignment_index } {% endif %}
+    {% if sample.prealignment_names is defined %} --prealignment-index {% for p in sample.prealignment_names %} { p ~ '=' ~ refgenie[p].bowtie2_index.dir } {% endfor %} {% endif %}
+    {% if sample.TSS_name is defined %} --TSS-name { sample.TSS_name } {% elif refgenie[sample.genome].refgene_anno is defined %} --TSS-name { refgenie[sample.genome].refgene_anno.refgene_tss } {% endif %}
+    {% if sample.pi_tss is defined %} --pi-tss { sample.pi_tss } {% elif refgenie[sample.genome].ensembl_gtf is defined %} --pi-tss { refgenie[sample.genome].ensembl_gtf.ensembl_tss } {% endif %}
+    {% if sample.pi_body is defined %} --pi-body { sample.pi_body } {% elif refgenie[sample.genome].ensembl_gtf is defined %} --pi-body { refgenie[sample.genome].ensembl_gtf.ensembl_gene_body } {% endif %}
+    {% if sample.pre_name is defined %} --pre-name { sample.pre_name } {% elif refgenie[sample.genome].refgene_anno is defined %} --pre-name { refgenie[sample.genome].refgene_anno.refgene_pre_mRNA } {% endif %}
+    {% if sample.exon_name is defined %} --exon-name { sample.exon_name } {% elif refgenie[sample.genome].refgene_anno is defined %} --exon-name { refgenie[sample.genome].refgene_anno.refgene_exon } {% endif %}
+    {% if sample.intron_name is defined %} --intron-name { sample.intron_name } {% elif refgenie[sample.genome].refgene_anno is defined %} --intron-name { refgenie[sample.genome].refgene_anno.refgene_intron } {% endif %}
+    {% if sample.anno_name is defined %} --anno-name { sample.anno_name } {% elif refgenie[sample.genome].feat_annotation is defined %} --anno-name { refgenie[sample.genome].feat_annotation.feat_annotation } {% endif %}
+    {% if sample.sob is defined %} {% if refgenie[sample.genome].tallymer_index is defined %} --search-file { refgenie[sample.genome].tallymer_index.search_file } {% endif %} {% endif %}
+    {% if sample.sob is defined %} {% if refgenie[sample.genome].fasta is defined %} --fasta { refgenie[sample.genome].fasta.fasta } {% endif %} {% endif %}
+    {% if sample.fasta is defined %} --fasta { sample.fasta } {% elif refgenie[sample.genome].fasta is defined %} --fasta { refgenie[sample.genome].fasta.fasta } {% endif %}
+    {% if sample.search_file is defined %} --search-file { sample.search_file } {% elif refgenie[sample.genome].tallymer_index is defined %} --search-file { refgenie[sample.genome].tallymer_index.search_file } {% endif %}
+    {% if sample.coverage is defined %} --coverage {% endif %}
+    {% if sample.keep is defined %} --keep {% endif %}
+    {% if sample.keep_mito is defined %} --keep-mito {% endif %}
+    {% if sample.no_fifo is defined %} --noFIFO {% endif %}
+    {% if sample.complexity is defined %} --no-complexity {% endif %}
+    {% if sample.no_bw is defined %} --no-bw {% endif %}
+    {% if sample.prioritize is defined %} --prioritize {% endif %}
+    {% if sample.config_file is defined %} -C {sample.config_file} {% endif %}
+    --pipestat-config {pipestat.config_file}
 
 compute:
-  singularity_image: ${SIMAGES}peppro
-  docker_image: databio/peppro
-  bulker_crate: databio/peppro:1.0.1
+  conda_env: peppro
+  bulker_crate: databio/peppro:1.1.0
   size_dependent_variables: resources.tsv
+
 var_templates:
   refgenie_config: "$REFGENIE"
+
 pre_submit:
   python_functions:
   - refgenconf.looper_refgenie_populate
+
 bioconductor:
   readFunName: readPepproGeneCounts
   readFunPath: BiocProject/readPepproGeneCounts.R
-  
